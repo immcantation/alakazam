@@ -6,18 +6,57 @@
 #' @version    0.2.0
 #' @date       2014.9.16
 
-#### Imports ####
-source_path <- dirname(sys.frame(1)$ofile)
-source(file.path(source_path, "IOCore.R"), chdir=TRUE)
-source(file.path(source_path, "SeqCore.R"), chdir=TRUE)
-
-
+#### TODO ####
 # Multifurcating tree
 #ape::multi2di
 # Read tree file into phylo object
 #ape::read.tree
 # Make/score trees with parsimony
 #phangorn::parsimony
+
+#### Imports ####
+self_path <- dirname(sys.frame(1)$ofile)
+source(file.path(self_path, "DataCore.R"), chdir=TRUE)
+source(file.path(self_path, "SeqCore.R"), chdir=TRUE)
+
+
+#### Class definitions ####
+
+#' S4 class defining a clone
+setClass("ChangeoClone", contains="data.frame",
+         slots=c(id="character", vgene="character", jgene="character", junc_len="numeric"))
+
+#### Functions ####
+
+#' Performs preprocessing of a clonal group for tree construction
+#' by masking gap positions, masking ragged ends, and removing duplicates
+#'
+#' @param     data           a data.frame containing the Change-O data for a clone
+#' @param     max_mask       the maximum number of characters to mask from the ends
+#'                           if NULL no threshold is set
+#' @param     id             the data column containing sequence identifiers
+#' @param     clone          the data column containing clone identifiers
+#' @param     seq_gap        the data column containing IMGT gapped sample sequences
+#' @param     germ_gap       the data column containing IMGT gapped germline sequences
+#' @param     text_fields    additional text annotation columns to process during collapse
+#' @param     num_fields     additional numeric annotation columns to process during collapse
+#' @return    a data.frame containing the modified clone
+prepareClone <- function(data, max_mask=NULL, id="SEQUENCE_ID", clone="CLONE", 
+                         seq_gap="SEQUENCE_GAP", germ_gap="GERMLINE_GAP_D_MASK",
+                         text_fields=NULL, num_fields=NULL) {
+    # Replace gaps with Ns
+    data[, seq_gap] <- maskSeqGaps(data[, seq_gap], outer_only=FALSE)
+    data[, germ_gap] <- maskSeqGaps(data[, germ_gap], outer_only=FALSE)
+    
+    # Mask ragged edges
+    data[, seq_gap] <- maskSeqEnds(data[, seq_gap], max_mask=max_mask, trim=FALSE)
+    data[, germ_gap] <- maskSeqEnds(data[, germ_gap], max_mask=max_mask, trim=FALSE)
+
+    unique_df <- collapseDuplicates(data, text_fields=text_fields, num_fields=num_fields)
+
+    # V, D, J genes? Junction length?  Germline as slot?
+    # Convert to dplyr and data.table?
+}
 
 
 #' Load clones from clip tab delimited file
@@ -67,14 +106,4 @@ processClipClones <- function(sample_name, sample_file) {
     
     cat(sample_name, '-> DONE', format(Sys.time(), '%Y-%m-%d %H:%M'), '\n')
     return(list(clones=dedup_df, raw=subset(clip_df, select=-c(taxa,seq))))
-}
-
-processesSequences <- function() {
-    # Replace gaps with Ns, removed ragged edges, and collapse duplicates
-    clone_df <- replace.gaps(clone_df, outer.only=F)
-    seq_masked <- maskSequenceEnds(clone_df$seq[clone_df$taxa != germline], 
-                                   max_mask=max_mask, trim=F)
-    clone_df$seq[clone_df$taxa != germline] <- seq_masked
-    unique_df <- collapseDuplicates(clone_df, text_fields=text_fields, 
-                                    num_fields=num_fields, exclude_taxa=germline)
 }

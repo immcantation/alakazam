@@ -4,7 +4,8 @@
 #' @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 #' @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 #' @version    0.2.0
-#' @date       2014.9.17
+#' @date       2014.9.18
+
 
 #### Imports ####
 require(grid)
