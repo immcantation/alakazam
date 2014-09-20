@@ -22,6 +22,9 @@ readChangeoDb <- function(file, seq_upper=TRUE) {
     # Read file
     db_df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
     
+    # Handled genotyped data
+    # ifelse("V_CALL_GENOTYPED" %in% colnames(data), "V_CALL_GENOTYPED", "V_CALL")
+    
     # Convert sequence fields to upper case
     if (seq_upper) {
         seq_columns <- c("SEQUENCE", "SEQUENCE_GAP", "JUNCTION", 
@@ -33,6 +36,18 @@ readChangeoDb <- function(file, seq_upper=TRUE) {
     }
     
     return(db_df)
+}
+
+
+#' Create temporary folder
+#'
+#' @param     prefix    a prefix name for the folder
+#' @return    the path to the temporary folder
+makeTempDir <- function(prefix) {
+    temp_path <- tempfile(paste0(prefix, "-temp-"))
+    dir.create(temp_path)
+    
+    return(temp_path)
 }
 
 

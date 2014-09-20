@@ -68,7 +68,7 @@ getNucMatrix <- function(gap=Inf) {
 #' @param     seq2       sequence as a string
 #' @param     nuc_mat    nucleotide character distance matrix
 #' @return    distance between seq1 and seq2
-getSeqDist <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
+getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
     # Convert string to character vector
     seq1 <- unlist(strsplit(seq1, ''))
     seq2 <- unlist(strsplit(seq2, ''))
@@ -137,53 +137,51 @@ maskSeqEnds <- function(sequences, max_mask=NULL, trim=FALSE) {
 
 #' Collapse duplicate sequences and fields
 #'
-#' @param   clone_df       data.frame of clone with [taxa, seq] columns;
+#' @param   data           a ChangeoClone object return by prepareClone
 #' @param   text_fields    a vector of text columns to collapse 
 #' @param   num_fields     a vector of numeric columns to collapse 
-#' @param   exclude_taxa   a vector of taxa that should not be considered duplicates
 #' @param   nuc_mat        nucleotide character distance matrix
-#' @return  modified clone_df with duplicates removed and fields collapsed
-collapseDuplicates <- function(clone_df, text_fields=NULL, num_fields=NULL, 
-                               exclude_taxa='Germline', nuc_mat=nuc.matrix(gap=0)) {
+#' @return  modified ChangeoClone object with duplicate sequences removed and fields collapsed
+collapseDuplicates <- function(data, text_fields=NULL, num_fields=NULL, 
+                               nuc_mat=getNucMatrix(gap=0)) {
+    
+    # >>> REMOVE rbind calls for speed
+    # >>> Remove or cleanup progress messages
     cat('FUNCTION> collapseDuplicates\n')
-    #clone_df <- data.frame(taxa=paste0('seq', 1:7), 
-    #                       seq=c('ATA', 'AGA', 'ANA', 'ANA', 'ATG', 'ATG', 'CCC'),
-    #                       stringsAsFactors=F)
-    total_count <- nrow(clone_df)
-    exclude_df <- subset(clone_df, taxa %in% exclude_taxa)
-    collapse_df <- subset(clone_df, !(taxa %in% exclude_taxa))
-    collapse_count <- nrow(collapse_df)
     
     # Return input if there are no sequences to collapse
-    if (collapse_count <= 1) { 
-        cat('INFO>', total_count, 'sequences total\n')
+    nseq <- nrow(data)
+    if (nseq <= 1) { 
+        cat('INFO>', nseq, 'sequences total\n')
         cat('INFO> 0 sequences collapsed\n')
         cat('INFO> 0 sequences discarded\n')
         cat('\n')
-        return(clone_df) 
+        return(data)
     }
     
     # Build distance matrix
-    d_mat <- matrix(0, collapse_count, collapse_count, 
-                    dimnames=list(collapse_df$taxa, collapse_df$taxa))
-    for (i in 1:(collapse_count - 1)) {
-        for (j in (i + 1):collapse_count) {
-            d_mat[i, j] <- d_mat[j, i] <- seq.distance(collapse_df$seq[i], collapse_df$seq[j], nuc_mat)
+    d_mat <- matrix(0, nseq, nseq, 
+                    dimnames=list(data[, "SEQUENCE_ID"], data[, "SEQUENCE_ID"]))
+    for (i in 1:(nseq - 1)) {
+        for (j in (i + 1):nseq) {
+            d_mat[i, j] <- d_mat[j, i] <- getSeqDistance(data[i, "SEQUENCE_GAP"], 
+                                                         data[j, "SEQUENCE_GAP"], 
+                                                         nuc_mat)
         }
     }
     
     # Return input if no sequences have zero distance
     if (all(d_mat[lower.tri(d_mat, diag=F)] != 0)) {
-        cat('INFO>', total_count, 'sequences total\n')
+        cat('INFO>', nseq, 'sequences total\n')
         cat('INFO> 0 sequences collapsed\n')
         cat('INFO> 0 sequences discarded\n')
         cat('\n')
-        return(clone_df)
+        return(data)
     }        
     
     # Find sequences that will cluster ambiguously
     ambig_rows <- numeric()
-    for (i in 1:collapse_count) {
+    for (i in 1:nseq) {
         idx <- which(d_mat[i, ] == 0)
         tmp_mat <- d_mat[idx, idx]
         if (any(tmp_mat != 0)) { 
@@ -193,7 +191,7 @@ collapseDuplicates <- function(clone_df, text_fields=NULL, num_fields=NULL,
     
     # Exclude ambiguous sequences from clustering
     discard_count <- length(ambig_rows)
-    discard_taxa <- rownames(d_mat)[ambig_rows]
+    discard_ids <- rownames(d_mat)[ambig_rows]
     if (discard_count > 0) {
         d_mat <- d_mat[-ambig_rows, -ambig_rows]
     }
@@ -226,18 +224,18 @@ collapseDuplicates <- function(clone_df, text_fields=NULL, num_fields=NULL,
     }
     
     # Get data.frame of unique sequences
-    unique_df <- subset(clone_df, taxa %in% uniq_taxa)
+    unique_df <- subset(data, SEQUENCE_ID %in% uniq_taxa)
     
     # Collapse duplicate sets and append entries to unique data.frame
     for (taxa in dup_taxa) {
         # Define row indices of identical sequences
-        idx <- which(clone_df$taxa %in% taxa)
-        tmp_df <- clone_df[idx[1], ]
+        idx <- which(data[, "SEQUENCE_ID"] %in% taxa)
+        tmp_df <- data[idx[1], ]
         
         if (length(idx) > 1) {
             # Define set of text fields for row
             for (f in text_fields) {
-                f_set <- na.omit(clone_df[idx, f])
+                f_set <- na.omit(data[idx, f])
                 f_set <- unlist(strsplit(f_set, '/'))
                 f_set <- sort(unique(f_set))
                 tmp_df[f] <- paste(f_set, collapse='/')
@@ -245,56 +243,32 @@ collapseDuplicates <- function(clone_df, text_fields=NULL, num_fields=NULL,
             
             # Sum numeric fields
             for (f in num_fields) {
-                f_set <- clone_df[idx, f]
+                f_set <- data[idx, f]
                 tmp_df[f] <- sum(f_set, na.rm=T)
             }
             
             #Assign sequence with least number of N characters
-            seq_set <- unique(clone_df[idx, 'seq'])
-            unambig_len <- nchar(gsub('N', '', seq_set))
-            tmp_df$seq <- seq_set[which.max(unambig_len)]
+            seq_set <- unique(data[idx, "SEQUENCE_GAP"])
+            unambig_len <- nchar(gsub("N", "", seq_set))
+            tmp_df[, "SEQUENCE_GAP"] <- seq_set[which.max(unambig_len)]
         }
         
         # Add row to unique data.frame
         unique_df <- rbind(unique_df, tmp_df)
     }
     
-    cat('INFO>', total_count, 'sequences total\n')
-    cat('INFO>', collapse_count - nrow(unique_df) - discard_count, 'sequences collapsed\n')
+    cat('INFO>', nseq, 'sequences total\n')
+    cat('INFO>', nseq - nrow(unique_df) - discard_count, 'sequences collapsed\n')
     if (discard_count > 0) {
-        cat('INFO> ', discard_count, ' sequences discarded (', paste(discard_taxa, collapse=','), ')\n', sep='')
+        cat('INFO> ', discard_count, ' sequences discarded (', paste(discard_ids, collapse=','), ')\n', sep='')
     } else {
         cat('INFO> 0 sequences discarded\n')
     }
     cat('\n')
     
-    return(rbind(exclude_df, unique_df))
+    return(unique_df)
 }
 
-
-#' Performs collapse of duplicate sequence restricted by sets of field values
-#'
-#' @param     clone_df        data.frame of clone with [taxa, seq] columns;
-#' @param     uniq_fields     a vector of columns defining uniqueness
-#' @param     text_fields     a vector of text columns to collapse 
-#' @param     num_fields      a vector of numeric columns to collapse 
-#' @param     exclude_taxa    a vector of taxa that should not be considered duplicates
-#' @param     nuc_mat         nucleotide character distance matrix
-#' @return    modified clone_df with duplicates removed
-restrictedCollapse <- function(clone_df, uniq_fields, text_fields=NULL, num_fields=NULL, 
-                               exclude_taxa='Germline', nuc_mat=getNucMatrix(gap=0)) {
-    uniq_fields <- uniq_fields[uniq_fields %in% names(clone_df)]
-    exclude_df <- subset(clone_df, taxa %in% exclude_taxa)
-    collapse_df <- subset(clone_df, !(taxa %in% exclude_taxa))
-    unique_df <- ddply(collapse_df, uniq_fields, .fun=collapseDuplicates, 
-                       text_fields=text_fields, num_fields=num_fields, 
-                       exclude_taxa=exclude_taxa, nuc_mat=nuc_mat)
-    
-    return(rbind(exclude_df, unique_df))
-}
-
-
-#### Amino acid functions ####
 
 #### Gene annotation functions ####
 
