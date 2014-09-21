@@ -40,12 +40,12 @@ setClass("ChangeoClone", contains="data.frame",
 #' Performs preprocessing of a clonal group for tree construction
 #' by masking gap positions, masking ragged ends, and removing duplicates
 #'
-#' @param     data           a data.frame containing the Change-O data for a clone
-#' @param     max_mask       the maximum number of characters to mask from the ends
-#'                           if NULL no threshold is set
-#' @param     text_fields    additional text annotation columns to process during collapse
-#' @param     num_fields     additional numeric annotation columns to process during collapse
-#' @return    a ChangeoClone object containing the modified clone
+#' @param   data         a data.frame containing the Change-O data for a clone
+#' @param   max_mask     the maximum number of characters to mask from the ends
+#'                       if NULL no threshold is set
+#' @param   text_fields  additional text annotation columns to process during collapse
+#' @param   num_fields   additional numeric annotation columns to process during collapse
+#' @return  a ChangeoClone object containing the modified clone
 prepareClone <- function(data, max_mask=NULL, text_fields=NULL, num_fields=NULL) {
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c("SEQUENCE_ID", "SEQUENCE_GAP", text_fields, num_fields)]
@@ -54,7 +54,8 @@ prepareClone <- function(data, max_mask=NULL, text_fields=NULL, num_fields=NULL)
                                             trim=FALSE)
     
     # Remove duplicates
-    tmp_df <- collapseDuplicates(tmp_df, text_fields=text_fields, num_fields=num_fields)
+    tmp_df <- collapseDuplicates(tmp_df, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
+                                 text_fields=text_fields, num_fields=num_fields)
     
     # Define return object
     clone <- new("ChangeoClone", tmp_df, 
@@ -72,9 +73,9 @@ prepareClone <- function(data, max_mask=NULL, text_fields=NULL, num_fields=NULL)
 
 #' Create PHYLIP input files in a temporary folder
 #'
-#' @param     clone    a ChangeoClone object
-#' @param     path     a directory to store the write the output files to
-#' @return    a named vector translating sequence IDs (values) to PHYLIP taxa (names)
+#' @param   clone  a ChangeoClone object
+#' @param   path   a directory to store the write the output files to
+#' @return  a named vector translating sequence IDs (names) to PHYLIP taxa (values)
 writePhylipInput <- function(clone, path) {
     # Define PHYLIP columns
     v1 <- c(sprintf('%-9s', nrow(clone)),
@@ -86,7 +87,7 @@ writePhylipInput <- function(clone, path) {
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(clone[, "SEQUENCE_ID"], taxa[-1])
+    id_map <- setNames(str_trim(v1[-(1:2)]), clone[, "SEQUENCE_ID"])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
@@ -98,9 +99,9 @@ writePhylipInput <- function(clone, path) {
 
 #' Run PHYLIP dnapars application
 #'
-#' @param     path            the temporary directory containing infile
-#' @param     dnapars_exec    the path to the dnapars executable
-#' @return    NULL
+#' @param   path          the temporary directory containing infile
+#' @param   dnapars_exec  the path to the dnapars executable
+#' @return  NULL
 runPhylip <- function(path, dnapars_exec=DNAPARS_EXEC) {
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
@@ -114,8 +115,8 @@ runPhylip <- function(path, dnapars_exec=DNAPARS_EXEC) {
 
 #' Reads in the PHYLIP outfile
 #'
-#' @param     path    the temporary folder containing the dnapars outfile
-#' @return    a character vector with each item as a line in the outfile
+#' @param   path  the temporary folder containing the dnapars outfile
+#' @return  a character vector with each item as a line in the outfile
 readPhylipOutput <- function(path) {
     phylip_out <- scan(file.path(path, "outfile"), what="character", sep="\n", 
                        blank.lines.skip=F, strip.white=F)
@@ -125,9 +126,9 @@ readPhylipOutput <- function(path) {
 
 #' Test for successful PHYLIP dnapars run by checking the outfile
 #'
-#' @param     phylip_out    a character vector returned by readPhylipOut
-#' @return    TRUE if trees built 
-#'            FALSE if no trees built
+#' @param   phylip_out  a character vector returned by readPhylipOut
+#' @return  TRUE if trees built 
+#'          FALSE if no trees built
 checkPhylipOutput <- function(phylip_out) {
     # Check for failed tree build
     result <- !(any(grepl('-1 trees in all found', phylip_out)))
@@ -138,10 +139,10 @@ checkPhylipOutput <- function(phylip_out) {
 
 #' Extracts inferred sequences from PHYLIP dnapars outfile
 #'
-#' @param     phylip_out     a character vector returned by readPhylipOutput
-#' @param     text_fields    a vector of text columns to fill with default values 
-#' @param     num_fields     a vector of numeric columns to fill with default values 
-#' @return    data.frame of inferred sequences with columns (TAXA, SEQUENCE)
+#' @param   phylip_out   a character vector returned by readPhylipOutput
+#' @param   text_fields  a vector of text columns to fill with default values 
+#' @param   num_fields   a vector of numeric columns to fill with default values 
+#' @return  data.frame of inferred sequences with columns (TAXA, SEQUENCE)
 getPhylipInferred <- function(phylip_out, text_fields=NULL, num_fields=NULL) {
     # Process dnapars output
     seq_start <- min(grep("From\\s+To\\s+Any Steps\\?\\s+State at upper node", 
@@ -173,8 +174,8 @@ getPhylipInferred <- function(phylip_out, text_fields=NULL, num_fields=NULL) {
 
 #' Extracts graph edge list from a PHYLIP dnapars outfile
 #'
-#' @param      phylip_out     a character vector returned by readPhylipOutput
-#' @returns    data.frame of edges with columns [from, to, weight]
+#' @param    phylip_out  a character vector returned by readPhylipOutput
+#' @returns  a data.frame of edges with columns (from, to, weight)
 getPhylipEdges <- function(phylip_out) {
     # Process dnapars output
     edge_start <- min(grep('between\\s+and\\s+length', phylip_out, 
@@ -189,53 +190,72 @@ getPhylipEdges <- function(phylip_out) {
 }
 
 
-#' Modify graph edges
+#' Modify edges of phylip output
 #'
-#' @param   edge.df    data.frame of edges with [from, to, weight] columns
-#' @param   node.df    data.frame of nodes with [taxa, seq] columns
-#' @param   germline   the name of the germline taxon
-#' @param   nuc.mat    nucleotide character distance matrix
-#' @return  modified edge.df
-modify.edges <- function(edge.df, node.df, germline='Germline', nuc.mat=nuc.matrix()) {
+#' @param   edges    data.frame of edges returned by getPhylipEdges
+#' @param   clone    a ChangeoClone object containg sequence data
+#' @param   nuc_mat  nucleotide character distance matrix
+#' @return  modified edges data.frame
+modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix()) {
     # Move germline to root position
-    germline.idx <- which(edge.df$to == germline)
-    edge.df[germline.idx, c('from', 'to')] <- edge.df[germline.idx, c('to', 'from')]
+    germline.idx <- which(edges$to == "GERMLINE")
+    edges[germline.idx, c('from', 'to')] <- edges[germline.idx, c('to', 'from')]
     
     # Calculate edge mutations
-    for (i in 1:nrow(edge.df)) {
-        seq1 <- node.df$seq[node.df$taxa == edge.df$from[i]]
-        seq2 <- node.df$seq[node.df$taxa == edge.df$to[i]]
-        edge.df$weight[i] <- seq.distance(seq1, seq2, nuc.mat)        
+    for (i in 1:nrow(edges)) {
+        if (edges$from[i] == "GERMLINE") {
+            seq1 <- clone@germline
+        } else {
+            seq1 <- clone[clone[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
+        }
+        seq2 <- clone[clone[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
+        edges$weight[i] <- getSeqDistance(seq1, seq2, nuc_mat)        
     }
     
     # Find rows zero weight edges with inferred parent nodes
-    remove.row <- which(edge.df$weight == 0 & 
-                            edge.df$from != germline & 
-                            grepl('^\\d+$', edge.df$from))
+    remove.row <- which(edges$weight == 0 & 
+                        edges$from != "GERMLINE" & 
+                        grepl('^\\d+$', edges$from))
     
     # Replace inferred parent nodes with child nodes when edge weight is zero
     while (length(remove.row) > 0) {
         # Remove first node with zero distance to parent
         r <- remove.row[1]
-        r.idx <- which(edge.df[c('from', 'to')] == edge.df$from[r], arr.ind=T)
-        edge.df[r.idx] <- edge.df$to[r]
+        r.idx <- which(edges[c('from', 'to')] == edges$from[r], arr.ind=T)
+        edges[r.idx] <- edges$to[r]
         
         # Recalculate edge weights for modified rows
         r.mod <- r.idx[, 1][r.idx[, 1] != r]
         for (i in r.mod) {
-            seq1 <- node.df$seq[node.df$taxa == edge.df$from[i]]
-            seq2 <- node.df$seq[node.df$taxa == edge.df$to[i]]
-            edge.df$weight[i] <- seq.distance(seq1, seq2, nuc.mat)        
+            if (edges$from[i] == "GERMLINE") {
+                seq1 <- clone@germline
+            } else {
+                seq1 <- clone[clone[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
+            }
+            seq2 <- clone[clone[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
+            edges$weight[i] <- getSeqDistance(seq1, seq2, nuc_mat)      
         }
         
         # Remove row
-        edge.df <- edge.df[-r, ]
+        edges <- edges[-r, ]
         
         # Re-determine rows to remove
-        remove.row <- which(edge.df$weight == 0 & 
-                                edge.df$from != germline & 
-                                grepl('^\\d+$', edge.df$from))         
+        remove.row <- which(edges$weight == 0 & 
+                            edges$from != "GERMLINE" & 
+                            grepl('^\\d+$', edges$from))         
     }
     
-    return(edge.df)
+    return(edges)
+}
+
+#' Convert edge data.frame and clone object to igraph graph object
+#'
+#' @param   edges    data.frame of edges returned by getPhylipEdges
+#' @param   clone    a ChangeoClone object containg sequence data
+#' @return  an igraph graph object
+convertPhylip <- function(edges, clone) {
+    # Create igraph object
+    g <- graph.data.frame(edges, directed=T)
+    V(g)$number <- match(V(g)$name, clone[, "SEQUENCE_ID"])
+    c_df <- clone[V(g)$number, ]
 }

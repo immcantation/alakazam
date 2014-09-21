@@ -61,7 +61,8 @@ makeTempDir <- function(prefix) {
 #' @return    NULL
 translateStrings <- function(strings, translation) {
     for (n in names(translation)) {
-        strings <- gsub(paste(translation[[n]], collapse='|'), n, strings)
+        rep_regex <- paste(translation[[n]], collapse='|')
+        strings <- gsub(paste0("^(", rep_regex, ")$"), n, strings)
     }
     
     return(strings)

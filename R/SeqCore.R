@@ -135,14 +135,17 @@ maskSeqEnds <- function(sequences, max_mask=NULL, trim=FALSE) {
 }
 
 
-#' Collapse duplicate sequences and fields
+#' Remove duplicate nucleotide sequences and combine annotations
 #'
-#' @param   data           a ChangeoClone object return by prepareClone
-#' @param   text_fields    a vector of text columns to collapse 
-#' @param   num_fields     a vector of numeric columns to collapse 
-#' @param   nuc_mat        nucleotide character distance matrix
+#' @param   data         a ChangeoClone object return by prepareClone
+#' @param   id           the column containing the sequence identifier 
+#' @param   seq          the column containing the nucleotide sequence
+#' @param   text_fields  a vector of textual columns to collapse 
+#' @param   num_fields   a vector of numeric columns to collapse 
+#' @param   nuc_mat      nucleotide character distance matrix
 #' @return  modified ChangeoClone object with duplicate sequences removed and fields collapsed
-collapseDuplicates <- function(data, text_fields=NULL, num_fields=NULL, 
+collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
+                               text_fields=NULL, num_fields=NULL, 
                                nuc_mat=getNucMatrix(gap=0)) {
     
     # >>> REMOVE rbind calls for speed
@@ -161,11 +164,11 @@ collapseDuplicates <- function(data, text_fields=NULL, num_fields=NULL,
     
     # Build distance matrix
     d_mat <- matrix(0, nseq, nseq, 
-                    dimnames=list(data[, "SEQUENCE_ID"], data[, "SEQUENCE_ID"]))
+                    dimnames=list(data[, id], data[, id]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
-            d_mat[i, j] <- d_mat[j, i] <- getSeqDistance(data[i, "SEQUENCE_GAP"], 
-                                                         data[j, "SEQUENCE_GAP"], 
+            d_mat[i, j] <- d_mat[j, i] <- getSeqDistance(data[i, seq], 
+                                                         data[j, seq], 
                                                          nuc_mat)
         }
     }
@@ -224,12 +227,12 @@ collapseDuplicates <- function(data, text_fields=NULL, num_fields=NULL,
     }
     
     # Get data.frame of unique sequences
-    unique_df <- subset(data, SEQUENCE_ID %in% uniq_taxa)
+    unique_df <- data[data[, id] %in% uniq_taxa, ]
     
     # Collapse duplicate sets and append entries to unique data.frame
     for (taxa in dup_taxa) {
         # Define row indices of identical sequences
-        idx <- which(data[, "SEQUENCE_ID"] %in% taxa)
+        idx <- which(data[, id] %in% taxa)
         tmp_df <- data[idx[1], ]
         
         if (length(idx) > 1) {
@@ -248,9 +251,9 @@ collapseDuplicates <- function(data, text_fields=NULL, num_fields=NULL,
             }
             
             #Assign sequence with least number of N characters
-            seq_set <- unique(data[idx, "SEQUENCE_GAP"])
+            seq_set <- unique(data[idx, seq])
             unambig_len <- nchar(gsub("N", "", seq_set))
-            tmp_df[, "SEQUENCE_GAP"] <- seq_set[which.max(unambig_len)]
+            tmp_df[, seq] <- seq_set[which.max(unambig_len)]
         }
         
         # Add row to unique data.frame
