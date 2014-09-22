@@ -137,7 +137,7 @@ maskSeqEnds <- function(sequences, max_mask=NULL, trim=FALSE) {
 
 #' Remove duplicate nucleotide sequences and combine annotations
 #'
-#' @param   data         a ChangeoClone object return by prepareClone
+#' @param   data         a data.frame containing Change-O columns
 #' @param   id           the column containing the sequence identifier 
 #' @param   seq          the column containing the nucleotide sequence
 #' @param   text_fields  a vector of textual columns to collapse 
