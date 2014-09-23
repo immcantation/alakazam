@@ -1,8 +1,8 @@
 Package: alakazam
 Title: R tools to accompany pRESTO and Change-O
 Version: 0.2
-Authors@R: "Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu> [aut,
-    cre]"
+Author: Jason Anthony Vander Heiden
+Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Description: Diversity and lineage
 Depends:
     R (>= 3.1.1)
