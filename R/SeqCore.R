@@ -1,10 +1,10 @@
-#' Common DNA, amino acid, and gene annotation operations for Alakazam
-#' 
+# Common DNA, amino acid, and gene annotation operations for Alakazam
+# 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.18
+# @date       2014.9.24
 
 
 #### Constants ####
@@ -27,33 +27,63 @@ TR_COLORS <- c("TRA"="#CBD5E8",
                "TRD"="#FDCDAC", 
                "TRG"="#E6F5C9")
 
+# Nucleotide translations
+IUPAC_DNA <- list("A"="A", 
+                  "C"="C", 
+                  "G"="G", 
+                  "T"="T",
+                  "M"=c("A","C"), 
+                  "R"=c("A","G"), 
+                  "W"=c("A","T"), 
+                  "S"=c("C","G"), 
+                  "Y"=c("C","T"), 
+                  "K"=c("G","T"), 
+                  "V"=c("A","C","G"), 
+                  "H"=c("A","C","T"), 
+                  "D"=c("A","G","T"), 
+                  "B"=c("C","G","T"),
+                  "N"=c("A","C","G","T"))
 
 #### Nucleotide functions ####
 
-#' Build nucleotide distance matrix
+#' Build a nucleotide distance matrix
 #'
-#' @param     gap    the value to assign to gap (-, .) characters
-#' @return    matrix of nucleotide character distance
+#' \code{getNucMatrix} returns a Hamming distance matrix for IUPAC ambiguous
+#' nucleotide characters with modifications for gap (-, .) and missing (?)
+#' character values.
+#' 
+#' @param    gap  the value to assign to gap (-, .) characters. 
+#' @return   A \code{matrix} of nucleotide character distances with
+#'           row and column names indicating the character pair. By default, 
+#'           distances will be either \code{O} (equivalent), 
+#'           \code{1} (non-equivalent or missing), or \code{Inf} (gap). 
+#' 
+#' @examples
+#' # Sets gap characters to Inf distance
+#' # Distinguishes gaps from an N character
+#' nuc_dist <- getNucMatrix()
+#' 
+#' # Sets gap characters to 0 distance
+#' # Makes gap characters equivalent to N characters
+#' nuc_dist <- getNucMatrix(gap=0)
+#' 
+#' @export
 getNucMatrix <- function(gap=Inf) {
-    IUPAC_DNA <- list('A'='A', 'C'='C', 'G'='G', 'T'='T',
-                      'M'=c('A','C'), 'R'=c('A','G'), 'W'=c('A','T'), 
-                      'S'=c('C','G'), 'Y'=c('C','T'), 'K'=c('G','T'), 
-                      'V'=c('A','C','G'), 'H'=c('A','C','T'), 
-                      'D'=c('A','G','T'), 'B'=c('C','G','T'),
-                      'N'=c('A','C','G','T'))
-    
-    sub.mat <- diag(18)
-    colnames(sub.mat) <- rownames(sub.mat) <- c(names(IUPAC_DNA), c('-','.','?'))
+    # Define Hamming distance matrix
+    sub_mat <- diag(18)
+    colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_DNA), c("-", ".", "?"))
     for (i in 1:length(IUPAC_DNA)) {
         for (j in i:length(IUPAC_DNA)) {
-            sub.mat[i, j] <- sub.mat[j, i] <- any(IUPAC_DNA[[i]] %in% IUPAC_DNA[[j]])
+            sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_DNA[[i]] %in% IUPAC_DNA[[j]])
         }
     }
-    sub.mat[c('.','-'), c('.','-')] <- 1 
-    sub.mat[c('.','-'), 1:15] <- 1 - gap 
-    sub.mat[1:15, c('.','-')] <- 1 - gap
     
-    return(1 - sub.mat)
+    # Add gap characters
+    sub_mat[c(".", "-"), c(".", "-")] <- 1 
+    sub_mat[c(".", "-"), 1:15] <- 1 - gap 
+    sub_mat[1:15, c(".", "-")] <- 1 - gap
+    
+    return(1 - sub_mat)
 }
 
 
@@ -88,8 +118,16 @@ maskSeqGaps <- function(sequences, outer_only=FALSE) {
         for (i in 1:length(sequences)) {
             head_match <- attr(regexpr('^[-\\.]+', sequences[i]), 'match.length')
             tail_match <- attr(regexpr('[-\\.]+$', sequences[i]), 'match.length')
-            if (head_match > 0) { sequences[i] <- gsub('^[-\\.]+', paste(rep('N', head_match), collapse=''), sequences[i]) }
-            if (tail_match > 0) { sequences[i] <- gsub('[-\\.]+$', paste(rep('N', tail_match), collapse=''), sequences[i]) }
+            if (head_match > 0) { 
+                sequences[i] <- gsub('^[-\\.]+', 
+                                     paste(rep('N', head_match), collapse=''), 
+                                     sequences[i]) 
+            }
+            if (tail_match > 0) { 
+                sequences[i] <- gsub('[-\\.]+$', 
+                                     paste(rep('N', tail_match), collapse=''), 
+                                     sequences[i]) 
+            }
         }
     } else {
         sequences <- gsub('[-\\.]', 'N', sequences)

@@ -1,18 +1,32 @@
-#' Common data structure manipulation, file input/output, and plotting functions for Alakazam
-#' 
+# Common data structure manipulation, file input/output, and plotting functions for Alakazam
+# 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.18
-
+# @date       2014.9.24
 
 #' Read a Change-O tab delimited database file
+#' 
+#' Reads a tab delimited database file created by a Change-O tool into a 
+#' a \code{data.frame}.
 #'
-#' @param     file         a tab delimited file output by Change-O
-#' @param     seq_upper    if TRUE convert sequence fields to upper case
-#'                         if FALSE do not alter sequence fields
-#' @return    a data.frame of the database file
+#' @param    file       a tab delimited database file output by a Change-O tool.
+#' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case.
+#'                      if \code{FALSE} do not alter sequence fields.
+#' @return   a \code{data.frame} of the database file
+#' 
+#' @seealso  \code{\link{read.table}}
+#' @examples
+#' \dontrun{
+#'   # Loads a database and converts sequences to uppercase characters
+#'   df <- readChangeoDb("changeo_output.tab")
+#' 
+#'   # Do not alter sequence field case
+#'   df <- readChangeoDb("changeo_output.tab", seq_upper=FALSE)
+#' }
+#' 
+#' @export
 readChangeoDb <- function(file, seq_upper=TRUE) {
     # Read file
     db_df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
@@ -34,10 +48,20 @@ readChangeoDb <- function(file, seq_upper=TRUE) {
 }
 
 
-#' Create temporary folder
+#' Create a temporary folder
 #'
-#' @param     prefix    a prefix name for the folder
-#' @return    the path to the temporary folder
+#' \code{makeTempDir} creates a randomly named temporary folder in the 
+#' system temp location.
+#' 
+#' @param    prefix  a prefix name for the folder.
+#' @return   The path to the temporary folder.
+#' 
+#' @seealso  This is just a wrapper for \code{\link{tempfile}} and 
+#'           \code{\link{dir.create}}.
+#' @examples
+#' makeTempDir("Clone50")
+#' 
+#' @export
 makeTempDir <- function(prefix) {
     temp_path <- tempfile(paste0(prefix, "-temp-"))
     dir.create(temp_path)
@@ -57,12 +81,12 @@ makeTempDir <- function(prefix) {
 #' \code{strings} value or it will not be replaced.  Values that do not have a replacement
 #' named in the \code{translation} parameter will not be modified.
 #' 
-#' @param   strings       a vector of strings to modify
-#' @param   translation   a named character vector or a list of character vectors specifying 
-#'                        the strings to replace (values) and their replacements (names)
-#' @return  a modified \code{strings} vector
+#' @param    strings      a vector of strings to modify.
+#' @param    translation  a named character vector or a list of character vectors specifying 
+#'                        the strings to replace (values) and their replacements (names).
+#' @return   A modified \code{strings} vector.
 #' 
-#' @seealso \code{\link{gsub}} for single value replacement in the base package
+#' @seealso  \code{\link{gsub}} for single value replacement in the base package.
 #' @examples
 #' # Using a vector translation
 #' strings <- LETTERS[1:5]

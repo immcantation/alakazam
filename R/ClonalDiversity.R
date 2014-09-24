@@ -1,10 +1,10 @@
-#' Clonal diversity analysis
-#' 
+# Clonal diversity analysis
+# 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.1
+# @date       2014.9.24
 
 
 #### Class definitions ####
