@@ -9,12 +9,12 @@
 #' Read a Change-O tab delimited database file
 #' 
 #' Reads a tab delimited database file created by a Change-O tool into a 
-#' a \code{data.frame}.
+#' a data.frame.
 #'
-#' @param    file       a tab delimited database file output by a Change-O tool.
-#' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case.
+#' @param    file       tab delimited database file output by a Change-O tool.
+#' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case;
 #'                      if \code{FALSE} do not alter sequence fields.
-#' @return   a \code{data.frame} of the database file
+#' @return   a data.frame of the database file
 #' 
 #' @seealso  \code{\link{read.table}}
 #' @examples
@@ -53,7 +53,7 @@ readChangeoDb <- function(file, seq_upper=TRUE) {
 #' \code{makeTempDir} creates a randomly named temporary folder in the 
 #' system temp location.
 #' 
-#' @param    prefix  a prefix name for the folder.
+#' @param    prefix  prefix name for the folder.
 #' @return   The path to the temporary folder.
 #' 
 #' @seealso  This is just a wrapper for \code{\link{tempfile}} and 
@@ -81,8 +81,8 @@ makeTempDir <- function(prefix) {
 #' \code{strings} value or it will not be replaced.  Values that do not have a replacement
 #' named in the \code{translation} parameter will not be modified.
 #' 
-#' @param    strings      a vector of strings to modify.
-#' @param    translation  a named character vector or a list of character vectors specifying 
+#' @param    strings      vector of character strings to modify.
+#' @param    translation  named character vector or a list of character vectors specifying 
 #'                        the strings to replace (values) and their replacements (names).
 #' @return   A modified \code{strings} vector.
 #' 

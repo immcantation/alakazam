@@ -16,10 +16,6 @@
 #phangorn::parsimony
 
 
-#### Constants ####
-DNAPARS_EXEC <- file.path(Sys.getenv('HOME'), 'apps', 'phylip-3.69', 'dnapars')
-
-
 #### Class definitions ####
 
 #' S4 class defining a clone
@@ -74,10 +70,15 @@ setMethod("appendRows",
 #'                       V_CALL, J_CALL, JUNCTION_GAP_LENGTH
 #' @param   max_mask     the maximum number of characters to mask from the ends
 #'                       if NULL no threshold is set
+#'                       if 0 end masking is not performed.
 #' @param   text_fields  additional text annotation columns to process during collapse
 #' @param   num_fields   additional numeric annotation columns to process during collapse
 #' @return  a ChangeoClone object containing the modified clone
-prepareClone <- function(data, max_mask=NULL, text_fields=NULL, num_fields=NULL) {
+#' 
+#' 
+#' 
+#' @export
+prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL) {
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c("SEQUENCE_ID", "SEQUENCE_GAP", text_fields, num_fields)]
     tmp_df[, "SEQUENCE_GAP"] <- maskSeqGaps(tmp_df[, "SEQUENCE_GAP"], outer_only=FALSE)
@@ -312,9 +313,13 @@ phylipToGraph <- function(edges, clone) {
 #' Make a lineage tree using the dnapars application of PHYLIP
 #'
 #' @param   clone         a ChangeoClone object
-#' @param   dnapars_exec  the path to the dnapars executable
+#' @param   dnapars_exec  the path to the PHYLIP dnapars executable
+#' @param   rm_temp       if TRUE delete the temporary directory after running PHYLIP;
+#'                        if FALSE keep the temporary directory.
 #' @return  an igraph graph object
-buildPhylipLineage <- function(clone, dnapars_exec=DNAPARS_EXEC) {
+#' 
+#' @export
+buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
     # Create temporary directory
     temp_path <- makeTempDir(paste0(clone, "-phylip"))
     
