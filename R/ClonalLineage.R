@@ -1,26 +1,29 @@
-#' Ig lineage reconstruction via maximum parsimony
-#' 
+# Ig lineage reconstruction via maximum parsimony
+# 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.23
+# @date       2014.9.25
 
 
-#### TODO ####
-# Multifurcating tree
-#ape::multi2di
-# Read tree file into phylo object
-#ape::read.tree
-# Make/score trees with parsimony
-#phangorn::parsimony
-
-
-#### Class definitions ####
+#### Classes ####
 
 #' S4 class defining a clone
 #' 
-#' .Data is the clone identifier
+#' \code{ChangeoClone} defines common fields to perform lineage recontruction
+#' from a Change-O clone.
+#' 
+#' @slot  .Data       string defining the clone identifier.
+#' @slot  id          character vector of sequence identifiers.
+#' @slot  sequence    character vector of nucleotide sequences.
+#' @slot  annotation  data.frame of annotations.
+#' @slot  v_gene      string defining the V segment gene call.
+#' @slot  v_gene      string defining the J segment gene call.
+#' @slot  junc_len    numeric junction length.
+#' 
+#' @name ChangeoClone
+#' @export
 setClass("ChangeoClone", contains="character",
          slots=c(id="character",
                  sequence="character",
@@ -30,6 +33,18 @@ setClass("ChangeoClone", contains="character",
                  j_gene="character", 
                  junc_len="numeric"))
 
+
+#### Generics ####
+
+setGeneric("appendRows", 
+           function(object, id, sequence, annotation) {
+               standardGeneric("appendRows")
+           })
+
+#### Methods ####
+
+#' @rdname ChangeoClone
+#' @export
 setMethod("[", "ChangeoClone",  
           function(x, i, j="missing", drop="missing") {
               x@id <- x@id[i]
@@ -38,11 +53,9 @@ setMethod("[", "ChangeoClone",
               x
           })
 
-setGeneric("appendRows", 
-           function(object, id, sequence, annotation) {
-               standardGeneric("appendRows")
-           })
 
+#' @rdname ChangeoClone
+#' @export
 setMethod("appendRows", 
           signature(object="ChangeoClone", 
                     id="character", 
@@ -56,26 +69,62 @@ setMethod("appendRows",
           })
 
 
+#### TODO ####
+# Multifurcating tree
+#ape::multi2di
+# Read tree file into phylo object
+#ape::read.tree
+# Make/score trees with parsimony
+#phangorn::parsimony
+
+
 #### Preprocessing functions ####
 
-#' Performs preprocessing of a clonal group for tree construction
+#' Process a clone for lineage construction
 #' 
-#' Takes a data.frame as input and masks gap positions, masks ragged ends,  
-#' remove duplicates sequences, and merges annotations associated with duplicate 
-#' sequences
+#' \code{prepChangeoClone} preprocessing a clonal group for lineage reconstruction.
+#' 
+#' Takes a data.frame with Change-O style column as input and masks gap positions, 
+#' masks ragged ends, remove duplicates sequences, and merges annotations associated 
+#' with duplicate sequences.
+#' 
+#' The clone identifier, germline sequence, V gene, J gene, and junction length are 
+#' determined from the first entry in the CLONE, GERMLINE_GAP_D_MASK, V_CALL, J_CALL, 
+#' and JUNCTION_GAP_LENGTH columns, respectively. For any given clone, each value in these
+#' columns should be identical.
 #'
-#' @param   data         a data.frame containing the Change-O data for a clone
-#'                       which must have the following columns:
-#'                       SEQUENCE_ID, SEQUENCE_GAP, CLONE, GERMLINE_GAP_D_MASK
-#'                       V_CALL, J_CALL, JUNCTION_GAP_LENGTH
-#' @param   max_mask     the maximum number of characters to mask from the ends
-#'                       if NULL no threshold is set
-#'                       if 0 end masking is not performed.
-#' @param   text_fields  additional text annotation columns to process during collapse
-#' @param   num_fields   additional numeric annotation columns to process during collapse
-#' @return  a ChangeoClone object containing the modified clone
+#' @param    data         a data.frame containing the Change-O data for a clone. 
+#'                        The data.frame must contain the following columns:
+#'                        SEQUENCE_ID, SEQUENCE_GAP, CLONE, GERMLINE_GAP_D_MASK
+#'                        V_CALL, J_CALL, JUNCTION_GAP_LENGTH.
+#' @param    max_mask     maximum number of characters to mask at the leading and trailing
+#'                        sequence ends. If \code{NULL} then the threshold is automatically
+#'                        set to the highest number of observed outer ends.  If set to 0 then
+#'                        no masking is performed.
+#' @param    text_fields  text annotation columns to process during duplicate removal.
+#' @param    num_fields   numeric annotation columns to process during duplicate removal.
+#' @return   a \code{ChangeoClone} object containing the modified clone
 #' 
+#' @seealso  Executes in order \code{\link{maskSeqGaps}}, \code{\link{maskSeqEnds}}
+#'           and \code{\link{collapseDuplicates}}. Returns a \code{\link{ChangeoClone}}.
+#' @examples
+#' # Example Change-O data.frame
+#' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+#'                  SEQUENCE_GAP=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                  V_CALL="Homsap IGKV1-39*01 F",
+#'                  J_CALL="Homsap IGKJ5*01 F",
+#'                  JUNCTION_GAP_LENGTH=2,
+#'                  GERMLINE_GAP_D_MASK="CCCCAGGG",
+#'                  CLONE=1,
+#'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
+#'                  COUNT=1:4,
+#'                  stringsAsFactors=FALSE)
 #' 
+#' # Without end masking
+#' prepChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+#'
+#' # With end masking
+#' prepChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
 #' 
 #' @export
 prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL) {
@@ -104,11 +153,11 @@ prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL
 
 #### PHYLIP functions ####
 
-#' Create PHYLIP input files in a temporary folder
-#'
-#' @param   clone  a ChangeoClone object
-#' @param   path   a directory to store the write the output files to
-#' @return  a named vector translating sequence IDs (names) to PHYLIP taxa (values)
+# Create PHYLIP input files in a temporary folder
+#
+# @param   clone  a ChangeoClone object
+# @param   path   a directory to store the write the output files to
+# @return  a named vector translating sequence IDs (names) to PHYLIP taxa (values)
 writePhylipInput <- function(clone, path) {
     # Define PHYLIP columns
     nseq <- length(clone@sequence)
@@ -131,12 +180,12 @@ writePhylipInput <- function(clone, path) {
 }
 
 
-#' Run PHYLIP dnapars application
-#'
-#' @param   path          the temporary directory containing infile
-#' @param   dnapars_exec  the path to the dnapars executable
-#' @return  NULL
-runPhylip <- function(path, dnapars_exec=DNAPARS_EXEC) {
+# Run PHYLIP dnapars application
+#
+# @param   path          the temporary directory containing infile
+# @param   dnapars_exec  the path to the dnapars executable
+# @return  NULL
+runPhylip <- function(path, dnapars_exec) {
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
@@ -147,10 +196,10 @@ runPhylip <- function(path, dnapars_exec=DNAPARS_EXEC) {
 }
 
 
-#' Reads in the PHYLIP outfile
-#'
-#' @param   path  the temporary folder containing the dnapars outfile
-#' @return  a character vector with each item as a line in the outfile
+# Reads in the PHYLIP outfile
+#
+# @param   path  the temporary folder containing the dnapars outfile
+# @return  a character vector with each item as a line in the outfile
 readPhylipOutput <- function(path) {
     phylip_out <- scan(file.path(path, "outfile"), what="character", sep="\n", 
                        blank.lines.skip=F, strip.white=F)
@@ -158,11 +207,11 @@ readPhylipOutput <- function(path) {
 }
 
 
-#' Test for successful PHYLIP dnapars run by checking the outfile
-#'
-#' @param   phylip_out  a character vector returned by readPhylipOut
-#' @return  TRUE if trees built 
-#'          FALSE if no trees built
+# Test for successful PHYLIP dnapars run by checking the outfile
+#
+# @param   phylip_out  a character vector returned by readPhylipOut
+# @return  TRUE if trees built 
+#          FALSE if no trees built
 checkPhylipOutput <- function(phylip_out) {
     # Check for failed tree build
     result <- !(any(grepl('-1 trees in all found', phylip_out)))
@@ -171,13 +220,11 @@ checkPhylipOutput <- function(phylip_out) {
 }
 
 
-#' Extracts inferred sequences from PHYLIP dnapars outfile
-#'
-#' @param   phylip_out   a character vector returned by readPhylipOutput
-#' @return  a list containing an id vector, a sequence vector and an annotation data.frame
+# Extracts inferred sequences from PHYLIP dnapars outfile
+#
+# @param   phylip_out   a character vector returned by readPhylipOutput
+# @return  a list containing an id vector, a sequence vector and an annotation data.frame
 getPhylipInferred <- function(phylip_out) {
-    # >>> REMOVE text_fields, num_fields
-    
     # Process dnapars output
     seq_start <- min(grep("From\\s+To\\s+Any Steps\\?\\s+State at upper node", 
                           phylip_out, perl=T, fixed=F))
@@ -199,10 +246,10 @@ getPhylipInferred <- function(phylip_out) {
 }
 
 
-#' Extracts graph edge list from a PHYLIP dnapars outfile
-#'
-#' @param   phylip_out  a character vector returned by readPhylipOutput
-#' @return  a data.frame of edges with columns (from, to, weight)
+# Extracts graph edge list from a PHYLIP dnapars outfile
+#
+# @param   phylip_out  a character vector returned by readPhylipOutput
+# @return  a data.frame of edges with columns (from, to, weight)
 getPhylipEdges <- function(phylip_out) {
     # Process dnapars output
     edge_start <- min(grep('between\\s+and\\s+length', phylip_out, 
@@ -217,13 +264,13 @@ getPhylipEdges <- function(phylip_out) {
 }
 
 
-#' Modify edges of phylip output
-#'
-#' @param   edges    data.frame of edges returned by getPhylipEdges
-#' @param   clone    a ChangeoClone object containg sequence data
-#' @param   nuc_mat  nucleotide character distance matrix
-#' @return  a list of modified edges data.frame and clone object
-modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix()) {
+# Modify edges of phylip output
+#
+# @param   edges    data.frame of edges returned by getPhylipEdges
+# @param   clone    a ChangeoClone object containg sequence data
+# @param   nuc_mat  nucleotide character distance matrix
+# @return  a list of modified edges data.frame and clone object
+modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix(gap=0)) {
     # Move germline to root position
     germ_idx <- which(edges$to == "Germline")
     edges[germ_idx, c('from', 'to')] <- edges[germ_idx, c('to', 'from')]
@@ -279,11 +326,11 @@ modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix()) {
     return(list(edges=edges, clone=clone))
 }
 
-#' Convert edge data.frame and clone object to igraph graph object
-#'
-#' @param   edges  data.frame of edges returned by getPhylipEdges
-#' @param   clone  a ChangeoClone object containg sequence data
-#' @return  an igraph graph object
+# Convert edge data.frame and clone object to igraph graph object
+#
+# @param   edges  data.frame of edges returned by getPhylipEdges
+# @param   clone  a ChangeoClone object containg sequence data
+# @return  an igraph graph object
 phylipToGraph <- function(edges, clone) {
     # Create igraph object
     g <- graph.data.frame(edges, directed=T)
@@ -306,17 +353,54 @@ phylipToGraph <- function(edges, clone) {
     V(g)$label <- V(g)$name
     E(g)$label <- E(g)$weight
     
+    # Add graph attributes
+    g$clone <- clone@.Data
+    g$v_gene <- clone@v_gene
+    g$j_gene <- clone@j_gene
+    g$junc_len <- clone@junc_len
+    
     return(g)
 }
 
 
-#' Make a lineage tree using the dnapars application of PHYLIP
+#' Infer an Ig lineage using PHYLIP
+#' 
+#' \code{buildPhylipLineage} reconstructs an Ig lineage using the dnapars
+#' application of the PHYLIP package.
 #'
-#' @param   clone         a ChangeoClone object
-#' @param   dnapars_exec  the path to the PHYLIP dnapars executable
-#' @param   rm_temp       if TRUE delete the temporary directory after running PHYLIP;
-#'                        if FALSE keep the temporary directory.
-#' @return  an igraph graph object
+#' @param    clone         \code{ChangeoClone} object containg clone data.
+#' @param    dnapars_exec  path to the PHYLIP dnapars executable.
+#' @param    rm_temp       if TRUE delete the temporary directory after running PHYLIP;
+#'                         if FALSE keep the temporary directory.
+#' @return   an igraph \code{graph} object
+#' 
+#' @seealso See \code{\link{igraph}} and \code{\link{igraph.plotting}} for working 
+#'          with igraph \code{graph} objects.
+#' @examples
+#' \dontrun{
+#' # Example Change-O data.frame
+#' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+#'                  SEQUENCE_GAP=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                  V_CALL="Homsap IGKV1-39*01 F",
+#'                  J_CALL="Homsap IGKJ5*01 F",
+#'                  JUNCTION_GAP_LENGTH=2,
+#'                  GERMLINE_GAP_D_MASK="CCCCAGGG",
+#'                  CLONE=1,
+#'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
+#'                  COUNT=1:4,
+#'                  stringsAsFactors=FALSE)
+#' 
+#' # Preprocess clone
+#' clone <- prepChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+#' 
+#' # Run PHYLIP and process output
+#' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
+#' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+#' 
+#' # Plot with with a tree layout
+#' ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
+#' plot(graph, layout=ly)
+#' }
 #' 
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
@@ -329,7 +413,9 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
     phylip_out <- readPhylipOutput(temp_path)
     
     # Remove temporary directory
-    unlink(temp_path, recursive=TRUE)
+    if (rm_temp) {
+        unlink(temp_path, recursive=TRUE)
+    }
     
     # Check output for trees
     if (!checkPhylipOutput(phylip_out)) {

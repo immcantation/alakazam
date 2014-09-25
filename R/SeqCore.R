@@ -4,17 +4,29 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.24
+# @date       2014.9.25
 
 
 #### Constants ####
 
 #' Default colors
+#' 
+#' Default color sets for nucleotide characters, Ig isotypes, and TCR chains.
+#' 
+#' @format  Named vectors with hexcode colors as values.
+#' \itemize{
+#'   \item \code{NUC_COLORS}  DNA character colors (A, C, G, T).
+#'   \item \code{IG_COLORS}   Ig isotype colors (IgA, IgD, IgE, IgG, IgM, IgK, IgL).
+#'   \item \code{TR_COLORS}   TCR chain colors (TRA, TRB, TRD, TRG).
+#' }
+#' 
+#' @name   NUC_COLORS
 NUC_COLORS <- c("A"="#64F73F", 
                 "C"="#FFB340", 
                 "G"="#EB413C", 
-                "T"="#3C88EE",
-                "U"="#3C88EE")
+                "T"="#3C88EE")
+
+#' @rdname NUC_COLORS
 IG_COLORS <- c("IgA"="#377EB8", 
                "IgD"="#FF7F00", 
                "IgE"="#E41A1C", 
@@ -22,12 +34,24 @@ IG_COLORS <- c("IgA"="#377EB8",
                "IgM"="#984EA3",
                "IgK"="#E5C494",
                "IgL"="#FFD92F")
+
+#' @rdname NUC_COLORS
 TR_COLORS <- c("TRA"="#CBD5E8", 
                "TRB"="#F4CAE4", 
                "TRD"="#FDCDAC", 
                "TRG"="#E6F5C9")
 
-#' IUPAC nucleotide translation list
+
+#' IUPAC ambiguous nucleotide translation
+#'
+#' A translation list for IUPAC ambiguous nucleotide characters and a corresponding vector
+#' of matching DNA characters
+#' 
+#' @format  A list with single character codes as names and values containing character 
+#'          vectors that containg the set of (A, C, G, T) characters corresponding to each 
+#'          ambiguous character.
+#' 
+#' @name    IUPAC_NUC
 IUPAC_NUC <- list("A"="A", 
                   "C"="C", 
                   "G"="G", 
@@ -43,6 +67,7 @@ IUPAC_NUC <- list("A"="A",
                   "D"=c("A","G","T"), 
                   "B"=c("C","G","T"),
                   "N"=c("A","C","G","T"))
+
 
 #### Sequence distance functions ####
 
@@ -162,8 +187,7 @@ getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
 #' @return   A modified \code{seq} vector with Ns in place of gap (-, .) characters.
 #' 
 #' @family   sequence manipulation functions
-#' @seealso  Called by \code{\link{prepLineageClone}}. 
-#'           Uses \code{\link{regex}} for replacement.
+#' @seealso  Uses \code{\link{regex}} for replacement.
 #'           
 #' @examples
 #' maskSeqGaps(c("ATG-C", "CC..C"))
@@ -212,8 +236,7 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 #' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
 #' 
 #' @family   sequence manipulation functions
-#' @seealso  Called by \code{\link{prepLineageClone}}. 
-#'           Uses \code{\link{regex}} and \code{\link{substr}} for replacement.
+#' @seealso  Uses \code{\link{regex}} and \code{\link{substr}} for replacement.
 #' @examples
 #' # Default behavior uniformly masks ragged ends
 #' seq <- c("CCCCTGGG", "NAACTGGN", "NNNCTGNN")
@@ -276,8 +299,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'           along with their annotations.
 #' 
 #' @family   sequence manipulation functions
-#' @seealso  Called by \code{\link{prepLineageClone}}. 
-#'           Distance is determined using \code{\link{getSeqDistance}} and 
+#' @seealso  Distance is determined using \code{\link{getSeqDistance}} and 
 #'           \code{\link{getNucMatrix}}.
 #' @examples
 #' # Example Change-O data.frame
