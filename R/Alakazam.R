@@ -11,6 +11,10 @@
 #' @import igraph
 #' @import plyr
 #' @import stringr
+#' @import utils
+#' @import parallel
+#' @import doMC
+#' @import shm
 NULL
 
 ### >>> Fix readChangeoDb example (include example file)

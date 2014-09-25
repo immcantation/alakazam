@@ -465,8 +465,8 @@ getAllele <- function(segment_call, first=TRUE) {
     if (first) {
         r <- stringr::str_extract(segment_call, stringr::perl(allele_regex))
     } else {
-        r <- stringr::str_extract_all(segment_call, stringr::perl(allele_regex))
-        r <- sapply(r, function(x) paste(sort(x), collapse=','))
+        r <-stringr::str_extract_all(segment_call, stringr::perl(allele_regex))
+        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
     }
     
     return(r)
@@ -481,7 +481,7 @@ getGene <- function(segment_call, first=TRUE) {
         r <- stringr::str_extract(segment_call, stringr::perl(gene_regex))
     } else {
         r <- stringr::str_extract_all(segment_call, stringr::perl(gene_regex))
-        r <- sapply(r, function(x) paste(sort(x), collapse=','))
+        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
     }
     
     return(r)
@@ -497,7 +497,7 @@ getFamily <- function(segment_call, first=TRUE) {
         r <- stringr::str_extract(segment_call, stringr::perl(family_regex))
     } else {
         r <- stringr::str_extract_all(segment_call, stringr::perl(family_regex))
-        r <- sapply(r, function(x) paste(sort(x), collapse=','))
+        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
     }
     
     return(r)
