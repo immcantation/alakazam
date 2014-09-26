@@ -101,7 +101,6 @@ getDistanceToClosest <- function(arrJunctions){
 #' @param   first       if TRUE only the first call the gene assignment is used;
 #'                      if FALSE the union of ambiguous gene assignments is used to group all sequences with any of those gene calls.
 #' @param   model       SHM targeting model, one of c('HS5F','MTri'); see Details.
-#' @param   ncores       Number of cores to use for parallelization
 #' 
 #' @return  \code{data.frame} with DIST_NEAREST column added
 #' 
@@ -111,13 +110,11 @@ getDistanceToClosest <- function(arrJunctions){
 #' df <- readChangeoDb(file)
 #' 
 #' # Calculate distance to nearest
-#' df <- distToNearest(df, genotyped=TRUE, first=FALSE, ncores=1)
+#' df <- distToNearest(df, genotyped=TRUE, first=FALSE)
 #' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,0.02))
 #' 
 #' @export
-distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F', ncore=detectCores()) {
-  registerDoMC(cores=ncores)
-  
+distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F') {  
 	if(!is.data.frame(db))
 		stop('Must submit a data frame')
 	
@@ -164,8 +161,8 @@ distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F', ncore=d
 	db[,"ROW_ID"] <- 1:nrow(db)
 	
 	# cat("Calculating distance to nearest neighbor\n")
-	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), mutate,
-                       DIST_NEAREST=getDistanceToClosest(JUNCTION), .parallel=TRUE), 
+	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), mutate, 
+                       DIST_NEAREST=getDistanceToClosest(JUNCTION)), 
                  ROW_ID)
 	
 	db <- db[,!(names(db) %in% c("V","J","ROW_ID"))]

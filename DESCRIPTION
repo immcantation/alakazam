@@ -1,7 +1,7 @@
 Package: alakazam
 Title: R tools to accompany pRESTO and Change-O
 Version: 0.2.0
-Author: Jason Anthony Vander Heiden, Namita Gupta
+Author: Jason Anthony Vander Heiden, Namita Gupta, Mohamed Uduman
 Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Description: Diversity calculation, lineage inferrence, and distance-to-nearest
     components of the Change-O pipeline.
@@ -10,10 +10,8 @@ Depends:
 License: CC BY-NC-SA 3.0
 LazyData: true
 Imports:
-    doMC,
     ggplot2,
     igraph,
-    parallel,
     plyr,
     scales,
     shm,
