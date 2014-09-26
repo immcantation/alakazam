@@ -6,12 +6,11 @@
 # @date       2014.09.24
 
 
-#' Get S5F distance between two sequences of same length broken down into fivemers
-#'
-#' @param   seq1   the first nucleotide sequence
-#' @param   seq2   the second nucleotide sequence
-#' 
-#' @return  distance between two sequences based on S5F model
+# Get S5F distance between two sequences of same length broken down into fivemers
+#
+# @param   seq1   the first nucleotide sequence
+# @param   seq2   the second nucleotide sequence
+# @return  distance between two sequences based on S5F model
 #' @export
 dist_seq_fast<-function(seq1,seq2){  
   #Compute distance only on fivemers that have mutations
@@ -36,10 +35,9 @@ dist_seq_fast<-function(seq1,seq2){
 }
 
 
-# Given an array of junction sequenes, find the distance to the closest sequence
+# Given an array of junction sequences, find the distance to the closest sequence
 #
 # @param   arrJunctions
-#
 # @return  distances to the closest sequence
 #' @export
 getDistanceToClosest <- function(arrJunctions){ 
@@ -103,6 +101,7 @@ getDistanceToClosest <- function(arrJunctions){
 #' @param   first       if TRUE only the first call the gene assignment is used;
 #'                      if FALSE the union of ambiguous gene assignments is used to group all sequences with any of those gene calls.
 #' @param   model       SHM targeting model, one of c('HS5F','MTri'); see Details.
+#' @param   ncores       Number of cores to use for parallelization
 #' 
 #' @return  \code{data.frame} with DIST_NEAREST column added
 #' 
@@ -111,13 +110,13 @@ getDistanceToClosest <- function(arrJunctions){
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
-#' # Calculate distance-to-nearest
-#' df <- distToNearest(df, genotyped=TRUE, first=FALSE)
+#' # Calculate distance to nearest
+#' df <- distToNearest(df, genotyped=TRUE, first=FALSE, ncores=1)
 #' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,0.02))
 #' 
 #' @export
-distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F') {
-  registerDoMC(cores=detectCores())
+distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F', ncore=detectCores()) {
+  registerDoMC(cores=ncores)
   
 	if(!is.data.frame(db))
 		stop('Must submit a data frame')
