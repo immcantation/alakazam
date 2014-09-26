@@ -109,20 +109,14 @@ calcDiversity <- function(p, q) {
 #'           See \code{\link{testDiversity}} for significance testing.
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "IB_T_genotyped_clone-pass_germ-pass_300.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- bootstrapDiversity(df, "BARCODE", step_q=1, max_q=10, nboot=100)
-#' div[div$q == 0, ]
-#' slot(div, "groups")
-#' slot(div, "n")
+#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100)
 #' 
 #' # Increasing threshold results in exclusion of small groups and a warning message
-#' div <- bootstrapDiversity(df, "BARCODE", min_n=40, step_q=1, max_q=10, nboot=100)
-#' div[div$q == 0, ]
-#' slot(div, "groups")
-#' slot(div, "n")
+#' bootstrapDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
 #'
 #' @export
 bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
@@ -201,15 +195,11 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #'           See \code{\link{bootstrapDiversity}} for curve generation.
 #' @examples          
 #' # Load example data
-#' file <- system.file("extdata", "IB_T_genotyped_clone-pass_germ-pass_300.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' div <- testDiversity(df, "BARCODE", q=0, min_n=30, nboot=100)
-#' div
-#' slot(div, "groups")
-#' slot(div, "n")
-#' slot(div, "stats")
+#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
@@ -242,7 +232,7 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
     
     # Generate diversity index and confidence intervals via resampling
     cat("-> CALCULATING DIVERSITY\n")
-    pb <- txtProgressBar(min=1, max=ngroup, initial=1, width=40, style=3)
+    pb <- txtProgressBar(min=0, max=ngroup, initial=0, width=40, style=3)
     div_mat <- matrix(NA, nboot, ngroup, dimnames=list(NULL, group_keep))
     for (i in 1:ngroup) {
         g <- group_keep[i]
@@ -334,13 +324,13 @@ getBaseTheme <- function() {
 #' @seealso  Plotting is performed with \code{\link{ggplot}}.
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "IB_T_genotyped_clone-pass_germ-pass_300.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- bootstrapDiversity(df, "BARCODE", min_n=30, step_q=1, max_q=10, nboot=100)
+#' div <- bootstrapDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, main_title=paste(slot(div, "n"), "sequences sampled"),
-#'                    legend_title="Barcode")
+#'                    legend_title="Sample")
 #' 
 #' @export
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 

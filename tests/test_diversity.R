@@ -2,12 +2,13 @@
 # @author  Jason Anthony Vander Heiden  
 # @date    2014.9.25
 
-#### Run paramaters ####
-clone_file <- "/mnt/data/oconnor_mg_memory/changeo/RQ2341_HD07M/RQ2341_HD07M_db-pass_germ-pass_clone-pass.tab"
-text_fields <- "PRCONS"
-num_fields <- "DUPCOUNT"
+#### Run parameters ####
+clone_file <- "inst/extdata/changeo_demo.tab"
 
 #### Preprocessing ####
 data_df <- readChangeoDb(clone_file)
 
-#### PHYLIP steps ####
+#### Diversity steps ####
+div_curve <- bootstrapDiversity(data_df, "SAMPLE", nboot=500)
+plotDiversityCurve(div_curve)
+div_test <- testDiversity(data_df, 0, "SAMPLE", nboot=500)

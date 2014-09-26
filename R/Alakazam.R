@@ -16,14 +16,15 @@
 #' @docType     package
 #' @references  pRESTO, Change-O, TIgGER, BASELINe, et al. 
 #' 
+#' @import doMC
 #' @import ggplot2
 #' @import igraph
-#' @import plyr
-#' @import stringr
-#' @import utils
 #' @import parallel
-#' @import doMC
+#' @import plyr
+#' @import scales
+#' @import stringr
 #' @import shm
+#' @import utils
 NULL
 
 ### >>> Fix readChangeoDb example (include example file)

@@ -3,15 +3,19 @@ Title: R tools to accompany pRESTO and Change-O
 Version: 0.2
 Author: Jason Anthony Vander Heiden, Namita Gupta
 Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
-Description: Diversity and lineage
+Description: Diversity calculation, lineage inferrence, and distance-to-nearest
+    components of the Change-O pipeline.
 Depends:
     R (>= 3.1.1)
 License: CC BY-NC-SA
 LazyData: true
 Imports:
+    doMC,
     ggplot2,
     igraph,
+    parallel,
     plyr,
     scales,
     shm,
-    stringr
+    stringr,
+    utils

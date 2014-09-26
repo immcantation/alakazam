@@ -3,7 +3,7 @@
 # @date    2014.9.25
 
 #### Run paramaters ####
-db_file1 <- "inst/extdata/IB_T_genotyped_clone-pass_germ-pass_300.tab"
+db_file1 <- "inst/extdata/changeo_demo.tab"
 
 #### Preprocessing ####
 data_df1 <- readChangeoDb(db_file1)

@@ -65,7 +65,7 @@ getDistanceToClosest <- function(arrJunctions){
   arrUniqueJunctionsDist <- rep(NA,numbOfUniqueJuctions)
   if(numbOfUniqueJuctions>1){
     arrJunctionsUnique <- toupper(arrJunctionsUnique)
-    arrJunctionsUnique <- gsub('.', '-', arrJunctionsUnique, fixed=T)
+    arrJunctionsUnique <- gsub('.', '-', arrJunctionsUnique, fixed=TRUE)
     arrJunctionsUnique <- as.vector(sapply(arrJunctionsUnique,function(x){paste("NN",x,"NN",sep="")})) 
     matSequenceFivemers <- sapply(arrJunctionsUnique,
                                   function(x){  
@@ -107,18 +107,16 @@ getDistanceToClosest <- function(arrJunctions){
 #' @return  \code{data.frame} with DIST_NEAREST column added
 #' 
 #' @examples
-#' #### Run paramaters ####
-#' db_file <- system.file("extdata", "IB_T_genotyped_clone-pass_germ-pass_300.tab", package="alakazam")
-#'
-#' #### Preprocessing ####
-#' data_df <- readChangeoDb(db_file)
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
 #' 
-#' #### DistToNearest steps ####
-#' data_df <- distToNearest(data_df, genotyped=T, first=F)
-#' hist(data_df$DIST_NEAREST, breaks=50, xlim=c(0,0.02))
+#' # Calculate distance-to-nearest
+#' df <- distToNearest(df, genotyped=TRUE, first=FALSE)
+#' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,0.02))
 #' 
 #' @export
-distToNearest <- function(db, genotyped=F, first=T, model='HS5F') {
+distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='HS5F') {
   registerDoMC(cores=detectCores())
   
 	if(!is.data.frame(db))
@@ -138,8 +136,8 @@ distToNearest <- function(db, genotyped=F, first=T, model='HS5F') {
 		db$V <- getGene(db[,v_col])
 		db$J <- getGene(db[,j_col])
 	} else {
-	  db$V <- getGene(db[,v_col], first=F)
-	  db$J <- getGene(db[,j_col], first=F)
+	  db$V <- getGene(db[,v_col], first=FALSE)
+	  db$J <- getGene(db[,j_col], first=FALSE)
     # Reassign V genes to most general group of genes
     for(ambig in unique(db$V[grepl(',',db$V)]))
       for(g in strsplit(ambig, split=','))
