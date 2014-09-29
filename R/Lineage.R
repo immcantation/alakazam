@@ -125,7 +125,7 @@ setMethod("appendRows",
 #'
 #' # With end masking
 #' prepChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
-#' 
+#'
 #' @export
 prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL) {
     # Replace gaps with Ns and masked ragged ends
@@ -404,6 +404,11 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
+    if (length(clone@sequence) < 2) {
+        warning("Clone ", clone@.Data, " was skipped as it does not contain at least 
+                2 unique sequences")
+        return(NULL)
+    }
     # Create temporary directory
     temp_path <- makeTempDir(paste0(clone, "-phylip"))
     
