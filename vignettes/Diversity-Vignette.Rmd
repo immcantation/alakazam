@@ -1,0 +1,99 @@
+---
+title: "Clonal diversity statistics"
+author: "Jason Anthony Vander Heiden"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+The clonal diversity of the repertoire can be analyzed using the general form
+of the diversity index, as proposed by Hill in:
+
+    Hill, M. Diversity and evenness: a unifying notation and its consequences. 
+        Ecology 54, 427–432 (1973).
+
+Coupled with resampling strategies to correct for variations in sequencing 
+depth. This package provides two approaches to assessing diversity: 
+
+1. Generation of a smooth diversity (D) curve over a range of diversity orders 
+(q) using `bootstrapDiversity`.
+2. A significance test of the diversity (D) at a fixed diversity order (q) using 
+`testDiversity`.
+
+Load Change-O data
+--------------------------------------------------------------------------------
+A small example Change-O tab-delimited database file is included in the 
+`alakazam` package. Diversity calculation requires the `CLONE` field 
+(column) to be present in the Change-O file, as well as an additional grouping 
+column. In this example we will use the grouping columns `SAMPLE` and `ISOTYPE`.
+
+```{r, eval=TRUE, warning=FALSE}
+library(alakazam)
+
+# Load Change-O file
+file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+df <- readChangeoDb(file)
+```
+
+Generate a diversity curve
+--------------------------------------------------------------------------------
+The function `bootstrapDiversity` performs uniform resampling, with replacement,
+of the input sequences and recalculates the clone size distribution, and 
+diversity, with each bootstrap realization. Diversity (D) is calculated over a
+range of diversity orders (q) to generate a smooth curve.
+
+```{r, eval=TRUE, results='hide'}
+# Compare diversity curve across values in the "SAMPLE" column
+# q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
+# A 95% confidence interval will be calculated (ci=0.95)
+# 2000 bootstrap realizations are performed (nboot=2000)
+sample_div <- bootstrapDiversity(df, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
+                                 ci=0.95, nboot=2000)
+
+# Compare diversity curve across values in the "ISOTYPE" column
+# Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
+# Excluded groups are indicated by a warning message
+isotype_div <- bootstrapDiversity(df, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
+                                  step_q=0.05, ci=0.95, nboot=2000)
+```
+
+```{r, eval=TRUE, fig.width=6, fig.height=4}
+# Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
+# Indicate number of sequences resampled from each group in the title
+sample_main <- paste0("Sample diversity (n=", sample_div@n, ")")
+p1 <- plotDiversityCurve(sample_div, main_title=sample_main, 
+                         legend_title="Sample", log_q=TRUE, log_d=TRUE)
+
+# Plot isotype diversity using default set of Ig isotype colors
+isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
+p2 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
+                         legend_title="Isotype", log_q=TRUE, log_d=TRUE)
+```
+
+Test diversity at a fixed diversity order
+--------------------------------------------------------------------------------
+The function `testDiversity` performs resampling and diversity calculation in 
+the same manner as `bootstrapDiversity`, but only for a single diversity order. 
+Significance testing across groups is performed using the delta of the bootstrap
+distributions between groups.
+
+```{r, eval=TRUE, results='hide'}
+# Test diversity at q=0 (species richness) across values in the "SAMPLE" column
+# 2000 bootstrap realizations are performed (nboot=2000)
+sample_test <- testDiversity(df, 0, "SAMPLE", nboot=2000)
+```
+```{r, eval=TRUE}
+sample_test
+```
+```{r, eval=TRUE, results='hide'}
+# Test diversity across values in the "ISOTYPE" column
+# Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
+# Excluded groups are indicated by a warning message
+isotype_test <- testDiversity(df, 2, "ISOTYPE", min_n=30, nboot=2000)
+```
+```{r, eval=TRUE}
+isotype_test
+```

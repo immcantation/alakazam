@@ -21,12 +21,14 @@
 #' }
 #' 
 #' @name   NUC_COLORS
+#' @export
 NUC_COLORS <- c("A"="#64F73F", 
                 "C"="#FFB340", 
                 "G"="#EB413C", 
                 "T"="#3C88EE")
 
 #' @rdname NUC_COLORS
+#' @export
 IG_COLORS <- c("IgA"="#377EB8", 
                "IgD"="#FF7F00", 
                "IgE"="#E41A1C", 
@@ -36,6 +38,7 @@ IG_COLORS <- c("IgA"="#377EB8",
                "IgL"="#FFD92F")
 
 #' @rdname NUC_COLORS
+#' @export
 TR_COLORS <- c("TRA"="#CBD5E8", 
                "TRB"="#F4CAE4", 
                "TRD"="#FDCDAC", 
@@ -52,6 +55,7 @@ TR_COLORS <- c("TRA"="#CBD5E8",
 #'          ambiguous character.
 #' 
 #' @name    IUPAC_NUC
+#' @export
 IUPAC_NUC <- list("A"="A", 
                   "C"="C", 
                   "G"="G", 

@@ -5,10 +5,10 @@ Author: Jason Anthony Vander Heiden, Namita Gupta, Mohamed Uduman
 Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Description: Diversity calculation, lineage inferrence, and distance-to-nearest
     components of the Change-O pipeline.
-Depends:
-    R (>= 3.1.1)
 License: CC BY-NC-SA 3.0
 LazyData: true
+Depends:
+    R (>= 3.1.1)
 Imports:
     ggplot2,
     igraph,
@@ -17,3 +17,6 @@ Imports:
     shm,
     stringr,
     utils
+Suggests:
+    knitr
+VignetteBuilder: knitr
