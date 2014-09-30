@@ -101,7 +101,7 @@ Plotting of a lineage tree may be done using the built-in functions of the
 igraph package. The default edge and vertex labels are edge weights and sequence 
 identifiers, respectively. 
 
-```{r, eval=TRUE, fig.align="center"}
+```{r, eval=TRUE, fig.width=4, fix.height=4}
 # Plot graph with defaults
 plot(graph)
 ```
@@ -112,7 +112,7 @@ the `layout.reingold.tilford` layout with assignment of the root position to the
 germline sequence, which is named "Germline" in the object returned by 
 `buildPhylipLineage`.
 
-```{r, eval=TRUE, fig.align="center"}
+```{r, eval=TRUE, fig.width=4, fix.height=4}
 # Modify graph and plot attributes
 V(graph)$color <- "grey80"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
