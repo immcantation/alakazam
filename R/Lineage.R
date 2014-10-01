@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.25
+# @date       2014.10.1
 
 
 #### Classes ####
@@ -14,68 +14,23 @@
 #' \code{ChangeoClone} defines common fields to perform lineage recontruction
 #' from a Change-O clone.
 #' 
-#' @slot  .Data       string defining the clone identifier.
-#' @slot  id          character vector of sequence identifiers.
-#' @slot  sequence    character vector of nucleotide sequences.
-#' @slot  annotation  data.frame of annotations.
+#' @slot  data        data.frame containing SEQUENCE_ID, SEQUENCE_GAP,
+#'                    and additional annotation fields.
+#' @slot  clone       string defining the clone identifier.
+#' @slot  germline    string containing the germline sequence for the clone.
 #' @slot  v_gene      string defining the V segment gene call.
 #' @slot  v_gene      string defining the J segment gene call.
 #' @slot  junc_len    numeric junction length.
 #' 
 #' @name ChangeoClone
 #' @export
-setClass("ChangeoClone", contains="character",
-         slots=c(id="character",
-                 sequence="character",
-                 annotation="data.frame",
+setClass("ChangeoClone", 
+         slots=c(data="data.frame",
+                 clone="character",
                  germline="character", 
                  v_gene="character", 
                  j_gene="character", 
                  junc_len="numeric"))
-
-
-#### Generics ####
-
-setGeneric("appendRows", 
-           function(object, id, sequence, annotation) {
-               standardGeneric("appendRows")
-           })
-
-#### Methods ####
-
-#' @rdname ChangeoClone
-#' @export
-setMethod("[", "ChangeoClone",  
-          function(x, i, j="missing", drop="missing") {
-              x@id <- x@id[i]
-              x@sequence <- x@sequence[i]
-              x@annotation <- x@annotation[i, ]
-              x
-          })
-
-
-#' @rdname ChangeoClone
-#' @export
-setMethod("appendRows", 
-          signature(object="ChangeoClone", 
-                    id="character", 
-                    sequence="character", 
-                    annotation="data.frame"), 
-          function(object, id, sequence, annotation) {
-              object@id <- c(object@id, id)
-              object@sequence <- c(object@sequence, sequence)
-              object@annotation <- plyr::rbind.fill(object@annotation, annotation)
-              object
-          })
-
-
-#### TODO ####
-# Multifurcating tree
-#ape::multi2di
-# Read tree file into phylo object
-#ape::read.tree
-# Make/score trees with parsimony
-#phangorn::parsimony
 
 
 #### Preprocessing functions ####
@@ -138,10 +93,9 @@ prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL
                                  text_fields=text_fields, num_fields=num_fields)
     
     # Define return object
-    clone <- new("ChangeoClone", as.character(data[1, "CLONE"]),
-                 id=as.character(tmp_df[, "SEQUENCE_ID"]),
-                 sequence=tmp_df[, "SEQUENCE_GAP"],
-                 annotation=subset(tmp_df, select=c(text_fields, num_fields)),
+    clone <- new("ChangeoClone", 
+                 data=tmp_df,
+                 clone=as.character(data[1, "CLONE"]),
                  germline=maskSeqGaps(data[1, "GERMLINE_GAP_D_MASK"], outer_only=FALSE), 
                  v_gene=getGene(data[1, "V_CALL"]), 
                  j_gene=getGene(data[1, "J_CALL"]), 
@@ -157,20 +111,20 @@ prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL
 #
 # @param   clone  a ChangeoClone object
 # @param   path   a directory to store the write the output files to
-# @return  a named vector translating sequence IDs (names) to PHYLIP taxa (values)
+# @return  a named vector translating SEQUENCE_ID (names) to PHYLIP taxa (values)
 writePhylipInput <- function(clone, path) {
     # Define PHYLIP columns
-    nseq <- length(clone@sequence)
-    v1 <- c(sprintf('%-9s', nseq),
+    nseq <- nrow(clone@data)
+    v1 <- c(sprintf('%-9s', nseq + 1),
             sprintf("%-9s", "Germline"), 
             sprintf("SAM%-6s", 1:nseq))
     v2 <- c(nchar(clone@germline),
             clone@germline, 
-            clone@sequence)
+            clone@data[, "SEQUENCE_GAP"])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(str_trim(v1[-(1:2)]), clone@id)
+    id_map <- setNames(str_trim(v1[-(1:2)]), clone@data[, "SEQUENCE_ID"])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
@@ -239,18 +193,21 @@ getPhylipInferred <- function(phylip_out) {
     seq_df <- seq_df[-(fix.row[-1] - 1), ]
     
     # Create data.frame of inferred sequences
-    inferred_id <- unique(grep("^[0-9]+$", seq_df[, 2], value=T))
-    inferred_seq <- sapply(inferred_id, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
+    inferred_num <- unique(grep("^[0-9]+$", seq_df[, 2], value=T))
+    inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
-    return(list(id=inferred_id, sequence=inferred_seq))
+    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE_GAP=inferred_seq))
 }
 
 
 # Extracts graph edge list from a PHYLIP dnapars outfile
 #
-# @param   phylip_out  a character vector returned by readPhylipOutput
+# @param   phylip_out  character vector returned by readPhylipOutput
+# @param   id_map      named vector of PHYLIP taxa names (values) to sequence 
+#                      identifiers (names) that will be translated. If NULL
+#                      no taxa name translation is performed
 # @return  a data.frame of edges with columns (from, to, weight)
-getPhylipEdges <- function(phylip_out) {
+getPhylipEdges <- function(phylip_out, id_map=NULL) {
     # Process dnapars output
     edge_start <- min(grep('between\\s+and\\s+length', phylip_out, 
                            perl=TRUE, fixed=FALSE))
@@ -259,6 +216,18 @@ getPhylipEdges <- function(phylip_out) {
     edge_block <- paste(phylip_out[(edge_start + 2):(edge_start + edge_len - 2)], collapse='\n')
     edge_df <- read.table(textConnection(edge_block), col.names=c('from', 'to', 'weight'), 
                           as.is=TRUE)
+
+    # Modify inferred taxa names to include "Inferred"
+    inf_map <- unique(grep("^[0-9]+$", c(edge_df$from, edge_df$to), value=T))
+    names(inf_map) <- paste0("Inferred", inf_map)
+    edge_df$from <- translateStrings(edge_df$from, inf_map)
+    edge_df$to <- translateStrings(edge_df$to, inf_map)
+    
+    if (!is.null(id_map)) {
+        # Reassign PHYLIP taxa names to sequence IDs
+        edge_df$from <- translateStrings(edge_df$from, id_map)
+        edge_df$to <- translateStrings(edge_df$to, id_map)
+    }
     
     return(edge_df)
 }
@@ -280,9 +249,9 @@ modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix(gap=0)) {
         if (edges$from[i] == "Germline") {
             seq1 <- clone@germline
         } else {
-            seq1 <- clone@sequence[clone@id == edges$from[i]]
+            seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
         }
-        seq2 <- clone@sequence[clone@id == edges$to[i]]
+        seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
         edges$weight[i] <- getSeqDistance(seq1, seq2, nuc_mat)        
     }
     
@@ -304,9 +273,9 @@ modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix(gap=0)) {
             if (edges$from[i] == "Germline") {
                 seq1 <- clone@germline
             } else {
-                seq1 <- clone@sequence[clone@id == edges$from[i]]
+                seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
             }
-            seq2 <- clone@sequence[clone@id == edges$to[i]]
+            seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
             edges$weight[i] <- getSeqDistance(seq1, seq2, nuc_mat)      
         }
         
@@ -320,8 +289,8 @@ modifyPhylipEdges <- function(edges, clone, nuc_mat=getNucMatrix(gap=0)) {
     }
     
     # Remove rows from clone
-    keep_clone <- clone@id %in% unique(c(edges$from, edges$to))
-    clone <- clone[keep_clone]
+    keep_clone <- clone@data[, "SEQUENCE_ID"] %in% unique(c(edges$from, edges$to))
+    clone@data <- clone@data[keep_clone, ]
     
     return(list(edges=edges, clone=clone))
 }
@@ -339,14 +308,15 @@ phylipToGraph <- function(edges, clone) {
     germ_idx <- which(V(g)$name == "Germline")
     g <- set.vertex.attribute(g, "sequence", index=germ_idx, clone@germline)
     
-    # Add sample sequences
-    clone_idx <- match(clone@id, V(g)$name) 
-    g <- set.vertex.attribute(g, "sequence", index=clone_idx, clone@sequence)
+    # Add sample sequences and names
+    clone_idx <- match(clone@data[, "SEQUENCE_ID"], V(g)$name) 
+    g <- set.vertex.attribute(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE_GAP"])
     
     # Add annotations
-    for (n in names(clone@annotation)) {
+    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE_GAP"))]
+    for (n in ann_fields) {
         g <- set.vertex.attribute(g, n, index=germ_idx, NA)
-        g <- set.vertex.attribute(g, n, index=clone_idx, clone@annotation[, n])
+        g <- set.vertex.attribute(g, n, index=clone_idx, clone@data[, n])
     }
     
     # Add edge and vertex labels
@@ -354,7 +324,7 @@ phylipToGraph <- function(edges, clone) {
     E(g)$label <- E(g)$weight
     
     # Add graph attributes
-    g$clone <- clone@.Data
+    g$clone <- clone@clone
     g$v_gene <- clone@v_gene
     g$j_gene <- clone@j_gene
     g$junc_len <- clone@junc_len
@@ -404,13 +374,13 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
-    if (length(clone@sequence) < 2) {
-        warning("Clone ", clone@.Data, " was skipped as it does not contain at least 
+    if (nrow(clone@data) < 2) {
+        warning("Clone ", clone@clone, " was skipped as it does not contain at least 
                 2 unique sequences")
         return(NULL)
     }
     # Create temporary directory
-    temp_path <- makeTempDir(paste0(clone, "-phylip"))
+    temp_path <- makeTempDir(paste0(clone@clone, "-phylip"))
     
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
@@ -429,24 +399,11 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
     }
     
     # Extract inferred sequences from PHYLIP output
-    inf_list <- getPhylipInferred(phylip_out)
-    inf_ann <- as.data.frame(matrix(NA, length(inf_list$id), ncol(clone@annotation)))
-    names(inf_ann) <- names(clone@annotation)
-    clone <- appendRows(clone, inf_list$id, inf_list$sequence, inf_ann)
+    inf_df <- getPhylipInferred(phylip_out)
+    clone@data <- rbind.fill(clone@data, inf_df)
 
     # Extract edge table from PHYLIP output 
-    edges <- getPhylipEdges(phylip_out)
-    
-    # Reassign PHYLIP taxa names to sequence IDs
-    edges$from <- translateStrings(edges$from, id_map)
-    edges$to <- translateStrings(edges$to, id_map)
-    
-    # Modify inferred taxa names to include "Inferred"
-    inf_map <- unique(grep("^[0-9]+$", clone@id, value=T))
-    names(inf_map) <- paste0("Inferred", inf_map)
-    clone@id <- translateStrings(clone@id, inf_map)
-    edges$from <- translateStrings(edges$from, inf_map)
-    edges$to <- translateStrings(edges$to, inf_map)
+    edges <- getPhylipEdges(phylip_out, id_map=id_map)
     
     # Modify PHYLIP tree to remove 0 distance edges
     mod_list <- modifyPhylipEdges(edges, clone)

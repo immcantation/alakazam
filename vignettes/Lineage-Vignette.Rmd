@@ -57,7 +57,7 @@ clone <- prepChangeoClone(sub_df, text_fields=c("SAMPLE", "ISOTYPE"),
                           num_fields="DUPCOUNT")
 
 # Show combined annotations
-clone@annotation
+clone@data[, c("SAMPLE", "ISOTYPE", "DUPCOUNT")]
 ```
 
 Run PHYLIP
@@ -114,7 +114,7 @@ germline sequence, which is named "Germline" in the object returned by
 
 ```{r, eval=TRUE, fig.width=4, fix.height=4}
 # Modify graph and plot attributes
-V(graph)$color <- "grey80"
+V(graph)$color <- "lightgrey"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
 V(graph)$label <- V(graph)$ISOTYPE
@@ -125,8 +125,8 @@ par(mar=c(0, 0, 0, 0) + 0.1)
 # Define a tree layout with the Germline at the top
 ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
 # Plot graph
-plot(graph, layout=ly, edge.arrow.mode=0, vertex.label.color="black", 
-     vertex.size=50)
+plot(graph, layout=ly, edge.arrow.mode=0, vertex.frame.color=NA,
+     vertex.label.color="black", vertex.size=50)
 # Add legend
 legend("topleft", c("Germline", "Inferred", "Sample"), 
        fill=c("black", "white", "grey80"), cex=0.75)
@@ -157,6 +157,7 @@ graph_list <- llply(clone_list, buildPhylipLineage,
 # These entries may be removed for clarity
 graph_list[sapply(graph_list, is.null)] <- NULL
 
-# Leaving 3 clones
-names(graph_list)
+# Leaving a subset of clones
+length(clone_list)
+length(graph_list)
 ```

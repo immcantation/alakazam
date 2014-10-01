@@ -12,6 +12,7 @@ Depends:
 Imports:
     ggplot2,
     igraph,
+    methods,
     plyr,
     scales,
     shm,

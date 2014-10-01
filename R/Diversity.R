@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.25
+# @date       2014.10.1
 
 
 #### Classes ####
@@ -13,7 +13,7 @@
 #'
 #' \code{DiversityCurve} defines diversity (D) scores over multiple diversity orders (q).
 #' 
-#' @slot  .Data   data.frame with columns (q, D, lower, upper) defining the median (D),
+#' @slot  data    data.frame with columns (q, D, lower, upper) defining the median (D),
 #'                upper confidence bound (upper) lower confidence bound (lower) for each
 #'                value of q (q).
 #' @slot  groups  character vector of groups retained in diversity calculation.
@@ -23,8 +23,12 @@
 #' 
 #' @name DiversityCurve
 #' @export
-setClass("DiversityCurve", contains="data.frame",
-         slots=c(groups="character", n="numeric", nboot="numeric", ci="numeric"))
+setClass("DiversityCurve", 
+         slots=c(data="data.frame", 
+                 groups="character", 
+                 n="numeric", 
+                 nboot="numeric", 
+                 ci="numeric"))
 
 
 #' S4 class defining diversity significance
@@ -32,20 +36,31 @@ setClass("DiversityCurve", contains="data.frame",
 #' \code{DiversityTest} defines the signifance of diversity (D) differences at a fixed
 #' fixed diversity order (q).
 #' 
-#' @slot  .Data   data.frame with columns for group pairs and associated pvalues, and 
+#' @slot  tests   data.frame with columns for group pairs (test), pvalues (pvalue), and
 #'                bootstrap delta distribution summary statistics (delta_mean, delta_sd).
-#' @slot  groups  character vector of groups retained in diversity calculation.
 #' @slot  stats   data.frame of diversity (D) summary statistics by group. Includes columns
 #'                for group, mean, median, sd, mad.
+#' @slot  q       diversity order tested (q).
+#' @slot  groups  character vector of groups retained in diversity calculation.
 #' @slot  n       numeric value indication the number of sampled sequences from each group.
 #' @slot  nboot   number of bootstrap realizations.
-#' @slot  q       diversity order tested (q).
 #' 
 #' @name DiversityTest
 #' @export
-setClass("DiversityTest", contains="data.frame",
-         slots=c(groups="character", stats="data.frame", n="numeric", 
-                 nboot="numeric", q="numeric"))
+setClass("DiversityTest", 
+         slots=c(tests="data.frame",
+                 stats="data.frame",
+                 groups="character", 
+                 n="numeric", 
+                 nboot="numeric", 
+                 q="numeric"))
+
+
+#### Methods ####
+
+#' @rdname DiversityTest
+#' @export
+setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 
 #### Calculation functions ####
 
@@ -166,8 +181,12 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
     cat("\n")
     
     # Generate return object
-    div <- new("DiversityCurve", ldply(div_list, .id="group"), 
-               groups=group_keep, n=n, nboot=nboot, ci=ci)
+    div <- new("DiversityCurve", 
+               data=ldply(div_list, .id="group"), 
+               groups=group_keep, 
+               n=n, 
+               nboot=nboot, 
+               ci=ci)
 
     return(div)
 }
@@ -279,8 +298,13 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
                            sd=apply(div_mat, 2, sd))
     
     # Generate return object
-    div <- new("DiversityTest", test_df, groups=group_keep, stats=stats_df, 
-               n=n, nboot=nboot, q=q)
+    div <- new("DiversityTest", 
+               tests=test_df, 
+               stats=stats_df,
+               q=q,
+               groups=group_keep,
+               n=n, 
+               nboot=nboot)
     
     return(div)
 }
@@ -294,13 +318,13 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 getBaseTheme <- function() {
     # Define universal plot settings
     base_theme <- theme_bw() + 
-        theme(plot.title=element_text(size=16)) +
         theme(text=element_text(size=14)) +
+        theme(plot.title=element_text(size=16)) +
         theme(strip.background=element_rect(fill='white')) + 
-        theme(strip.text=element_text(size=16, face='bold')) +
-        theme(axis.title=element_text(size=16, vjust=0.25)) +
-        theme(axis.text.x=element_text(size=14, vjust=0.5, hjust=0.5)) +
-        theme(axis.text.y=element_text(size=14))
+        theme(strip.text=element_text(size=16, face='bold'))
+        #theme(axis.title=element_text(size=16, vjust=0.5))
+        #theme(axis.text.x=element_text(size=14, vjust=0.5, hjust=0.5)) +
+        #theme(axis.text.y=element_text(size=14))
     
     return(base_theme)
 }
@@ -319,6 +343,9 @@ getBaseTheme <- function() {
 #'                           if FALSE plot in a linear scale.
 #' @param    log_d           if TRUE then plot diversity in a log scale;
 #'                           if FALSE plot in a linear scale.
+#' @param    silent          if TRUE do not draw the plot and just return the ggplot2 object;
+#'                           if FALSE draw the plot.
+#' @param    ...             additional arguments to pass to ggplot2::theme.
 #' @return   a \code{ggplot} object
 #' 
 #' @seealso  Plotting is performed with \code{\link{ggplot}}.
@@ -334,9 +361,10 @@ getBaseTheme <- function() {
 #' 
 #' @export
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
-                               legend_title=NULL, log_q=TRUE, log_d=TRUE) {
+                               legend_title=NULL, log_q=TRUE, log_d=TRUE,
+                               silent=FALSE, ...) {
     # Define plot elements
-    p1 <- ggplot(data, aes(x=q, y=D, group=group)) + 
+    p1 <- ggplot(data@data, aes(x=q, y=D, group=group)) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('q') +
@@ -360,9 +388,12 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
                                       labels=trans_format('log2', math_format(2^.x)))
     }
     
+    # Add additional theme elements
+    p1 <- p1 + do.call(theme, list(...))
+
     # Plot
-    plot(p1)
+    if (!silent) { plot(p1) }
     
-    return(p1)
+    invisible(p1)
 }
 
