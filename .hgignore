@@ -1,6 +1,0 @@
-syntax: glob
-.*
-*.Rproj
-
-syntax: glob
-man/*.Rd
