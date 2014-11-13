@@ -8,7 +8,7 @@ Description: Diversity calculation, lineage inferrence, and distance-to-nearest
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
-    R (>= 3.1.1)
+    R (>= 3.0.0)
 Imports:
     ggplot2,
     igraph,
