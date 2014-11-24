@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.25
+# @date       2014.11.24
 
 
 #### Constants ####
@@ -186,8 +186,8 @@ getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
 #' vector of nucleotide sequences.
 #'
 #' @param    seq         a character vector of nucleotide sequence strings.
-#' @param    outer_only  if TRUE replace only continguous leading and trailing gaps;
-#'                       if FALSE replace all gap characters.
+#' @param    outer_only  if \code{TRUE} replace only continguous leading and trailing gaps;
+#'                       if \code{FALSE} replace all gap characters.
 #' @return   A modified \code{seq} vector with Ns in place of gap (-, .) characters.
 #' 
 #' @family   sequence manipulation functions
@@ -295,6 +295,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @param    num_fields   a vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
 #' @param    nuc_mat      nucleotide character distance matrix.
+#' @param    verbose      if \code{TRUE} report the number input, discarded and output 
+#'                        sequences; if \code{FALSE} process sequences silently.
 #' @return   A modified data.frame with duplicate sequences removed and annotation fields 
 #'           collapsed. Columns that are not specified in either \code{text_fields} or
 #'           \code{num_fields} will be retained, but the value will be chosen from a random
@@ -330,19 +332,24 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, 
-                               nuc_mat=getNucMatrix(gap=0)) {
+                               nuc_mat=getNucMatrix(gap=0),
+                               verbose=FALSE) {
+    # TODO:  Remove rbind and append calls for speed
     
-    # >>> REMOVE rbind calls for speed
-    # >>> Remove or cleanup progress messages
-    cat('FUNCTION> collapseDuplicates\n')
+    # Define verbose reporting function
+    printVerbose <- function(n_total, n_unique, n_discard) {
+        cat(" FUNCTION> collapseDuplicates\n", sep="")
+        cat("    TOTAL> ", n_total, "\n", sep="")
+        cat("   UNIQUE> ", n_unique, "\n", sep="")
+        cat("COLLAPSED> ", n_total - n_unique - n_discard, "\n", sep="")
+        cat("DISCARDED> ", n_discard, "\n", sep="")
+        cat("\n")
+    }
     
     # Return input if there are no sequences to collapse
     nseq <- nrow(data)
     if (nseq <= 1) { 
-        cat('INFO>', nseq, 'sequences total\n')
-        cat('INFO> 0 sequences collapsed\n')
-        cat('INFO> 0 sequences discarded\n')
-        cat('\n')
+        if (verbose) { printVerbose(nseq, 0, 0) }
         return(data)
     }
     
@@ -359,10 +366,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     
     # Return input if no sequences have zero distance
     if (all(d_mat[lower.tri(d_mat, diag=F)] != 0)) {
-        cat('INFO>', nseq, 'sequences total\n')
-        cat('INFO> 0 sequences collapsed\n')
-        cat('INFO> 0 sequences discarded\n')
-        cat('\n')
+        if (verbose) { printVerbose(nseq, 0, 0) }
         return(data)
     }        
     
@@ -444,15 +448,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         unique_df <- plyr::rbind.fill(unique_df, tmp_df)
     }
     
-    cat('INFO>', nseq, 'sequences total\n')
-    cat('INFO>', nseq - nrow(unique_df) - discard_count, 'sequences collapsed\n')
-    if (discard_count > 0) {
-        cat('INFO> ', discard_count, ' sequences discarded (', paste(discard_ids, collapse=','), ')\n', sep='')
-    } else {
-        cat('INFO> 0 sequences discarded\n')
-    }
-    cat('\n')
-    
+    if (verbose) { printVerbose(nseq, nrow(unique_df), discard_count) }
     return(unique_df)
 }
 
@@ -465,8 +461,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' respectively, from a character vector of immunoglobulin (Ig) segment allele calls in IMGT format.
 #'
 #' @param     segment_call    character vector containing segment calls delimited by commas.
-#' @param     first           if TRUE return only the first call in \code{segment_call};
-#'                            if FALSE return all calls delimited by commas.
+#' @param     first           if \code{TRUE} return only the first call in \code{segment_call};
+#'                            if \code{FALSE} return all calls delimited by commas.
 #' @return    a character vector containing allele, gene or family names
 #' 
 #' @seealso   Uses \code{\link{str_extract}}.
