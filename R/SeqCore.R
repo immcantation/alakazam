@@ -334,8 +334,6 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, 
                                nuc_mat=getNucMatrix(gap=0),
                                verbose=FALSE) {
-    # TODO:  Remove rbind and append calls for speed
-    
     # Define verbose reporting function
     printVerbose <- function(n_total, n_unique, n_discard) {
         cat(" FUNCTION> collapseDuplicates\n", sep="")
@@ -401,23 +399,27 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         # Find all zero distance taxa
         idx <- which(d_mat[i, ] == 0)
         if (length(idx) == 1) {
-            # Assign unique sequences to unique vector         
+            # Assign unique sequences to unique vector
             uniq_taxa <- append(uniq_taxa, taxa_names[idx])
+            #uniq_taxa <- c(uniq_taxa, taxa_names[idx])
         } else if (length(idx) > 1) {
             # Assign clusters of duplicates to duplicate list            
-            dup_taxa <- append(dup_taxa, list(taxa_names[idx]))
+            #dup_taxa <- append(dup_taxa, list(taxa_names[idx]))
+            dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
         } else {
             # Report error (should never occur)
             stop('Error in distance matrix of collapseDuplicates')
         }
         # Update vector of clustered taxa
-        done_taxa <- append(done_taxa, taxa_names[idx])
+        #done_taxa <- append(done_taxa, taxa_names[idx])
+        done_taxa <- c(done_taxa, taxa_names[idx])
     }
     
     # Get data.frame of unique sequences
-    unique_df <- data[data[, id] %in% uniq_taxa, ]
+    #unique_df <- data[data[, id] %in% uniq_taxa, ]
     
     # Collapse duplicate sets and append entries to unique data.frame
+    unique_list <- list(data[data[, id] %in% uniq_taxa, ])
     for (taxa in dup_taxa) {
         # Define row indices of identical sequences
         idx <- which(data[, id] %in% taxa)
@@ -445,8 +447,13 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         }
         
         # Add row to unique data.frame
-        unique_df <- plyr::rbind.fill(unique_df, tmp_df)
+        #unique_df <- plyr::rbind.fill(unique_df, tmp_df)
+        # Add row to unique list
+        unique_list <- c(unique_list, list(tmp_df))
     }
+    
+    # Combine all rows into unique data.frame
+    unique_df <- plyr::rbind.fill(unique_list)
     
     if (verbose) { printVerbose(nseq, nrow(unique_df), discard_count) }
     return(unique_df)
