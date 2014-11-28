@@ -6,6 +6,7 @@
 # @version    0.2.0
 # @date       2014.9.24
 
+
 #' Read a Change-O tab delimited database file
 #' 
 #' Reads a tab delimited database file created by a Change-O tool into a 
@@ -45,6 +46,28 @@ readChangeoDb <- function(file, seq_upper=TRUE) {
     }
     
     return(db_df)
+}
+
+
+#' Write a Change-O tab delimited database file
+#' 
+#' A simple wrapper around write.table with defaults appropriate for writing a 
+#' Change-O tab delimited database file from a data.frame.
+#'
+#' @param    data       data.frame of Change-O data.
+#' @param    file       output file name.
+#' @return   NULL
+#' 
+#' @seealso  \code{\link{write.table}}
+#' @examples
+#' \dontrun{
+#'   # Write a database
+#'   writeChangeoDb(data, "changeo_output.tab")
+#' }
+#' 
+#' @export
+writeChangeoDb <- function(data, file) {
+    write.table(data, file=file, quote=FALSE, sep="\t", row.names=FALSE)
 }
 
 

@@ -294,6 +294,9 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'                        "/" character.
 #' @param    num_fields   a vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
+#' @param    seq_fields   a vector of nucletoide sequence columns to collapse. The sequence 
+#'                        with the fewest Ns will be retained. This is distinct from the 
+#'                        \code{seq} parameter which is used to determine duplicates. 
 #' @param    nuc_mat      nucleotide character distance matrix.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
@@ -331,7 +334,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
-                               text_fields=NULL, num_fields=NULL, 
+                               text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                nuc_mat=getNucMatrix(gap=0),
                                verbose=FALSE) {
     # Define verbose reporting function
@@ -347,7 +350,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     # Return input if there are no sequences to collapse
     nseq <- nrow(data)
     if (nseq <= 1) { 
-        if (verbose) { printVerbose(nseq, 0, 0) }
+        if (verbose) { printVerbose(nseq, 1, 0) }
         return(data)
     }
     
@@ -364,7 +367,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     
     # Return input if no sequences have zero distance
     if (all(d_mat[lower.tri(d_mat, diag=F)] != 0)) {
-        if (verbose) { printVerbose(nseq, 0, 0) }
+        if (verbose) { printVerbose(nseq, nseq, 0) }
         return(data)
     }        
     
@@ -431,19 +434,29 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                 f_set <- na.omit(data[idx, f])
                 f_set <- unlist(strsplit(f_set, '/'))
                 f_set <- sort(unique(f_set))
-                tmp_df[f] <- paste(f_set, collapse='/')
+                tmp_df[, f] <- paste(f_set, collapse='/')
             }
             
             # Sum numeric fields
             for (f in num_fields) {
                 f_set <- data[idx, f]
-                tmp_df[f] <- sum(f_set, na.rm=T)
+                tmp_df[, f] <- sum(f_set, na.rm=T)
             }
             
-            #Assign sequence with least number of N characters
-            seq_set <- unique(data[idx, seq])
-            unambig_len <- nchar(gsub("N", "", seq_set))
-            tmp_df[, seq] <- seq_set[which.max(unambig_len)]
+            # Select sequence fields with fewest Ns
+            for (f in seq_fields) {
+                f_set <- data[idx, f]
+                f_len <- nchar(gsub("N", "", f_set))
+                tmp_df[, f] <- f_set[which.max(f_len)]
+            }
+            
+            # Assign id and sequence with least number of Ns
+            #seq_set <- unique(data[idx, seq])
+            #unambig_len <- nchar(gsub("N", "", seq_set))
+            #tmp_df[, seq] <- seq_set[which.max(unambig_len)]
+            seq_set <- data[idx, c(id, seq)]
+            unambig_len <- nchar(gsub("N", "", seq_set[, seq]))
+            tmp_df[, c(id, seq)] <- seq_set[which.max(unambig_len), c(id, seq)]
         }
         
         # Add row to unique data.frame
