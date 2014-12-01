@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.11.24
+# @date       2014.12.1
 
 
 #### Constants ####
@@ -380,46 +380,44 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
             ambig_rows <- append(ambig_rows, i) 
         }
     }
+    discard_count <- length(ambig_rows)
+
+    # Return single sequence if all sequence belong to ambiguous clusters
+    if (discard_count == nrow(d_mat)) {
+        unambig_len <- nchar(gsub("N", "", data[, seq]))
+        if (verbose) { printVerbose(nseq, 0, discard_count - 1) }
+        return(data[which.max(unambig_len), ])
+    }
     
     # Exclude ambiguous sequences from clustering
-    discard_count <- length(ambig_rows)
-    discard_ids <- rownames(d_mat)[ambig_rows]
     if (discard_count > 0) {
         d_mat <- d_mat[-ambig_rows, -ambig_rows]
     }
-    
+        
     # Cluster remaining sequences into unique and duplicate sets
     dup_taxa <-  list()
     uniq_taxa <- character()
     done_taxa <- character()
     taxa_names <- rownames(d_mat)
-    for (i in 1:nrow(d_mat)) {
+    for (taxa in taxa_names) {
         # Skip taxa if previously assigned to a cluster
-        if (taxa_names[i] %in% done_taxa) { 
-            next 
-        }
-        
+        if (taxa %in% done_taxa) { next }
+            
         # Find all zero distance taxa
-        idx <- which(d_mat[i, ] == 0)
+        idx <- which(d_mat[taxa, ] == 0)
         if (length(idx) == 1) {
             # Assign unique sequences to unique vector
             uniq_taxa <- append(uniq_taxa, taxa_names[idx])
-            #uniq_taxa <- c(uniq_taxa, taxa_names[idx])
         } else if (length(idx) > 1) {
             # Assign clusters of duplicates to duplicate list            
-            #dup_taxa <- append(dup_taxa, list(taxa_names[idx]))
             dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
         } else {
             # Report error (should never occur)
             stop('Error in distance matrix of collapseDuplicates')
         }
         # Update vector of clustered taxa
-        #done_taxa <- append(done_taxa, taxa_names[idx])
         done_taxa <- c(done_taxa, taxa_names[idx])
     }
-    
-    # Get data.frame of unique sequences
-    #unique_df <- data[data[, id] %in% uniq_taxa, ]
     
     # Collapse duplicate sets and append entries to unique data.frame
     unique_list <- list(data[data[, id] %in% uniq_taxa, ])
@@ -451,16 +449,11 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
             }
             
             # Assign id and sequence with least number of Ns
-            #seq_set <- unique(data[idx, seq])
-            #unambig_len <- nchar(gsub("N", "", seq_set))
-            #tmp_df[, seq] <- seq_set[which.max(unambig_len)]
             seq_set <- data[idx, c(id, seq)]
             unambig_len <- nchar(gsub("N", "", seq_set[, seq]))
             tmp_df[, c(id, seq)] <- seq_set[which.max(unambig_len), c(id, seq)]
         }
         
-        # Add row to unique data.frame
-        #unique_df <- plyr::rbind.fill(unique_df, tmp_df)
         # Add row to unique list
         unique_list <- c(unique_list, list(tmp_df))
     }
