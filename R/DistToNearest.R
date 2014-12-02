@@ -10,7 +10,7 @@
 #
 # @param   model   string defining name of the model to load.
 #                  One of "hs5f" or "m3n".
-# @return  a list containing the substitution (sub) and mutability (mut) models
+# @return  a list containing the substitution (subs) and mutability (mut) models
 #' @export
 loadModel <- function(model) {
     if (model == "hs5f") { data_file = "HS5F_Targeting.RData" }
@@ -22,7 +22,7 @@ loadModel <- function(model) {
     Targeting <- get("Targeting", envir=tmp_env)
     rm(tmp_env)
     
-    return(list(sub=Targeting[["Substitution"]], mut=Targeting[["Mutability"]]))
+    return(list(subs=Targeting[["Substitution"]], mut=Targeting[["Mutability"]]))
 }
 
 
@@ -30,11 +30,11 @@ loadModel <- function(model) {
 #
 # @param   seq1   first nucleotide sequence.
 # @param   seq2   second nucleotide sequence.
-# @param   sub    substitution model.
+# @param   subs    substitution model.
 # @param   mut    mutability model.
 # @return  distance between two sequences.
 #' @export
-dist_seq_fast <- function(seq1, seq2, sub, mut){
+dist_seq_fast <- function(seq1, seq2, subs, mut){
     #Compute distance only on fivemers that have mutations
     fivemersWithMu <- substr(seq1,3,3)!=substr(seq2,3,3)
     fivemersWithNonNuc <- ( !is.na(match(substr(seq1,3,3),c("A","C","G","T"))) & !is.na(match(substr(seq2,3,3),c("A","C","G","T"))) )
@@ -42,11 +42,11 @@ dist_seq_fast <- function(seq1, seq2, sub, mut){
     seq2 <- seq2[fivemersWithMu & fivemersWithNonNuc]
     a <- tryCatch({
         if(length(seq1)==1){
-            seq1_to_seq2 <- sub[substr(seq2,3,3),seq1] * mut[seq1]
-            seq2_to_seq1 <- sub[substr(seq1,3,3),seq2] * mut[seq2]
+            seq1_to_seq2 <- subs[substr(seq2,3,3),seq1] * mut[seq1]
+            seq2_to_seq1 <- subs[substr(seq1,3,3),seq2] * mut[seq2]
         }else{
-            seq1_to_seq2 <- sum( diag(sub[substr(seq2,3,3),seq1]) *  mut[seq1] )
-            seq2_to_seq1 <- sum( diag(sub[substr(seq1,3,3),seq2]) *  mut[seq2] )
+            seq1_to_seq2 <- sum( diag(subs[substr(seq2,3,3),seq1]) *  mut[seq1] )
+            seq2_to_seq1 <- sum( diag(subs[substr(seq1,3,3),seq2]) *  mut[seq2] )
         }
         return( mean(c(seq1_to_seq2, seq2_to_seq1)) )
     },error = function(e){
@@ -58,11 +58,11 @@ dist_seq_fast <- function(seq1, seq2, sub, mut){
 # Given an array of junction sequences, find the distance to the closest sequence
 #
 # @param   arrJunctions   character vector of junction sequences.
-# @param   sub            substitution model.
+# @param   subs            substitution model.
 # @param   mut            mutability model.
 # @return  A vector of distances to the closest sequence.
 #' @export
-getDistanceToClosest <- function(arrJunctions, sub, mut){ 
+getDistanceToClosest <- function(arrJunctions, subs, mut){ 
   
   #Initialize array of distances
   arrJunctionsDist <- rep(NA,length(arrJunctions))
@@ -97,7 +97,7 @@ getDistanceToClosest <- function(arrJunctions, sub, mut){
                                   , simplify="matrix"
     )
     matDistance <-sapply(1:numbOfUniqueJuctions, function(i)c(rep.int(0,i-1),sapply(i:numbOfUniqueJuctions,function(j){
-      dist_seq_fast(matSequenceFivemers[,i],matSequenceFivemers[,j], sub=sub, mut=mut)
+      dist_seq_fast(matSequenceFivemers[,i],matSequenceFivemers[,j], subs=subs, mut=mut)
     })))
     matDistance <- matDistance + t(matDistance)
     arrUniqueJunctionsDist <- sapply(1:numbOfUniqueJuctions, function(i){ min(matDistance[-i,i]) })    
@@ -168,15 +168,15 @@ distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='hs5f') {
   
 	# Load targeting model
 	# cat("Loading Targeting Model\n")
-    model_data <- loadModel(model)
-
+  model_data <- loadModel(model)
+  
 	# Create new column for distance to nearest neighbor
 	db$DIST_NEAREST = rep(NA, nrow(db))
 	db[,"ROW_ID"] <- 1:nrow(db)
 	
 	# cat("Calculating distance to nearest neighbor\n")
-	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), mutate, 
-                       DIST_NEAREST=getDistanceToClosest(JUNCTION, sub=model_data[['sub']], mut=model_data[['mut']])), 
+	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), here(mutate), 
+                       DIST_NEAREST=getDistanceToClosest(JUNCTION, subs=model_data[['subs']], mut=model_data[['mut']])), 
                  ROW_ID)
 	
 	db <- db[,!(names(db) %in% c("V","J","ROW_ID"))]
