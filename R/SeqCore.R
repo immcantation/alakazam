@@ -476,6 +476,9 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' @param     segment_call    character vector containing segment calls delimited by commas.
 #' @param     first           if \code{TRUE} return only the first call in \code{segment_call};
 #'                            if \code{FALSE} return all calls delimited by commas.
+#' @param     collapse        if \code{TRUE} check for duplicates and return only unique segment
+#'                            assignments; if \code{FALSE} return all assignments (faster). 
+#'                            Has no effect if \code{first=TRUE}.
 #' @return    a character vector containing allele, gene or family names
 #' 
 #' @seealso   Uses \code{\link{str_extract}}.
@@ -492,9 +495,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' 
 #' getFamily(kappa_call)
 #' getFamily(kappa_call, first=FALSE)
+#' getFamily(kappa_call, first=FALSE, collapse=TRUE)
 #'
 #' @export
-getAllele <- function(segment_call, first=TRUE) {
+getAllele <- function(segment_call, first=TRUE, collapse=FALSE) {
     allele_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*[-\\*][\\.\\w]+)'
     
     if (first) {
@@ -507,7 +511,11 @@ getAllele <- function(segment_call, first=TRUE) {
         m <- gregexpr(allele_regex, segment_call, perl=TRUE)
         r <- regmatches(segment_call, m)
         #r <- stringr::str_extract_all(segment_call, stringr::perl(allele_regex))
-        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=","))
+        if (collapse) {
+            r <- sapply(r, function(x) paste(unique(x), collapse=","))
+        } else {
+            r <- sapply(r, paste, collapse=",")
+        }
     }
     
     return(r)
@@ -515,7 +523,7 @@ getAllele <- function(segment_call, first=TRUE) {
 
 #' @rdname getAllele
 #' @export
-getGene <- function(segment_call, first=TRUE) {
+getGene <- function(segment_call, first=TRUE, collapse=FALSE) {
     gene_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*)'
     
     if (first) {
@@ -526,7 +534,11 @@ getGene <- function(segment_call, first=TRUE) {
         #r <- stringr::str_extract_all(segment_call, stringr::perl(gene_regex))
         m <- gregexpr(gene_regex, segment_call, perl=TRUE)
         r <- regmatches(segment_call, m)
-        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
+        if (collapse) {
+            r <- sapply(r, function(x) paste(unique(x), collapse=","))
+        } else {
+            r <- sapply(r, paste, collapse=",")
+        }
     }
     
     return(r)
@@ -535,7 +547,7 @@ getGene <- function(segment_call, first=TRUE) {
 
 #' @rdname getAllele
 #' @export
-getFamily <- function(segment_call, first=TRUE) {
+getFamily <- function(segment_call, first=TRUE, collapse=FALSE) {
     family_regex <- '(IG[HLK][VDJ]\\d+)'
     
     if (first) {
@@ -546,7 +558,11 @@ getFamily <- function(segment_call, first=TRUE) {
         #r <- stringr::str_extract_all(segment_call, stringr::perl(family_regex))
         m <- gregexpr(family_regex, segment_call, perl=TRUE)
         r <- regmatches(segment_call, m)
-        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
+        if (collapse) {
+            r <- sapply(r, function(x) paste(unique(x), collapse=","))
+        } else {
+            r <- sapply(r, paste, collapse=",")
+        }
     }
     
     return(r)
