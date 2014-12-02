@@ -498,10 +498,16 @@ getAllele <- function(segment_call, first=TRUE) {
     allele_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*[-\\*][\\.\\w]+)'
     
     if (first) {
-        r <- stringr::str_extract(segment_call, stringr::perl(allele_regex))
+        # gsub(paste0(".*(", gene_regex, ").*"), "\\1", segment_call, perl=T)
+        # m <- gregexpr(allele_regex, kappa_call, perl=TRUE)
+        #r <- stringr::str_extract(segment_call, stringr::perl(allele_regex))
+        m <- regexpr(allele_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
     } else {
-        r <-stringr::str_extract_all(segment_call, stringr::perl(allele_regex))
-        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
+        m <- gregexpr(allele_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
+        #r <- stringr::str_extract_all(segment_call, stringr::perl(allele_regex))
+        r <- sapply(r, function(x) paste(sort(unique(x)), collapse=","))
     }
     
     return(r)
@@ -513,9 +519,13 @@ getGene <- function(segment_call, first=TRUE) {
     gene_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*)'
     
     if (first) {
-        r <- stringr::str_extract(segment_call, stringr::perl(gene_regex))
+        #r <- stringr::str_extract(segment_call, stringr::perl(gene_regex))
+        m <- regexpr(gene_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
     } else {
-        r <- stringr::str_extract_all(segment_call, stringr::perl(gene_regex))
+        #r <- stringr::str_extract_all(segment_call, stringr::perl(gene_regex))
+        m <- gregexpr(gene_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
         r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
     }
     
@@ -529,9 +539,13 @@ getFamily <- function(segment_call, first=TRUE) {
     family_regex <- '(IG[HLK][VDJ]\\d+)'
     
     if (first) {
-        r <- stringr::str_extract(segment_call, stringr::perl(family_regex))
+        #r <- stringr::str_extract(segment_call, stringr::perl(family_regex))
+        m <- regexpr(family_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
     } else {
-        r <- stringr::str_extract_all(segment_call, stringr::perl(family_regex))
+        #r <- stringr::str_extract_all(segment_call, stringr::perl(family_regex))
+        m <- gregexpr(family_regex, segment_call, perl=TRUE)
+        r <- regmatches(segment_call, m)
         r <- sapply(r, function(x) paste(sort(unique(x)), collapse=','))
     }
     
