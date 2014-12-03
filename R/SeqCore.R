@@ -470,7 +470,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 
 #' Get Ig segment allele, gene and family names
 #' 
-#' \code{getCall} performs generic matching of delimited segment calls with a custom regular 
+#' \code{getSegment} performs generic matching of delimited segment calls with a custom regular 
 #' expression. \code{getAllele}, \code{getGene} and \code{getFamily} extract the allele, gene and 
 #' family names, respectively, from a character vector of immunoglobulin (Ig) segment allele calls 
 #' in IMGT format.
@@ -482,7 +482,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' @param     collapse        if \code{TRUE} check for duplicates and return only unique segment
 #'                            assignments; if \code{FALSE} return all assignments (faster). 
 #'                            Has no effect if \code{first=TRUE}.
-#' @param     sep             a string defining both the input and output segment call delimiter.
+#' @param     sep             character defining both the input and output segment call delimiter.
 #' @return    a character vector containing allele, gene or family names
 #' 
 #' @seealso   Uses \code{\link{str_extract}}.
@@ -502,7 +502,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' getFamily(kappa_call, first=FALSE, collapse=TRUE)
 #'
 #' @export
-getCall <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, sep=",") {
+getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, sep=",") {
     # Define boundaries of individual segment calls
     edge_regex <- if (first) { ".*" } else { paste0("[^", sep, "]*") }
     
@@ -518,7 +518,7 @@ getCall <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, sep=
     return(r)
 }
 
-#' @rdname getCall
+#' @rdname getSegment
 #' @export
 getAllele <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
     allele_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*[-\\*][\\.\\w]+)'
@@ -527,7 +527,7 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
     return(r)
 }
 
-#' @rdname getCall
+#' @rdname getSegment
 #' @export
 getGene <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
     gene_regex <- '(IG[HLK][VDJ]\\d+[-/\\w]*)'
@@ -537,7 +537,7 @@ getGene <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
 }
 
 
-#' @rdname getCall
+#' @rdname getSegment
 #' @export
 getFamily <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
     family_regex <- '(IG[HLK][VDJ]\\d+)'
