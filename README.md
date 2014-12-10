@@ -18,7 +18,7 @@ Build
 6. Build -> Configure Build Tools
     * Check use devtools option
     * Check use roxygen option
-    * Selection configure roxygen options and check everything.
+    * Select configure roxygen options and check everything.
 
 Requirements
 -------------------------------------------------------------------------------
