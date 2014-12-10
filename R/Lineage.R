@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.10.1
+# @date       2014.12.10
 
 
 #### Classes ####
@@ -189,7 +189,9 @@ getPhylipInferred <- function(phylip_out) {
     
     # Correct first line of block and remove blank rows
     fix.row <- c(1, which(is.na(seq_df[,1])) + 1)
-    seq_df[fix.row, ] <- cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:5], stringsAsFactors=F)
+    end_col <-  ncol(seq_df) - 2
+    #seq_df[fix.row, ] <- cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:5], stringsAsFactors=F)
+    seq_df[fix.row, ] <- cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:end_col], stringsAsFactors=F)
     seq_df <- seq_df[-(fix.row[-1] - 1), ]
     
     # Create data.frame of inferred sequences
@@ -348,20 +350,13 @@ phylipToGraph <- function(edges, clone) {
 #'          with igraph \code{graph} objects.
 #' @examples
 #' \dontrun{
-#' # Example Change-O data.frame
-#' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-#'                  SEQUENCE_GAP=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-#'                  V_CALL="Homsap IGKV1-39*01 F",
-#'                  J_CALL="Homsap IGKJ5*01 F",
-#'                  JUNCTION_GAP_LENGTH=2,
-#'                  GERMLINE_GAP_D_MASK="CCCCAGGG",
-#'                  CLONE=1,
-#'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
-#'                  COUNT=1:4,
-#'                  stringsAsFactors=FALSE)
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
 #' 
 #' # Preprocess clone
-#' clone <- prepChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+#' clone <- subset(df, CLONE == 164)
+#' clone <- prepChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
 #' dnapars_exec <- "~/apps/phylip-3.69/dnapars"

@@ -223,7 +223,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
     
-    #>>> Needs two-tailed variant.  P-values can >1 if pvalue=pvalue*2
+    # TODO:  Needs two-tailed variant.  P-values can >1 if pvalue=pvalue*2
     
     # Verify function arguments
     if (!is.data.frame(data)) {
