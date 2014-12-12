@@ -13,27 +13,39 @@
 #' a data.frame.
 #'
 #' @param    file       tab delimited database file output by a Change-O tool.
+#' @param    select     columns to select from database
+#' @param    drop       columns to drop from database
 #' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case;
 #'                      if \code{FALSE} do not alter sequence fields.
 #' @return   a data.frame of the database file
 #' 
 #' @seealso  \code{\link{read.table}}
 #' @examples
-#' \dontrun{
-#'   # Loads a database and converts sequences to uppercase characters
-#'   df <- readChangeoDb("changeo_output.tab")
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' 
-#'   # Do not alter sequence field case
-#'   df <- readChangeoDb("changeo_output.tab", seq_upper=FALSE)
-#' }
+#' # Do not alter sequence field case
+#' df <- readChangeoDb(file, drop=c('DUPCOUNT'), seq_upper=FALSE)
 #' 
 #' @export
-readChangeoDb <- function(file, seq_upper=TRUE) {
+readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
     # Read file
     db_df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
     
     # Handled genotyped data
     # ifelse("V_CALL_GENOTYPED" %in% colnames(data), "V_CALL_GENOTYPED", "V_CALL")
+    
+    select_cols <- colnames(db_df)
+    
+    # Select specific columns
+    if(!is.null(select))
+      select_cols <- intersect(select_cols, select)
+    
+    # Remove unwanted columns
+    if(!is.null(drop))
+      select_cols <- setdiff(select_cols, drop)
+    
+    db_df <- subset(db_df, select = select_cols)
     
     # Convert sequence fields to upper case
     if (seq_upper) {
