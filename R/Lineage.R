@@ -362,7 +362,7 @@ phylipToGraph <- function(edges, clone) {
 #' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 #' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 #' 
-#' # Plot with with a tree layout
+#' # Plot graph with a tree layout
 #' ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
 #' plot(graph, layout=ly)
 #' }

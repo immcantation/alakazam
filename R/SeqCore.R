@@ -337,6 +337,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                nuc_mat=getNucMatrix(gap=0),
                                verbose=FALSE) {
+    # TODO:  Should we verify/recast text_fields, num_fields and seq_field types?
+    
     # Define verbose reporting function
     printVerbose <- function(n_total, n_unique, n_discard) {
         cat(" FUNCTION> collapseDuplicates\n", sep="")

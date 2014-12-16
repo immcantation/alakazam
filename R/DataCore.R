@@ -1,16 +1,16 @@
-# Common data structure manipulation, file input/output, and plotting functions for Alakazam
+# Common file input/output and data structure manipulation functions for Alakazam
 # 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.9.24
+# @date       2014.12.15
 
 
 #' Read a Change-O tab delimited database file
 #' 
-#' Reads a tab delimited database file created by a Change-O tool into a 
-#' a data.frame.
+#' \code{readChangeoDb} reads a tab delimited database file created by a Change-O tool 
+#' into a data.frame.
 #'
 #' @param    file       tab delimited database file output by a Change-O tool.
 #' @param    select     columns to select from database
@@ -63,8 +63,8 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 
 #' Write a Change-O tab delimited database file
 #' 
-#' A simple wrapper around write.table with defaults appropriate for writing a 
-#' Change-O tab delimited database file from a data.frame.
+#' \code{writeChangeoDb} ia s simple wrapper around write.table with defaults appropriate 
+#' for writing a Change-O tab delimited database file from a data.frame.
 #'
 #' @param    data       data.frame of Change-O data.
 #' @param    file       output file name.

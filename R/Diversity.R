@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.10.1
+# @date       2014.12.15
 
 
 #### Classes ####
@@ -343,6 +343,10 @@ getBaseTheme <- function() {
 #'                           if FALSE plot in a linear scale.
 #' @param    log_d           if TRUE then plot diversity in a log scale;
 #'                           if FALSE plot in a linear scale.
+#' @param    xlim            numeric vector of two values specifying the \code{c(lower, upper)} 
+#'                           x-axis limits.
+#' @param    ylim            numeric vector of two values specifying the \code{c(lower, upper)} 
+#'                           y-axis limits.
 #' @param    silent          if TRUE do not draw the plot and just return the ggplot2 object;
 #'                           if FALSE draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
@@ -362,7 +366,7 @@ getBaseTheme <- function() {
 #' @export
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
                                legend_title=NULL, log_q=TRUE, log_d=TRUE,
-                               silent=FALSE, ...) {
+                               xlim=NULL, ylim=NULL, silent=FALSE, ...) {
     # Define plot elements
     p1 <- ggplot(data@data, aes(x=q, y=D, group=group)) + 
         ggtitle(main_title) + 
@@ -378,14 +382,18 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
             scale_fill_manual(name=legend_title, values=colors)
     }        
     if (log_q) {
-        p1 <- p1 + scale_x_continuous(trans=log2_trans(),
+        p1 <- p1 + scale_x_continuous(trans=log2_trans(), limits=xlim,
                                       breaks=trans_breaks('log2', function(x) 2^x),
                                       labels=trans_format('log2', math_format(2^.x)))
+    } else {
+        p1 <- p1 + scale_x_continuous(limits=xlim)
     }
     if (log_d) {
-        p1 <- p1 + scale_y_continuous(trans=log2_trans(),
+        p1 <- p1 + scale_y_continuous(trans=log2_trans(), limits=ylim,
                                       breaks=trans_breaks('log2', function(x) 2^x),
                                       labels=trans_format('log2', math_format(2^.x)))
+    } else {
+        p1 <- p1 + scale_y_continuous(limits=ylim)
     }
     
     # Add additional theme elements
