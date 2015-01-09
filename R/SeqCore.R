@@ -178,6 +178,39 @@ getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
 }
 
 
+#' Test nucleotide sequences for equality.
+#' 
+#' \code{testSeqEqual} checks if two nucleotide sequences are identical.
+#'
+#' @param    seq1    character string containing a nucleotide sequence.
+#' @param    seq2    character string containing a nucleotide sequence.
+#' @param    ignore  vector of characters to ignore when testing for equality.
+#' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
+#' 
+#' @seealso  \code{\link{collapseDuplicates}}.
+#' @examples
+#' # Ignore gaps
+#' testSeqEqual("ATG-C", "AT--C")
+#' testSeqEqual("ATGGC", "ATGGN")
+#' testSeqEqual("AT--T", "ATGGC")
+#' 
+#' # Ignore only Ns
+#' testSeqEqual("ATG-C", "AT--C", ignore="N")
+#' testSeqEqual("ATGGC", "ATGGN", ignore="N")
+#' testSeqEqual("AT--T", "ATGGC", ignore="N")
+#' 
+#' @export
+testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
+    # Convert string to character vector
+    x <- unlist(strsplit(seq1, ""))
+    y <- unlist(strsplit(seq2, ""))
+    # Determine non-ignored positions
+    i <- !((x %in% ignore) | (y %in% ignore))
+    
+    return(all(x[i] == y[i]))
+}
+
+
 #### Sequence manipulation functions ####
 
 #' Replace gap characters with Ns in nucleotide sequences
@@ -296,8 +329,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'                        of duplicate sequences will be summed. 
 #' @param    seq_fields   a vector of nucletoide sequence columns to collapse. The sequence 
 #'                        with the fewest Ns will be retained. This is distinct from the 
-#'                        \code{seq} parameter which is used to determine duplicates. 
-#' @param    nuc_mat      nucleotide character distance matrix.
+#'                        \code{seq} parameter which is used to determine duplicates.
+#' @param    ignore       vector of characters to ignore when testing for equality.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
 #' @return   A modified data.frame with duplicate sequences removed and annotation fields 
@@ -308,8 +341,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'           along with their annotations.
 #' 
 #' @family   sequence manipulation functions
-#' @seealso  Distance is determined using \code{\link{getSeqDistance}} and 
-#'           \code{\link{getNucMatrix}}.
+#' @seealso  \code{\link{testSeqEqual}}.
 #' @examples
 #' # Example Change-O data.frame
 #' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
@@ -321,22 +353,21 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' 
 #' # Annotations are not parsed if neither text_fields nor num_fields is specified
 #' # The retained sequence annotations will be random
-#' collapseDuplicates(df)
+#' collapseDuplicates(df, verbose=T)
 #'
 #' # Unique text_fields annotations are combined into a single string with "/"
 #' # num_fields annotations are summed
 #' # Unambiguous duplicates are discarded
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT")
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", verbose=T)
 #' 
 #' # Masking ragged ends may impact duplicate removal
 #' df$SEQUENCE_GAP <- maskSeqEnds(df$SEQUENCE_GAP)
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT")
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", verbose=T)
 #'
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                               nuc_mat=getNucMatrix(gap=0),
-                               verbose=FALSE) {
+                               ignore=c("N", "-", ".", "?"), verbose=FALSE) {
     # TODO:  Should we verify/recast text_fields, num_fields and seq_field types?
     
     # Define verbose reporting function
@@ -357,18 +388,15 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     }
     
     # Build distance matrix
-    d_mat <- matrix(0, nseq, nseq, 
-                    dimnames=list(data[, id], data[, id]))
+    d_mat <- matrix(FALSE, nseq, nseq, dimnames=list(data[, id], data[, id]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
-            d_mat[i, j] <- d_mat[j, i] <- getSeqDistance(data[i, seq], 
-                                                         data[j, seq], 
-                                                         nuc_mat)
+            d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[i, seq], data[j, seq], ignore)
         }
     }
     
-    # Return input if no sequences have zero distance
-    if (all(d_mat[lower.tri(d_mat, diag=F)] != 0)) {
+    # Return input if no sequences are equal
+    if (all(!d_mat[lower.tri(d_mat, diag=F)])) {
         if (verbose) { printVerbose(nseq, nseq, 0) }
         return(data)
     }        
@@ -376,7 +404,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     # Find sequences that will cluster ambiguously
     ambig_rows <- numeric()
     for (i in 1:nseq) {
-        idx <- which(d_mat[i, ] == 0)
+        idx <- which(d_mat[i, ])
         tmp_mat <- d_mat[idx, idx]
         if (any(tmp_mat != 0)) { 
             ambig_rows <- append(ambig_rows, i) 
@@ -406,7 +434,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         if (taxa %in% done_taxa) { next }
             
         # Find all zero distance taxa
-        idx <- which(d_mat[taxa, ] == 0)
+        idx <- which(d_mat[taxa, ])
         if (length(idx) == 1) {
             # Assign unique sequences to unique vector
             uniq_taxa <- append(uniq_taxa, taxa_names[idx])
