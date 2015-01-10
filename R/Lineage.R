@@ -136,17 +136,23 @@ writePhylipInput <- function(clone, path) {
 
 # Run PHYLIP dnapars application
 #
-# @param   path          the temporary directory containing infile
-# @param   dnapars_exec  the path to the dnapars executable
+# @param   path          temporary directory containing infile.
+# @param   dnapars_exec  path to the dnapars executable.
+# @param   verbose       if TRUE suppress phylip console output.
 # @return  NULL
-runPhylip <- function(path, dnapars_exec) {
+runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
 
     # Run dnapars
     phy_options <- c("S", "Y", "I", "4", "5", ".")
-    system(paste0("cd ", path, "; ", dnapars_exec), input=c(phy_options, "Y"))
+    if (verbose) {
+        system(paste0("cd ", path, "; ", dnapars_exec), input=c(phy_options, "Y"))
+    } else {
+        system(paste0("cd ", path, "; ", dnapars_exec), input=c(phy_options, "Y"),
+               ignore.stdout=TRUE, ignore.stderr=TRUE)
+    }
 }
 
 
@@ -156,7 +162,7 @@ runPhylip <- function(path, dnapars_exec) {
 # @return  a character vector with each item as a line in the outfile
 readPhylipOutput <- function(path) {
     phylip_out <- scan(file.path(path, "outfile"), what="character", sep="\n", 
-                       blank.lines.skip=F, strip.white=F)
+                       blank.lines.skip=FALSE, strip.white=FALSE, quiet=TRUE)
     return(phylip_out)
 }
 
@@ -344,6 +350,8 @@ phylipToGraph <- function(edges, clone) {
 #' @param    dnapars_exec  path to the PHYLIP dnapars executable.
 #' @param    rm_temp       if TRUE delete the temporary directory after running PHYLIP;
 #'                         if FALSE keep the temporary directory.
+#' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
+#'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to the console.                        
 #' @return   an igraph \code{graph} object
 #' 
 #' @seealso See \code{\link{igraph}} and \code{\link{igraph.plotting}} for working 
@@ -368,7 +376,7 @@ phylipToGraph <- function(edges, clone) {
 #' }
 #' 
 #' @export
-buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
+buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE) {
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
                 2 unique sequences")
@@ -379,7 +387,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE) {
     
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
-    runPhylip(temp_path, dnapars_exec)
+    runPhylip(temp_path, dnapars_exec, verbose=verbose)
     phylip_out <- readPhylipOutput(temp_path)
     
     # Remove temporary directory
