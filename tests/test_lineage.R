@@ -1,8 +1,10 @@
 # Lineage tests
 # @author  Jason Anthony Vander Heiden  
-# @date    2014.9.24
+# @date    2015.01.10
 
 #### Run paramaters ####
+library(alakazam)
+library(igraph)
 dnapars_exec <- file.path(Sys.getenv('HOME'), 'apps', 'phylip-3.69', 'dnapars')
 clone_file <- "inst/extdata/changeo_demo.tab"
 text_fields <- c("SAMPLE", "ISOTYPE")

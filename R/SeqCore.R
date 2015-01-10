@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.12.1
+# @date       2015.01.10
 
 
 #### Constants ####
@@ -388,7 +388,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     }
     
     # Build distance matrix
-    d_mat <- matrix(FALSE, nseq, nseq, dimnames=list(data[, id], data[, id]))
+    d_mat <- matrix(TRUE, nseq, nseq, dimnames=list(data[, id], data[, id]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
             d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[i, seq], data[j, seq], ignore)
@@ -396,7 +396,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     }
     
     # Return input if no sequences are equal
-    if (all(!d_mat[lower.tri(d_mat, diag=F)])) {
+    if (!any(d_mat[lower.tri(d_mat, diag=F)])) {
         if (verbose) { printVerbose(nseq, nseq, 0) }
         return(data)
     }        
@@ -406,7 +406,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     for (i in 1:nseq) {
         idx <- which(d_mat[i, ])
         tmp_mat <- d_mat[idx, idx]
-        if (any(tmp_mat != 0)) { 
+        if (!all(tmp_mat)) { 
             ambig_rows <- append(ambig_rows, i) 
         }
     }
