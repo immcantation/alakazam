@@ -368,7 +368,16 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                ignore=c("N", "-", ".", "?"), verbose=FALSE) {
-    # TODO:  Should we verify/recast text_fields, num_fields and seq_field types?
+    # Verify column classes and exit if they are incorrect
+    if (!all(sapply(subset(data, select=text_fields), is.character))) {
+        stop("All text_fields columns must be of type 'character'")
+    }
+    if (!all(sapply(subset(data, select=num_fields), is.numeric))) {
+        stop("All num_fields columns must be of type 'numeric'")
+    }
+    if (!all(sapply(subset(data, select=seq_fields), is.character))) {
+        stop("All seq_fields columns must be of type 'character'")
+    }
     
     # Define verbose reporting function
     printVerbose <- function(n_total, n_unique, n_discard) {
@@ -443,7 +452,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
             dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
         } else {
             # Report error (should never occur)
-            stop('Error in distance matrix of collapseDuplicates')
+            stop("Error in distance matrix of collapseDuplicates")
         }
         # Update vector of clustered taxa
         done_taxa <- c(done_taxa, taxa_names[idx])
@@ -460,22 +469,37 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
             # Define set of text fields for row
             for (f in text_fields) {
                 f_set <- na.omit(data[idx, f])
-                f_set <- unlist(strsplit(f_set, '/'))
-                f_set <- sort(unique(f_set))
-                tmp_df[, f] <- paste(f_set, collapse='/')
+                if (length(f_set) > 0) {
+                    f_set <- unlist(strsplit(f_set, '/'))
+                    f_set <- sort(unique(f_set))
+                    f_val <- paste(f_set, collapse='/')
+                } else {
+                    f_val <- NA
+                }
+                tmp_df[, f] <- f_val
             }
             
             # Sum numeric fields
             for (f in num_fields) {
-                f_set <- data[idx, f]
-                tmp_df[, f] <- sum(f_set, na.rm=T)
+                f_set <- na.omit(data[idx, f])
+                if (length(f_set) > 0) { 
+                    f_val <- sum(f_set) 
+                } else { 
+                    f_val <- NA 
+                }
+                tmp_df[, f] <- f_val
             }
             
             # Select sequence fields with fewest Ns
             for (f in seq_fields) {
-                f_set <- data[idx, f]
-                f_len <- nchar(gsub("N", "", f_set))
-                tmp_df[, f] <- f_set[which.max(f_len)]
+                f_set <- na.omit(data[idx, f])
+                if (length(f_set) > 0) {
+                    f_len <- nchar(gsub("N", "", f_set))
+                    f_val <- f_set[which.max(f_len)]
+                } else {
+                    f_val <- NA
+                }
+                tmp_df[, f] <- f_val
             }
             
             # Assign id and sequence with least number of Ns
