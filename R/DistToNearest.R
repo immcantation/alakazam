@@ -177,7 +177,7 @@ distToNearest <- function(db, seq='JUNCTION', genotyped=FALSE, first=TRUE, model
 	
 	# cat("Calculating distance to nearest neighbor\n")
 	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), here(mutate), 
-                       DIST_NEAREST=getDistanceToClosest(seq, subs=model_data[['subs']], mut=model_data[['mut']])), 
+                       DIST_NEAREST=getDistanceToClosest(eval(parse(text=seq)), subs=model_data[['subs']], mut=model_data[['mut']])), 
                  ROW_ID)
   
 	return(db$DIST_NEAREST)
