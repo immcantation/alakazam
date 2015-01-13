@@ -178,7 +178,6 @@ distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='hs5f') {
 	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), here(mutate), 
                        DIST_NEAREST=getDistanceToClosest(JUNCTION, subs=model_data[['subs']], mut=model_data[['mut']])), 
                  ROW_ID)
-	
-	db <- db[,!(names(db) %in% c("V","J","ROW_ID"))]
-	return(db)
+  
+	return(db$DIST_NEAREST)
 }
