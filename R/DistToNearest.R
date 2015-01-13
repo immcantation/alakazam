@@ -112,20 +112,27 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
 
 #' Distance to nearest neighbor
 #' 
-#' Get distance of every sequence to its nearest sequence sharing same V gene, J gene, and junction length.
+#' Get distance of every sequence to its nearest sequence sharing same V gene, J gene, and 
+#' sequence length.
 #' 
 #' hs5f model is the SHM targeting model from Yaari, G., et al. Frontiers in Immunology, 2013.
 #' m3n model uses the SHM substitution matrix found in Smith, D., et al. J. Immunol., 1996.
 #'
-#' @param   db          \code{data.frame} which must have the following columns: V_CALL, J_CALL, JUNCTION_GAP_LENGTH.
-#' @param   seq         Field with sequences to compare
-#' @param   genotyped   Logical for whether \code{data.frame} is genotyped; if genotyped is true, 
-#'                      \code{data.frame} must have column V_CALL_GENOTYPED.
-#' @param   first       if TRUE only the first call the gene assignment is used;
-#'                      if FALSE the union of ambiguous gene assignments is used to group all sequences with any of those gene calls.
-#' @param   model       SHM targeting model, one of c('hs5f','m3n'); see Details.
+#' @param   db         \code{data.frame} which must have the following columns: V_CALL and J_CALL.
+#' @param   seq        the column containing nucleotide sequences to compare. Also used to determine
+#'                     sequence length for grouping.
+#' @param   genotyped  logical indicating whether \code{db} is genotyped; if genotyped is \code{TRUE}, 
+#'                     \code{db} must have the column V_CALL_GENOTYPED.
+#' @param   first      if \code{TRUE} only the first call the gene assignment is used;
+#'                     if \code{FALSE} the union of ambiguous gene assignments is used to group all sequences with 
+#'                     any of those gene calls.
+#' @param   model      SHM targeting model; must be one of c("hs5f", "m3n"). See Details for further information.
+#' @param   vector     if \code{TRUE} return a numeric vector of only the distances; if \code{FALSE} return the 
+#'                     entire input data.frame with a DIST_NEAREST column added.
 #' 
-#' @return  vector of distances of each sequence to its nearest neighbor
+#' @return  If \code{vector=TRUE} returns a numeric vector of distances of each sequence to its nearest neighbor. 
+#'          If \code{vector=FALSE} returns a modified \code{db} data.frame with nearest neighbor distances
+#'          in the DIST_NEAREST column.
 #' 
 #' @examples
 #' # Load example data
@@ -133,13 +140,13 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
 #' df <- readChangeoDb(file)
 #' 
 #' # Calculate distance to nearest
-#' df$DIST_NEAREST <- distToNearest(df, genotyped=TRUE, first=FALSE)
-#' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,10))
+#' dist <- distToNearest(df, genotyped=TRUE, first=FALSE, vector=TRUE)
+#' hist(dist, breaks=50, xlim=c(0, 15))
 #' 
 #' @export
-distToNearest <- function(db, seq='JUNCTION', genotyped=FALSE, first=TRUE, model='hs5f') {  
-	if(!is.data.frame(db))
-		stop('Must submit a data frame')
+distToNearest <- function(db, seq="JUNCTION", genotyped=FALSE, first=TRUE, model="hs5f", 
+                          vector=FALSE) {  
+	if(!is.data.frame(db)) { stop('Must submit a data frame') }
 	
 	if(genotyped) { 
 		v_col <- "V_CALL_GENOTYPED"
@@ -169,16 +176,23 @@ distToNearest <- function(db, seq='JUNCTION', genotyped=FALSE, first=TRUE, model
   
 	# Load targeting model
 	# cat("Loading Targeting Model\n")
-  model_data <- loadModel(model)
+    model_data <- loadModel(model)
   
 	# Create new column for distance to nearest neighbor
-	db$DIST_NEAREST = rep(NA, nrow(db))
-	db[,"ROW_ID"] <- 1:nrow(db)
+	db$DIST_NEAREST <- rep(NA, nrow(db))
+	db$ROW_ID <- 1:nrow(db)
+    db$L <- nchar(db[, seq])
 	
 	# cat("Calculating distance to nearest neighbor\n")
-	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), here(mutate), 
-                       DIST_NEAREST=getDistanceToClosest(eval(parse(text=seq)), subs=model_data[['subs']], mut=model_data[['mut']])), 
-                 ROW_ID)
-  
-	return(db$DIST_NEAREST)
+	db <- arrange(ddply(db, .(V, J, L), here(mutate), 
+                        DIST_NEAREST=getDistanceToClosest(eval(parse(text=seq)), 
+                                                          subs=model_data[['subs']], 
+                                                          mut=model_data[['mut']])), 
+                  ROW_ID)
+    
+    if (vector) {
+        return(db$DIST_NEAREST)
+    } else {
+        return(db[, !(names(db) %in% c("V", "J", "L", "ROW_ID"))])
+    }
 }

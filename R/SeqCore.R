@@ -520,6 +520,49 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 }
 
 
+#' Extracts FWRs and CDRs from IMGT-gapped sequences
+#' 
+#' \code{getVRegion} extracts the framework and complementarity determining regions of the V-segment 
+#' for IMGT-gapped immunoglobulin (Ig) nucleotide sequences from  according to the IMGT numbering scheme.
+#'
+#' @param     sequences  character vector of IMGT gapped sequences.
+#' @param     region     string defining the region of the V segment to extract. Must be one of 
+#'                       \code{c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")}
+#' @return    A character vector of the extracted sub-sequences.
+#' 
+#' @seealso   \code{\link{substr}}.
+#' @references
+#'   \url{http://imgt.org}
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' clone <- subset(df, CLONE == 164)
+#'
+#' # Get regions
+#' getVRegion(clone$SEQUENCE_GAP, "FWR1")
+#' getVRegion(clone$SEQUENCE_GAP, "CDR1")
+#' getVRegion(clone$SEQUENCE_GAP, "FWR2")
+#' getVRegion(clone$SEQUENCE_GAP, "CDR2")
+#' getVRegion(clone$SEQUENCE_GAP, "FWR3")
+#'
+#' @export
+getVRegion <- function(sequences, region) {
+    # Define IMGT region boundaries
+    imgt <- list("FWR1"=c(1, 78),
+                 "CDR1"=c(79, 114),
+                 "FWR2"=c(115, 165),
+                 "CDR2"=c(166, 195),
+                 "FWR3"=c(196, 312))
+    # Check region argument    
+    if (!(region %in% names(imgt))) {
+        stop("Incorrect region value. Must be one of c('FWR1', 'CDR1', 'FWR2', 'CDR2' ,'FWR3').")
+    }
+    
+    return(substr(sequences, imgt[[region]][1], imgt[[region]][2]))
+}
+
+
 #### Gene annotation functions ####
 
 #' Get Ig segment allele, gene and family names
@@ -537,7 +580,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #'                            assignments; if \code{FALSE} return all assignments (faster). 
 #'                            Has no effect if \code{first=TRUE}.
 #' @param     sep             character defining both the input and output segment call delimiter.
-#' @return    a character vector containing allele, gene or family names
+#' @return    A character vector containing allele, gene or family names
 #' 
 #' @seealso   Uses \code{\link{str_extract}}.
 #' @references
