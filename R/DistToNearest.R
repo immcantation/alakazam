@@ -117,14 +117,15 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
 #' hs5f model is the SHM targeting model from Yaari, G., et al. Frontiers in Immunology, 2013.
 #' m3n model uses the SHM substitution matrix found in Smith, D., et al. J. Immunol., 1996.
 #'
-#' @param   db          \code{data.frame} which must have the following columns: V_CALL, J_CALL, JUNCTION_GAP_LENGTH, JUNCTION.
+#' @param   db          \code{data.frame} which must have the following columns: V_CALL, J_CALL, JUNCTION_GAP_LENGTH.
+#' @param   seq         Field with sequences to compare
 #' @param   genotyped   Logical for whether \code{data.frame} is genotyped; if genotyped is true, 
 #'                      \code{data.frame} must have column V_CALL_GENOTYPED.
 #' @param   first       if TRUE only the first call the gene assignment is used;
 #'                      if FALSE the union of ambiguous gene assignments is used to group all sequences with any of those gene calls.
 #' @param   model       SHM targeting model, one of c('hs5f','m3n'); see Details.
 #' 
-#' @return  \code{data.frame} with DIST_NEAREST column added
+#' @return  vector of distances of each sequence to its nearest neighbor
 #' 
 #' @examples
 #' # Load example data
@@ -132,11 +133,11 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
 #' df <- readChangeoDb(file)
 #' 
 #' # Calculate distance to nearest
-#' df <- distToNearest(df, genotyped=TRUE, first=FALSE)
-#' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,0.02))
+#' df$DIST_NEAREST <- distToNearest(df, genotyped=TRUE, first=FALSE)
+#' hist(df$DIST_NEAREST, breaks=50, xlim=c(0,10))
 #' 
 #' @export
-distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='hs5f') {  
+distToNearest <- function(db, seq='JUNCTION', genotyped=FALSE, first=TRUE, model='hs5f') {  
 	if(!is.data.frame(db))
 		stop('Must submit a data frame')
 	
@@ -176,7 +177,7 @@ distToNearest <- function(db, genotyped=FALSE, first=TRUE, model='hs5f') {
 	
 	# cat("Calculating distance to nearest neighbor\n")
 	db <- arrange( ddply(db, .(V,J,JUNCTION_GAP_LENGTH), here(mutate), 
-                       DIST_NEAREST=getDistanceToClosest(JUNCTION, subs=model_data[['subs']], mut=model_data[['mut']])), 
+                       DIST_NEAREST=getDistanceToClosest(seq, subs=model_data[['subs']], mut=model_data[['mut']])), 
                  ROW_ID)
   
 	return(db$DIST_NEAREST)
