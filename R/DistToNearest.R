@@ -1,5 +1,5 @@
 # Generates distance to nearest neighbor by using S5F mutability model
-# 
+#
 # @author     Namita Gupta, Gur Yaari, Mohamed Uduman
 # @copyright  Copyright 2013 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
@@ -16,23 +16,38 @@ loadModel <- function(model) {
     if (model == "hs5f") { data_file = "HS5F_Targeting.RData" }
     else if (model == "m3n") { data_file = "MTri_Targeting.RData" }
     else { stop("Are you sure you know what you're doing?\n") }
-    
+
     tmp_env <- new.env()
     load(system.file("extdata", data_file, package="shm"), envir=tmp_env)
     Targeting <- get("Targeting", envir=tmp_env)
     rm(tmp_env)
-    
+
     return(list(subs=Targeting[["Substitution"]], mut=Targeting[["Mutability"]]))
 }
 
 
-# Get distance between two sequences of same length broken down into 5-mers.
-#
-# @param   seq1   first nucleotide sequence.
-# @param   seq2   second nucleotide sequence.
-# @param   subs    substitution model.
-# @param   mut    mutability model.
-# @return  distance between two sequences.
+#' Get distance between two five-mer sequences of same length
+#'
+#' @param   seq1   first nucleotide sequence.
+#' @param   seq2   second nucleotide sequence.
+#' @param   subs    substitution model.
+#' @param   mut    mutability model.
+#' @return  distance between two sequences.
+#'
+#' @examples
+#' seq1  = "AAAAAAA"
+#' seq2 = "ATAACAAA"
+#'
+#' # adds 'NN' to the begning and end of the sequences
+#' seq1 <- paste0('NN', seq1, 'NN')
+#' seq2 <- paste0('NN', seq2, 'NN')
+#'
+#' #Break sequence into fivemers
+#' seq1 <- slidingArrayOf5mers(seq1)
+#' seq2 <- slidingArrayOf5mers(seq2)
+#' model="hs5f"
+#' model_data <- loadModel(model)
+#' dist_seq_fast(seq1, seq2, model_data[["subs"]], model_data[["mut"]])
 #' @export
 dist_seq_fast <- function(seq1, seq2, subs, mut){
     #Compute distance only on fivemers that have mutations
@@ -62,33 +77,33 @@ dist_seq_fast <- function(seq1, seq2, subs, mut){
 # @param   mut            mutability model.
 # @return  A vector of distances to the closest sequence.
 #' @export
-getDistanceToClosest <- function(arrJunctions, subs, mut){ 
-  
+getDistanceToClosest <- function(arrJunctions, subs, mut){
+
   #Initialize array of distances
   arrJunctionsDist <- rep(NA,length(arrJunctions))
-  
+
   #Filter unique junctions
   arrJunctionsUnique <- unique(arrJunctions)
-  
+
   #Map indexes of unique to its non-unique in the original arrJunctions
   indexJunctions <- match(arrJunctions, arrJunctionsUnique)
-  
-  #Identify junctions with multiple non-unique sequences and set its distances to 0 
+
+  #Identify junctions with multiple non-unique sequences and set its distances to 0
   indexJunctionsCounts <- table(indexJunctions)
   indexRepeated <- as.numeric(names(indexJunctionsCounts)[indexJunctionsCounts>1])
   indexRepeated <- indexJunctions%in%indexRepeated
   arrJunctionsDist[ indexRepeated ] <- rep(0,sum(indexRepeated))
   names(arrJunctionsDist) <- arrJunctions
-  
+
   #Compute distances between junctions
   numbOfUniqueJuctions <- length(arrJunctionsUnique)
   arrUniqueJunctionsDist <- rep(NA,numbOfUniqueJuctions)
   if(numbOfUniqueJuctions>1){
     arrJunctionsUnique <- toupper(arrJunctionsUnique)
     arrJunctionsUnique <- gsub('.', '-', arrJunctionsUnique, fixed=TRUE)
-    arrJunctionsUnique <- as.vector(sapply(arrJunctionsUnique,function(x){paste("NN",x,"NN",sep="")})) 
+    arrJunctionsUnique <- as.vector(sapply(arrJunctionsUnique,function(x){paste("NN",x,"NN",sep="")}))
     matSequenceFivemers <- sapply(arrJunctionsUnique,
-                                  function(x){  
+                                  function(x){
                                     lenString <- nchar(x)
                                     fivemersPos <- 3:(lenString-2)
                                     fivemers <-  substr(rep(x,lenString-4),(fivemersPos-2),(fivemersPos+2))
@@ -100,10 +115,10 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
       dist_seq_fast(matSequenceFivemers[,i],matSequenceFivemers[,j], subs=subs, mut=mut)
     })))
     matDistance <- matDistance + t(matDistance)
-    arrUniqueJunctionsDist <- sapply(1:numbOfUniqueJuctions, function(i){ min(matDistance[-i,i]) })    
+    arrUniqueJunctionsDist <- sapply(1:numbOfUniqueJuctions, function(i){ min(matDistance[-i,i]) })
     names(arrUniqueJunctionsDist) <- arrJunctionsUnique
   }
-  
+
   #Fill the distances for the sequences that are unique
   arrJunctionsDist[is.na(arrJunctionsDist)] <- arrUniqueJunctionsDist[indexJunctionsCounts==1]
   return(round(arrJunctionsDist,4))
@@ -111,53 +126,53 @@ getDistanceToClosest <- function(arrJunctions, subs, mut){
 
 
 #' Distance to nearest neighbor
-#' 
-#' Get distance of every sequence to its nearest sequence sharing same V gene, J gene, and 
+#'
+#' Get distance of every sequence to its nearest sequence sharing same V gene, J gene, and
 #' sequence length.
-#' 
+#'
 #' hs5f model is the SHM targeting model from Yaari, G., et al. Frontiers in Immunology, 2013.
 #' m3n model uses the SHM substitution matrix found in Smith, D., et al. J. Immunol., 1996.
 #'
 #' @param   db         \code{data.frame} which must have the following columns: V_CALL and J_CALL.
 #' @param   seq        the column containing nucleotide sequences to compare. Also used to determine
 #'                     sequence length for grouping.
-#' @param   genotyped  logical indicating whether \code{db} is genotyped; if genotyped is \code{TRUE}, 
+#' @param   genotyped  logical indicating whether \code{db} is genotyped; if genotyped is \code{TRUE},
 #'                     \code{db} must have the column V_CALL_GENOTYPED.
 #' @param   first      if \code{TRUE} only the first call the gene assignment is used;
-#'                     if \code{FALSE} the union of ambiguous gene assignments is used to group all sequences with 
+#'                     if \code{FALSE} the union of ambiguous gene assignments is used to group all sequences with
 #'                     any of those gene calls.
 #' @param   model      SHM targeting model; must be one of c("hs5f", "m3n"). See Details for further information.
-#' @param   vector     if \code{TRUE} return a numeric vector of only the distances; if \code{FALSE} return the 
+#' @param   vector     if \code{TRUE} return a numeric vector of only the distances; if \code{FALSE} return the
 #'                     entire input data.frame with a DIST_NEAREST column added.
-#' 
-#' @return  If \code{vector=TRUE} returns a numeric vector of distances of each sequence to its nearest neighbor. 
+#'
+#' @return  If \code{vector=TRUE} returns a numeric vector of distances of each sequence to its nearest neighbor.
 #'          If \code{vector=FALSE} returns a modified \code{db} data.frame with nearest neighbor distances
 #'          in the DIST_NEAREST column.
-#' 
+#'
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
-#' 
+#'
 #' # Calculate distance to nearest
 #' dist <- distToNearest(df, genotyped=TRUE, first=FALSE, vector=TRUE)
 #' hist(dist, breaks=50, xlim=c(0, 15))
-#' 
+#'
 #' @export
-distToNearest <- function(db, seq="JUNCTION", genotyped=FALSE, first=TRUE, model="hs5f", 
-                          vector=FALSE) {  
+distToNearest <- function(db, seq="JUNCTION", genotyped=FALSE, first=TRUE, model="hs5f",
+                          vector=FALSE) {
 	if(!is.data.frame(db)) { stop('Must submit a data frame') }
-	
-	if(genotyped) { 
+
+	if(genotyped) {
 		v_col <- "V_CALL_GENOTYPED"
 	} else {
 		v_col <- "V_CALL"
 	}
 	j_col <- "J_CALL"
-	
+
 	# Parse V and J Column to get gene
 	# cat("V+J Column parsing\n")
-	
+
 	if(first) {
 		db$V <- getGene(db[,v_col])
 		db$J <- getGene(db[,j_col])
@@ -173,23 +188,23 @@ distToNearest <- function(db, seq="JUNCTION", genotyped=FALSE, first=TRUE, model
 	    for(g in strsplit(ambig, split=','))
 	      db$J[db$J==g] = ambig
 	}
-  
+
 	# Load targeting model
 	# cat("Loading Targeting Model\n")
     model_data <- loadModel(model)
-  
+
 	# Create new column for distance to nearest neighbor
 	db$DIST_NEAREST <- rep(NA, nrow(db))
 	db$ROW_ID <- 1:nrow(db)
     db$L <- nchar(db[, seq])
-	
+
 	# cat("Calculating distance to nearest neighbor\n")
-	db <- arrange(ddply(db, .(V, J, L), here(mutate), 
-                        DIST_NEAREST=getDistanceToClosest(eval(parse(text=seq)), 
-                                                          subs=model_data[['subs']], 
-                                                          mut=model_data[['mut']])), 
+	db <- arrange(ddply(db, .(V, J, L), here(mutate),
+                        DIST_NEAREST=getDistanceToClosest(eval(parse(text=seq)),
+                                                          subs=model_data[['subs']],
+                                                          mut=model_data[['mut']])),
                   ROW_ID)
-    
+
     if (vector) {
         return(db$DIST_NEAREST)
     } else {
