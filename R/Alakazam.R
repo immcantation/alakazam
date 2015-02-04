@@ -22,6 +22,5 @@
 #' @import plyr
 #' @import scales
 #' @import stringr
-#' @import shm
 #' @import utils
 NULL

@@ -1,6 +1,0 @@
-# Multifurcating tree
-#ape::multi2di
-# Read tree file into phylo object
-#ape::read.tree
-# Make/score trees with parsimony
-#phangorn::parsimony

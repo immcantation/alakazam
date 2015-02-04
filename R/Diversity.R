@@ -72,10 +72,10 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' @param    q  numeric vector of diversity orders.
 #' @return   A vector of diversity numbers (D) for each q.
 #' 
-#' @seealso  Used by \code{\link{bootstrapDiversity}} and \code{\link{testDiversity}}.
 #' @references    
 #' Hill, M. Diversity and evenness: a unifying notation and its consequences. 
 #'   Ecology 54, 427–432 (1973).
+#' @seealso  Used by \code{\link{bootstrapDiversity}} and \code{\link{testDiversity}}.
 #' @examples
 #' # May define p as clonal member counts
 #' p <- c(1, 1, 3, 10)

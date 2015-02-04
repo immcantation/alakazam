@@ -15,7 +15,6 @@ Imports:
     methods,
     plyr,
     scales,
-    shm,
     stringr,
     utils
 Suggests:
