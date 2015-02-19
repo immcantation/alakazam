@@ -13,8 +13,8 @@
 #' into a data.frame.
 #'
 #' @param    file       tab delimited database file output by a Change-O tool.
-#' @param    select     columns to select from database
-#' @param    drop       columns to drop from database
+#' @param    select     columns to select from database file.
+#' @param    drop       columns to drop from database file.
 #' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case;
 #'                      if \code{FALSE} do not alter sequence fields.
 #' @return   a data.frame of the database file
@@ -29,32 +29,30 @@
 #' 
 #' @export
 readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
+    # Define column data types
+    seq_columns <- c("SEQUENCE", "SEQUENCE_GAP", "JUNCTION", 
+                     "GERMLINE_GAP", "GERMLINE_GAP_D_MASK")
+    text_columns <- c("SEQUENCE_ID", "CLONE", "SAMPLE")
+    
     # Read file
     db_df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
     
-    # Handled genotyped data
-    # ifelse("V_CALL_GENOTYPED" %in% colnames(data), "V_CALL_GENOTYPED", "V_CALL")
-    
-    select_cols <- colnames(db_df)
-    
-    # Select specific columns
-    if(!is.null(select))
-      select_cols <- intersect(select_cols, select)
-    
-    # Remove unwanted columns
-    if(!is.null(drop))
-      select_cols <- setdiff(select_cols, drop)
-    
-    db_df <- subset(db_df, select = select_cols)
+    # Select columns
+    select_columns <- colnames(db_df)
+    if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
+    if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
+    db_df <- subset(db_df, select=select_columns)
     
     # Convert sequence fields to upper case
     if (seq_upper) {
-        seq_columns <- c("SEQUENCE", "SEQUENCE_GAP", "JUNCTION", 
-                         "GERMLINE_GAP", "GERMLINE_GAP_D_MASK")
-        
-        for (x in intersect(seq_columns, colnames(db_df))) {
+        for (x in intersect(seq_columns, select_columns)) {
             db_df[, x] <- toupper(db_df[, x]) 
         }
+    }
+    
+    # Convert text fields to character
+    for (x in intersect(text_columns, select_columns)) {
+        db_df[, x] <- as.character(db_df[, x])
     }
     
     return(db_df)
