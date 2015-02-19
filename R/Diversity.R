@@ -36,24 +36,25 @@ setClass("DiversityCurve",
 #' \code{DiversityTest} defines the signifance of diversity (D) differences at a fixed
 #' fixed diversity order (q).
 #' 
-#' @slot  tests   data.frame with columns for group pairs (test), pvalues (pvalue), and
-#'                bootstrap delta distribution summary statistics (delta_mean, delta_sd).
-#' @slot  stats   data.frame of diversity (D) summary statistics by group. Includes columns
-#'                for group, mean, median, sd, mad.
-#' @slot  q       diversity order tested (q).
-#' @slot  groups  character vector of groups retained in diversity calculation.
-#' @slot  n       numeric value indication the number of sampled sequences from each group.
-#' @slot  nboot   number of bootstrap realizations.
+#' @slot  tests    data.frame with columns for group pairs (test), pvalues (pvalue), and
+#'                 bootstrap delta distribution summary statistics 
+#'                 (delta_median, delta_mad, delta_mean, delta_sd).
+#' @slot  summary  data.frame of diversity (D) summary statistics by group. Includes columns
+#'                 for group, mean, median, sd, mad.
+#' @slot  groups   character vector of groups retained in diversity calculation.
+#' @slot  q        diversity order tested (q).
+#' @slot  n        numeric value indication the number of sampled sequences from each group.
+#' @slot  nboot    number of bootstrap realizations.
 #' 
 #' @name DiversityTest
 #' @export
 setClass("DiversityTest", 
          slots=c(tests="data.frame",
-                 stats="data.frame",
+                 summary="data.frame",
                  groups="character", 
+                 q="numeric",
                  n="numeric", 
-                 nboot="numeric", 
-                 q="numeric"))
+                 nboot="numeric"))
 
 
 #### Methods ####
@@ -212,7 +213,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
 #'           \code{\link{DiversityTest}} for the return object. 
 #'           See \code{\link{bootstrapDiversity}} for curve generation.
-#' @examples          
+#' @examples  
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
@@ -223,7 +224,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
     
-    # TODO:  Needs two-tailed variant.  P-values can >1 if pvalue=pvalue*2
+    # TODO:  write plotDiversityTest function
     
     # Verify function arguments
     if (!is.data.frame(data)) {
@@ -263,46 +264,43 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
     cat("\n")
         
     # Compute ECDF of bootstrap distribution shift from bootstrap deltas
-    #>>> Change to median and mad?
     group_pairs <- combn(group_keep, 2, simplify=F)
     npairs <- length(group_pairs)
     delta_mat <- matrix(NA, nboot, npairs)
-    pvalue_mat <- matrix(NA, npairs, 3, 
-                         dimnames=list(NULL, c("pvalue", "delta_mean", "delta_sd")))
-    test_names <- character(length=npairs)
+    pvalue_mat <- matrix(NA, npairs, 5, dimnames=list(NULL, c("pvalue", 
+                                                              "delta_median", 
+                                                              "delta_mad", 
+                                                              "delta_mean", 
+                                                              "delta_sd")))
+    test_names <- sapply(group_pairs, paste, collapse=" != ")
     for (i in 1:npairs) {
         g1 <- group_pairs[[i]][1]
         g2 <- group_pairs[[i]][2]
-        if (median(div_mat[, g1]) > median(div_mat[, g2])) {
-            g_delta <- div_mat[, g1] - div_mat[, g2]
-            g_name <- paste(g1, g2, sep=' > ')
-        } else {
-            g_delta <- div_mat[, g2] - div_mat[, g1]
-            g_name <- paste(g2, g1, sep=' > ')
-        }  
-        test_names[i] <- g_name
         
         # Determine p-value
         g_cdf <- ecdf(g_delta)
-        #pvalue_mat[i, ] <- c(g_cdf(0) * 2, mean(g_delta), sd(g_delta))
-        pvalue_mat[i, ] <- c(g_cdf(0), mean(g_delta), sd(g_delta))
+        p <- g_cdf(0)
+        p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
+        pvalue_mat[i, ] <- c(p, 
+                             median(g_delta), 
+                             mad(g_delta), 
+                             mean(g_delta), 
+                             sd(g_delta))
     }
     
-    # >>> Convert mean/sd to slots of DiversityTest?
-    # >>> Plot function for sd/mean (dnorm)?
-    test_df <- cbind(data.frame(test=test_names), as.data.frame(pvalue_mat))
-    stats_df <- data.frame(group=group_keep, 
-                           median=apply(div_mat, 2, median),
-                           mad=apply(div_mat, 2, mad),
-                           mean=apply(div_mat, 2, mean),
-                           sd=apply(div_mat, 2, sd))
+    tests_df <- cbind(data.frame(test=test_names), as.data.frame(pvalue_mat))
+    summary_df <- data.frame(group=group_keep, 
+                             median=apply(div_mat, 2, median),
+                             mad=apply(div_mat, 2, mad),
+                             mean=apply(div_mat, 2, mean),
+                             sd=apply(div_mat, 2, sd))
     
     # Generate return object
     div <- new("DiversityTest", 
-               tests=test_df, 
-               stats=stats_df,
-               q=q,
+               tests=tests_df, 
+               summary=summary_df,
                groups=group_keep,
+               q=q,
                n=n, 
                nboot=nboot)
     
