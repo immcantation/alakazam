@@ -276,6 +276,12 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
     for (i in 1:npairs) {
         g1 <- group_pairs[[i]][1]
         g2 <- group_pairs[[i]][2]
+        # TODO:  verify this is correct. Is g1 - g2 different from g2 - g1?
+        if (median(div_mat[, g1]) > median(div_mat[, g2])) {
+            g_delta <- div_mat[, g1] - div_mat[, g2]
+        } else {
+            g_delta <- div_mat[, g2] - div_mat[, g1]
+        }  
         
         # Determine p-value
         g_cdf <- ecdf(g_delta)
