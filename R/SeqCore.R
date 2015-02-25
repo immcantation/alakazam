@@ -562,53 +562,6 @@ getVRegion <- function(sequences, region) {
     return(substr(sequences, imgt[[region]][1], imgt[[region]][2]))
 }
 
-
-#' Finds the consensus by frequency
-#' 
-#' \code{getConsensus} extracts the framework and complementarity determining regions of the V-segment 
-#' for IMGT-gapped immunoglobulin (Ig) nucleotide sequences from  according to the IMGT numbering scheme.
-#'
-#' @param     sequences  character vector of aligned sequences.
-#' @param     min_freq   the minumum frequency of a position a nucleotide must
-#'                       consitute in order to not be gapped.
-#' @param     include_n  logical indicating if N nucleotides should be included.
-#' @return    A character vector of the consensus sequence.
-#' 
-#' @details   In the case of a tie, the alphabetically first nucleotide is
-#'            chosen
-#' @examples
-#' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
-#' df <- readChangeoDb(file)
-#' clone <- subset(df, CLONE %in% c(164,186))
-#' sequences <- clone[,"SEQUENCE_GAP"]
-#'
-#' # Get consensus
-#' getConsensus(sequences)
-#'
-#' @export
-getConsensus <- function(sequences, min_freq = 0.75, include_n = FALSE) {
-  # Split sequences into characters
-  seq_chars = strsplit(toupper(sequences), "")
-  # Pad the sequences to match the longest
-  seq_lens = sapply(seq_chars, length)
-  padding = lapply(max(seq_lens) - seq_lens, function(x) rep(NA, x))
-  nt_mat = mapply(c, seq_chars, padding)
-  # Mask non-nucleotide characters
-  nucs = c("A","C","G","T")
-  if (include_n) { nucs = c("A","C","G","T","N") }
-  nt_mat[which(!(nt_mat %in% nucs))] = NA
-  # Find the most frequent nucleotide at each position
-  nt_max = apply(nt_mat, 1, function(x) names(c(sort(table(x)))[1]))
-  nt_max[which(sapply(nt_max, length) == 0)] = "-"
-  nt_max = unlist(nt_max)
-  # Gap positions where the most frequent nucleotide is not frequent enough
-  max_counts = apply(nt_mat, 1, function(x) sort(table(x),decreasing=TRUE)[1])
-  infrequent = which(max_counts < length(sequences)*min_freq)
-  nt_max[infrequent] = "-"
-  return(paste(nt_max, collapse=""))
-}
-
   
 #### Gene annotation functions ####
 
