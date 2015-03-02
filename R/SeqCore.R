@@ -201,9 +201,15 @@ getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
 #' 
 #' @export
 testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
+    # Test that sequences lengths are equal
+    if (nchar(seq1) != nchar(seq2)) {
+        return(FALSE)
+    }
+    
     # Convert string to character vector
     x <- unlist(strsplit(seq1, ""))
     y <- unlist(strsplit(seq2, ""))
+    
     # Determine non-ignored positions
     i <- !((x %in% ignore) | (y %in% ignore))
     
@@ -404,7 +410,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     d_mat <- matrix(TRUE, nseq, nseq, dimnames=list(data[, id], data[, id]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
-            d_mat[i, j] <- d_mat[j, i] <- suppressWarnings(testSeqEqual(data[i, seq], data[j, seq], ignore))
+            d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[i, seq], data[j, seq], ignore)
         }
     }
     
