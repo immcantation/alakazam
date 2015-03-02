@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2015.01.10
+# @date       2015.03.02
 
 
 #### Constants ####
@@ -652,7 +652,3 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
     
     return(r)
 }
-
-
-
-
