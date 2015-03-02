@@ -378,6 +378,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     if (!all(sapply(subset(data, select=seq_fields), is.character))) {
         stop("All seq_fields columns must be of type 'character'")
     }
+    seq_len <- nchar(data[, seq])
+    if (any(seq_len != seq_len[1])) {
+        warning("All sequences are not the same length")
+    }
     
     # Define verbose reporting function
     printVerbose <- function(n_total, n_unique, n_discard) {
@@ -400,7 +404,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     d_mat <- matrix(TRUE, nseq, nseq, dimnames=list(data[, id], data[, id]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
-            d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[i, seq], data[j, seq], ignore)
+            d_mat[i, j] <- d_mat[j, i] <- suppressWarnings(testSeqEqual(data[i, seq], data[j, seq], ignore))
         }
     }
     

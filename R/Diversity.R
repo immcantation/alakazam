@@ -219,7 +219,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' df <- readChangeoDb(file)
 #' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
+#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=1000)
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
@@ -277,7 +277,7 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
         g1 <- group_pairs[[i]][1]
         g2 <- group_pairs[[i]][2]
         # TODO:  verify this is correct. Is g1 - g2 different from g2 - g1?
-        if (median(div_mat[, g1]) > median(div_mat[, g2])) {
+        if (median(div_mat[, g1]) >= median(div_mat[, g2])) {
             g_delta <- div_mat[, g1] - div_mat[, g2]
         } else {
             g_delta <- div_mat[, g2] - div_mat[, g1]
