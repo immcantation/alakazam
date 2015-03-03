@@ -4,24 +4,27 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.12.10
+# @date       2015.03.03
 
 
 #### Classes ####
 
 #' S4 class defining a clone
 #' 
-#' \code{ChangeoClone} defines common fields to perform lineage recontruction
-#' from a Change-O clone.
+#' \code{ChangeoClone} defines a common data structure for perform lineage recontruction
+#' from Change-O data.
 #' 
-#' @slot  data        data.frame containing SEQUENCE_ID, SEQUENCE_GAP,
-#'                    and additional annotation fields.
-#' @slot  clone       string defining the clone identifier.
-#' @slot  germline    string containing the germline sequence for the clone.
-#' @slot  v_gene      string defining the V segment gene call.
-#' @slot  v_gene      string defining the J segment gene call.
-#' @slot  junc_len    numeric junction length.
+#' @slot     data      data.frame containing sequences and annotations. Contains the
+#'                     columns SEQUENCE_ID and SEQUENCE_GAP, as well as any additional
+#'                     sequence-specific annotation columns.
+#' @slot     clone     string defining the clone identifier.
+#' @slot     germline  string containing the germline sequence for the clone.
+#' @slot     v_gene    string defining the V segment gene call.
+#' @slot     v_gene    string defining the J segment gene call.
+#' @slot     junc_len  numeric junction length (nucleotide count).
 #' 
+#' @seealso  See \code{\link{makeChangeoClone}} and \code{\link{buildPhylipLineage}} for use.
+#'           
 #' @name ChangeoClone
 #' @export
 setClass("ChangeoClone", 
@@ -35,33 +38,48 @@ setClass("ChangeoClone",
 
 #### Preprocessing functions ####
 
-#' Process a clone for lineage construction
+#' Generate a ChangeoClone object for lineage construction
 #' 
-#' \code{prepChangeoClone} preprocessing a clonal group for lineage reconstruction.
+#' \code{makeChangeoClone} takes a data.frame with Change-O style columns as input and 
+#' masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
+#' annotations associated with duplicate sequences. It returns a ChangeoClone object which
+#' serves as input for lineage reconstruction.
 #' 
-#' Takes a data.frame with Change-O style column as input and masks gap positions, 
-#' masks ragged ends, remove duplicates sequences, and merges annotations associated 
-#' with duplicate sequences.
-#' 
-#' The clone identifier, germline sequence, V gene, J gene, and junction length are 
-#' determined from the first entry in the CLONE, GERMLINE_GAP_D_MASK, V_CALL, J_CALL, 
-#' and JUNCTION_GAP_LENGTH columns, respectively. For any given clone, each value in these
-#' columns should be identical.
-#'
-#' @param    data         a data.frame containing the Change-O data for a clone. 
-#'                        The data.frame must contain the following columns:
-#'                        SEQUENCE_ID, SEQUENCE_GAP, CLONE, GERMLINE_GAP_D_MASK
-#'                        V_CALL, J_CALL, JUNCTION_GAP_LENGTH.
+#' @param    data         data.frame containing the Change-O data for a clone. See Details
+#'                        for the list of required columns.
 #' @param    max_mask     maximum number of characters to mask at the leading and trailing
-#'                        sequence ends. If \code{NULL} then the threshold is automatically
-#'                        set to the highest number of observed outer ends.  If set to 0 then
-#'                        no masking is performed.
-#' @param    text_fields  text annotation columns to process during duplicate removal.
-#' @param    num_fields   numeric annotation columns to process during duplicate removal.
-#' @return   a \code{ChangeoClone} object containing the modified clone
-#' 
+#'                        sequence ends. If \code{NULL} then the upper masking bound will 
+#'                        be automatically determined from the maximum number of observed 
+#'                        leading or trailing Ns amongst all sequences.
+#' @param    text_fields  text annotation columns to merge during duplicate removal.
+#' @param    num_fields   numeric annotation columns to sum during duplicate removal.
+#'
+#' @return   A \code{ChangeoClone} object containing the modified clone.
+#'
+#' @details
+#' The input data.frame (\code{data}) must contain the following columns:
+#' \itemize{
+#'   \item \code{SEQUENCE_ID}:          unique sequence identifier.
+#'   \item \code{SEQUENCE_GAP}:         IMGT-gapped sample sequence.
+#'   \item \code{GERMLINE_GAP_D_MASK}:  IMGT-gapped germline sequence.
+#'   \item \code{V_CALL}:               V-segment allele name.
+#'   \item \code{J_CALL}:               J-segment allele name.
+#'   \item \code{JUNCTION_GAP_LENGTH}:  IMGT-gapped junction sequence length.
+#'   \item \code{CLONE}:                clone identifier.
+#' }
+#' Additional columns will be retained in the \code{data} slot of the return object,
+#' but are not required.
+#'
+#' The clone identifier, germline sequence, V-segment gene call, J-segment gene call, 
+#' and junction length are determined from the first entry in the CLONE, 
+#' GERMLINE_GAP_D_MASK, V_CALL, J_CALL, and JUNCTION_GAP_LENGTH columns, respectively. 
+#' For any given clone, each value in these columns should be identical.
+#'  
 #' @seealso  Executes in order \code{\link{maskSeqGaps}}, \code{\link{maskSeqEnds}}
-#'           and \code{\link{collapseDuplicates}}. Returns a \code{\link{ChangeoClone}}.
+#'           and \code{\link{collapseDuplicates}}. 
+#'           Returns a \code{\link{ChangeoClone}} which serves as input to
+#'           \code{\link{buildPhylipLineage}}.
+#' 
 #' @examples
 #' # Example Change-O data.frame
 #' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
@@ -76,13 +94,13 @@ setClass("ChangeoClone",
 #'                  stringsAsFactors=FALSE)
 #' 
 #' # Without end masking
-#' prepChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+#' makeChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
 #'
 #' # With end masking
-#' prepChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+#' makeChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
 #'
 #' @export
-prepChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL) {
+makeChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL) {
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c("SEQUENCE_ID", "SEQUENCE_GAP", text_fields, num_fields)]
     tmp_df[, "SEQUENCE_GAP"] <- maskSeqGaps(tmp_df[, "SEQUENCE_GAP"], outer_only=FALSE)
@@ -343,19 +361,94 @@ phylipToGraph <- function(edges, clone) {
 
 #' Infer an Ig lineage using PHYLIP
 #' 
-#' \code{buildPhylipLineage} reconstructs an Ig lineage using the dnapars
-#' application of the PHYLIP package.
-#'
-#' @param    clone         \code{ChangeoClone} object containg clone data.
+#' \code{buildPhylipLineage} reconstructs an Ig lineage via maximum parsimony using the 
+#' dnapars application of the PHYLIP package.
+#' 
+#' @param    clone         \code{ChangeoClone} object containing clone data.
 #' @param    dnapars_exec  path to the PHYLIP dnapars executable.
-#' @param    rm_temp       if TRUE delete the temporary directory after running PHYLIP;
+#' @param    rm_temp       if TRUE delete the temporary directory after running dnapars;
 #'                         if FALSE keep the temporary directory.
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
-#'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to the console.                        
-#' @return   an igraph \code{graph} object
+#'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
+#'                         the console.
+#'                                                
+#' @return   An igraph \code{graph} object defining the Ig lineage tree. Each unique input 
+#'           sequence in \code{clone} is a vertex of the tree, with additional vertices being
+#'           either the germline (root) sequences or inferred intermediates. The \code{graph} 
+#'           object has the following attributes.
+#'           
+#'           Vertex attributes:
+#'           \itemize{
+#'             \item \code{name}:      value in the SEQUENCE_ID column of the \code{data} 
+#'                                     slot of the input ChangeoClone for observed sequences. 
+#'                                     The germline (root) vertex is assigned the name 
+#'                                     "Germline" and inferred intermediates are assigned
+#'                                     names with the format {"Inferred1", "Inferred2", ...}.
+#'             \item \code{sequence}:  value in the SEQUENCE_GAP column of the \code{data} 
+#'                                     slot of the input ChangeoClone for observed sequences.
+#'                                     The germline (root) vertex is assigned the sequence
+#'                                     in the \code{germline} slot of the input ChangeoClone.
+#'                                     The sequence of inferred intermediates are extracted
+#'                                     from the dnapars output.
+#'             \item \code{label}:     same as the \code{name} attribute.
+#'           }
+#'           Additionally, each other column in the \code{data} slot of the input 
+#'           ChangeoClone is added as a vertex attribute with the attribute name set to 
+#'           the source column name. For the germline and inferred intermediate vertices,
+#'           these additional vertext attributes are all assigned a value of \code{NA}.
+#'           
+#'           Edge attributes:
+#'           \itemize{
+#'             \item \code{weight}:    Hamming distance between the \code{sequence} attributes
+#'                                     of the two vertices.
+#'             \item \code{label}:     same as the \code{weight} attribute.
+#'           }
+#'           Graph attributes:
+#'           \itemize{
+#'             \item \code{clone}:     clone identifier from the \code{clone} slot of the
+#'                                     input ChangeoClone.
+#'             \item \code{v_gene}:    V-segment gene call from the \code{v_gene} slot of 
+#'                                     the input ChangeoClone.
+#'             \item \code{j_gene}:    J-segment gene call from the \code{j_gene} slot of 
+#'                                     the input ChangeoClone.
+#'             \item \code{junc_len}:  junction length (nucleotide count) from the 
+#'                                     \code{junc_len} slot of the input ChangeoClone.
+#'           }
+#'           
+#' @details
+#' \code{buildPhylipLineage} builds the lineage tree of a set of unique Ig sequences via
+#' maximum parsimony through an external call to the dnapars application of the PHYLIP
+#' package. dnapars is called with default options, except for the search option, which is
+#' set to "Rearrange on one best tree". The germline sequence of the clone is used for the 
+#' outgroup. 
 #' 
-#' @seealso See \code{\link{igraph}} and \code{\link{igraph.plotting}} for working 
-#'          with igraph \code{graph} objects.
+#' Following tree construction using dnapars, the dnapars output is modified to allow
+#' input sequences to appear as internal nodes of the tree. Intermediate sequences 
+#' inferred by dnapars are replaced by children within the tree having a Hamming distance 
+#' of zero from their parent node. The distance calculation allows IUPAC ambiguous 
+#' character matches, where an ambiguous character has distance zero to any character in 
+#' the set of characters it represents. Distance calculation and movement of child nodes 
+#' up the tree is repeated until all parent-child pairs have a distance greater than zero 
+#' between them. The germline sequence (outgroup) is moved to the root of the tree and
+#' excluded from the node replacement processes; permitting the trunk of the tree to be
+#' the only edge with a distance of zero. Edge weights of the resultant tree are assigned 
+#' as the distance between each sequence.
+#' 
+#' @references
+#' \enumerate{
+#'   \item Felsenstein. PHYLIP - Phylogeny Inference Package (Version 3.2). 
+#'           Cladistics. 1989 5:164–166.
+#'   \item Stern, Yaari, Vander Heiden et al. B cells populating the multiple sclerosis 
+#'           brain mature in the draining cervical lymph nodes. 
+#'           Sci Transl Med. 2014 6(248):248ra107.
+#' }
+#'   
+#' @seealso  Takes as input a \code{\link{ChangeoClone}}. 
+#'           Temporary directories are created with \code{\link{makeTempDir}}.
+#'           Distance is calculated using \code{\link{getSeqDistance}}. 
+#'           See \code{\link{igraph}} and \code{\link{igraph.plotting}} for working 
+#'           with igraph \code{graph} objects. 
+#'
 #' @examples
 #' \dontrun{
 #' # Load example data
@@ -364,7 +457,7 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Preprocess clone
 #' clone <- subset(df, CLONE == 164)
-#' clone <- prepChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
+#' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
 #' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
