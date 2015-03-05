@@ -14,7 +14,7 @@ Build
     * man/*.Rd
 3. Use RStudio
 4. Make RStudio project from existing directory
-5. install.packages(c("devtools", "roxygen2", "testthat", "knitr"))
+5. install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))
 6. Build -> Configure Build Tools
     * Check use devtools option
     * Check use roxygen option
@@ -23,16 +23,9 @@ Build
 Requirements
 -------------------------------------------------------------------------------
 * R 3.0
-* Internal R packages
-    - shm
 * External R packages
     - Biostrings
     - ggplot2
-    - grid
-    - igraph
     - plyr
-    - RColorBrewer
-    - reshape2
     - scales
-    - seqinr
     - stringr
