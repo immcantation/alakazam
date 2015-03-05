@@ -336,6 +336,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @param    seq_fields   a vector of nucletoide sequence columns to collapse. The sequence 
 #'                        with the fewest Ns will be retained. This is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
+#' @param    add_count    if \code{TRUE} add column COLLAPSE_COUNT that indicates
+#'                        the number of sequences that were collapsed.
 #' @param    ignore       vector of characters to ignore when testing for equality.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
@@ -373,7 +375,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                               ignore=c("N", "-", ".", "?"), verbose=FALSE) {
+                               add_count=FALSE, ignore=c("N", "-", ".", "?"), 
+                               verbose=FALSE) {
     # Verify column classes and exit if they are incorrect
     if (!all(sapply(subset(data, select=text_fields), is.character))) {
         stop("All text_fields columns must be of type 'character'")
@@ -397,6 +400,12 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         cat("COLLAPSED> ", n_total - n_unique - n_discard, "\n", sep="")
         cat("DISCARDED> ", n_discard, "\n", sep="")
         cat("\n")
+    }
+    
+    #Intialize COLLAPSE_COUNT with 1s
+    if(add_count) {
+        data[, "COLLAPSE_COUNT"] <- rep(1,nrow(data))
+        num_fields <- c(num_fields, "COLLAPSE_COUNT")
     }
     
     # Return input if there are no sequences to collapse
