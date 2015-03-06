@@ -1,10 +1,10 @@
 ---
-title: "Lineage reconstruction"
+title: "Alakazam: Ig lineage reconstruction"
 author: "Jason Anthony Vander Heiden"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Ig lineage reconstruction}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
 ---
@@ -19,8 +19,15 @@ Load Change-O data
 --------------------------------------------------------------------------------
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. Lineage reconstruction requires the following fields 
-(columns) to be present in the Change-O file: `SEQUENCE_ID`, `SEQUENCE_GAP`, 
-`CLONE`, `GERMLINE_GAP_D_MASK` `V_CALL`, `J_CALL`, and `JUNCTION_GAP_LENGTH`.
+(columns) to be present in the Change-O file: 
+
+* `SEQUENCE_ID`
+* `SEQUENCE_GAP` 
+* `CLONE`
+* `GERMLINE_GAP_D_MASK`
+* `V_CALL`
+* `J_CALL`
+* `JUNCTION_GAP_LENGTH`
 
 ```{r, eval=TRUE, warning=FALSE}
 library(alakazam)
@@ -40,11 +47,11 @@ Before a lineage can be contructed the sequences must first be cleaned of gap
 annotations must be conbined for each cluster of duplicate sequences. 
 Optionally, "ragged" ends of sequences, such as may occur from primer template
 switching, may also be cleaned by masking mismatched positions and the leading
-and trailing ends of each sequence. The function `prepChangeoClone` is a wrapper
+and trailing ends of each sequence. The function `makeChangeoClone` is a wrapper
 function which combines these steps and returns a `ChangeoClone` object which
 may then be passed into the lineage reconstruction function.
 
-Two arguments to `prepChangeoClone` control which annotations are retained
+Two arguments to `makeChangeoClone` control which annotations are retained
 following duplicate removal. Unique values appearing within columns given by the 
 `text_fields` arguments will be concatenated into a single string delimited by a
 "/" character. Values appearing within columns given by the 
@@ -53,7 +60,7 @@ following duplicate removal. Unique values appearing within columns given by the
 ```{r, eval=TRUE}
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- prepChangeoClone(sub_df, text_fields=c("SAMPLE", "ISOTYPE"), 
+clone <- makeChangeoClone(sub_df, text_fields=c("SAMPLE", "ISOTYPE"), 
                           num_fields="DUPCOUNT")
 
 # Show combined annotations
@@ -66,7 +73,7 @@ Lineage construction uses the `dnapars` (maximum parsimony) application of the
 PHYLIP package. The function `buildPhylipLineage` performs a number of steps to
 execute `dnapars`, parse its output, and modify the tree topology to meet the
 criteria of an Ig lineage. This function takes as input a `ChangeoClone` object
-output by `prepChangeoClone` and returns an igraph `graph` object. The igraph
+output by `makeChangeoClone` and returns an igraph `graph` object. The igraph
 `graph` object will contain clone annotations as graph attributes, sequence 
 annotations as vertex attributes, and mutations along edges as edge attributes.
 
@@ -143,7 +150,7 @@ data.frame on the clone column.
 library(plyr)
 dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 # Preprocess clones
-clone_list <- dlply(df, "CLONE", prepChangeoClone, 
+clone_list <- dlply(df, "CLONE", makeChangeoClone, 
                     text_fields=c("SAMPLE", "ISOTYPE"), 
                     num_fields="DUPCOUNT")
 # Build lineages

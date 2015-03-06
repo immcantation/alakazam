@@ -10,11 +10,10 @@ Dependencies
 R 3.0  
 R packages
 
-  -  Biostrings
   -  ggplot2
+  -  igraph
   -  plyr
   -  scales
-  -  stringr
 
 Mercurial Configuration
 -------------------------------------------------------------------------------
@@ -24,6 +23,7 @@ syntax: glob
   .*
   *.Rproj
   man/*.Rd
+  inst/doc/*
 ```
 
 Build Instructions

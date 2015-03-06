@@ -4,7 +4,7 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2015.03.05
+# @date       2015.03.06
 
 
 #### Constants ####
@@ -347,19 +347,18 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 
 #' Remove duplicate DNA sequences and combine annotations
 #' 
-#' \code{collapseDuplicates} identifies duplicate DNA sequences in a data.frame, 
-#' allowing for ambiguous characters, removes the duplicate entries and combines any 
-#' associated annotations (data.frame columns).
+#' \code{collapseDuplicates} identifies duplicate DNA sequences, allowing for ambiguous 
+#' characters, removes the duplicate entries, and combines any associated annotations.
 #'
 #' @param    data         data.frame containing Change-O columns. The data.frame 
 #'                        must contain, at a minimum, a unique identifier column 
-#'                        and a column containg a character vector of nucleotide sequences.
+#'                        and a column containg a character vector of DNA sequences.
 #' @param    id           name of the column containing sequence identifiers.
-#' @param    seq          name of the column containing nucleotide sequences.
+#' @param    seq          name of the column containing DNA sequences.
 #' @param    text_fields  character vector of textual columns to collapse. The textual 
 #'                        annotations of duplicate sequences will be merged into a single 
-#'                        string with each unique value alphabetized and delimited by a 
-#'                        "/" character.
+#'                        string with each unique value alphabetized and delimited by 
+#'                        \code{sep}.
 #' @param    num_fields   a vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
 #' @param    seq_fields   a vector of nucletoide sequence columns to collapse. The sequence 
@@ -368,20 +367,41 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @param    add_count    if \code{TRUE} add column COLLAPSE_COUNT that indicates
 #'                        the number of sequences that were collapsed.
 #' @param    ignore       vector of characters to ignore when testing for equality.
+#' @param    sep          character to use for delimiting collapsed annotations in the 
+#'                        \code{text_fields} columns. Defines both the input and output 
+#'                        delimiter.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
 #'                        
-#' @return   A modified data.frame with duplicate sequences removed and annotation fields 
-#'           collapsed. Columns that are not specified in either \code{text_fields} or
-#'           \code{num_fields} will be retained, but the value will be chosen from a random
-#'           sequences amongst all sequences in a cluster of duplicates.  Sequences that
-#'           could not be unambiguously assigned to a single duplicate cluster are discarded,
-#'           along with their annotations.
+#' @return   A modified \code{data} data.frame with duplicate sequences removed and 
+#'           annotation fields collapsed. 
 #' 
 #' @details
-#' Needs details.
+#' \code{collapseDuplicates} identifies duplicate sequences in the \code{seq} column by
+#' testing for character identity, with consideration of IUPAC ambiguous nucleotide codes. 
+#' A cluster of sequences are considered duplicates if they are all equivalent, and no 
+#' member of the cluster is equivalent to a sequence in a different cluster. 
 #' 
-#' @seealso  \code{\link{testSeqEqual}}.
+#' Textual annotations, specified by \code{text_fields}, are collapsed by taking the unique
+#' set of values within in each duplicate cluster and delimiting those values by \code{sep}.
+#' Numeric annotations, specified by \code{num_fields}, are collapsed by summing all values 
+#' in the duplicate cluster. Sequence annotations, specified by \code{seq_fields}, are 
+#' collapsed by retaining the first sequence with the fewest number of N characters.
+#' 
+#' Columns that are not specified in either \code{text_fields}, \code{num_fields}, or 
+#' \code{seq_fields} will be retained, but the value will be chosen from a random entry 
+#' amongst all sequences in a cluster of duplicates.
+#' 
+#' An ambiguous sequence is one that can be assigned to two different clusters, wherein
+#' the ambiguous sequence is equivalent to two sequences which are themselves 
+#' non-equivalent. Ambiguous sequences arise due to ambiguous characters ay positions that
+#' vary across sequences, and are discarded along with their annotations. Thus, ambiguous
+#' sequences are removed as duplicates of some sequence, but do not create a potential
+#' false-positive annotation merger. Ambiguous sequences are not included in the 
+#' COLLAPSE_COUNT annotation that is added when \code{add_count=TRUE}.
+#' 
+#' @seealso  Equality is tested with \code{\link{testSeqEqual}}.  For IUPAC ambiguous 
+#'           character codes see \code{\link{IUPAC_DNA}}.
 #' @family   sequence manipulation functions
 #'
 #' @examples
@@ -396,21 +416,29 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' # Annotations are not parsed if neither text_fields nor num_fields is specified
 #' # The retained sequence annotations will be random
 #' collapseDuplicates(df, verbose=T)
-#'
+#' 
 #' # Unique text_fields annotations are combined into a single string with "/"
 #' # num_fields annotations are summed
-#' # Unambiguous duplicates are discarded
+#' # Ambiguous duplicates are discarded
 #' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", verbose=T)
+#'
+#' # Use alternate delimiter for collapsing textual annotations
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", sep="/", verbose=T)
+#' 
+#' # Add count of duplicates
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=T, verbose=T)
 #' 
 #' # Masking ragged ends may impact duplicate removal
 #' df$SEQUENCE_GAP <- maskSeqEnds(df$SEQUENCE_GAP)
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", verbose=T)
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=T, verbose=T)
 #'
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
-                               verbose=FALSE) {
+                               sep=",", verbose=FALSE) {
+    # TODO:  Should seq_fields collapse by consensus?  This should never matter if they are subsequences of seq.
+    
     # Verify column classes and exit if they are incorrect
     if (!all(sapply(subset(data, select=text_fields), is.character))) {
         stop("All text_fields columns must be of type 'character'")
@@ -436,9 +464,9 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
         cat("\n")
     }
     
-    #Intialize COLLAPSE_COUNT with 1s
+    # Intialize COLLAPSE_COUNT with 1 for each sequence
     if(add_count) {
-        data[, "COLLAPSE_COUNT"] <- rep(1,nrow(data))
+        data[, "COLLAPSE_COUNT"] <- rep(1, nrow(data))
         num_fields <- c(num_fields, "COLLAPSE_COUNT")
     }
     
@@ -523,9 +551,9 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
             for (f in text_fields) {
                 f_set <- na.omit(data[idx, f])
                 if (length(f_set) > 0) {
-                    f_set <- unlist(strsplit(f_set, '/'))
+                    f_set <- unlist(strsplit(f_set, sep))
                     f_set <- sort(unique(f_set))
-                    f_val <- paste(f_set, collapse='/')
+                    f_val <- paste(f_set, collapse=sep)
                 } else {
                     f_val <- NA
                 }
@@ -573,6 +601,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 }
 
 
+#### Annotation functions ####
+
 #' Extracts FWRs and CDRs from IMGT-gapped sequences
 #' 
 #' \code{extractVRegion} extracts the framework and complementarity determining regions of the V-segment 
@@ -613,9 +643,6 @@ extractVRegion <- function(sequences, region) {
     
     return(substr(sequences, IMGT_REGIONS[[region]][1], IMGT_REGIONS[[region]][2]))
 }
-
-  
-#### Gene annotation functions ####
 
 #' Get Ig segment allele, gene and family names
 #' 

@@ -147,7 +147,7 @@ writePhylipInput <- function(clone, path) {
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(str_trim(v1[-(1:2)]), clone@data[, "SEQUENCE_ID"])
+    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[, "SEQUENCE_ID"])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 

@@ -23,7 +23,8 @@
 #' @return   A data.frame of the database file.
 #' 
 #' @seealso  See \code{\link{writeChangeoDb}} for file output. 
-#'           Uses \code{\link{read.table}}. 
+#'           Uses \code{\link{read.table}}.
+#' @family   file input and output functions
 #' 
 #' @examples
 #' # Load example data
@@ -79,6 +80,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' 
 #' @seealso  See \code{\link{readChangeoDb}} for file input. 
 #'           Uses \code{\link{write.table}}.
+#' @family   file input and output functions
 #' 
 #' @examples
 #' \dontrun{
@@ -103,6 +105,7 @@ writeChangeoDb <- function(data, file) {
 #' 
 #' @seealso  This is just a wrapper for \code{\link{tempfile}} and 
 #'           \code{\link{dir.create}}.
+#' @family   file input and output functions
 #' 
 #' @examples
 #' makeTempDir("Clone50")

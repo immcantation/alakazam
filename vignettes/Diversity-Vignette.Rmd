@@ -1,10 +1,10 @@
 ---
-title: "Clonal diversity statistics"
+title: "Alakazam: Analysis of clonal diversity"
 author: "Jason Anthony Vander Heiden"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Diversity analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
 ---
