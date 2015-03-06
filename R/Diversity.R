@@ -4,22 +4,29 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.12.15
+# @date       2015.03.05
 
 
 #### Classes ####
 
 #' S4 class defining diversity curve 
 #'
-#' \code{DiversityCurve} defines diversity (D) scores over multiple diversity orders (q).
+#' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
+#' orders (\eqn{q}).
 #' 
-#' @slot  data    data.frame with columns (q, D, lower, upper) defining the median (D),
-#'                upper confidence bound (upper) lower confidence bound (lower) for each
-#'                value of q (q).
-#' @slot  groups  character vector of groups retained in diversity calculation.
-#' @slot  n       numeric value indication the number of sampled sequences from each group.
-#' @slot  nboot   number of bootstrap realizations.
-#' @slot  ci      confidence interval (between 0 and 1).
+#' @slot  data    data.frame defining the diversity curve with the following columns:
+#'                \itemize{
+#'                  \item  \code{q}:      diversity order.
+#'                  \item  \code{D}:      median diversity index over all bootstrap 
+#'                                        realizations.
+#'                  \item  \code{lower}:  lower confidence inverval bound.
+#'                  \item  \code{upper}:  upper confidence interval bound.
+#'                }
+#' @slot  groups  character vector of groups retained in the diversity calculation.
+#' @slot  n       numeric value indication the number of sequences sampled from each group.
+#' @slot  nboot   number of bootstrap realizations performed.
+#' @slot  ci      confidence interval defining the upper and lower bounds 
+#'                (a value between 0 and 1).
 #' 
 #' @name DiversityCurve
 #' @export
@@ -30,20 +37,38 @@ setClass("DiversityCurve",
                  nboot="numeric", 
                  ci="numeric"))
 
-
 #' S4 class defining diversity significance
 #'
-#' \code{DiversityTest} defines the signifance of diversity (D) differences at a fixed
-#' fixed diversity order (q).
+#' \code{DiversityTest} defines the signifance of diversity (\eqn{D}) differences at a 
+#' fixed diversity order (\eqn{q}).
 #' 
-#' @slot  tests    data.frame with columns for group pairs (test), pvalues (pvalue), and
-#'                 bootstrap delta distribution summary statistics 
-#'                 (delta_median, delta_mad, delta_mean, delta_sd).
-#' @slot  summary  data.frame of diversity (D) summary statistics by group. Includes columns
-#'                 for group, mean, median, sd, mad.
+#' @slot  tests    data.frame describing the significance test results with columns:
+#'                 \itemize{
+#'                   \item  \code{test}:          string listing the two groups tested.
+#'                   \item  \code{pvalue}:        p-value for the test.
+#'                   \item  \code{delta_median}:  median of the \eqn{D} bootstrap delta 
+#'                                                distribution for the test.
+#'                   \item  \code{delta_mad}:     median absolute deviation of the \eqn{D} 
+#'                                                bootstrap delta distribution for the test.
+#'                   \item  \code{delta_mean}:    mean of the \eqn{D} bootstrap delta 
+#'                                                distribution for the test.
+#'                   \item  \code{delta_sd}:      standard deviation of the \eqn{D} 
+#'                                                bootstrap delta distribution for the test.
+#'                 }
+#' @slot  summary  data.frame containing summary statistics for the diversity index 
+#'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
+#'                 \itemize{
+#'                   \item  \code{group}:   the name of the group.
+#'                   \item  \code{median}:  median of the \eqn{D} bootstrap distribution.
+#'                   \item  \code{mad}:     median absolute deviation of the \eqn{D} 
+#'                                          bootstrap distribution.
+#'                   \item  \code{mean}:    mean of the \eqn{D} bootstrap distribution.
+#'                   \item  \code{sd}:      standard deviation of the \eqn{D} bootstrap 
+#'                                          distribution.
+#'                 }
 #' @slot  groups   character vector of groups retained in diversity calculation.
-#' @slot  q        diversity order tested (q).
-#' @slot  n        numeric value indication the number of sampled sequences from each group.
+#' @slot  q        diversity order tested (\eqn{q}).
+#' @slot  n        numeric value indication the number of sequences sampled from each group.
 #' @slot  nboot    number of bootstrap realizations.
 #' 
 #' @name DiversityTest
@@ -59,24 +84,73 @@ setClass("DiversityTest",
 
 #### Methods ####
 
+# TODO:  plot method for DiversityCurve pointing to plotDiversityCurve
+# TODO:  plot method for DiversityTest
+# TODO:  summary method for DiversityTest
+# TODO:  summary method for DiversityCurve
+
+#' @rdname DiversityCurve
+#' @export
+setMethod("print", "DiversityCurve", function(x) { print(x@data) })
+
 #' @rdname DiversityTest
 #' @export
 setMethod("print", "DiversityTest", function(x) { print(x@tests) })
+
+# @rdname DiversityCurve
+# @export
+# setMethod("plot", 
+#           signature("DiversityCurve", 
+#                     colors="character", 
+#                     main_title="character", 
+#                     legend_title="character", 
+#                     log_q="logical", 
+#                     log_d="logical",
+#                     xlim="numeric", 
+#                     ylim="numeric", 
+#                     silent="logical"),
+#           function(data, colors=NULL, main_title="Diversity", 
+#                    legend_title=NULL, log_q=TRUE, log_d=TRUE,
+#                    xlim=NULL, ylim=NULL, silent=FALSE) {
+#             plotDiversityCurve(data, colors=colors, main_title=main_title, 
+#                                legend_title=legend_title, log_q=log_q, log_d=log_d,
+#                                xlim=xlim, ylim=ylim, silent=silent) })
+
 
 #### Calculation functions ####
 
 #' Calculate the diversity index
 #' 
-#' \code{calcDiversity} calculates the diversity index for a vector of diversity orders.
+#' \code{calcDiversity} calculates the clonal diversity index for a vector of diversity 
+#' orders.
 #'
-#' @param    p  numeric vector of species counts or proportions.
+#' @param    p  numeric vector of clone (species) counts or proportions.
 #' @param    q  numeric vector of diversity orders.
-#' @return   A vector of diversity numbers (D) for each q.
 #' 
-#' @references    
-#' Hill, M. Diversity and evenness: a unifying notation and its consequences. 
-#'   Ecology 54, 427–432 (1973).
+#' @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
+#' 
+#' @details
+#' This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
+#' (\eqn{D}) of a single parameter \eqn{q}. Special cases of the generalized diversity 
+#' index correspond to the most popular diversity measures in ecology: species richness 
+#' (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q approaches 1}), the 
+#' inverse of the Simpson index (\eqn{q = 2}), and the reciprocal abundance of the largest 
+#' clone (\eqn{q approaches +\infty}). At \eqn{q = 0} different clones weight equally, 
+#' regardless of their size. As the parameter \eqn{q} increase from \eqn{0} to \eqn{+\infty} 
+#' the diversity index (\eqn{D}) depends less on rare clones and more on common (abundant) 
+#' ones, thus encompassing a range of definitions that can be visualized as a single curve. 
+#' 
+#' Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
+#' at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427–32.
+#' }
+#' 
 #' @seealso  Used by \code{\link{bootstrapDiversity}} and \code{\link{testDiversity}}.
+#' 
 #' @examples
 #' # May define p as clonal member counts
 #' p <- c(1, 1, 3, 10)
@@ -104,25 +178,51 @@ calcDiversity <- function(p, q) {
 #'
 #' \code{bootstrapDiversity} divides a set of clones by a group annotation,
 #' uniformly subsamples the sequences from each group, and calculates diversity
-#' scores (D) over an interval of diversity orders (q).
+#' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
 #' 
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
 #' @param    group     name of the \code{data} column containing group identifiers.
 #' @param    clone     name of the \code{data} column containing clone identifiers.
-#' @param    min_q     minimum value of q.
-#' @param    max_q     maximum value of q.
-#' @param    step_q    value to increment q.
+#' @param    min_q     minimum value of \eqn{q}.
+#' @param    max_q     maximum value of \eqn{q}.
+#' @param    step_q    value by which to increment \eqn{q}.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
-#' @param    nboot     number of bootstrap iterations to perform.
-#' @return   A \code{DiversityCurve} summarizing the diversity scores over all q.
+#' @param    nboot     number of bootstrap realizations to generate.
 #' 
+#' @return   A \code{\link{DiversityCurve}} object summarizing the diversity scores.
+#' 
+#' @details
+#' Clonal diversity is calculated using the generalized diversity index proposed by 
+#' Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
+#' 
+#' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
+#' \code{min_q} to \code{max_q} incremented by \code{step_q}; \eqn{D} at \eqn{q=1} is 
+#' estimated by \eqn{D} at \eqn{q=0.9999}. Variability in total sequence counts across 
+#' unique values in the \code{group} column is corrected using repeated subsampling with 
+#' replacement (bootstrapping) \code{nboot} times. Each bootstrap realization is fixed to 
+#' a uniform count for each group, determined by either the value of \code{max_n} or the 
+#' minimum number of sequences among all groups when \code{max_n=NULL}. 
+#' 
+#' The diversity index (\eqn{D}) for each group is the median value of over all bootstrap 
+#' realizations, with the confidence interval estimate derived via the percentile method.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427–32.
+#'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
+#'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
+#'            J Allergy Clin Immunol. 2014 134(3):604–12.
+#' }
+#'  
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
 #'           \code{\link{DiversityCurve}} for the return object. 
 #'           See \code{\link{testDiversity}} for significance testing.
+#' 
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
@@ -133,6 +233,7 @@ calcDiversity <- function(p, q) {
 #' 
 #' # Increasing threshold results in exclusion of small groups and a warning message
 #' bootstrapDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
+#' 
 #'
 #' @export
 bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
@@ -163,7 +264,6 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
     }
     
     # Generate diversity index and confidence intervals via resampling
-    # >>> Add MAD?
     cat("-> CALCULATING DIVERSITY\n")
     pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3)
     div_list <- list()
@@ -195,9 +295,9 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 
 #' Pairwise test of the diversity index
 #' 
-#' \code{testDiversity} performs pairwise significance tests of the diversity index (D)
-#' at a given diversity order (q) for a set of annotation groups using a bootstrap delta
-#' distribution.
+#' \code{testDiversity} performs pairwise significance tests of the diversity index 
+#' (\eqn{D}) at a given diversity order (\eqn{q}) for a set of annotation groups via
+#' bootstrapping.
 #'
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
 #' @param    q         diversity order to test.
@@ -208,11 +308,44 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
 #' @param    nboot     number of bootstrap realizations to perform.
-#' @return   A \code{DiversityTest} object containing p-values and summary statistics.
+#' 
+#' @return   A \code{\link{DiversityTest}} object containing p-values and summary statistics.
+#' 
+#' @details
+#' Clonal diversity is calculated using the generalized diversity index proposed by 
+#' Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
+#' 
+#' Variability in total sequence counts across unique values in the \code{group} column is 
+#' corrected using repeated subsampling with replacement (bootstrapping) \code{nboot} times. 
+#' Each bootstrap realization is fixed to a uniform count for each group, determined by 
+#' either the value of \code{max_n} or the minimum number of sequences among all groups when 
+#' \code{max_n=NULL}. The diversity index estimate (\eqn{D}) for each group is the median value 
+#' of over all bootstrap realizations. 
+#' 
+#' Significance of the difference in diversity index (\eqn{D}) between groups is tested by 
+#' constructing a bootstrap delta distribution for each pair of unique values in the 
+#' \code{group} column. The bootstrap delta distribution is built by subtracting the diversity 
+#' index \eqn{Da} in \eqn{group a} from the corresponding value \eqn{Db} in \eqn{group b}, 
+#' for all bootstrap realizations, yeilding \code{nboot} total deltas; where \eqn{group a} 
+#' is the group with the greater median \eqn{D}. The p-value for hypothesis \eqn{Da != Db} 
+#' is the value of \eqn{P(0)} from the empirical cumulative distribution function of the 
+#' bootstrap delta distribution, multipled by 2 for the two-tailed correction.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427–32.
+#'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
+#'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
+#'            J Allergy Clin Immunol. 2014 134(3):604–12.
+#' }
 #' 
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
 #'           \code{\link{DiversityTest}} for the return object. 
 #'           See \code{\link{bootstrapDiversity}} for curve generation.
+#'           See \code{\link{ecdf}} for computation of the empirical cumulative 
+#'           distribution function.
+#' 
 #' @examples  
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
@@ -338,25 +471,30 @@ getBaseTheme <- function() {
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
 #'
-#' @param    data            \code{DiversityCurve} object returned by \code{boostrapDiversity}
-#' @param    colors          named character vector whose names are values in the group column
-#'                           and whose values are colors to assign to those group values.
+#' @param    data            \code{\link{DiversityCurve}} object returned by 
+#'                           \code{\link{bootstrapDiversity}}.
+#' @param    colors          named character vector whose names are values in the 
+#'                           \code{group} column of the \code{data} slot of \code{data},
+#'                           and whose values are colors to assign to those group names.
 #' @param    main_title      string specifying the plot title.
 #' @param    legend_title    string specifying the legend title.
-#' @param    log_q           if TRUE then plot q in a log scale;
-#'                           if FALSE plot in a linear scale.
-#' @param    log_d           if TRUE then plot diversity in a log scale;
-#'                           if FALSE plot in a linear scale.
-#' @param    xlim            numeric vector of two values specifying the \code{c(lower, upper)} 
-#'                           x-axis limits.
-#' @param    ylim            numeric vector of two values specifying the \code{c(lower, upper)} 
-#'                           y-axis limits.
+#' @param    log_q           if TRUE then plot \eqn{q} on a log scale;
+#'                           if FALSE plot on a linear scale.
+#' @param    log_d           if TRUE then plot the diversity scores \eqn{D} on a log scale;
+#'                           if FALSE plot on a linear scale.
+#' @param    xlim            numeric vector of two values specifying the 
+#'                           \code{c(lower, upper)} x-axis limits.
+#' @param    ylim            numeric vector of two values specifying the 
+#'                           \code{c(lower, upper)} y-axis limits.
 #' @param    silent          if TRUE do not draw the plot and just return the ggplot2 object;
 #'                           if FALSE draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
-#' @return   a \code{ggplot} object
+#'
+#' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @seealso  Plotting is performed with \code{\link{ggplot}}.
+#' @seealso  See \code{\link{bootstrapDiversity}} for generating \code{\link{DiversityCurve}}
+#'           objects for input. Plotting is performed with \code{\link{ggplot}}.
+#' 
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
@@ -408,4 +546,3 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     invisible(p1)
 }
-

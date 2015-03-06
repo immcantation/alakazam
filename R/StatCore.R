@@ -4,16 +4,17 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.12.15
+# @date       2015.03.05
 
 
-#' Weighted Stouffer meta analysis of p-values
+#' Weighted meta analysis of p-values via Stouffer's method
 #'
 #' \code{stoufferMeta} combines multiple weighted p-values into a meta-analysis p-value
 #' using Stouffer's Z-score method.
 #' 
 #' @param    p   numeric vector of p-values.
 #' @param    w   numeric vector of weights.
+#' 
 #' @return   A named numeric vector with the combined Z-score and p-value in the form
 #'           \code{c(Z, pvalue)}.
 #' 

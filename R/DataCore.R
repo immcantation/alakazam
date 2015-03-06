@@ -1,11 +1,13 @@
-# Common file input/output and data structure manipulation functions for Alakazam
+# Common input/output and data structure manipulation functions for Alakazam
 # 
 # @author     Jason Anthony Vander Heiden
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2014.12.15
+# @date       2015.03.05
 
+
+#### File I/O functions ####
 
 #' Read a Change-O tab delimited database file
 #' 
@@ -17,15 +19,21 @@
 #' @param    drop       columns to drop from database file.
 #' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case;
 #'                      if \code{FALSE} do not alter sequence fields.
-#' @return   a data.frame of the database file
 #' 
-#' @seealso  \code{\link{read.table}}
+#' @return   A data.frame of the database file.
+#' 
+#' @seealso  See \code{\link{writeChangeoDb}} for file output. 
+#'           Uses \code{\link{read.table}}. 
+#' 
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' 
-#' # Do not alter sequence field case
-#' df <- readChangeoDb(file, drop=c('DUPCOUNT'), seq_upper=FALSE)
+#' # Subset columns and convert sequence fields to upper case
+#' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_GAP"), seq_upper=TRUE)
+#' 
+#' # Drop columns and do not alter sequence field case
+#' df <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
 #' 
 #' @export
 readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
@@ -61,14 +69,17 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 
 #' Write a Change-O tab delimited database file
 #' 
-#' \code{writeChangeoDb} ia s simple wrapper around write.table with defaults appropriate 
-#' for writing a Change-O tab delimited database file from a data.frame.
+#' \code{writeChangeoDb} is a simple wrapper around \code{\link{write.table}} with defaults 
+#' appropriate for writing a Change-O tab delimited database file from a data.frame.
 #'
-#' @param    data       data.frame of Change-O data.
-#' @param    file       output file name.
+#' @param    data  data.frame of Change-O data.
+#' @param    file  output file name.
+#' 
 #' @return   NULL
 #' 
-#' @seealso  \code{\link{write.table}}
+#' @seealso  See \code{\link{readChangeoDb}} for file input. 
+#'           Uses \code{\link{write.table}}.
+#' 
 #' @examples
 #' \dontrun{
 #'   # Write a database
@@ -87,10 +98,12 @@ writeChangeoDb <- function(data, file) {
 #' system temp location.
 #' 
 #' @param    prefix  prefix name for the folder.
+#' 
 #' @return   The path to the temporary folder.
 #' 
 #' @seealso  This is just a wrapper for \code{\link{tempfile}} and 
 #'           \code{\link{dir.create}}.
+#' 
 #' @examples
 #' makeTempDir("Clone50")
 #' 
@@ -103,23 +116,28 @@ makeTempDir <- function(prefix) {
 }
 
 
+#### Data manipulation functions ####
+
 #' Translate a vector of strings
 #' 
 #' \code{translateStrings} modifies a character vector by substituting one or more 
 #' strings with a replacement string.
 #'
-#' Replacement is accomplished using \code{\link{gsub}}. 
+#' @param    strings      vector of character strings to modify.
+#' @param    translation  named character vector or a list of character vectors specifying 
+#'                        the strings to replace (values) and their replacements (names).
 #' 
+#' @return   A modified \code{strings} vector.
+#' 
+#' @details
 #' Does not perform partial replacements. Each translation value must match a complete 
 #' \code{strings} value or it will not be replaced.  Values that do not have a replacement
 #' named in the \code{translation} parameter will not be modified.
 #' 
-#' @param    strings      vector of character strings to modify.
-#' @param    translation  named character vector or a list of character vectors specifying 
-#'                        the strings to replace (values) and their replacements (names).
-#' @return   A modified \code{strings} vector.
+#' Replacement is accomplished using \code{\link{gsub}}.
 #' 
-#' @seealso  \code{\link{gsub}} for single value replacement in the base package.
+#' @seealso  See \code{\link{gsub}} for single value replacement in the base package.
+#' 
 #' @examples
 #' # Using a vector translation
 #' strings <- LETTERS[1:5]
@@ -133,6 +151,7 @@ makeTempDir <- function(prefix) {
 #' 
 #' @export
 translateStrings <- function(strings, translation) {
+    # TODO:  use match instead for complete matching?  Currently regex characters in values will mess up the matching.
     for (n in names(translation)) {
         rep_regex <- paste(translation[[n]], collapse='|')
         strings <- gsub(paste0("^(", rep_regex, ")$"), n, strings)

@@ -4,30 +4,33 @@
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 # @version    0.2.0
-# @date       2015.03.02
+# @date       2015.03.05
 
 
 #### Constants ####
 
 #' Default colors
 #' 
-#' Default color sets for nucleotide characters, Ig isotypes, and TCR chains.
+#' Default color palettes for DNA characters, Ig isotypes, and TCR chains.
 #' 
-#' @format  Named vectors with hexcode colors as values.
+#' @format  Named character vectors with hexcode colors as values.
 #' \itemize{
-#'   \item \code{NUC_COLORS}  DNA character colors (A, C, G, T).
-#'   \item \code{IG_COLORS}   Ig isotype colors (IgA, IgD, IgE, IgG, IgM, IgK, IgL).
-#'   \item \code{TR_COLORS}   TCR chain colors (TRA, TRB, TRD, TRG).
+#'   \item  \code{DNA_COLORS}:  DNA character colors (A, C, G, T).
+#'   \item  \code{IG_COLORS}:   Ig isotype colors (IgA, IgD, IgE, IgG, IgM, IgK, IgL).
+#'   \item  \code{TR_COLORS}:   TCR chain colors (TRA, TRB, TRD, TRG).
 #' }
 #' 
-#' @name   NUC_COLORS
+#' @name   DEFAULT_COLORS
+NULL
+
+#' @rdname   DEFAULT_COLORS
 #' @export
-NUC_COLORS <- c("A"="#64F73F", 
+DNA_COLORS <- c("A"="#64F73F", 
                 "C"="#FFB340", 
                 "G"="#EB413C", 
                 "T"="#3C88EE")
 
-#' @rdname NUC_COLORS
+#' @rdname DEFAULT_COLORS
 #' @export
 IG_COLORS <- c("IgA"="#377EB8", 
                "IgD"="#FF7F00", 
@@ -37,26 +40,24 @@ IG_COLORS <- c("IgA"="#377EB8",
                "IgK"="#E5C494",
                "IgL"="#FFD92F")
 
-#' @rdname NUC_COLORS
+#' @rdname DEFAULT_COLORS
 #' @export
 TR_COLORS <- c("TRA"="#CBD5E8", 
                "TRB"="#F4CAE4", 
                "TRD"="#FDCDAC", 
                "TRG"="#E6F5C9")
 
-
-#' IUPAC ambiguous nucleotide translation
+#' IUPAC ambiguous DNA characters
 #'
-#' A translation list for IUPAC ambiguous nucleotide characters and a corresponding vector
-#' of matching DNA characters
+#' A translation list mapping IUPAC ambiguous DNA characters to matching DNA characters.
 #' 
 #' @format  A list with single character codes as names and values containing character 
 #'          vectors that containg the set of (A, C, G, T) characters corresponding to each 
 #'          ambiguous character.
 #' 
-#' @name    IUPAC_NUC
+#' @name    IUPAC_DNA
 #' @export
-IUPAC_NUC <- list("A"="A", 
+IUPAC_DNA <- list("A"="A", 
                   "C"="C", 
                   "G"="G", 
                   "T"="T",
@@ -72,39 +73,60 @@ IUPAC_NUC <- list("A"="A",
                   "B"=c("C","G","T"),
                   "N"=c("A","C","G","T"))
 
+#' IMGT V-segment regions
+#'
+#' A list defining the boundaries of V-segment framework regions (FWRs) and complementarity 
+#' determining regions (CDRs) for IMGT-gapped immunoglobulin (Ig) nucleotide sequences 
+#' according to the IMGT numbering scheme.
+#' 
+#' @format  A list with regions named one of \code{c(FWR1, FWR2, FWR3, CDR1, CDR2)} 
+#'          with values containing a numeric vector of length two defining the 
+#'          \code{c(start, end)} positions of the named region.
+#'          
+#' @references
+#'   \url{http://imgt.org}
+#' 
+#' @export
+IMGT_REGIONS <- list("FWR1"=c(1, 78),
+                     "CDR1"=c(79, 114),
+                     "FWR2"=c(115, 165),
+                     "CDR2"=c(166, 195),
+                     "FWR3"=c(196, 312))
+
 
 #### Sequence distance functions ####
 
-#' Build a nucleotide distance matrix
+#' Build a DNA distance matrix
 #'
-#' \code{getNucMatrix} returns a Hamming distance matrix for IUPAC ambiguous
-#' nucleotide characters with modifications for gap (-, .) and missing (?)
+#' \code{getDNADistMatrix} returns a Hamming distance matrix for IUPAC ambiguous
+#' DNA characters with modifications for gap (-, .) and missing (?)
 #' character values.
 #' 
 #' @param    gap  value to assign to gap (-, .) characters. 
-#' @return   A \code{matrix} of nucleotide character distances with
-#'           row and column names indicating the character pair. By default, 
-#'           distances will be either O (equivalent), 1 (non-equivalent or missing), 
-#'           or \code{Inf} (gap). 
 #' 
-#' @seealso  Creates nucleotide distance matrix for \code{\link{getSeqDistance}}.
+#' @return   A \code{matrix} of DNA character distances with row and column names 
+#'           indicating the character pair. By default, distances will be either O 
+#'           (equivalent), 1 (non-equivalent or missing), or \code{Inf} (gap). 
+#' 
+#' @seealso  Creates DNA distance matrix for \code{\link{getSeqDistance}}.
+#' 
 #' @examples
 #' # Set gap characters to Inf distance
 #' # Distinguishes gaps from Ns
-#' nuc_dist <- getNucMatrix()
+#' getDNADistMatrix()
 #' 
 #' # Set gap characters to 0 distance
 #' # Makes gap characters equivalent to Ns
-#' nuc_dist <- getNucMatrix(gap=0)
+#' getDNADistMatrix(gap=0)
 #' 
 #' @export
-getNucMatrix <- function(gap=Inf) {
+getDNADistMatrix <- function(gap=Inf) {
     # Define Hamming distance matrix
     sub_mat <- diag(18)
-    colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_NUC), c("-", ".", "?"))
-    for (i in 1:length(IUPAC_NUC)) {
-        for (j in i:length(IUPAC_NUC)) {
-            sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_NUC[[i]] %in% IUPAC_NUC[[j]])
+    colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_DNA), c("-", ".", "?"))
+    for (i in 1:length(IUPAC_DNA)) {
+        for (j in i:length(IUPAC_DNA)) {
+            sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_DNA[[i]] %in% IUPAC_DNA[[j]])
         }
     }
     
@@ -119,51 +141,52 @@ getNucMatrix <- function(gap=Inf) {
 
 #' Calculate distance between two sequences
 #' 
-#' \code{getSeqDistance} calculates the distance between two nucleotide
-#' sequences.
+#' \code{getSeqDistance} calculates the distance between two DNA sequences.
 #'
-#' @param    seq1     character string containing a nucleotide sequence.
-#' @param    seq2     character string containing a nucleotide sequence.
-#' @param    nuc_mat  nucleotide character distance matrix. Defaults to
-#'                    a Hamming distance matrix returned by \code{getNucMatrix}.
-#'                    If gap characters (-, .) are assigned a value of \code{Inf}
-#'                    in \code{nuc_mat} then continguous gaps of any run length,
-#'                    which are not present in both sequences, will be counted as a 
-#'                    distance of 1. Meaning, indels of any length will increase
-#'                    the sequence distance by 1. Gap values other than \code{Inf}
-#'                    will return a distance that does not consider indels as a 
-#'                    special case.
-#' @return   Distance between \code{seq1} and \code{seq2}. 
+#' @param    seq1      character string containing a DNA sequence.
+#' @param    seq2      character string containing a DNA sequence.
+#' @param    dist_mat  DNA character distance matrix. Defaults to a Hamming distance 
+#'                     matrix returned by \code{\link{getDNADistMatrix}}. If gap 
+#'                     characters (-, .) are assigned a value of \code{Inf} in 
+#'                     \code{dist_mat} then contiguous gaps of any run length,
+#'                     which are not present in both sequences, will be counted as a 
+#'                     distance of 1. Meaning, indels of any length will increase
+#'                     the sequence distance by 1. Gap values other than \code{Inf}
+#'                     will return a distance that does not consider indels as a 
+#'                     special case.
+#'
+#' @return   Numerical distance between \code{seq1} and \code{seq2}.
 #' 
 #' @seealso  Nucleotide distance matrix may be built with 
-#'           \code{\link{getNucMatrix}}.
+#'           \code{\link{getDNADistMatrix}}.
+#'           
 #' @examples
 #' # Ungapped examples
 #' getSeqDistance("ATGGC", "ATGGG")
 #' getSeqDistance("ATGGC", "ATG??")
 #' 
 #' # Gaps will be treated as Ns with a gap=0 distance matrix
-#' getSeqDistance("ATGGC", "AT--C", nuc_mat=getNucMatrix(gap=0))
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNADistMatrix(gap=0))
 #' 
 #' # Gaps will be treated as universally non-matching characters with gap=1
-#' getSeqDistance("ATGGC", "AT--C", nuc_mat=getNucMatrix(gap=1))
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNADistMatrix(gap=1))
 #' 
 #' # Gaps of any length will be treated as single mismatches with a gap=Inf distance matrix
-#' getSeqDistance("ATGGC", "AT--C", nuc_mat=getNucMatrix(gap=Inf))
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNADistMatrix(gap=Inf))
 #' 
 #' # Gaps of equivalent run lengths are not counted as gaps
-#' getSeqDistance("ATG-C", "ATG-C", nuc_mat=getNucMatrix(gap=Inf))
+#' getSeqDistance("ATG-C", "ATG-C", dist_mat=getDNADistMatrix(gap=Inf))
 #'
 #' # Overlapping runs of gap characters are counted as a single gap
-#' getSeqDistance("ATG-C", "AT--C", nuc_mat=getNucMatrix(gap=Inf))
-#' getSeqDistance("A-GGC", "AT--C", nuc_mat=getNucMatrix(gap=Inf))
-#' getSeqDistance("AT--C", "AT--C", nuc_mat=getNucMatrix(gap=Inf))
+#' getSeqDistance("ATG-C", "AT--C", dist_mat=getDNADistMatrix(gap=Inf))
+#' getSeqDistance("A-GGC", "AT--C", dist_mat=getDNADistMatrix(gap=Inf))
+#' getSeqDistance("AT--C", "AT--C", dist_mat=getDNADistMatrix(gap=Inf))
 #' 
 #' # Discontiguous runs of gap characters each count as separate gaps
-#' getSeqDistance("-TGGC", "AT--C", nuc_mat=getNucMatrix(gap=Inf))
+#' getSeqDistance("-TGGC", "AT--C", dist_mat=getDNADistMatrix(gap=Inf))
 #' 
 #' @export
-getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
+getSeqDistance <- function(seq1, seq2, dist_mat=getDNADistMatrix(gap=Inf)) {
     # Convert string to character vector
     seq1 <- unlist(strsplit(seq1, ""))
     seq2 <- unlist(strsplit(seq2, ""))
@@ -171,23 +194,27 @@ getSeqDistance <- function(seq1, seq2, nuc_mat=getNucMatrix(gap=Inf)) {
     seq1 <- seq1[valid.idx]
     seq2 <- seq2[valid.idx]
     # Calculate distance
-    d <- sapply(1:length(seq1), function(x) { nuc_mat[seq1[x], seq2[x]] })
+    d <- sapply(1:length(seq1), function(x) { dist_mat[seq1[x], seq2[x]] })
     indels <- sum(rle(d)$values == Inf)
     
     return(sum(d[is.finite(d)]) + indels)
 }
 
 
-#' Test nucleotide sequences for equality.
+#' Test DNA sequences for equality.
 #' 
-#' \code{testSeqEqual} checks if two nucleotide sequences are identical.
+#' \code{testSeqEqual} checks if two DNA sequences are identical.
 #'
-#' @param    seq1    character string containing a nucleotide sequence.
-#' @param    seq2    character string containing a nucleotide sequence.
+#' @param    seq1    character string containing a DNA sequence.
+#' @param    seq2    character string containing a DNA sequence.
 #' @param    ignore  vector of characters to ignore when testing for equality.
-#' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
 #' 
-#' @seealso  \code{\link{collapseDuplicates}}.
+#' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
+#'           Sequences of unequal length will always return \code{FALSE} regardless of
+#'           their character values.
+#' 
+#' @seealso  Used by \code{\link{collapseDuplicates}}.
+#' 
 #' @examples
 #' # Ignore gaps
 #' testSeqEqual("ATG-C", "AT--C")
@@ -219,18 +246,19 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 
 #### Sequence manipulation functions ####
 
-#' Replace gap characters with Ns in nucleotide sequences
+#' Masks gap characters in DNA sequences
 #' 
-#' \code{maskSeqGaps} substitutes gap characters (-, .) with Ns in a
-#' vector of nucleotide sequences.
+#' \code{maskSeqGaps} substitutes gap characters (-, .) with Ns in a vector 
+#' of DNA sequences.
 #'
-#' @param    seq         a character vector of nucleotide sequence strings.
-#' @param    outer_only  if \code{TRUE} replace only continguous leading and trailing gaps;
+#' @param    seq         a character vector of DNA sequence strings.
+#' @param    outer_only  if \code{TRUE} replace only contiguous leading and trailing gaps;
 #'                       if \code{FALSE} replace all gap characters.
+#'                       
 #' @return   A modified \code{seq} vector with Ns in place of gap (-, .) characters.
 #' 
-#' @family   sequence manipulation functions
 #' @seealso  Uses \code{\link{regex}} for replacement.
+#' @family   sequence manipulation functions
 #'           
 #' @examples
 #' maskSeqGaps(c("ATG-C", "CC..C"))
@@ -262,13 +290,13 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 }
 
 
-#' Replaces ragged leading and trailing edges of aligned sequences with Ns
+#' Masks ragged leading and trailing edges of aligned DNA sequences
 #' 
-#' \code{maskSeqEnds} takes a vector of nucleotide sequences, as character strings,
+#' \code{maskSeqEnds} takes a vector of DNA sequences, as character strings,
 #' and replaces the leading and trailing characters with Ns to create a sequence
 #' vector with uniformly masked outer sequence segments.
 #' 
-#' @param    seq       a character vector of nucleotide sequence strings.
+#' @param    seq       a character vector of DNA sequence strings.
 #' @param    max_mask  the maximum number of characters to mask. If set to 0 then
 #'                     no masking will be performed. If set to \code{NULL} then the upper 
 #'                     masking bound will be automatically determined from the maximum 
@@ -278,8 +306,9 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 #'                     than masked with Ns.
 #' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
 #' 
-#' @family   sequence manipulation functions
 #' @seealso  Uses \code{\link{regex}} and \code{\link{substr}} for replacement.
+#' @family   sequence manipulation functions
+#' 
 #' @examples
 #' # Default behavior uniformly masks ragged ends
 #' seq <- c("CCCCTGGG", "NAACTGGN", "NNNCTGNN")
@@ -316,13 +345,13 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 }
 
 
-#' Remove duplicate nucleotide sequences and combine annotations
+#' Remove duplicate DNA sequences and combine annotations
 #' 
-#' \code{collapseDuplicates} identifies duplicate nucleotides sequences in a 
-#' data.frame, allowing for ambiguous nucleotide characters, removes the
-#' duplicate entries and combines any associated annotations (data.frame columns).
+#' \code{collapseDuplicates} identifies duplicate DNA sequences in a data.frame, 
+#' allowing for ambiguous characters, removes the duplicate entries and combines any 
+#' associated annotations (data.frame columns).
 #'
-#' @param    data         data.frame containing Change-O columns. The data.frame frame
+#' @param    data         data.frame containing Change-O columns. The data.frame 
 #'                        must contain, at a minimum, a unique identifier column 
 #'                        and a column containg a character vector of nucleotide sequences.
 #' @param    id           name of the column containing sequence identifiers.
@@ -341,6 +370,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @param    ignore       vector of characters to ignore when testing for equality.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
+#'                        
 #' @return   A modified data.frame with duplicate sequences removed and annotation fields 
 #'           collapsed. Columns that are not specified in either \code{text_fields} or
 #'           \code{num_fields} will be retained, but the value will be chosen from a random
@@ -348,8 +378,12 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'           could not be unambiguously assigned to a single duplicate cluster are discarded,
 #'           along with their annotations.
 #' 
-#' @family   sequence manipulation functions
+#' @details
+#' Needs details.
+#' 
 #' @seealso  \code{\link{testSeqEqual}}.
+#' @family   sequence manipulation functions
+#'
 #' @examples
 #' # Example Change-O data.frame
 #' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
@@ -393,7 +427,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     }
     
     # Define verbose reporting function
-    printVerbose <- function(n_total, n_unique, n_discard) {
+    .printVerbose <- function(n_total, n_unique, n_discard) {
         cat(" FUNCTION> collapseDuplicates\n", sep="")
         cat("    TOTAL> ", n_total, "\n", sep="")
         cat("   UNIQUE> ", n_unique, "\n", sep="")
@@ -411,7 +445,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     # Return input if there are no sequences to collapse
     nseq <- nrow(data)
     if (nseq <= 1) { 
-        if (verbose) { printVerbose(nseq, 1, 0) }
+        if (verbose) { .printVerbose(nseq, 1, 0) }
         return(data)
     }
     
@@ -425,7 +459,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     
     # Return input if no sequences are equal
     if (!any(d_mat[lower.tri(d_mat, diag=F)])) {
-        if (verbose) { printVerbose(nseq, nseq, 0) }
+        if (verbose) { .printVerbose(nseq, nseq, 0) }
         return(data)
     }        
     
@@ -443,7 +477,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     # Return single sequence if all sequence belong to ambiguous clusters
     if (discard_count == nrow(d_mat)) {
         unambig_len <- nchar(gsub("N", "", data[, seq]))
-        if (verbose) { printVerbose(nseq, 0, discard_count - 1) }
+        if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         return(data[which.max(unambig_len), ])
     }
     
@@ -534,24 +568,29 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
     # Combine all rows into unique data.frame
     unique_df <- plyr::rbind.fill(unique_list)
     
-    if (verbose) { printVerbose(nseq, nrow(unique_df), discard_count) }
+    if (verbose) { .printVerbose(nseq, nrow(unique_df), discard_count) }
     return(unique_df)
 }
 
 
 #' Extracts FWRs and CDRs from IMGT-gapped sequences
 #' 
-#' \code{getVRegion} extracts the framework and complementarity determining regions of the V-segment 
-#' for IMGT-gapped immunoglobulin (Ig) nucleotide sequences from  according to the IMGT numbering scheme.
+#' \code{extractVRegion} extracts the framework and complementarity determining regions of the V-segment 
+#' for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the IMGT numbering scheme.
 #'
-#' @param     sequences  character vector of IMGT gapped sequences.
-#' @param     region     string defining the region of the V segment to extract. Must be one of 
+#' @param     sequences  character vector of IMGT-gapped nucleotide sequences.
+#' @param     region     string defining the region of the V-segment to extract. Must be one of 
 #'                       \code{c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")}
+#'                       
 #' @return    A character vector of the extracted sub-sequences.
 #' 
-#' @seealso   \code{\link{substr}}.
+#' @seealso   IMGT-gapped region boundaries are defined in \code{\link{IMGT_REGIONS}}. 
+#'            Uses \code{\link{substr}}.
+#' @family   sequence manipulation functions
+#' 
 #' @references
 #'   \url{http://imgt.org}
+#' 
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
@@ -559,26 +598,20 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' clone <- subset(df, CLONE == 164)
 #'
 #' # Get regions
-#' getVRegion(clone$SEQUENCE_GAP, "FWR1")
-#' getVRegion(clone$SEQUENCE_GAP, "CDR1")
-#' getVRegion(clone$SEQUENCE_GAP, "FWR2")
-#' getVRegion(clone$SEQUENCE_GAP, "CDR2")
-#' getVRegion(clone$SEQUENCE_GAP, "FWR3")
+#' extractVRegion(clone$SEQUENCE_GAP, "FWR1")
+#' extractVRegion(clone$SEQUENCE_GAP, "CDR1")
+#' extractVRegion(clone$SEQUENCE_GAP, "FWR2")
+#' extractVRegion(clone$SEQUENCE_GAP, "CDR2")
+#' extractVRegion(clone$SEQUENCE_GAP, "FWR3")
 #'
 #' @export
-getVRegion <- function(sequences, region) {
-    # Define IMGT region boundaries
-    imgt <- list("FWR1"=c(1, 78),
-                 "CDR1"=c(79, 114),
-                 "FWR2"=c(115, 165),
-                 "CDR2"=c(166, 195),
-                 "FWR3"=c(196, 312))
+extractVRegion <- function(sequences, region) {
     # Check region argument    
-    if (!(region %in% names(imgt))) {
-        stop("Incorrect region value. Must be one of c('FWR1', 'CDR1', 'FWR2', 'CDR2' ,'FWR3').")
+    if (!(region %in% names(IMGT_REGIONS))) {
+        stop("Incorrect region value. Must be one of c('", paste(names(IMGT_REGIONS), collapse="', '"), "').")
     }
     
-    return(substr(sequences, imgt[[region]][1], imgt[[region]][2]))
+    return(substr(sequences, IMGT_REGIONS[[region]][1], IMGT_REGIONS[[region]][2]))
 }
 
   
@@ -587,9 +620,9 @@ getVRegion <- function(sequences, region) {
 #' Get Ig segment allele, gene and family names
 #' 
 #' \code{getSegment} performs generic matching of delimited segment calls with a custom regular 
-#' expression. \code{getAllele}, \code{getGene} and \code{getFamily} extract the allele, gene and 
-#' family names, respectively, from a character vector of immunoglobulin (Ig) segment allele calls 
-#' in IMGT format.
+#' expression. \code{\link{getAllele}}, \code{\link{getGene}} and \code{\link{getFamily}} extract 
+#' the allele, gene and family names, respectively, from a character vector of immunoglobulin (Ig) 
+#' or TCR segment allele calls in IMGT format.
 #'
 #' @param     segment_call    character vector containing segment calls delimited by commas.
 #' @param     segment_regex   string defining the segment match regular expression.
@@ -599,11 +632,14 @@ getVRegion <- function(sequences, region) {
 #'                            assignments; if \code{FALSE} return all assignments (faster). 
 #'                            Has no effect if \code{first=TRUE}.
 #' @param     sep             character defining both the input and output segment call delimiter.
-#' @return    A character vector containing allele, gene or family names
 #' 
-#' @seealso   Uses \code{\link{str_extract}}.
+#' @return    A character vector containing allele, gene or family names.
+#' 
+#' @seealso   Uses \code{\link{gsub}}.
+#'
 #' @references
 #'   \url{http://imgt.org}
+#'
 #' @examples
 #' kappa_call <- c("Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F", "Homsap IGKJ5*01 F")
 #'
