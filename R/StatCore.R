@@ -7,7 +7,7 @@
 # @date       2015.03.05
 
 
-#' Weighted meta analysis of p-values via Stouffer's method
+#' Weighted meta-analysis of p-values via Stouffer's method
 #'
 #' \code{stoufferMeta} combines multiple weighted p-values into a meta-analysis p-value
 #' using Stouffer's Z-score method.

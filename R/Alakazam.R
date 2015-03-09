@@ -9,7 +9,7 @@
 
 #' The alakazam package
 #' 
-#' \code{alakazam} in a member of the Change-0 suite of tools and serves three main 
+#' \code{alakazam} in a member of the Change-O suite of tools and serves three main 
 #' purposes:
 #' \itemize{
 #'   \item  Providing core functionality for other R packages in the Change-O suite. This
@@ -77,13 +77,13 @@
 #' \enumerate{
 #'   \item  Vander Heiden JA, Yaari G, et al. pRESTO: a toolkit for processing 
 #'            high-throughput sequencing raw reads of lymphocyte receptor repertoires. 
-#'            Bioinformatics. 2014 30(13):1930–2.
+#'            Bioinformatics. 2014 30(13):1930-2.
 #'   \item  Stern JNH, Yaari G, Vander Heiden JA, et al. B cells populating the multiple 
 #'            sclerosis brain mature in the draining cervical lymph nodes. 
 #'            Sci Transl Med. 2014 6(248):248ra107.
 #'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
 #'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
-#'            J Allergy Clin Immunol. 2014 134(3):604–12.
+#'            J Allergy Clin Immunol. 2014 134(3):604-12.
 #'   \item  Gupta NT, Vander Heiden JA, et al. Change-O: a toolkit for analyzing 
 #'            large-scale B cell immunoglobulin repertoire sequencing data.
 #'            Under review.
@@ -91,8 +91,6 @@
 #' 
 #' @import   ggplot2
 #' @import   igraph
-#' @import   methods
 #' @import   plyr
 #' @import   scales
-#' @import   utils
 NULL

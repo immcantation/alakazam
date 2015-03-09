@@ -133,9 +133,9 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
 #' (\eqn{D}) of a single parameter \eqn{q}. Special cases of the generalized diversity 
 #' index correspond to the most popular diversity measures in ecology: species richness 
-#' (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q approaches 1}), the 
+#' (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q} approaches \eqn{1}), the 
 #' inverse of the Simpson index (\eqn{q = 2}), and the reciprocal abundance of the largest 
-#' clone (\eqn{q approaches +\infty}). At \eqn{q = 0} different clones weight equally, 
+#' clone (\eqn{q} approaches \eqn{+\infty}). At \eqn{q = 0} different clones weight equally, 
 #' regardless of their size. As the parameter \eqn{q} increase from \eqn{0} to \eqn{+\infty} 
 #' the diversity index (\eqn{D}) depends less on rare clones and more on common (abundant) 
 #' ones, thus encompassing a range of definitions that can be visualized as a single curve. 
@@ -146,7 +146,7 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' @references
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
-#'            Ecology. 1973 54(2):427–32.
+#'            Ecology. 1973 54(2):427-32.
 #' }
 #' 
 #' @seealso  Used by \code{\link{bootstrapDiversity}} and \code{\link{testDiversity}}.
@@ -213,10 +213,10 @@ calcDiversity <- function(p, q) {
 #' @references
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
-#'            Ecology. 1973 54(2):427–32.
+#'            Ecology. 1973 54(2):427-32.
 #'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
 #'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
-#'            J Allergy Clin Immunol. 2014 134(3):604–12.
+#'            J Allergy Clin Immunol. 2014 134(3):604-12.
 #' }
 #'  
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
@@ -325,19 +325,19 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' Significance of the difference in diversity index (\eqn{D}) between groups is tested by 
 #' constructing a bootstrap delta distribution for each pair of unique values in the 
 #' \code{group} column. The bootstrap delta distribution is built by subtracting the diversity 
-#' index \eqn{Da} in \eqn{group a} from the corresponding value \eqn{Db} in \eqn{group b}, 
-#' for all bootstrap realizations, yeilding \code{nboot} total deltas; where \eqn{group a} 
-#' is the group with the greater median \eqn{D}. The p-value for hypothesis \eqn{Da != Db} 
-#' is the value of \eqn{P(0)} from the empirical cumulative distribution function of the 
+#' index \eqn{Da} in \eqn{group-a} from the corresponding value \eqn{Db} in \eqn{group-b}, 
+#' for all bootstrap realizations, yeilding a distribution of \code{nboot} total deltas; where 
+#' \eqn{group-a} is the group with the greater median \eqn{D}. The p-value for hypothesis 
+#' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution function of the 
 #' bootstrap delta distribution, multipled by 2 for the two-tailed correction.
 #' 
 #' @references
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
-#'            Ecology. 1973 54(2):427–32.
+#'            Ecology. 1973 54(2):427-32.
 #'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
 #'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
-#'            J Allergy Clin Immunol. 2014 134(3):604–12.
+#'            J Allergy Clin Immunol. 2014 134(3):604-12.
 #' }
 #' 
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
@@ -478,16 +478,16 @@ getBaseTheme <- function() {
 #'                           and whose values are colors to assign to those group names.
 #' @param    main_title      string specifying the plot title.
 #' @param    legend_title    string specifying the legend title.
-#' @param    log_q           if TRUE then plot \eqn{q} on a log scale;
-#'                           if FALSE plot on a linear scale.
-#' @param    log_d           if TRUE then plot the diversity scores \eqn{D} on a log scale;
-#'                           if FALSE plot on a linear scale.
+#' @param    log_q           if \code{TRUE} then plot \eqn{q} on a log scale;
+#'                           if \code{FALSE} plot on a linear scale.
+#' @param    log_d           if \code{TRUE} then plot the diversity scores \eqn{D} 
+#'                           on a log scale; if \code{FALSE} plot on a linear scale.
 #' @param    xlim            numeric vector of two values specifying the 
 #'                           \code{c(lower, upper)} x-axis limits.
 #' @param    ylim            numeric vector of two values specifying the 
 #'                           \code{c(lower, upper)} y-axis limits.
-#' @param    silent          if TRUE do not draw the plot and just return the ggplot2 object;
-#'                           if FALSE draw the plot.
+#' @param    silent          if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                           object; if \code{FALSE} draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
 #'
 #' @return   A \code{ggplot} object defining the plot.

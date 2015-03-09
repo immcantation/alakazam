@@ -15,8 +15,8 @@
 #' from Change-O data.
 #' 
 #' @slot     data      data.frame containing sequences and annotations. Contains the
-#'                     columns SEQUENCE_ID and SEQUENCE_GAP, as well as any additional
-#'                     sequence-specific annotation columns.
+#'                     columns \code{SEQUENCE_ID} and \code{SEQUENCE_GAP}, as well as any 
+#'                     additional sequence-specific annotation columns.
 #' @slot     clone     string defining the clone identifier.
 #' @slot     germline  string containing the germline sequence for the clone.
 #' @slot     v_gene    string defining the V segment gene call.
@@ -42,8 +42,8 @@ setClass("ChangeoClone",
 #' 
 #' \code{makeChangeoClone} takes a data.frame with Change-O style columns as input and 
 #' masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
-#' annotations associated with duplicate sequences. It returns a ChangeoClone object which
-#' serves as input for lineage reconstruction.
+#' annotations associated with duplicate sequences. It returns a \code{ChangeoClone} 
+#' object which serves as input for lineage reconstruction.
 #' 
 #' @param    data         data.frame containing the Change-O data for a clone. See Details
 #'                        for the list of required columns.
@@ -80,7 +80,7 @@ setClass("ChangeoClone",
 #'  
 #' @seealso  Executes in order \code{\link{maskSeqGaps}}, \code{\link{maskSeqEnds}}
 #'           and \code{\link{collapseDuplicates}}. 
-#'           Returns a \code{\link{ChangeoClone}} which serves as input to
+#'           Returns a \code{\link{ChangeoClone}} object which serves as input to
 #'           \code{\link{buildPhylipLineage}}.
 #' 
 #' @examples
@@ -371,8 +371,8 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @param    clone         \code{\link{ChangeoClone}} object containing clone data.
 #' @param    dnapars_exec  path to the PHYLIP dnapars executable.
-#' @param    rm_temp       if TRUE delete the temporary directory after running dnapars;
-#'                         if FALSE keep the temporary directory.
+#' @param    rm_temp       if \code{TRUE} delete the temporary directory after running dnapars;
+#'                         if \code{FALSE} keep the temporary directory.
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
 #'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
 #'                         the console.
@@ -384,23 +384,23 @@ phylipToGraph <- function(edges, clone) {
 #'           
 #'           Vertex attributes:
 #'           \itemize{
-#'             \item  \code{name}:      value in the SEQUENCE_ID column of the \code{data} 
-#'                                      slot of the input ChangeoClone for observed sequences. 
+#'             \item  \code{name}:      value in the \code{SEQUENCE_ID} column of the \code{data} 
+#'                                      slot of the input \code{clone} for observed sequences. 
 #'                                      The germline (root) vertex is assigned the name 
 #'                                      "Germline" and inferred intermediates are assigned
 #'                                      names with the format {"Inferred1", "Inferred2", ...}.
-#'             \item  \code{sequence}:  value in the SEQUENCE_GAP column of the \code{data} 
-#'                                      slot of the input ChangeoClone for observed sequences.
+#'             \item  \code{sequence}:  value in the \code{SEQUENCE_GAP} column of the \code{data} 
+#'                                      slot of the input \code{clone} for observed sequences.
 #'                                      The germline (root) vertex is assigned the sequence
-#'                                      in the \code{germline} slot of the input ChangeoClone.
+#'                                      in the \code{germline} slot of the input \code{clone}.
 #'                                      The sequence of inferred intermediates are extracted
 #'                                      from the dnapars output.
 #'             \item  \code{label}:     same as the \code{name} attribute.
 #'           }
 #'           Additionally, each other column in the \code{data} slot of the input 
-#'           ChangeoClone is added as a vertex attribute with the attribute name set to 
+#'           \code{clone} is added as a vertex attribute with the attribute name set to 
 #'           the source column name. For the germline and inferred intermediate vertices,
-#'           these additional vertext attributes are all assigned a value of \code{NA}.
+#'           these additional vertex attributes are all assigned a value of \code{NA}.
 #'           
 #'           Edge attributes:
 #'           \itemize{
@@ -411,13 +411,13 @@ phylipToGraph <- function(edges, clone) {
 #'           Graph attributes:
 #'           \itemize{
 #'             \item  \code{clone}:     clone identifier from the \code{clone} slot of the
-#'                                      input ChangeoClone.
+#'                                      input \code{ChangeoClone}.
 #'             \item  \code{v_gene}:    V-segment gene call from the \code{v_gene} slot of 
-#'                                      the input ChangeoClone.
+#'                                      the input \code{ChangeoClone}.
 #'             \item  \code{j_gene}:    J-segment gene call from the \code{j_gene} slot of 
-#'                                      the input ChangeoClone.
+#'                                      the input \code{ChangeoClone}.
 #'             \item  \code{junc_len}:  junction length (nucleotide count) from the 
-#'                                      \code{junc_len} slot of the input ChangeoClone.
+#'                                      \code{junc_len} slot of the input \code{ChangeoClone}.
 #'           }
 #'           
 #' @details
@@ -435,14 +435,14 @@ phylipToGraph <- function(edges, clone) {
 #' the set of characters it represents. Distance calculation and movement of child nodes 
 #' up the tree is repeated until all parent-child pairs have a distance greater than zero 
 #' between them. The germline sequence (outgroup) is moved to the root of the tree and
-#' excluded from the node replacement processes; permitting the trunk of the tree to be
+#' excluded from the node replacement processes, which permits the trunk of the tree to be
 #' the only edge with a distance of zero. Edge weights of the resultant tree are assigned 
 #' as the distance between each sequence.
 #' 
 #' @references
 #' \enumerate{
 #'   \item  Felsenstein J. PHYLIP - Phylogeny Inference Package (Version 3.2). 
-#'            Cladistics. 1989 5:164–166.
+#'            Cladistics. 1989 5:164-166.
 #'   \item  Stern JNH, Yaari G, Vander Heiden JA, et al. B cells populating the multiple 
 #'            sclerosis brain mature in the draining cervical lymph nodes. 
 #'            Sci Transl Med. 2014 6(248):248ra107.

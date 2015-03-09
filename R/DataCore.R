@@ -9,21 +9,38 @@
 
 #### File I/O functions ####
 
-#' Read a Change-O tab delimited database file
+#' Read a Change-O tab-delimited database file
 #' 
-#' \code{readChangeoDb} reads a tab delimited database file created by a Change-O tool 
+#' \code{readChangeoDb} reads a tab-delimited database file created by a Change-O tool 
 #' into a data.frame.
 #'
-#' @param    file       tab delimited database file output by a Change-O tool.
+#' @param    file       tab-delimited database file output by a Change-O tool.
 #' @param    select     columns to select from database file.
 #' @param    drop       columns to drop from database file.
-#' @param    seq_upper  if \code{TRUE} convert sequence fields to upper case;
-#'                      if \code{FALSE} do not alter sequence fields.
+#' @param    seq_upper  if \code{TRUE} convert sequence columns to upper case;
+#'                      if \code{FALSE} do not alter sequence columns. See Value 
+#'                      for a list of which columns are effected.
+
 #' 
-#' @return   A data.frame of the database file.
-#' 
-#' @seealso  See \code{\link{writeChangeoDb}} for file output. 
-#'           Uses \code{\link{read.table}}.
+#' @return   A data.frame of the database file. Columns will be imported as is, except for 
+#'           the following columns which will be explicitly converted into character 
+#'           values:
+#'           \itemize{
+#'             \item  SEQUENCE_ID
+#'             \item  CLONE
+#'             \item  SAMPLE
+#'           }
+#'           And the following sequence columns which will converted to upper case if
+#'           \code{seq_upper=TRUE} (default).
+#'           \itemize{
+#'             \item  SEQUENCE
+#'             \item  SEQUENCE_GAP
+#'             \item  JUNCTION
+#'             \item  GERMLINE_GAP
+#'             \item  GERMLINE_GAP_D_MASK
+#'           }
+#'                   
+#' @seealso  Wraps \code{\link{read.table}}.
 #' @family   file input and output functions
 #' 
 #' @examples
@@ -68,18 +85,17 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 }
 
 
-#' Write a Change-O tab delimited database file
+#' Write a Change-O tab-delimited database file
 #' 
 #' \code{writeChangeoDb} is a simple wrapper around \code{\link{write.table}} with defaults 
-#' appropriate for writing a Change-O tab delimited database file from a data.frame.
+#' appropriate for writing a Change-O tab-delimited database file from a data.frame.
 #'
 #' @param    data  data.frame of Change-O data.
 #' @param    file  output file name.
 #' 
 #' @return   NULL
 #' 
-#' @seealso  See \code{\link{readChangeoDb}} for file input. 
-#'           Uses \code{\link{write.table}}.
+#' @seealso  Wraps \code{\link{write.table}}.
 #' @family   file input and output functions
 #' 
 #' @examples
