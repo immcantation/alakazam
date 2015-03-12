@@ -168,13 +168,17 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
 
+    # Set platform specific command separator
+    task_sep <- if (.Platform$OS.type == "windows") { "&&" } else { ";" } 
+    
     # Run dnapars
     phy_options <- c("S", "Y", "I", "4", "5", ".")
+    cmd <- paste("cd", path, task_sep, dnapars_exec)
     if (verbose) {
-        system(paste0("cd ", path, "; ", dnapars_exec), input=c(phy_options, "Y"))
+        system2(cmd, input=c(phy_options, "Y"))
     } else {
-        system(paste0("cd ", path, "; ", dnapars_exec), input=c(phy_options, "Y"),
-               ignore.stdout=TRUE, ignore.stderr=TRUE)
+        system2(cmd, input=c(phy_options, "Y"),
+                stdout=NULL, stderr=NULL)
     }
 }
 
