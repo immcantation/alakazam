@@ -149,7 +149,7 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #'            Ecology. 1973 54(2):427-32.
 #' }
 #' 
-#' @seealso  Used by \code{\link{bootstrapDiversity}} and \code{\link{testDiversity}}.
+#' @seealso  Used by \code{\link{resampleDiversity}} and \code{\link{testDiversity}}.
 #' 
 #' @examples
 #' # May define p as clonal member counts
@@ -176,7 +176,7 @@ calcDiversity <- function(p, q) {
 
 #' Generate a clonal diversity index curve
 #'
-#' \code{bootstrapDiversity} divides a set of clones by a group annotation,
+#' \code{resampleDiversity} divides a set of clones by a group annotation,
 #' uniformly resamples the sequences from each group, and calculates diversity
 #' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
 #' 
@@ -190,11 +190,10 @@ calcDiversity <- function(p, q) {
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
-#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
-#' @param    nboot     number of bootstrap realizations to generate.
 #' @param    replace   if \code{TRUE} resample with replacement; if \code{FALSE} resample
 #'                     without replacement.
-#' 
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
 #' 
 #' @return   A \code{\link{DiversityCurve}} object summarizing the diversity scores.
 #' 
@@ -233,17 +232,17 @@ calcDiversity <- function(p, q) {
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
 #' # With replacement
-#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=TRUE)
+#' resampleDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=TRUE)
 #' # Without replacement
-#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=FALSE)
+#' resampleDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=FALSE)
 #' 
 #' # Increasing threshold results in exclusion of small groups and a warning message
-#' bootstrapDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
+#' resampleDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
 #' 
 #'
 #' @export
-bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
-                               min_n=10, max_n=NULL, ci=0.95, nboot=2000, replace=TRUE) {
+resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
+                               min_n=10, max_n=NULL, replace=FALSE, ci=0.95, nboot=2000) {
     # Verify function arguments
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
@@ -348,7 +347,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
 #' 
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
 #'           \code{\link{DiversityTest}} for the return object. 
-#'           See \code{\link{bootstrapDiversity}} for curve generation.
+#'           See \code{\link{resampleDiversity}} for curve generation.
 #'           See \code{\link{ecdf}} for computation of the empirical cumulative 
 #'           distribution function.
 #' 
@@ -473,12 +472,12 @@ getBaseTheme <- function() {
 }
 
 
-#' Plot the results of bootstrapDiversity
+#' Plot the results of resampleDiversity
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
 #'
 #' @param    data            \code{\link{DiversityCurve}} object returned by 
-#'                           \code{\link{bootstrapDiversity}}.
+#'                           \code{\link{resampleDiversity}}.
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -498,7 +497,7 @@ getBaseTheme <- function() {
 #'
 #' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @seealso  See \code{\link{bootstrapDiversity}} for generating \code{\link{DiversityCurve}}
+#' @seealso  See \code{\link{resampleDiversity}} for generating \code{\link{DiversityCurve}}
 #'           objects for input. Plotting is performed with \code{\link{ggplot}}.
 #' 
 #' @examples
@@ -507,7 +506,7 @@ getBaseTheme <- function() {
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- bootstrapDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+#' div <- resampleDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, main_title=paste(slot(div, "n"), "sequences sampled"),
 #'                    legend_title="Sample")
 #' 
