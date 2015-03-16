@@ -177,7 +177,7 @@ calcDiversity <- function(p, q) {
 #' Generate a clonal diversity index curve
 #'
 #' \code{bootstrapDiversity} divides a set of clones by a group annotation,
-#' uniformly subsamples the sequences from each group, and calculates diversity
+#' uniformly resamples the sequences from each group, and calculates diversity
 #' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
 #' 
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
@@ -192,6 +192,9 @@ calcDiversity <- function(p, q) {
 #'                     if automatically determined from the size of the largest group.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
+#' @param    replace   if \code{TRUE} resample with replacement; if \code{FALSE} resample
+#'                     without replacement.
+#' 
 #' 
 #' @return   A \code{\link{DiversityCurve}} object summarizing the diversity scores.
 #' 
@@ -202,12 +205,12 @@ calcDiversity <- function(p, q) {
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
 #' \code{min_q} to \code{max_q} incremented by \code{step_q}; \eqn{D} at \eqn{q=1} is 
 #' estimated by \eqn{D} at \eqn{q=0.9999}. Variability in total sequence counts across 
-#' unique values in the \code{group} column is corrected using repeated subsampling with 
-#' replacement (bootstrapping) \code{nboot} times. Each bootstrap realization is fixed to 
-#' a uniform count for each group, determined by either the value of \code{max_n} or the 
-#' minimum number of sequences among all groups when \code{max_n=NULL}. 
+#' unique values in the \code{group} column is corrected using repeated sampling 
+#' \code{nboot} times. Each resampling realization is fixed to a uniform count for each 
+#' group, determined by either the value of \code{max_n} or the minimum number of 
+#' sequences among all groups when \code{max_n=NULL}. 
 #' 
-#' The diversity index (\eqn{D}) for each group is the median value of over all bootstrap 
+#' The diversity index (\eqn{D}) for each group is the median value of over all resampling 
 #' realizations, with the confidence interval estimate derived via the percentile method.
 #' 
 #' @references
@@ -229,7 +232,10 @@ calcDiversity <- function(p, q) {
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100)
+#' # With replacement
+#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=TRUE)
+#' # Without replacement
+#' bootstrapDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100, replace=FALSE)
 #' 
 #' # Increasing threshold results in exclusion of small groups and a warning message
 #' bootstrapDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
@@ -237,7 +243,7 @@ calcDiversity <- function(p, q) {
 #'
 #' @export
 bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
-                               min_n=10, max_n=NULL, ci=0.95, nboot=2000) {
+                               min_n=10, max_n=NULL, ci=0.95, nboot=2000, replace=TRUE) {
     # Verify function arguments
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
@@ -271,7 +277,7 @@ bootstrapDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, st
     for (g in group_keep) {
         i <- i + 1
         r <- which(data[[group]] == g)
-        sample_mat <- replicate(nboot, data[[clone]][sample(r, n, replace=T)])
+        sample_mat <- replicate(nboot, data[[clone]][sample(r, n, replace=replace)])
         boot_mat <- apply(sample_mat, 2, function(x) calcDiversity(table(x), q))
         boot_ci <- t(apply(boot_mat, 1, quantile, probs=ci_probs))
         div_list[[g]] <- matrix(c(q, boot_ci[, c(2, 1, 3)]),
