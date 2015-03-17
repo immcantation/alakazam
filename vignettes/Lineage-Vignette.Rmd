@@ -132,7 +132,7 @@ par(mar=c(0, 0, 0, 0) + 0.1)
 # Define a tree layout with the Germline at the top
 ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
 # Plot graph
-plot(graph, layout=ly, edge.arrow.mode=0, vertex.frame.color=NA,
+plot(graph, layout=ly, edge.arrow.mode=0, vertex.frame.color="black",
      vertex.label.color="black", vertex.size=50)
 # Add legend
 legend("topleft", c("Germline", "Inferred", "Sample"), 
