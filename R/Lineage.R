@@ -181,7 +181,7 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
 
     # Set dnapars options
     phy_options <- c("S", "Y", "I", "4", "5", ".")
-    params <- list(command=cmd, input=c(phy_options, "Y"))
+    params <- list(cmd, input=c(phy_options, "Y"))
     if (verbose) {
         do.call(invoke, params)
     } else {
