@@ -171,19 +171,22 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Set platform specific options
     if (.Platform$OS.type == "windows") { 
         cmd <- paste("cd", path, "&&", dnapars_exec)
+        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE, show.output.on.console=FALSE)
         invoke <- shell
     } else { 
         cmd <- paste("cd", path, ";", dnapars_exec)
+        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
         invoke <- system
     } 
-    
-    # Run dnapars
+
+    # Set dnapars options
     phy_options <- c("S", "Y", "I", "4", "5", ".")
+    params <- list(command=cmd, input=c(phy_options, "Y"))
     if (verbose) {
-        invoke(cmd, input=c(phy_options, "Y"))
+        do.call(invoke, params)
     } else {
-        invoke(cmd, input=c(phy_options, "Y"),
-               ignore.stdout=TRUE, ignore.stderr=TRUE)
+        params <- append(params, quiet_params)
+        do.call(invoke, params)
     }
 }
 
@@ -478,6 +481,7 @@ phylipToGraph <- function(edges, clone) {
 #' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 #' 
 #' # Plot graph with a tree layout
+#' library(igraph)
 #' ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
 #' plot(graph, layout=ly)
 #' }
