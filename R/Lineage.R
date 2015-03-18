@@ -171,7 +171,8 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Set platform specific options
     if (.Platform$OS.type == "windows") { 
         cmd <- paste("cd", path, "&&", dnapars_exec)
-        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE, show.output.on.console=FALSE)
+        #quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE, show.output.on.console=FALSE)
+        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
         invoke <- shell
     } else { 
         cmd <- paste("cd", path, ";", dnapars_exec)
