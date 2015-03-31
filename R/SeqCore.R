@@ -411,7 +411,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @examples
 #' # Example Change-O data.frame
 #' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-#'                  SEQUENCE_GAP=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 #'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
 #'                  SAMPLE=c("S1", "S1", "S2", "S2"),
 #'                  COUNT=1:4,
@@ -433,11 +433,11 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=T, verbose=T)
 #' 
 #' # Masking ragged ends may impact duplicate removal
-#' df$SEQUENCE_GAP <- maskSeqEnds(df$SEQUENCE_GAP)
+#' df$SEQUENCE_IMGT <- maskSeqEnds(df$SEQUENCE_IMGT)
 #' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=T, verbose=T)
 #'
 #' @export
-collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
+collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
                                sep=",", verbose=FALSE) {
@@ -647,16 +647,16 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
 #' clone <- subset(df, CLONE == 164)
 #'
 #' # Get all regions
-#' extractVRegion(clone$SEQUENCE_GAP)
+#' extractVRegion(clone$SEQUENCE_IMGT)
 #' 
 #' # Get single region
-#' extractVRegion(clone$SEQUENCE_GAP, "FWR1")
+#' extractVRegion(clone$SEQUENCE_IMGT, "FWR1")
 #' 
 #' # Get all CDRs
-#' extractVRegion(clone$SEQUENCE_GAP, c("CDR1", "CDR2"))
+#' extractVRegion(clone$SEQUENCE_IMGT, c("CDR1", "CDR2"))
 #' 
 #' # Get all FWRs
-#' extractVRegion(clone$SEQUENCE_GAP, c("FWR1", "FWR2", "FWR3")
+#' extractVRegion(clone$SEQUENCE_IMGT, c("FWR1", "FWR2", "FWR3")
 #'
 #' @export
 extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")) {

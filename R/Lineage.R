@@ -15,12 +15,12 @@
 #' from Change-O data.
 #' 
 #' @slot     data      data.frame containing sequences and annotations. Contains the
-#'                     columns \code{SEQUENCE_ID} and \code{SEQUENCE_GAP}, as well as any 
+#'                     columns \code{SEQUENCE_ID} and \code{SEQUENCE_IMGT}, as well as any 
 #'                     additional sequence-specific annotation columns.
 #' @slot     clone     string defining the clone identifier.
 #' @slot     germline  string containing the germline sequence for the clone.
 #' @slot     v_gene    string defining the V segment gene call.
-#' @slot     v_gene    string defining the J segment gene call.
+#' @slot     j_gene    string defining the J segment gene call.
 #' @slot     junc_len  numeric junction length (nucleotide count).
 #' 
 #' @seealso  See \code{\link{makeChangeoClone}} and \code{\link{buildPhylipLineage}} for use.
@@ -62,20 +62,20 @@ setClass("ChangeoClone",
 #' @details
 #' The input data.frame (\code{data}) must contain the following columns:
 #' \itemize{
-#'   \item  \code{SEQUENCE_ID}:          unique sequence identifier.
-#'   \item  \code{SEQUENCE_GAP}:         IMGT-gapped sample sequence.
-#'   \item  \code{GERMLINE_GAP_D_MASK}:  IMGT-gapped germline sequence.
-#'   \item  \code{V_CALL}:               V-segment allele name.
-#'   \item  \code{J_CALL}:               J-segment allele name.
-#'   \item  \code{JUNCTION_GAP_LENGTH}:  IMGT-gapped junction sequence length.
-#'   \item  \code{CLONE}:                clone identifier.
+#'   \item  \code{SEQUENCE_ID}:           unique sequence identifier.
+#'   \item  \code{SEQUENCE_IMGT}:         IMGT-gapped sample sequence.
+#'   \item  \code{GERMLINE_IMGT_D_MASK}:  IMGT-gapped germline sequence.
+#'   \item  \code{V_CALL}:                V-segment allele name.
+#'   \item  \code{J_CALL}:                J-segment allele name.
+#'   \item  \code{JUNCTION_LENGTH}:       junction sequence length.
+#'   \item  \code{CLONE}:                 clone identifier.
 #' }
 #' Additional columns will be retained in the \code{data} slot of the return object,
 #' but are not required.
 #'
 #' The clone identifier, germline sequence, V-segment gene call, J-segment gene call, 
 #' and junction length are determined from the first entry in the CLONE, 
-#' GERMLINE_GAP_D_MASK, V_CALL, J_CALL, and JUNCTION_GAP_LENGTH columns, respectively. 
+#' GERMLINE_IMGT_D_MASK, V_CALL, J_CALL, and JUNCTION_LENGTH columns, respectively. 
 #' For any given clone, each value in these columns should be identical.
 #'  
 #' @seealso  Executes in order \code{\link{maskSeqGaps}}, \code{\link{maskSeqEnds}}
@@ -86,11 +86,11 @@ setClass("ChangeoClone",
 #' @examples
 #' # Example Change-O data.frame
 #' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-#'                  SEQUENCE_GAP=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 #'                  V_CALL="Homsap IGKV1-39*01 F",
 #'                  J_CALL="Homsap IGKJ5*01 F",
-#'                  JUNCTION_GAP_LENGTH=2,
-#'                  GERMLINE_GAP_D_MASK="CCCCAGGG",
+#'                  JUNCTION_LENGTH=2,
+#'                  GERMLINE_IMGT_D_MASK="CCCCAGGG",
 #'                  CLONE=1,
 #'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
 #'                  COUNT=1:4,
@@ -106,12 +106,12 @@ setClass("ChangeoClone",
 makeChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL,
                              add_count=TRUE) {
     # Replace gaps with Ns and masked ragged ends
-    tmp_df <- data[, c("SEQUENCE_ID", "SEQUENCE_GAP", text_fields, num_fields)]
-    tmp_df[, "SEQUENCE_GAP"] <- maskSeqGaps(tmp_df[, "SEQUENCE_GAP"], outer_only=FALSE)
-    tmp_df[, "SEQUENCE_GAP"] <- maskSeqEnds(tmp_df[, "SEQUENCE_GAP"], max_mask=max_mask, trim=FALSE)
+    tmp_df <- data[, c("SEQUENCE_ID", "SEQUENCE_IMGT", text_fields, num_fields)]
+    tmp_df[, "SEQUENCE_IMGT"] <- maskSeqGaps(tmp_df[, "SEQUENCE_IMGT"], outer_only=FALSE)
+    tmp_df[, "SEQUENCE_IMGT"] <- maskSeqEnds(tmp_df[, "SEQUENCE_IMGT"], max_mask=max_mask, trim=FALSE)
     
     # Remove duplicates
-    tmp_df <- collapseDuplicates(tmp_df, id="SEQUENCE_ID", seq="SEQUENCE_GAP",
+    tmp_df <- collapseDuplicates(tmp_df, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                  text_fields=text_fields, num_fields=num_fields,
                                  add_count=add_count)
     
@@ -119,10 +119,10 @@ makeChangeoClone <- function(data, max_mask=0, text_fields=NULL, num_fields=NULL
     clone <- new("ChangeoClone", 
                  data=tmp_df,
                  clone=as.character(data[1, "CLONE"]),
-                 germline=maskSeqGaps(data[1, "GERMLINE_GAP_D_MASK"], outer_only=FALSE), 
+                 germline=maskSeqGaps(data[1, "GERMLINE_IMGT_D_MASK"], outer_only=FALSE), 
                  v_gene=getGene(data[1, "V_CALL"]), 
                  j_gene=getGene(data[1, "J_CALL"]), 
-                 junc_len=data[1, "JUNCTION_GAP_LENGTH"])
+                 junc_len=data[1, "JUNCTION_LENGTH"])
     
     return(clone)
 }
@@ -143,7 +143,7 @@ writePhylipInput <- function(clone, path) {
             sprintf("SAM%-6s", 1:nseq))
     v2 <- c(nchar(clone@germline),
             clone@germline, 
-            clone@data[, "SEQUENCE_GAP"])
+            clone@data[, "SEQUENCE_IMGT"])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
@@ -240,7 +240,7 @@ getPhylipInferred <- function(phylip_out) {
     inferred_num <- unique(grep("^[0-9]+$", seq_df[, 2], value=T))
     inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
-    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE_GAP=inferred_seq))
+    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE_IMGT=inferred_seq))
 }
 
 
@@ -293,9 +293,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNADistMatrix(gap=0)) {
         if (edges$from[i] == "Germline") {
             seq1 <- clone@germline
         } else {
-            seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
+            seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_IMGT"]
         }
-        seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
+        seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_IMGT"]
         edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)        
     }
     
@@ -317,9 +317,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNADistMatrix(gap=0)) {
             if (edges$from[i] == "Germline") {
                 seq1 <- clone@germline
             } else {
-                seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_GAP"]
+                seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE_IMGT"]
             }
-            seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_GAP"]
+            seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE_IMGT"]
             edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)      
         }
         
@@ -354,10 +354,10 @@ phylipToGraph <- function(edges, clone) {
     
     # Add sample sequences and names
     clone_idx <- match(clone@data[, "SEQUENCE_ID"], V(g)$name) 
-    g <- set.vertex.attribute(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE_GAP"])
+    g <- set.vertex.attribute(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE_IMGT"])
     
     # Add annotations
-    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE_GAP"))]
+    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE_IMGT"))]
     for (n in ann_fields) {
         g <- set.vertex.attribute(g, n, index=germ_idx, NA)
         g <- set.vertex.attribute(g, n, index=clone_idx, clone@data[, n])
@@ -402,7 +402,7 @@ phylipToGraph <- function(edges, clone) {
 #'                                      The germline (root) vertex is assigned the name 
 #'                                      "Germline" and inferred intermediates are assigned
 #'                                      names with the format {"Inferred1", "Inferred2", ...}.
-#'             \item  \code{sequence}:  value in the \code{SEQUENCE_GAP} column of the \code{data} 
+#'             \item  \code{sequence}:  value in the \code{SEQUENCE_IMGT} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences.
 #'                                      The germline (root) vertex is assigned the sequence
 #'                                      in the \code{germline} slot of the input \code{clone}.

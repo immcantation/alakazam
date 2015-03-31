@@ -22,12 +22,12 @@ A small example Change-O tab-delimited database file is included in the
 (columns) to be present in the Change-O file: 
 
 * `SEQUENCE_ID`
-* `SEQUENCE_GAP` 
+* `SEQUENCE_IMGT` 
 * `CLONE`
-* `GERMLINE_GAP_D_MASK`
+* `GERMLINE_IMGT_D_MASK`
 * `V_CALL`
 * `J_CALL`
-* `JUNCTION_GAP_LENGTH`
+* `JUNCTION_LENGTH`
 
 ```{r, eval=TRUE, warning=FALSE}
 library(alakazam)
@@ -92,7 +92,7 @@ graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 # Clone annotations
 data.frame(CLONE=graph$clone,
-           JUNCTION_GAP_LENGTH=graph$junc_len,
+           JUNCTION_LENGTH=graph$junc_len,
            V_GENE=graph$v_gene,
            J_GENE=graph$j_gene)
 

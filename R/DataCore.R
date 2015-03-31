@@ -33,11 +33,12 @@
 #'           And the following sequence columns which will converted to upper case if
 #'           \code{seq_upper=TRUE} (default).
 #'           \itemize{
-#'             \item  SEQUENCE
-#'             \item  SEQUENCE_GAP
+#'             \item  SEQUENCE_INPUT
+#'             \item  SEQUENCE_VDJ
+#'             \item  SEQUENCE_IMGT
 #'             \item  JUNCTION
-#'             \item  GERMLINE_GAP
-#'             \item  GERMLINE_GAP_D_MASK
+#'             \item  GERMLINE_IMGT
+#'             \item  GERMLINE_IMGT_D_MASK
 #'           }
 #'                   
 #' @seealso  Wraps \code{\link{read.table}}.
@@ -48,7 +49,7 @@
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' 
 #' # Subset columns and convert sequence fields to upper case
-#' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_GAP"), seq_upper=TRUE)
+#' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"), seq_upper=TRUE)
 #' 
 #' # Drop columns and do not alter sequence field case
 #' df <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
@@ -56,8 +57,8 @@
 #' @export
 readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
     # Define column data types
-    seq_columns <- c("SEQUENCE", "SEQUENCE_GAP", "JUNCTION", 
-                     "GERMLINE_GAP", "GERMLINE_GAP_D_MASK")
+    seq_columns <- c("SEQUENCE_INPUT", "SEQUENCE_VDJ", "SEQUENCE_IMGT", "JUNCTION", 
+                     "GERMLINE_IMGT", "GERMLINE_IMGT_D_MASK")
     text_columns <- c("SEQUENCE_ID", "CLONE", "SAMPLE")
     
     # Read file
