@@ -54,7 +54,7 @@ may then be passed into the lineage reconstruction function.
 Two arguments to `makeChangeoClone` control which annotations are retained
 following duplicate removal. Unique values appearing within columns given by the 
 `text_fields` arguments will be concatenated into a single string delimited by a
-"/" character. Values appearing within columns given by the 
+"," character. Values appearing within columns given by the 
 `num_fields` arguments will be summed.
 
 ```{r, eval=TRUE}
