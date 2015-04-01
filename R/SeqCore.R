@@ -360,9 +360,9 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'                        annotations of duplicate sequences will be merged into a single 
 #'                        string with each unique value alphabetized and delimited by 
 #'                        \code{sep}.
-#' @param    num_fields   a vector of numeric columns to collapse. The numeric annotations
+#' @param    num_fields   vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
-#' @param    seq_fields   a vector of nucletoide sequence columns to collapse. The sequence 
+#' @param    seq_fields   vector of nucletoide sequence columns to collapse. The sequence 
 #'                        with the fewest numer of non-informative characters will be retained. 
 #'                        Where a non-informative character is one of \code{c("N", "-", ".", "?")}. 
 #'                        Note, this is distinct from the \code{seq} parameter which is used to 
