@@ -711,14 +711,16 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
 #' @export
 getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, sep=",") {
     # Define boundaries of individual segment calls
-    edge_regex <- if (first) { ".*" } else { paste0("[^", sep, "]*") }
+    edge_regex <- paste0("[^", sep, "]*")
     
     # Extract calls
     r <- gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), "\\1", 
               segment_call, perl=T)
     
     # Collapse to unique set if required
-    if (!first & collapse) {
+    if (first) {
+        r <- gsub(paste0(sep, ".*$"), "", r)
+    } else if (collapse) {
         r <- sapply(strsplit(r, sep), function(x) paste(unique(x), collapse=sep))
     }
     
