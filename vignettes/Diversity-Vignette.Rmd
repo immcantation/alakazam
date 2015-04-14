@@ -13,7 +13,7 @@ The clonal diversity of the repertoire can be analyzed using the general form
 of the diversity index, as proposed by Hill in:
 
     Hill, M. Diversity and evenness: a unifying notation and its consequences. 
-        Ecology 54, 427–432 (1973).
+        Ecology 54, 427-432 (1973).
 
 Coupled with resampling strategies to correct for variations in sequencing 
 depth. This package provides two approaches to assessing diversity: 
