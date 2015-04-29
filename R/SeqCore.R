@@ -76,6 +76,43 @@ IUPAC_DNA <- list("A"="A",
                   "B"=c("C","G","T"),
                   "N"=c("A","C","G","T"))
 
+#' IUPAC ambiguous AA characters
+#'
+#' A translation list mapping IUPAC ambiguous AA characters to matching AA characters.
+#' 
+#' @format  A list with single character codes as names and values containing character 
+#'          vectors that containg the set of amino acid characters 
+#'          corresponding to each ambiguous character.
+#' 
+#' @name    IUPAC_AA
+#' @export
+IUPAC_AA <-  list("A"="A", 
+                  "B"=c("N","R"),
+                  "C"="C", 
+                  "D"="D",
+                  "E"="E",
+                  "F"="F",
+                  "G"="G",
+                  "H"="H",
+                  "I"="I",
+                  "J"=c("I","L"),
+                  "K"="K",
+                  "L"="L",
+                  "M"="M",
+                  "N"="N",
+                  "P"="P",
+                  "Q"="Q",
+                  "R"="R",
+                  "S"="S",
+                  "T"="T",
+                  "V"="V",
+                  "W"="W",
+                  "X"=c("A","B","C","D","E","F","G","H",
+                        "I","J","K","L","M","N","P","R",
+                        "S","T","V","W","X","Y","Z"),
+                  "Y"="Y",
+                  "Z"=c("E","Q"))
+
 #' IMGT V-segment regions
 #'
 #' A list defining the boundaries of V-segment framework regions (FWRs) and complementarity 
@@ -141,6 +178,33 @@ getDNADistMatrix <- function(gap=-1) {
     return(1 - sub_mat)
 }
 
+#' Build an AA distance matrix
+#'
+#' \code{getAADistMatrix} returns a Hamming distance matrix for IUPAC ambiguous
+#' AA characters.
+#' 
+#' @return   A \code{matrix} of AA character distances with row and column names 
+#'           indicating the character pair.
+#' 
+#' @seealso  Creates AA distance matrix for \code{\link{getSeqDistance}}.
+#' 
+#' @examples
+#' getAADistMatrix()
+#' 
+#' @export
+getAADistMatrix <- function() {
+  # Define Hamming distance matrix
+  sub_mat <- diag(length(IUPAC_AA))
+  colnames(sub_mat) <- rownames(sub_mat) <- names(IUPAC_AA)
+  for (i in 1:length(IUPAC_AA)) {
+    for (j in i:length(IUPAC_AA)) {
+      sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_AA[[i]] %in% IUPAC_AA[[j]])
+    }
+  }
+  
+  return(1 - sub_mat)
+}
+
 
 #' Calculate distance between two sequences
 #' 
@@ -148,7 +212,7 @@ getDNADistMatrix <- function(gap=-1) {
 #'
 #' @param    seq1      character string containing a DNA sequence.
 #' @param    seq2      character string containing a DNA sequence.
-#' @param    dist_mat  DNA character distance matrix. Defaults to a Hamming distance 
+#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
 #'                     matrix returned by \code{\link{getDNADistMatrix}}. If gap 
 #'                     characters, \code{c("-", ".")}, are assigned a value of -1 
 #'                     in \code{dist_mat} then contiguous gaps of any run length,
@@ -160,7 +224,8 @@ getDNADistMatrix <- function(gap=-1) {
 #' @return   Numerical distance between \code{seq1} and \code{seq2}.
 #' 
 #' @seealso  Nucleotide distance matrix may be built with 
-#'           \code{\link{getDNADistMatrix}}.
+#'           \code{\link{getDNADistMatrix}}. Amino acid distance matrix may be built
+#'           with \code{\link{getAADistMatrix}}.
 #'           
 #' @examples
 #' # Ungapped examples
