@@ -50,15 +50,23 @@ TR_COLORS <- c("TRA"="#CBD5E8",
                "TRD"="#FDCDAC", 
                "TRG"="#E6F5C9")
 
-#' IUPAC ambiguous DNA characters
+#' IUPAC ambiguous characters
 #'
-#' A translation list mapping IUPAC ambiguous DNA characters to matching DNA characters.
+#' A translation list mapping IUPAC ambiguous characters code to corresponding nucleotide
+#' amino acid characters.
 #' 
 #' @format  A list with single character codes as names and values containing character 
-#'          vectors that containg the set of \code{c("A", "C", "G", "T")} characters 
-#'          corresponding to each ambiguous character.
+#'          vectors that define the set of standard characters that match to each each 
+#'          ambiguous character.
+#' \itemize{
+#'   \item  \code{IUPAC_DNA}:  DNA ambiguous character translations.
+#'   \item  \code{IUPAC_AA}:   Amino acid ambiguous character translations.
+#' }
 #' 
-#' @name    IUPAC_DNA
+#' @name    IUPAC_CODES
+NULL
+
+#' @rdname  IUPAC_CODES
 #' @export
 IUPAC_DNA <- list("A"="A", 
                   "C"="C", 
@@ -76,15 +84,7 @@ IUPAC_DNA <- list("A"="A",
                   "B"=c("C","G","T"),
                   "N"=c("A","C","G","T"))
 
-#' IUPAC ambiguous AA characters
-#'
-#' A translation list mapping IUPAC ambiguous AA characters to matching AA characters.
-#' 
-#' @format  A list with single character codes as names and values containing character 
-#'          vectors that containg the set of amino acid characters 
-#'          corresponding to each ambiguous character.
-#' 
-#' @name    IUPAC_AA
+#' @rdname    IUPAC_CODES
 #' @export
 IUPAC_AA <-  list("A"="A", 
                   "B"=c("N","R"),
@@ -112,6 +112,7 @@ IUPAC_AA <-  list("A"="A",
                         "S","T","V","W","X","Y","Z"),
                   "Y"="Y",
                   "Z"=c("E","Q"))
+
 
 #' IMGT V-segment regions
 #'
