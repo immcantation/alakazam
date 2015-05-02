@@ -2,7 +2,19 @@
 title: "Alakazam: Ig lineage reconstruction"
 author: "Jason Anthony Vander Heiden"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+  pdf_document:
+    fig_height: 
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
+    dev: pdf
 vignette: >
   %\VignetteIndexEntry{Ig lineage reconstruction}
   %\VignetteEngine{knitr::rmarkdown}
