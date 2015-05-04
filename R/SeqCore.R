@@ -150,6 +150,7 @@ IMGT_REGIONS <- list("FWR1"=c(1, 78),
 #'           (equivalent), 1 (non-equivalent or missing), or -1 (gap). 
 #' 
 #' @seealso  Creates DNA distance matrix for \code{\link{getSeqDistance}}.
+#'           See \link{getAADistMatrix} for amino acid distances.
 #' 
 #' @examples
 #' # Set gap characters to Inf distance
@@ -188,6 +189,7 @@ getDNADistMatrix <- function(gap=-1) {
 #'           indicating the character pair.
 #' 
 #' @seealso  Creates AA distance matrix for \code{\link{getSeqDistance}}.
+#'           See \link{getDNADistMatrix} for nucleotide distances.
 #' 
 #' @examples
 #' getAADistMatrix()
