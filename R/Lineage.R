@@ -206,17 +206,26 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
     
+    # Set platform specific options
+    if (.Platform$OS.type == "windows") { 
+        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
+        invoke <- shell
+    } else { 
+        quiet_params <- list(stdout=FALSE, stderr=FALSE)
+        invoke <- system2
+    } 
+    
     # Set dnapars options
     phy_options <- c("S", "Y", "I", "4", "5", ".")
     params <- list(dnapars_exec, input=c(phy_options, "Y"), wait=TRUE)
     if (!verbose) {
-        params <- append(params, list(stdout=FALSE, stderr=FALSE))
+        params <- append(params, quiet_params)
     }
     
     # Call phylip
     wd <- getwd()
     setwd(path)
-    do.call(system2, params)
+    do.call(invoke, params)
     setwd(wd)
 }
 
