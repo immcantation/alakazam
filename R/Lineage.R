@@ -205,28 +205,19 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
-
-    # Set platform specific options
-    if (.Platform$OS.type == "windows") { 
-        cmd <- paste("cd", path, "&&", dnapars_exec)
-        #quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE, show.output.on.console=FALSE)
-        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
-        invoke <- shell
-    } else { 
-        cmd <- paste("cd", path, ";", dnapars_exec)
-        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
-        invoke <- system
-    } 
-
+    
     # Set dnapars options
     phy_options <- c("S", "Y", "I", "4", "5", ".")
-    params <- list(cmd, input=c(phy_options, "Y"))
-    if (verbose) {
-        do.call(invoke, params)
-    } else {
-        params <- append(params, quiet_params)
-        do.call(invoke, params)
+    params <- list(dnapars_exec, input=c(phy_options, "Y"), wait=TRUE)
+    if (!verbose) {
+        params <- append(params, list(stdout=FALSE, stderr=FALSE))
     }
+    
+    # Call phylip
+    wd <- getwd()
+    setwd(path)
+    do.call(system2, params)
+    setwd(wd)
 }
 
 
@@ -516,7 +507,7 @@ phylipToGraph <- function(edges, clone) {
 #' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
-#' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
+#' dnapars_exec <- file.path(path.expand("~"), "apps/phylip-3.69/dnapars")
 #' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 #' 
 #' # Plot graph with a tree layout
