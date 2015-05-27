@@ -532,8 +532,16 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
                 2 unique sequences")
         return(NULL)
     }
+    
+    if (!file.access(dnaparse_exec, mode=1)) {
+        stop("The file ", dnaparse_exec, " cannot be executed\n.")
+    }
+    
     # Create temporary directory
     temp_path <- makeTempDir(paste0(clone@clone, "-phylip"))
+    if (verbose) {
+        cat("TEMP_DIR> ", temp_path)
+    }
     
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
