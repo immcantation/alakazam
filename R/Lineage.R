@@ -533,7 +533,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
         return(NULL)
     }
     
-    if (!file.access(dnaparse_exec, mode=1)) {
+    if (file.access(dnapars_exec, mode=1) == -1) {
         stop("The file ", dnaparse_exec, " cannot be executed\n.")
     }
     
