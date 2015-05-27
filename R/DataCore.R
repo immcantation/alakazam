@@ -179,3 +179,49 @@ translateStrings <- function(strings, translation) {
     
     return(strings)
 }
+
+
+# Check data.frame for valid fields and issue message if invalid
+#
+# @param   data    data.frame to check
+# @param   fields  vector of column names to check
+# @param   logic   one of "all" or "any" controlling whether all or at least one of
+#                  the fields must be valid
+# @return  TRUE is fields are valid and a string message if not.
+checkFields <- function(data, fields, logic=c("all", "any")) {
+    # Check arguments
+    logic <- match.arg(logic)
+    
+    data_names <- names(data)
+    if (logic == "all") {
+        # Check that all fields exist
+        for (f in fields) {
+            if (!(f %in% data_names)) { 
+                msg <- paste("The column", f, "was not found") 
+                return(msg)
+            }
+        }        
+        # Check that all values are not NA
+        for (f in fields) {
+            if (all(is.na(data[, f]))) { 
+                msg <- paste("The column", f, "contains no data") 
+                return(msg)
+            }
+        }
+    } else if (logic == "any") {
+        # Check that fields exist
+        if (!any(fields %in% data_names)) {
+            msg <- paste("Input must contain at least one of the columns:", paste(fields, collapse=", "))
+            return(msg)
+        }
+        # Check that all values are not NA
+        invalid <- sapply(fields, function(f) all(is.na(data_names[, f])))
+        if (all(invalid)) { 
+            msg <- paste("None of the columns", paste(fields, collapse=", "), "contain data") 
+            return(msg)
+        }
+    }
+    
+    # Return TRUE if all checks pass
+    return(TRUE)
+}

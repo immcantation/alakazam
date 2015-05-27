@@ -137,6 +137,11 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                              junc_len="JUNCTION_LENGTH", clone="CLONE",
                              max_mask=0, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE) {
+    # Check for valid fields
+    check <- checkFields(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
+                                 text_fields, num_fields, seq_fields))
+    if (check != TRUE) { stop(check) }
+    
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
     tmp_df[, seq] <- maskSeqGaps(tmp_df[, seq], outer_only=FALSE)
@@ -200,7 +205,7 @@ writePhylipInput <- function(clone, path) {
 # @param   path          temporary directory containing infile.
 # @param   dnapars_exec  path to the dnapars executable.
 # @param   verbose       if TRUE suppress phylip console output.
-# @return  NULL
+# @return  TRUE if phylip ran successfully and FALSE otherwise
 runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
@@ -225,8 +230,11 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Call phylip
     wd <- getwd()
     setwd(path)
-    do.call(invoke, params)
+    status <- tryCatch(do.call(invoke, params), error=function(e) e)
     setwd(wd)
+    
+    # Return TRUE if phylip ran successfully
+    invisible(status == 0)
 }
 
 
@@ -527,14 +535,29 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE) {
+    # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
                 2 unique sequences")
         return(NULL)
     }
     
+    # Check fields
+    seq_len = unique(nchar(clone@data[, "SEQUENCE"]))
+    germ_len = ifelse(length(clone@germline) == 0, 0, nchar(clone@germline))
+    if(germ_len == 0) {
+        stop("Clone ", clone@clone, "does not contain a germline sequence.")
+    }
+    if(length(seq_len) != 1) {
+        stop("Clone ", clone@clone, "does not contain sequences of equal length.")
+    }
+    if(seq_len != germ_len) {
+        stop("The germline and input sequences are not the same length for clone ", clone@clone)
+    }
+    
+    # Check dnapars access
     if (file.access(dnapars_exec, mode=1) == -1) {
-        stop("The file ", dnaparse_exec, " cannot be executed\n.")
+        stop("The file ", dnaparse_exec, " cannot be executed.")
     }
     
     # Create temporary directory
