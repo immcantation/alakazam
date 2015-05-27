@@ -563,7 +563,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     # Create temporary directory
     temp_path <- makeTempDir(paste0(clone@clone, "-phylip"))
     if (verbose) {
-        cat("TEMP_DIR> ", temp_path)
+        cat("TEMP_DIR> ", temp_path, "\n", sep="")
     }
     
     # Run PHYLIP
