@@ -207,6 +207,9 @@ writePhylipInput <- function(clone, path) {
 # @param   verbose       if TRUE suppress phylip console output.
 # @return  TRUE if phylip ran successfully and FALSE otherwise
 runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
+    # Expand shell variables
+    dnapars_exec <- path.expand(dnapars_exec)
+    
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
     if (file.exists(file.path(path, "outtree"))) { file.remove(file.path(path, "outtree")) }    
@@ -524,7 +527,7 @@ phylipToGraph <- function(edges, clone) {
 #' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
-#' dnapars_exec <- file.path(path.expand("~"), "apps/phylip-3.69/dnapars")
+#' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 #' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 #' 
 #' # Plot graph with a tree layout
@@ -557,7 +560,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     
     # Check dnapars access
     if (file.access(dnapars_exec, mode=1) == -1) {
-        stop("The file ", dnaparse_exec, " cannot be executed.")
+        stop("The file ", dnapars_exec, " cannot be executed.")
     }
     
     # Create temporary directory

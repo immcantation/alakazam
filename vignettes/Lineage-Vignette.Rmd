@@ -101,7 +101,7 @@ deleting files is somewhat rude).  In most cases, you will want to set
 library(igraph)
 
 # Run PHYLIP and parse output
-dnapars_exec <- file.path(path.expand("~"), "apps/phylip-3.69/dnapars")
+dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 # Clone annotations
@@ -162,7 +162,6 @@ data.frame on the clone column.
 
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
 library(plyr)
-dnapars_exec <- file.path(path.expand("~"), "apps/phylip-3.69/dnapars")
 # Preprocess clones
 clone_list <- dlply(df, "CLONE", makeChangeoClone, 
                     text_fields=c("SAMPLE", "ISOTYPE"), 
