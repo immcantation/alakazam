@@ -492,17 +492,21 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' # Unique text_fields annotations are combined into a single string with ","
 #' # num_fields annotations are summed
 #' # Ambiguous duplicates are discarded
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", verbose=TRUE)
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#'                    verbose=TRUE)
 #'
 #' # Use alternate delimiter for collapsing textual annotations
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", sep="/", verbose=TRUE)
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#'                    sep="/", verbose=TRUE)
 #' 
 #' # Add count of duplicates
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=TRUE, verbose=TRUE)
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#'                    add_count=TRUE, verbose=TRUE)
 #' 
 #' # Masking ragged ends may impact duplicate removal
 #' df$SEQUENCE_IMGT <- maskSeqEnds(df$SEQUENCE_IMGT)
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", add_count=TRUE, verbose=TRUE)
+#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#'                    add_count=TRUE, verbose=TRUE)
 #'
 #' @export
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",

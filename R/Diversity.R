@@ -71,7 +71,7 @@ setClass("DiversityCurve",
 #' @slot  n        numeric value indication the number of sequences sampled from each group.
 #' @slot  nboot    number of bootstrap realizations.
 #' 
-#' @name DiversityTest
+#' @name  DiversityTest
 #' @export
 setClass("DiversityTest", 
          slots=c(tests="data.frame",
@@ -89,11 +89,15 @@ setClass("DiversityTest",
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve
 
-#' @rdname DiversityCurve
+#' @param    x  DiversityCurve object
+#' 
+#' @rdname   DiversityCurve
 #' @export
 setMethod("print", "DiversityCurve", function(x) { print(x@data) })
 
-#' @rdname DiversityTest
+#' @param    x  DiversityTest object
+#' 
+#' @rdname   DiversityTest
 #' @export
 setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 
