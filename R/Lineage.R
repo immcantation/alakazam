@@ -1,11 +1,4 @@
 # Ig lineage reconstruction via maximum parsimony
-# 
-# @author     Jason Anthony Vander Heiden
-# @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
-# @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    0.2.0
-# @date       2015.04.01
-
 
 #### Classes ####
 
@@ -25,8 +18,10 @@
 #' 
 #' @seealso  See \code{\link{makeChangeoClone}} and \code{\link{buildPhylipLineage}} for use.
 #'           
-#' @name ChangeoClone
-#' @export
+#' @name         ChangeoClone-class
+#' @rdname       ChangeoClone-class
+#' @aliases      ChangeoClone
+#' @exportClass  ChangeoClone
 setClass("ChangeoClone", 
          slots=c(data="data.frame",
                  clone="character",

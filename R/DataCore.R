@@ -1,11 +1,4 @@
 # Common input/output and data structure manipulation functions for Alakazam
-# 
-# @author     Jason Anthony Vander Heiden
-# @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
-# @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    0.2.0
-# @date       2015.04.01
-
 
 #### File I/O functions ####
 

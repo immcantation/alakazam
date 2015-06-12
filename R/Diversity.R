@@ -1,11 +1,4 @@
 # Clonal diversity analysis
-# 
-# @author     Jason Anthony Vander Heiden
-# @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
-# @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    0.2.0
-# @date       2015.04.01
-
 
 #### Classes ####
 
@@ -28,8 +21,10 @@
 #' @slot  ci      confidence interval defining the upper and lower bounds 
 #'                (a value between 0 and 1).
 #' 
-#' @name DiversityCurve
-#' @export
+#' @name         DiversityCurve-class
+#' @rdname       DiversityCurve-class
+#' @aliases      DiversityCurve
+#' @exportClass  DiversityCurve
 setClass("DiversityCurve", 
          slots=c(data="data.frame", 
                  groups="character", 
@@ -71,9 +66,11 @@ setClass("DiversityCurve",
 #' @slot  n        numeric value indication the number of sequences sampled from each group.
 #' @slot  nboot    number of bootstrap realizations.
 #' 
-#' @name  DiversityTest
-#' @export
-setClass("DiversityTest", 
+#' @name         DiversityTest-class
+#' @rdname       DiversityTest-class
+#' @aliases      DiversityTest
+#' @exportClass  DiversityTest
+DiversityTest <- setClass("DiversityTest", 
          slots=c(tests="data.frame",
                  summary="data.frame",
                  groups="character", 
@@ -91,14 +88,14 @@ setClass("DiversityTest",
 
 #' @param    x  DiversityCurve object
 #' 
-#' @rdname   DiversityCurve
-#' @export
+#' @rdname   DiversityCurve-class
+#' @aliases  print,DiversityCurve-method
 setMethod("print", "DiversityCurve", function(x) { print(x@data) })
 
 #' @param    x  DiversityTest object
 #' 
-#' @rdname   DiversityTest
-#' @export
+#' @rdname   DiversityTest-class
+#' @aliases  print,DiversityTest-method
 setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 
 # @rdname DiversityCurve
@@ -339,6 +336,12 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 #' \eqn{group-a} is the group with the greater median \eqn{D}. The p-value for hypothesis 
 #' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution function of the 
 #' bootstrap delta distribution, multipled by 2 for the two-tailed correction.
+#' 
+#' @note
+#' This method may inflate statistical significance when clone sizes are uniformly small,
+#' such as when most clones sizes are 1, sample size is small, and \code{max_n} is near
+#' the total count of the smallest data group. Use caution when interpreting the results 
+#' in such cases. We are currently investigating this potential problem.
 #' 
 #' @references
 #' \enumerate{
