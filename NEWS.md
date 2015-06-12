@@ -1,4 +1,4 @@
 Version 0.2.0:  June 12, 2015
 -------------------------------------------------------------------------------
 
-Initial public release
+Initial public release.
