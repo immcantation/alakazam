@@ -1,6 +1,6 @@
 Alakazam
 -------------------------------------------------------------------------------
-March 4, 2015  
+June 12, 2015  
 Version 0.2.0
 
 Lineage and diversity R package of the Change-O suite.
