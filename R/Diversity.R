@@ -461,24 +461,6 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 
 #### Plotting functions ####
 
-# Define universal plot settings
-#
-# @return    a ggplot2 theme object
-getBaseTheme <- function() {
-    # Define universal plot settings
-    base_theme <- theme_bw() + 
-        theme(text=element_text(size=14)) +
-        theme(plot.title=element_text(size=16)) +
-        theme(strip.background=element_rect(fill='white')) + 
-        theme(strip.text=element_text(size=16, face='bold'))
-        #theme(axis.title=element_text(size=16, vjust=0.5))
-        #theme(axis.text.x=element_text(size=14, vjust=0.5, hjust=0.5)) +
-        #theme(axis.text.y=element_text(size=14))
-    
-    return(base_theme)
-}
-
-
 #' Plot the results of resampleDiversity
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
