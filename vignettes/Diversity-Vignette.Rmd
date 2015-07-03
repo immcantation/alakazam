@@ -1,26 +1,24 @@
 ---
-title: "Alakazam: Analysis of clonal diversity"
+title: 'Alakazam: Analysis of clonal diversity'
 author: "Jason Anthony Vander Heiden"
-date: "`r Sys.Date()`"
+date: '`r Sys.Date()`'
 output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
   html_document:
     fig_height: 4
     fig_width: 7.5
     highlight: pygments
     theme: readable
     toc: yes
-  pdf_document:
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
-    dev: pdf
 geometry: margin=1in
 fontsize: 11pt
-vignette: >
-  %\VignetteIndexEntry{Diversity analysis}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc}
+vignette: |
+  %\VignetteIndexEntry{Diversity analysis} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
 ---
 
 The clonal diversity of the repertoire can be analyzed using the general form

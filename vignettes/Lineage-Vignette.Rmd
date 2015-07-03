@@ -1,26 +1,24 @@
 ---
-title: "Alakazam: Ig lineage reconstruction"
+title: 'Alakazam: Ig lineage reconstruction'
 author: "Jason Anthony Vander Heiden"
-date: "`r Sys.Date()`"
+date: '`r Sys.Date()`'
 output:
+  pdf_document:
+    dev: pdf
+    fig_height: null
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
   html_document:
     fig_height: 4
     fig_width: 7.5
     highlight: pygments
     theme: readable
     toc: yes
-  pdf_document:
-    fig_height: 
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
-    dev: pdf
 geometry: margin=1in
 fontsize: 11pt
-vignette: >
-  %\VignetteIndexEntry{Ig lineage reconstruction}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\usepackage[utf8]{inputenc}
+vignette: |
+  %\VignetteIndexEntry{Ig lineage reconstruction} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
 ---
 
 Reconstruction of an Ig lineage requires the following steps:
@@ -122,7 +120,7 @@ Plotting of a lineage tree may be done using the built-in functions of the
 igraph package. The default edge and vertex labels are edge weights and sequence 
 identifiers, respectively. 
 
-```{r, eval=TRUE, fig.width=4, fix.height=4}
+```{r, eval=TRUE}
 # Plot graph with defaults
 plot(graph)
 ```
@@ -133,7 +131,7 @@ the `layout.reingold.tilford` layout with assignment of the root position to the
 germline sequence, which is named "Germline" in the object returned by 
 `buildPhylipLineage`.
 
-```{r, eval=TRUE, fig.width=4, fix.height=4}
+```{r, eval=TRUE}
 # Modify graph and plot attributes
 V(graph)$color <- "lightgrey"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
