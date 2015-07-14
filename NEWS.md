@@ -1,5 +1,12 @@
-Version 0.2.1.beta:  July 3, 2015
+Version 0.2.1.beta:  July 14, 2015
 -------------------------------------------------------------------------------
+
+General:
+
++ Renamed `getDNADistMatrix()` and `getAADistMatrix()` to `getDNAMatrix` and 
+  `getAAMatrix()`, respectively.
++ Added `getSeqMatrix()` which calculates a pairwise distance matrix for a set 
+  of sequences.
 
 Annotation:
 

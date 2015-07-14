@@ -327,7 +327,7 @@ getPhylipEdges <- function(phylip_out, id_map=NULL) {
 # @param   clone     a ChangeoClone object containg sequence data
 # @param   dist_mat  DNA character distance matrix
 # @return  a list of modified edges data.frame and clone object
-modifyPhylipEdges <- function(edges, clone, dist_mat=getDNADistMatrix(gap=0)) {
+modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     # Move germline to root position
     germ_idx <- which(edges$to == "Germline")
     edges[germ_idx, c('from', 'to')] <- edges[germ_idx, c('to', 'from')]
