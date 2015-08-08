@@ -225,6 +225,7 @@ calcDiversity <- function(p, q) {
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
 #'           \code{\link{DiversityCurve}} for the return object. 
 #'           See \code{\link{testDiversity}} for significance testing.
+#'           See \code{\link{plotDiversityCurve}} for plotting the return object.
 #' 
 #' @examples
 #' # Load example data
@@ -239,7 +240,6 @@ calcDiversity <- function(p, q) {
 #' 
 #' # Increasing threshold results in exclusion of small groups and a warning message
 #' resampleDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
-#' 
 #'
 #' @export
 resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, step_q=0.05, 
