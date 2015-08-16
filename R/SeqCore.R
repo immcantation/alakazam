@@ -870,7 +870,7 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
 #' @rdname getSegment
 #' @export
 getAllele <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {    
-    allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9]+[-/\\w]*[-\\*][\\.\\w]+)'
+    allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*][\\.\\w]+)'
     r <- getSegment(segment_call, allele_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, sep=sep)
     
@@ -880,7 +880,7 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep
 #' @rdname getSegment
 #' @export
 getGene <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {
-    gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9]+[-/\\w]*)'
+    gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*)'
     r <- getSegment(segment_call, gene_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, sep=sep)
     
@@ -891,7 +891,7 @@ getGene <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep="
 #' @rdname getSegment
 #' @export
 getFamily <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {
-    family_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9]+)'
+    family_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+)'
     r <- getSegment(segment_call, family_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, sep=sep)
     
