@@ -7,19 +7,20 @@
 #' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
 #' orders (\eqn{q}).
 #' 
-#' @slot  data    data.frame defining the diversity curve with the following columns:
-#'                \itemize{
-#'                  \item  \code{q}:      diversity order.
-#'                  \item  \code{D}:      median diversity index over all bootstrap 
-#'                                        realizations.
-#'                  \item  \code{lower}:  lower confidence inverval bound.
-#'                  \item  \code{upper}:  upper confidence interval bound.
-#'                }
-#' @slot  groups  character vector of groups retained in the diversity calculation.
-#' @slot  n       numeric value indication the number of sequences sampled from each group.
-#' @slot  nboot   number of bootstrap realizations performed.
-#' @slot  ci      confidence interval defining the upper and lower bounds 
-#'                (a value between 0 and 1).
+#' @slot  data      data.frame defining the diversity curve with the following columns:
+#'                  \itemize{
+#'                    \item  \code{q}:      diversity order.
+#'                    \item  \code{D}:      median diversity index over all bootstrap 
+#'                                          realizations.
+#'                    \item  \code{lower}:  lower confidence inverval bound.
+#'                    \item  \code{upper}:  upper confidence interval bound.
+#'                  }
+#' @slot  groups    character vector of groups retained in the diversity calculation.
+#' @slot  n         numeric vector indication the number of sequences sampled from each group.
+#' @slot  coverage  numeric vector indication the sample coverage for each sampled group.
+#' @slot  nboot     number of bootstrap realizations performed.
+#' @slot  ci        confidence interval defining the upper and lower bounds 
+#'                  (a value between 0 and 1).
 #' 
 #' @name         DiversityCurve-class
 #' @rdname       DiversityCurve-class
@@ -29,6 +30,7 @@ setClass("DiversityCurve",
          slots=c(data="data.frame", 
                  groups="character", 
                  n="numeric", 
+                 coverage="numeric",
                  nboot="numeric", 
                  ci="numeric"))
 
@@ -119,6 +121,144 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 
 
 #### Calculation functions ####
+
+# Calculate undetected species
+# 
+# Calculates the lower bound of undetected species counts using the Chao1 estimator.
+#
+# @param    x  vector of observed abundance counts.
+# 
+# @return   The count of undetected species.
+inferUnseenCount <- function(x) {
+    x <- x[x > 0]
+    n <- sum(x)
+    f1 <- sum(x == 1)
+    f2 <- sum(x == 2)
+    
+    if (f2 > 0) {
+        f0 <- ceiling(((n - 1) * f1^2) / (n * 2 * f2))
+    } else {
+        f0 <- ceiling(((n - 1) * f1 * (f1 - 1)) / (n * 2))
+    }
+    
+    return(f0)
+}
+
+
+# Calculate undetected species
+# 
+# Calculates the lower bound of undetected species counts using the Chao1 estimator.
+#
+# @param    x  vector of observed abundance counts.
+
+# 
+# @return   The count of undetected species.
+calcRarefiedDiversity <- function(x, q, m) {
+    x <- x[x >= 1]
+    n <- sum(x)
+    if (m > n) {
+        stop("m must be <= the total count of observed sequences.")
+    }
+    q[q == 1] <- 0.9999
+    
+    fk <- sapply(1:m, function(k) sum(exp(lchoose(x, k) + lchoose(n - x, m - k) - lchoose(n, m))))
+    D <- sapply(q, function(z) sum((1:m / m)^z * fk)^(1 / (1 - z)))
+    
+    return(D)
+}
+
+# Calculate sample coverage
+# 
+# Calculates sample coverage of varying orders.
+#
+# @param    x  numeric vector of abundance as counts
+# @param    r  the coverage order to calculate
+# 
+# @return   The sample coverage of the given order \code{r}.
+calcCoverage <- function(x, r=1) {
+    n <- sum(x)
+    fr <- sum(x == r)
+    fs <- sum(x == r + 1)
+    
+    if (fr == 0) {
+        stop("Cannot calculate coverage of order ", r, ". No abundance data with count=", r, ".")
+    }
+    if (fs == 0) {
+        stop("Cannot calculate coverage of order ", r, ". No abundance data with count=", r + 1, ".")
+    }
+    
+    a <- factorial(r)*fr / sum(x[x >= r]^r)
+    b <- ((n - r)*fr / ((n - r)*fr + (r + 1)*fs))^r
+    rC <- 1 - a*b
+    
+    return(rC)
+}
+
+
+# Calculate first order coverage
+#
+# @param    x  a numeric vector of species abundance as counts
+#
+# @returns  Coverage estimate.
+chao1Coverage <- function(x) {
+    x <- x[x >= 1]
+    n <- sum(x)
+    f1 <- sum(x == 1)
+    f2 <- sum(x == 2)
+    
+    if (f2 > 0) {
+        rC1 <- 1 - (f1 / n) * (((n - 1) * f1) / ((n - 1) * f1 + 2 * f2))
+    } else {
+        rC1 <- 1 - (f1 / n) * (((n - 1) * (f1 - 1)) / ((n - 1) * (f1 - 1) + 2))
+    }
+    
+    return(rC1)
+}
+
+
+# Adjustement to observed relative abundances
+#
+# @param    x  vector of observed abundance counts
+#
+# @return   An adjusted observed species relative abundance distribution.
+adjustObservedAbundance <- function(x) {
+    x <- x[x >= 1]
+    n <- sum(x)
+    
+    # Coverage
+    rC1 <- calcCoverage(x, r=1)
+    
+    # Calculate tuning parameter
+    lambda <- (1 - rC1) / sum(x/n * exp(-x))
+    
+    # Define adjusted relative abundance
+    p <- x/n * (1 -  lambda * exp(-x))
+    
+    return(p)
+}
+
+
+# Define undetected species relative abundances
+#
+# @param    x  vector of detected species abundance counts.
+# 
+# @return   An adjusted detected species relative abundance distribution.
+inferUnseenAbundance <- function(x) {
+    x <- x[x >= 1]
+    
+    # Coverage
+    rC1 <- calcCoverage(x, r=1)
+    
+    # Unseen count
+    f0 <- inferUnseenCount(x)
+    
+    # Assign unseen relative abundance
+    p <- rep((1 - rC1) / f0, f0)
+    
+    return(p)
+}
+
+
 
 #' Calculate the diversity index
 #' 
@@ -295,6 +435,208 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
                nboot=nboot, 
                ci=ci)
 
+    return(div)
+}
+
+
+#' Generate a clonal diversity index curve
+#'
+#' \code{resampleDiversity} divides a set of clones by a group annotation,
+#' uniformly resamples the sequences from each group, and calculates diversity
+#' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
+#' 
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    method    string defining the rarefaction method. One of \code{"depth"}, which
+#'                     rarefies to the same number of sequences for each group, or 
+#'                     \code{"coverage"}, which rarefies to the same degree of sample 
+#'                     completeness. 
+#' @param    min_q     minimum value of \eqn{q}.
+#' @param    max_q     maximum value of \eqn{q}.
+#' @param    step_q    value by which to increment \eqn{q}.
+#' @param    min_n     minimum number of observations to sample.
+#'                     A group with less observations than the minimum is excluded.
+#' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
+#'                     if automatically determined from the size of the largest group.
+#' @param    min_c     minimum coverage required to retain a group. A group with lower coverage 
+#'                     \code{min_c} prior to rarefaction will be excluded.
+#' @param    replace   if \code{TRUE} resample with replacement; if \code{FALSE} resample
+#'                     without replacement.
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
+#' 
+#' @return   A \code{\link{DiversityCurve}} object summarizing the diversity scores.
+#' 
+#' @details
+#' Clonal diversity is calculated using the generalized diversity index proposed by 
+#' Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
+#' 
+#' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
+#' \code{min_q} to \code{max_q} incremented by \code{step_q}.  Variability in total 
+#' sequence counts across unique values in the \code{group} column is corrected by
+#' rarefying to either a common number of sequences (\code{method="depth"}) or a common
+#' level of sample coverage (\code{method="coverage"}) as implemented in the 
+#' \code{\link[iNEXT]{iNEXT}} package and described by Chao et al, 2014. 
+#' 
+#' Confidence intervals are calculated using the \code{\link[iNEXT]{iNEXT}} 
+#' implementation.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427-32.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45–67.
+#' }
+#'  
+#' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
+#'           \code{\link{DiversityCurve}} for the return object. 
+#'           See \code{\link{testDiversity}} for significance testing.
+#'           See \code{\link{plotDiversityCurve}} for plotting the return object.
+#' 
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' # All groups do not pass default minimum thresholds using depth rarefaction
+#' div <- rarefyDiversity(df, "SAMPLE", method="depth", step_q=1, max_q=10, nboot=100)
+#' plotDiversityCurve(div, legend_title="Sample")
+#'                    
+#' # Difference groups fail the minimum count threshold when allowing for very low coverage samples
+#' div <- rarefyDiversity(df, "SAMPLE", method="coverage", step_q=1, max_q=10, min_c=0.1, nboot=100)
+#' plotDiversityCurve(div, legend_title="Sample")
+#'                    
+#' # Grouping by isotype rather than sample identifier
+#' div <- rarefyDiversity(df, "ISOTYPE", method="depth", min_n=40, step_q=1, max_q=10, nboot=100)
+#' plotDiversityCurve(div, legend_title="Isotype")
+#'
+#' @export
+rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "coverage"), 
+                            min_q=0, max_q=32, step_q=0.05, min_n=10, max_n=NULL, 
+                            min_c=0.2, ci=0.95, nboot=2000) {
+    # Check arguments
+    method <- match.arg(method)
+    
+    # Verify data
+    if (!is.data.frame(data)) {
+        stop("Input data is not a data.frame")
+    }
+    
+    if (!(group %in% names(data))) {
+        stop(paste("The column", group, "does not exist in the input data.frame"))
+    } else {
+        data[[group]] <- as.character(data[[group]])
+    }
+
+    if (!(clone %in% names(data))) {
+        stop(paste("The column", clone, "does not exist in the input data.frame"))
+    } else {
+        data[[clone]] <- as.character(data[[clone]])
+    }
+
+    # Calculate clonal abundance
+    # TODO:  Use repertoire::countClones and implement copy number approach
+    #clone_tab <- ddply(data, c(group, clone), here(summarize), COUNT=length(eval(parse(text=clone))))
+    
+    # Tabulate clonal abundance
+    clone_tab <- data %>% 
+                 group_by_(.dots=c(group, clone)) %>%
+                 dplyr::summarize(COUNT=n())
+    
+    # Count observations per group and set sampling criteria
+    #cover_tab <- ddply(clone_tab, c(group), summarize, 
+    #                   COVERAGE=iNEXT:::Chat.Ind(COUNT, sum(COUNT, na.rm=TRUE)))
+    #group_tab <- ddply(clone_tab, c(group), summarize, 
+    #                   COUNT=sum(COUNT, na.rm=TRUE))
+    #group_tab <- join(group_tab, cover_tab, by=group)
+
+    group_tab <- clone_tab %>%
+                 group_by_(.dots=c(group)) %>%
+                 dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE), 
+                                  COVERAGE=iNEXT:::Chat.Ind(COUNT, SEQUENCES))
+    group_all <- as.character(group_tab[[group]])
+    group_tab <- filter(group_tab, SEQUENCES >= min_n, COVERAGE >= min_c)
+    group_keep <- as.character(group_tab[[group]])
+    
+    if (method == "depth") {
+        nsam <- min(group_tab$SEQUENCES[group_tab$SEQUENCES >= min_n], max_n)
+        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
+    } else if (method == "coverage") {
+        # Get lowest coverage
+        csam <- max(min(group_tab$COVERAGE), min_c)
+
+        # Infer depth from coverage curves
+        .f <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
+        nsam <- setNames(numeric(length(group_keep)), group_keep)
+        for (g in group_keep) {
+            x <- clone_tab$COUNT[clone_tab[[group]] == g]
+            m <- group_tab$SEQUENCES[group_tab[[group]] == g]
+            #y <- iNEXT:::Chat.Ind(x, 1:m)
+            #nsam[g] <- which.min(abs(csam - y))
+            nsam[g] <- floor(optimize(.f, interval=c(1, m), x=x)$minimum)
+        }
+        # Filter to samples with enough sequences after coverage rarefaction
+        nsam <- nsam[nsam >= min_n]
+        group_keep <- names(nsam)
+    }
+    
+    # Set diversity orders and confidence interval
+    q <- seq(min_q, max_q, step_q)
+    ci_z <- ci + (1 - ci) / 2
+    
+    # Warn if groups removed
+    if (length(group_keep) < length(group_all)) {
+        warning("Not all groups passed thresholds min_n=", min_n, " and min_c=", min_c, 
+                ". Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
+    }
+    
+    # Generate diversity index and confidence intervals via resampling
+    cat("-> CALCULATING DIVERSITY\n")
+    pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3)
+    div_list <- list()
+    coverage <- setNames(numeric(length(group_keep)), group_keep)
+    i <- 0
+    for (g in group_keep) {
+        i <- i + 1
+        n <- nsam[g]
+        
+        # Calculate observed diversity
+        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
+        div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=n))
+        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
+        
+        # Bootstrap diversity
+        abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
+        sample_mat <- rmultinom(nboot, n, abund_inf)
+        div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=n)))
+        
+        # Assign confidence intervals based on variance of bootstrap realizations
+        sd_boot <- apply(div_boot, 1, sd)
+        err_boot <- qnorm(ci_z) * sd_boot
+        div_lower <- pmax(div_obs - err_boot, 0)
+        div_upper <- div_obs + err_boot
+        
+        # Build result matrix object
+        div_list[[g]] <- matrix(c(q, div_obs, div_lower, div_upper),
+                                nrow=length(q), ncol=4, 
+                                dimnames=list(NULL, c("q", "D", "lower", "upper")))
+        
+        setTxtProgressBar(pb, i)
+    }
+    cat("\n")
+    
+    # Generate return object
+    div <- new("DiversityCurve", 
+               data=bind_rows(div_list, .id="group"), 
+               groups=group_keep, 
+               n=nsam,
+               coverage=coverage,
+               nboot=nboot, 
+               ci=ci)
+    
     return(div)
 }
 

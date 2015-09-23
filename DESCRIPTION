@@ -11,9 +11,11 @@ URL: http://clip.med.yale.edu/changeo
 Depends:
     R (>= 3.0.0),
     ggplot2,
-    plyr
+    plyr,
+    dplyr
 Imports:
     igraph,
+    iNEXT,
     methods,
     scales
 Suggests:
