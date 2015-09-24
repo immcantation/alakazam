@@ -145,24 +145,26 @@ inferUnseenCount <- function(x) {
 }
 
 
-# Calculate undetected species
+# Calculates diversity under rarefaction
 # 
-# Calculates the lower bound of undetected species counts using the Chao1 estimator.
+# Calculates Hill numbers under rarefaction
 #
 # @param    x  vector of observed abundance counts.
+# @param    q  numeric vector of diversity orders.
+# @param    n  the sequence count to rarefy to.
 
-# 
-# @return   The count of undetected species.
-calcRarefiedDiversity <- function(x, q, m) {
+# @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
+calcRarefiedDiversity <- function(x, q, n) {
     x <- x[x >= 1]
-    n <- sum(x)
-    if (m > n) {
-        stop("m must be <= the total count of observed sequences.")
+    N <- sum(x)
+    if (n > N) {
+        stop("n must be <= the total count of observed sequences.")
     }
     q[q == 1] <- 0.9999
     
-    fk <- sapply(1:m, function(k) sum(exp(lchoose(x, k) + lchoose(n - x, m - k) - lchoose(n, m))))
-    D <- sapply(q, function(z) sum((1:m / m)^z * fk)^(1 / (1 - z)))
+    # TODO:  Walk through the math carefully and make sure this is correct!!!
+    fk <- sapply(1:n, function(k) sum(exp(lchoose(x, k) + lchoose(N - x, n - k) - lchoose(N, n))))
+    D <- sapply(q, function(z) sum((1:n / n)^z * fk)^(1 / (1 - z)))
     
     return(D)
 }
@@ -517,6 +519,8 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "coverage"), 
                             min_q=0, max_q=32, step_q=0.05, min_n=10, max_n=NULL, 
                             min_c=0.2, ci=0.95, nboot=2000) {
+    #group="SAMPLE"; clone="CLONE"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=10; max_n=NULL; min_c=0.2; ci=0.95; nboot=200
+    
     # Check arguments
     method <- match.arg(method)
     
@@ -569,14 +573,14 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         csam <- max(min(group_tab$COVERAGE), min_c)
 
         # Infer depth from coverage curves
-        .f <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
+        .fC <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
         nsam <- setNames(numeric(length(group_keep)), group_keep)
         for (g in group_keep) {
             x <- clone_tab$COUNT[clone_tab[[group]] == g]
             m <- group_tab$SEQUENCES[group_tab[[group]] == g]
             #y <- iNEXT:::Chat.Ind(x, 1:m)
             #nsam[g] <- which.min(abs(csam - y))
-            nsam[g] <- floor(optimize(.f, interval=c(1, m), x=x)$minimum)
+            nsam[g] <- floor(optimize(.fC, interval=c(1, m), x=x)$minimum)
         }
         # Filter to samples with enough sequences after coverage rarefaction
         nsam <- nsam[nsam >= min_n]
@@ -605,13 +609,15 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         
         # Calculate observed diversity
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=n))
+        div_obs <- calcRarefiedDiversity(abund_obs, q, n) 
+        #div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=n))
         coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
         
         # Bootstrap diversity
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         sample_mat <- rmultinom(nboot, n, abund_inf)
-        div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=n)))
+        #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=n)))
+        div_boot <- apply(sample_mat[,1:3], 2, calcRarefiedDiversity, q=q, n=n)
         
         # Assign confidence intervals based on variance of bootstrap realizations
         sd_boot <- apply(div_boot, 1, sd)
