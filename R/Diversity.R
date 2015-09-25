@@ -617,7 +617,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         sample_mat <- rmultinom(nboot, n, abund_inf)
         #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=n)))
-        div_boot <- apply(sample_mat[,1:3], 2, calcRarefiedDiversity, q=q, n=n)
+        div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, n=n)
         
         # Assign confidence intervals based on variance of bootstrap realizations
         sd_boot <- apply(div_boot, 1, sd)
@@ -626,17 +626,18 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         div_upper <- div_obs + err_boot
         
         # Build result matrix object
-        div_list[[g]] <- matrix(c(q, div_obs, div_lower, div_upper),
-                                nrow=length(q), ncol=4, 
-                                dimnames=list(NULL, c("q", "D", "lower", "upper")))
+        div_list[[g]] <- as.data.frame(matrix(c(q, div_obs, div_lower, div_upper),
+                                       nrow=length(q), ncol=4, 
+                                       dimnames=list(NULL, c("q", "D", "lower", "upper"))))
         
         setTxtProgressBar(pb, i)
     }
     cat("\n")
     
+    # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
     # Generate return object
     div <- new("DiversityCurve", 
-               data=bind_rows(div_list, .id="group"), 
+               data=as.data.frame(bind_rows(div_list, .id="group")), 
                groups=group_keep, 
                n=nsam,
                coverage=coverage,
@@ -814,7 +815,7 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
 #'
 #' @param    data            \code{\link{DiversityCurve}} object returned by 
-#'                           \code{\link{resampleDiversity}}.
+#'                           \code{\link{rarefyDiversity}}.
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -828,13 +829,17 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 #'                           \code{c(lower, upper)} x-axis limits.
 #' @param    ylim            numeric vector of two values specifying the 
 #'                           \code{c(lower, upper)} y-axis limits.
+#' @param    annotate        string defining whether to added values to the group labels 
+#'                           of the legend showing sequence counts (\code{"depth"}),
+#'                           coverage (\code{"coverage"}), both counts and coverage 
+#'                           (\code{"both"}), or neither (\code{"none"}).
 #' @param    silent          if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                           object; if \code{FALSE} draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
 #'
 #' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @seealso  See \code{\link{resampleDiversity}} for generating \code{\link{DiversityCurve}}
+#' @seealso  See \code{\link{rarefyDiversity}} for generating \code{\link{DiversityCurve}}
 #'           objects for input. Plotting is performed with \code{\link{ggplot}}.
 #' 
 #' @examples
@@ -843,28 +848,55 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- resampleDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
-#' plotDiversityCurve(div, main_title=paste(slot(div, "n"), "sequences sampled"),
-#'                    legend_title="Sample")
+#' div <- rarefyDiversity(df, "SAMPLE", min_c=0.1, step_q=0.1, max_q=10, nboot=100)
+#' plotDiversityCurve(div, legend_title="Sample")
 #' 
 #' @export
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
                                legend_title=NULL, log_q=TRUE, log_d=TRUE,
-                               xlim=NULL, ylim=NULL, silent=FALSE, ...) {
-    # Define plot elements
+                               xlim=NULL, ylim=NULL, 
+                               annotate=c("both", "depth", "coverage", "none"),
+                               silent=FALSE, ...) {
+    # Check arguments
+    annotate <- match.arg(annotate)
+    
+    # Define group label annotations
+    if (annotate == "none") {
+        group_labels <- setNames(data@groups, data@groups)
+    } else if (annotate == "depth") {
+        group_labels <- setNames(paste0(data@groups, 
+                                        " (N=", data@n, ")"), 
+                                 data@groups)
+    } else if (annotate == "coverage") {
+        group_labels <- setNames(paste0(data@groups, 
+                                        " (C=", round(data@coverage, 3), ")"), 
+                                 data@groups)
+    } else if (annotate == "both") {
+        group_labels <- setNames(paste0(data@groups, 
+                                        " (N=", data@n, 
+                                        ", C=", round(data@coverage, 3), ")"), 
+                                 data@groups)
+    }
+    
+    # Define base plot elements
     p1 <- ggplot(data@data, aes(x=q, y=D, group=group)) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('q') +
         ylab(expression(''^q * D)) +
-        geom_ribbon(aes(ymin=lower, ymax=upper, fill=group), alpha=0.25) +
-        geom_line(aes(color=group)) +
-        guides(color=guide_legend(title=legend_title), 
-               fill=guide_legend(title=legend_title))  
+        geom_ribbon(aes(ymin=lower, ymax=upper, fill=group), alpha=0.4) +
+        geom_line(aes(color=group))
+    
+    # Set colors and legend
     if (!is.null(colors)) {
-        p1 <- p1 + scale_color_manual(name=legend_title, values=colors) +
-            scale_fill_manual(name=legend_title, values=colors)
-    }        
+        p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
+            scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
+    } else {
+        p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
+            scale_fill_discrete(name=legend_title, labels=group_labels)
+    }
+    
+    # Set x-axis style
     if (log_q) {
         p1 <- p1 + scale_x_continuous(trans=log2_trans(), limits=xlim,
                                       breaks=trans_breaks('log2', function(x) 2^x),
@@ -872,6 +904,8 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     } else {
         p1 <- p1 + scale_x_continuous(limits=xlim)
     }
+    
+    # Set y-axis style
     if (log_d) {
         p1 <- p1 + scale_y_continuous(trans=log2_trans(), limits=ylim,
                                       breaks=trans_breaks('log2', function(x) 2^x),
