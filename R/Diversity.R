@@ -152,7 +152,7 @@ inferUnseenCount <- function(x) {
 # @param    x  vector of observed abundance counts.
 # @param    q  numeric vector of diversity orders.
 # @param    n  the sequence count to rarefy to.
-
+#
 # @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
 calcRarefiedDiversity <- function(x, q, n) {
     x <- x[x >= 1]

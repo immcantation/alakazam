@@ -33,5 +33,21 @@ stoufferMeta <- function(p, w=NULL) {
     x <- qnorm(1 - p)
     Z  <- sum(w*x) / sqrt(sum(w^2))
     pvalue <- 1 - pnorm(Z)
+    
     return(c(Z=Z, pvalue=pvalue))
+}
+
+# Stirling's approximation of the binomial coefficient
+# 
+# Calculates Stirling's approximation of the binomial coefficient for large numbers.
+#
+# @param    n  n.
+# @param    k  k.
+#
+# @return   The approximation of log(n choose k).
+lchooseStirling <- function(n, k) {
+    x <- n*log(n) - k*log(k) - (n - k)*log(n - k) + 
+         0.5*(log(n) - log(k) - log(n - k) - log(2*pi))
+    
+    return(x)
 }
