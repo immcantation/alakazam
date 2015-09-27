@@ -151,23 +151,37 @@ inferUnseenCount <- function(x) {
 #
 # @param    x  vector of observed abundance counts.
 # @param    q  numeric vector of diversity orders.
-# @param    n  the sequence count to rarefy to.
+# @param    m  the sequence count to rarefy to.
 #
 # @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-calcRarefiedDiversity <- function(x, q, n) {
+calcRarefiedDiversity <- function(x, q, m) {
     x <- x[x >= 1]
-    N <- sum(x)
-    if (n > N) {
-        stop("n must be <= the total count of observed sequences.")
+    n <- sum(x)
+    if (m > n) {
+        stop("m must be <= the total count of observed sequences.")
     }
     q[q == 1] <- 0.9999
+
+    # Tabulate frequency counts from 1:n
+    fk_n <- tabulate(x, nbins=n)
     
-    # TODO:  Walk through the math carefully and make sure this is correct!!!
-    fk <- sapply(1:n, function(k) sum(exp(lchoose(x, k) + lchoose(N - x, n - k) - lchoose(N, n))))
-    D <- sapply(q, function(z) sum((1:n / n)^z * fk)^(1 / (1 - z)))
+    # Calculate estimated fk(m)
+    fk_m <- sapply(1:m, function(k) sum(exp(lchoose(k:m, k) + 
+                                            lchoose(n - k:m, m - k) - 
+                                            lchoose(n, m))*fk_n[k:m]))
+    
+    #.fkm <- function(k) {
+    #    j <- k:m
+    #    sum(exp(lchoose(j, k) + lchoose(n - j, m - k) - lchoose(n, m))*fk_n[j])
+    #}
+    #fk <- sapply(1:m, function(k) sum(exp(lchoose(x, k) + lchoose(n - x, m - k) - lchoose(n, m))))
+    
+    # Calculate diversity
+    D <- sapply(q, function(r) sum((1:m / m)^r * fk_m)^(1 / (1 - r)))
     
     return(D)
 }
+
 
 # Calculate sample coverage
 # 
@@ -504,11 +518,11 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups do not pass default minimum thresholds using depth rarefaction
-#' div <- rarefyDiversity(df, "SAMPLE", method="depth", step_q=1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(df, "SAMPLE", method="coverage", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
-#' # Difference groups fail the minimum count threshold when allowing for very low coverage samples
-#' div <- rarefyDiversity(df, "SAMPLE", method="coverage", step_q=1, max_q=10, min_c=0.1, nboot=100)
+#' # Different groups fail the minimum count threshold when requiring higher coverage
+#' div <- rarefyDiversity(df, "SAMPLE", method="depth", min_c=0.2, step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier
@@ -518,7 +532,7 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "coverage"), 
                             min_q=0, max_q=32, step_q=0.05, min_n=10, max_n=NULL, 
-                            min_c=0.2, ci=0.95, nboot=2000) {
+                            min_c=0.1, ci=0.95, nboot=2000) {
     #group="SAMPLE"; clone="CLONE"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=10; max_n=NULL; min_c=0.2; ci=0.95; nboot=200
     
     # Check arguments
@@ -605,19 +619,19 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
     i <- 0
     for (g in group_keep) {
         i <- i + 1
-        n <- nsam[g]
+        m <- nsam[g]
         
         # Calculate observed diversity
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        div_obs <- calcRarefiedDiversity(abund_obs, q, n) 
-        #div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=n))
-        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
+        div_obs <- calcRarefiedDiversity(abund_obs, q=q, m=m) 
+        #div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=m))
+        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, m)
         
         # Bootstrap diversity
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
-        sample_mat <- rmultinom(nboot, n, abund_inf)
-        #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=n)))
-        div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, n=n)
+        sample_mat <- rmultinom(nboot, m, abund_inf)
+        #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=m)))
+        div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, m=m)
         
         # Assign confidence intervals based on variance of bootstrap realizations
         sd_boot <- apply(div_boot, 1, sd)

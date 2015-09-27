@@ -41,13 +41,58 @@ stoufferMeta <- function(p, w=NULL) {
 # 
 # Calculates Stirling's approximation of the binomial coefficient for large numbers.
 #
-# @param    n  n.
-# @param    k  k.
+# @param    n  a vector of n.
+# @param    k  a vector of k.
 #
-# @return   The approximation of log(n choose k).
+# @return   The approximation of log(n choose k). For n < 100 \link{lchoose} is used.
 lchooseStirling <- function(n, k) {
-    x <- n*log(n) - k*log(k) - (n - k)*log(n - k) + 
-         0.5*(log(n) - log(k) - log(n - k) - log(2*pi))
+    if (any(n < k)) {
+        stop("n must be >= k")
+    }
     
-    return(x)
+    n_len <- length(n)
+    k_len <- length(k)
+    nCk <- rep(NA, max(n_len, k_len))
+    nCk[n == k] <- 0
+    
+    # a = index n_small
+    # i = index k_small
+    # x = index nCk_small
+    #
+    # b = index n_large
+    # j = index k_large
+    # y = index nCk_large
+    #
+    # Check for vector inputs and assign indexing
+    if (n_len >= 1 & k_len >= 1 & n_len == k_len) {
+        a <- i <- x <- (n < 100 & n != k)
+        b <- j <- y <- (n >= 100 & n != k)
+    } else if (n_len > 1 & k_len == 1) {
+        a <- x <- (n < 100 & n != k)
+        b <- y <- (n >= 100 & n != k)
+        i <- j <- TRUE
+    } else if (n_len == 1 & k_len > 1) {
+        a <- (n < 100)
+        b <- !a
+        i <- j <- (n != k)
+        x <- if (n < 100) { i } else { NULL }
+        y <- if (n >= 100) { i } else { NULL }
+    } else {
+        stop("Inputs are wrong. n and k must have the same length or be length one.")
+    } 
+
+        
+    # Small n
+    nCk[x] <-  lchoose(n[a], k[i])
+    
+    # Large n indices
+    nCk[y] <- n[b]*log(n[b]) - k[j]*log(k[j]) - (n[b] - k[j])*log(n[b] - k[j]) + 
+              0.5*(log(n[b]) - log(k[j]) - log(n[b] - k[j]) - log(2*pi))
+    
+#     .nCk <- function(n, k) {
+#         n*log(n) - k*log(k) - (n - k)*log(n - k) + 
+#         0.5*(log(n) - log(k) - log(n - k) - log(2*pi))
+#     }
+    
+    return(nCk)
 }
