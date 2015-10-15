@@ -320,6 +320,8 @@ inferUnseenAbundance <- function(x) {
 #' 
 #' @export
 calcDiversity <- function(p, q) {
+    # Remove zeros
+    p <- p[p > 0]
     # Convert p to proportional abundance
     p <- p / sum(p)
     # Add jitter to q=1
@@ -464,6 +466,11 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
 #' @param    group     name of the \code{data} column containing group identifiers.
 #' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
 #' @param    method    string defining the rarefaction method. One of \code{"depth"}, which
 #'                     rarefies to the same number of sequences for each group, or 
 #'                     \code{"coverage"}, which rarefies to the same degree of sample 
@@ -530,10 +537,10 @@ resampleDiversity <- function(data, group, clone="CLONE", min_q=0, max_q=32, ste
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
-rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "coverage"), 
+rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, method=c("depth", "coverage"), 
                             min_q=0, max_q=32, step_q=0.05, min_n=10, max_n=NULL, 
                             min_c=0.1, ci=0.95, nboot=2000) {
-    #group="SAMPLE"; clone="CLONE"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=10; max_n=NULL; min_c=0.2; ci=0.95; nboot=200
+    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT", method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=10; max_n=NULL; min_c=0.2; ci=0.95; nboot=200
     
     # Check arguments
     method <- match.arg(method)
@@ -555,14 +562,24 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         data[[clone]] <- as.character(data[[clone]])
     }
 
+    if (!is.null(copy) && !(copy %in% names(data))) {
+        stop(paste("The column", copy, "does not exist in the input data.frame"))
+    }
+    
     # Calculate clonal abundance
     # TODO:  Use repertoire::countClones and implement copy number approach
     #clone_tab <- ddply(data, c(group, clone), here(summarize), COUNT=length(eval(parse(text=clone))))
     
     # Tabulate clonal abundance
-    clone_tab <- data %>% 
-                 group_by_(.dots=c(group, clone)) %>%
-                 dplyr::summarize(COUNT=n())
+    if (is.null(copy)) {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize(COUNT=n())
+    } else {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
+    }
     
     # Count observations per group and set sampling criteria
     #cover_tab <- ddply(clone_tab, c(group), summarize, 
@@ -623,7 +640,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         
         # Calculate observed diversity
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        div_obs <- calcRarefiedDiversity(abund_obs, q=q, m=m) 
+        #div_obs <- calcRarefiedDiversity(abund_obs, q=q, m=m) 
         #div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=m))
         coverage[g] <- iNEXT:::Chat.Ind(abund_obs, m)
         
@@ -631,9 +648,11 @@ rarefyDiversity <- function(data, group, clone="CLONE", method=c("depth", "cover
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         sample_mat <- rmultinom(nboot, m, abund_inf)
         #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=m)))
-        div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, m=m)
+        #div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, m=m)
+        div_boot <- apply(sample_mat, 2, calcDiversity, q=q)
         
         # Assign confidence intervals based on variance of bootstrap realizations
+        div_obs <- apply(div_boot, 1, mean)
         sd_boot <- apply(div_boot, 1, sd)
         err_boot <- qnorm(ci_z) * sd_boot
         div_lower <- pmax(div_obs - err_boot, 0)
