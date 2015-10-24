@@ -65,7 +65,7 @@ setClass("DiversityCurve",
 #'                 }
 #' @slot  groups   character vector of groups retained in diversity calculation.
 #' @slot  q        diversity order tested (\eqn{q}).
-#' @slot  n        numeric value indication the number of sequences sampled from each group.
+#' @slot  n        numeric vector indication the number of sequences sampled from each group.
 #' @slot  nboot    number of bootstrap realizations.
 #' 
 #' @name         DiversityTest-class
@@ -373,7 +373,7 @@ calcDiversity <- function(p, q) {
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
 #' of seen clones, and applying the relative abundance correction and unseen clone
-#' frequency described in Chao et al, 2015.
+#' frequency described in Chao et al, 2014.
 #'
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
 #' \code{min_q} to \code{max_q} incremented by \code{step_q}.  Variability in total 
@@ -426,13 +426,14 @@ calcDiversity <- function(p, q) {
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             method=c("depth", "coverage", "none"), 
-                            min_q=0, max_q=32, step_q=0.05, min_n=10, max_n=NULL, 
+                            min_q=0, max_q=32, step_q=0.05, min_n=30, max_n=NULL, 
                             min_c=0, ci=0.95, nboot=2000) {
-    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=10; max_n=NULL; min_c=0.1; ci=0.95; nboot=200
+    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=30; max_n=NULL; min_c=0.1; ci=0.95; nboot=200
     
     # Check arguments
     method <- match.arg(method)
     
+    # TODO: replace with checkFields()
     # Verify data
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
@@ -528,6 +529,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
         coverage[g] <- iNEXT:::Chat.Ind(abund_obs, m)
         
         # Generate bootstrap distributions
+        # TODO: swap this for internal function
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         sample_mat <- rmultinom(nboot, m, abund_inf)
         #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=m)))
@@ -570,16 +572,28 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' \code{testDiversity} performs pairwise significance tests of the diversity index 
 #' (\eqn{D}) at a given diversity order (\eqn{q}) for a set of annotation groups via
-#' bootstrapping.
+#' rarefaction and bootstrapping.
 #'
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
 #' @param    q         diversity order to test.
 #' @param    group     name of the \code{data} column containing group identifiers.
 #' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    method    string defining the rarefaction method. One of \code{"depth"}, which
+#'                     rarefies to the same number of sequences for each group,
+#'                     \code{"coverage"}, which rarefies to the same degree of sample 
+#'                     completeness, or \code{"none"}, which does not perform any correction
+#'                     for differences in sampling depth or completeness.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
+#' @param    min_c     minimum coverage required to retain a group. A group with lower 
+#'                     coverage \code{min_c} prior to rarefaction will be excluded.
 #' @param    nboot     number of bootstrap realizations to perform.
 #' 
 #' @return   A \code{\link{DiversityTest}} object containing p-values and summary statistics.
@@ -588,11 +602,17 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' Clonal diversity is calculated using the generalized diversity index proposed by 
 #' Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
 #' 
+#' Diversity is calculated on the estimated complete clonal abundance distribution.
+#' This distribution is inferred by using the Chao1 estimator to estimate the number
+#' of seen clones, and applying the relative abundance correction and unseen clone
+#' frequency described in Chao et al, 2014.
+#'
 #' Variability in total sequence counts across unique values in the \code{group} column is 
-#' corrected using repeated subsampling with replacement (bootstrapping) \code{nboot} times. 
-#' Each bootstrap realization is fixed to a uniform count for each group, determined by 
-#' either the value of \code{max_n} or the minimum number of sequences among all groups when 
-#' \code{max_n=NULL}. The diversity index estimate (\eqn{D}) for each group is the median value 
+#' corrected by repeated resampling from the estimated complete clonal distribution to 
+#' either a common number of sequences (\code{method="depth"}) or a common level of sample 
+#' coverage (\code{method="coverage"}). Details regarding determination of coverage 
+#' can be found in the \code{\link[iNEXT]{iNEXT}} package and Chao et al, 2014. 
+#' The diversity index estimate (\eqn{D}) for each group is the mean value 
 #' of over all bootstrap realizations. 
 #' 
 #' Significance of the difference in diversity index (\eqn{D}) between groups is tested by 
@@ -600,9 +620,9 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' \code{group} column. The bootstrap delta distribution is built by subtracting the diversity 
 #' index \eqn{Da} in \eqn{group-a} from the corresponding value \eqn{Db} in \eqn{group-b}, 
 #' for all bootstrap realizations, yeilding a distribution of \code{nboot} total deltas; where 
-#' \eqn{group-a} is the group with the greater median \eqn{D}. The p-value for hypothesis 
-#' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution function of the 
-#' bootstrap delta distribution, multipled by 2 for the two-tailed correction.
+#' \eqn{group-a} is the group with the greater mean \eqn{D}. The p-value for hypothesis 
+#' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution 
+#' function of the bootstrap delta distribution, multipled by 2 for the two-tailed correction.
 #' 
 #' @note
 #' This method may inflate statistical significance when clone sizes are uniformly small,
@@ -614,9 +634,17 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
 #'            Ecology. 1973 54(2):427-32.
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
 #'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
 #'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
 #'            J Allergy Clin Immunol. 2014 134(3):604-12.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45–67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
 #' }
 #' 
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
@@ -631,47 +659,111 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' df <- readChangeoDb(file)
 #' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=1000)
+#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
-testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
+testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
+                          method=c("depth", "coverage", "none"), 
+                          min_n=30, max_n=NULL, min_c=0, nboot=2000) {
+    #group="SAMPLE"; clone="CLONE"; copy=NULL; method="depth"; q=1; min_n=30; max_n=NULL; min_c=0.1; nboot=200
     
     # TODO:  write plotDiversityTest function
-    # TODO:  convert to dplyr
-    
-    # Verify function arguments
+
+    # Check arguments
+    method <- match.arg(method)
+        
+    # TODO: replace with checkFields()
+    # Verify data
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
     }
+    
     if (!(group %in% names(data))) {
         stop(paste("The column", group, "does not exist in the input data.frame"))
+    } else {
+        data[[group]] <- as.character(data[[group]])
     }
+    
     if (!(clone %in% names(data))) {
         stop(paste("The column", clone, "does not exist in the input data.frame"))
+    } else {
+        data[[clone]] <- as.character(data[[clone]])
+    }
+    
+    if (!is.null(copy) && !(copy %in% names(data))) {
+        stop(paste("The column", copy, "does not exist in the input data.frame"))
+    }
+    
+    # Tabulate clonal abundance
+    if (is.null(copy)) {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize(COUNT=n())
+    } else {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
     }
     
     # Count observations per group and set sampling criteria
-    group_sum <- ddply(data, c(group), here(summarize), count=length(eval(parse(text=group))))
-    group_all <- as.character(group_sum[, group])
-    group_keep <- as.character(group_sum[group_sum$count >= min_n, group])
-    n <- min(group_sum$count[group_sum$count >= min_n], max_n)
-    ngroup <- length(group_keep)
+    group_tab <- clone_tab %>%
+        group_by_(.dots=c(group)) %>%
+        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE), 
+                         COVERAGE=iNEXT:::Chat.Ind(COUNT, SEQUENCES))
+    group_all <- as.character(group_tab[[group]])
+    group_tab <- filter(group_tab, SEQUENCES >= min_n, COVERAGE >= min_c)
+    group_keep <- as.character(group_tab[[group]])
     
-    # Warn if groups removed
-    if (ngroup < length(group_all)) {
-        warning("Not all groups passed min_n=", min_n, " threshold. Excluded: ", 
-                paste(setdiff(group_all, group_keep), collapse=", "))
+    if (method == "none") {
+        if (!is.null(max_n)) {
+            nsam <- setNames(pmin(group_tab$SEQUENCES, max_n), group_keep)
+        } else {
+            nsam <- setNames(group_tab$SEQUENCES, group_keep)
+        }
+    } else if (method == "depth") {
+        nsam <- min(group_tab$SEQUENCES, max_n)
+        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
+    } else if (method == "coverage") {
+        # Get lowest coverage
+        csam <- max(min(group_tab$COVERAGE), min_c)
+        
+        # Infer depth from coverage curves
+        .fC <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
+        nsam <- setNames(numeric(length(group_keep)), group_keep)
+        for (g in group_keep) {
+            x <- clone_tab$COUNT[clone_tab[[group]] == g]
+            m <- group_tab$SEQUENCES[group_tab[[group]] == g]
+            nsam[g] <- floor(optimize(.fC, interval=c(1, m), x=x)$minimum)
+        }
+        # Filter to samples with enough sequences after coverage rarefaction
+        nsam <- nsam[nsam >= min_n]
+        group_keep <- names(nsam)
     }
     
+    # Warn if groups removed
+    if (length(group_keep) < length(group_all)) {
+        warning("Not all groups passed thresholds min_n=", min_n, " and min_c=", min_c, 
+                ". Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
+    }
+
     # Generate diversity index and confidence intervals via resampling
     cat("-> CALCULATING DIVERSITY\n")
-    pb <- txtProgressBar(min=0, max=ngroup, initial=0, width=40, style=3)
+    pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3)
+    ngroup <- length(group_keep)
     div_mat <- matrix(NA, nboot, ngroup, dimnames=list(NULL, group_keep))
     for (i in 1:ngroup) {
         g <- group_keep[i]
-        r <- which(data[[group]] == g)
-        sample_mat <- replicate(nboot, data[[clone]][sample(r, n, replace=T)])
-        div_mat[, i] <- apply(sample_mat, 2, function(x) calcDiversity(table(x), q))
+        m <- nsam[g]
+        
+        # Generate bootstrap distributions
+        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
+        # TODO: swap this for internal function
+        abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
+        sample_mat <- rmultinom(nboot, m, abund_inf)
+        
+        # Calculate diversity
+        div_mat[, i] <- apply(sample_mat, 2, calcDiversity, q=q)
+
         setTxtProgressBar(pb, i)
     }
     cat("\n")
@@ -680,17 +772,14 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
     group_pairs <- combn(group_keep, 2, simplify=F)
     npairs <- length(group_pairs)
     delta_mat <- matrix(NA, nboot, npairs)
-    pvalue_mat <- matrix(NA, npairs, 5, dimnames=list(NULL, c("pvalue", 
-                                                              "delta_median", 
-                                                              "delta_mad", 
-                                                              "delta_mean", 
-                                                              "delta_sd")))
+    pvalue_mat <- matrix(NA, npairs, 3, 
+                         dimnames=list(NULL, c("pvalue", "delta_mean", "delta_sd")))
     test_names <- sapply(group_pairs, paste, collapse=" != ")
     for (i in 1:npairs) {
         g1 <- group_pairs[[i]][1]
         g2 <- group_pairs[[i]][2]
         # TODO:  verify this is correct. Is g1 - g2 different from g2 - g1?
-        if (median(div_mat[, g1]) >= median(div_mat[, g2])) {
+        if (mean(div_mat[, g1]) >= mean(div_mat[, g2])) {
             g_delta <- div_mat[, g1] - div_mat[, g2]
         } else {
             g_delta <- div_mat[, g2] - div_mat[, g1]
@@ -701,26 +790,22 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
         p <- g_cdf(0)
         p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
         pvalue_mat[i, ] <- c(p, 
-                             median(g_delta), 
-                             mad(g_delta), 
                              mean(g_delta), 
                              sd(g_delta))
     }
     
     tests_df <- cbind(data.frame(test=test_names), as.data.frame(pvalue_mat))
     summary_df <- data.frame(group=group_keep, 
-                             median=apply(div_mat, 2, median),
-                             mad=apply(div_mat, 2, mad),
                              mean=apply(div_mat, 2, mean),
                              sd=apply(div_mat, 2, sd))
     
     # Generate return object
     div <- new("DiversityTest", 
-               tests=tests_df, 
-               summary=summary_df,
+               tests=as.data.frame(tests_df), 
+               summary=as.data.frame(summary_df),
                groups=group_keep,
                q=q,
-               n=n, 
+               n=nsam, 
                nboot=nboot)
     
     return(div)

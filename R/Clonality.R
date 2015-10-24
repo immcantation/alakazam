@@ -235,6 +235,8 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
 plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance", 
                           legend_title=NULL, xlim=NULL, ylim=NULL, 
                           silent=FALSE, ...) {
+    # TODO: additional styles. rank abundance, box/violin
+    
     # Define base plot elements
     g1 <- ggplot(data, aes(x=rank, y=p, group=group)) + 
         ggtitle(main_title) + 

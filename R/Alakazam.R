@@ -89,10 +89,10 @@
 #'            Under review.
 #' }
 #' 
+#' @import   dplyr
 #' @import   ggplot2
 #' @import   igraph
 #' @import   lazyeval
 #' @import   methods
-#' @import   plyr
 #' @import   scales
 NULL

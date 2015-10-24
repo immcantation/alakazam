@@ -1,8 +1,9 @@
-Version 0.2.1.beta:  August 21, 2015
+Version 0.2.1.beta:  October 24, 2015
 -------------------------------------------------------------------------------
 
 General:
 
++ Removed plyr dependency. Added dplyr, iNEXT and lazyeval dependencies.
 + Renamed `getDNADistMatrix()` and `getAADistMatrix()` to `getDNAMatrix` and 
   `getAAMatrix()`, respectively.
 + Added `getSeqMatrix()` which calculates a pairwise distance matrix for a set 
@@ -14,6 +15,28 @@ Annotation:
 + Added removal of 'D' label (gene duplication) from gene names when parsed 
   with `getSegment()`, `getAllele()`, `getGene()` and `getFamily()`.  May be 
   disabled by providing the argument `strip_d=FALSE`.
+
+Clonality:
+
++ Added several functions related to analysis of clone size distributions, 
+  including `countClones()`, `estimateAbundance()` and `plotAbundance`.
+  
+Diversity:
+
++ Renamed `resampleDiversity()` to `rarefyDiversity()` and changed many of
+  the internals. Bootstrapping is now performed on an inferred complete
+  relative abundance distribution, using methods from the iNEXT package.
++ Added support for inclusion of copy number in clone size determination
+  within `rarefyDiversity()` and `testDiversity()`.
++ Added coverage based rarefaction and no rarefaction to the options for 
+  resampling strategies in `rarefyDiversity()`.
++ Diversity scores and confiderence intervals within `rarefyDiversity()`
+  and `testDiversity()` are now calculated using the mean and standard 
+  deviation of the bootstrap realizations, rather than the median and
+  upper/lower quantiles.
++ Added ability to add counts and coverage values to the legend in
+  `potDiversityCurve()`.
+
   
 
 Version 0.2.0:  June 15, 2015
