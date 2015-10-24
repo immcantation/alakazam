@@ -43,7 +43,7 @@
 #' 
 #' @section  Diversity analysis:
 #' \itemize{
-#'   \item  \code{\link{resampleDiversity}}:   Generate clonal diversity curves.
+#'   \item  \code{\link{rarefyDiversity}}:   Generate clonal diversity curves.
 #'   \item  \code{\link{plotDiversityCurve}}:  Plot clonal diversity curves.
 #'   \item  \code{\link{testDiversity}}:       Test significance of clonal diversity scores.
 #' }

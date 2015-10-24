@@ -31,7 +31,7 @@ Coupled with resampling strategies to correct for variations in sequencing
 depth. This package provides two approaches to assessing diversity: 
 
 1. Generation of a smooth diversity (D) curve over a range of diversity orders 
-(q) using `resampleDiversity`.
+(q) using `rarefyDiversity`.
 2. A significance test of the diversity (D) at a fixed diversity order (q) using 
 `testDiversity`.
 
@@ -52,23 +52,23 @@ df <- readChangeoDb(file)
 
 Generate a diversity curve
 --------------------------------------------------------------------------------
-The function `resampleDiversity` performs uniform resampling, without replacement
-by default, of the input sequences and recalculates the clone size distribution, 
-and diversity, with each resampling realization. Diversity (D) is calculated over a
-range of diversity orders (q) to generate a smooth curve.
+The function `rarefyDiversity` performs uniform resampling of the input 
+sequences and recalculates the clone size distribution, and diversity, with each 
+resampling realization. Diversity (D) is calculated over a range of diversity 
+orders (q) to generate a smooth curve.
 
 ```{r, eval=TRUE, results='hide'}
 # Compare diversity curve across values in the "SAMPLE" column
 # q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 2000 resampling realizations are performed (nboot=2000)
-sample_div <- resampleDiversity(df, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
+sample_div <- rarefyDiversity(df, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
                                  ci=0.95, nboot=2000)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_div <- resampleDiversity(df, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
+isotype_div <- rarefyDiversity(df, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
                                   step_q=0.05, ci=0.95, nboot=2000)
 ```
 
@@ -88,7 +88,7 @@ p2 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main,
 Test diversity at a fixed diversity order
 --------------------------------------------------------------------------------
 The function `testDiversity` performs resampling and diversity calculation in 
-the same manner as `resampleDiversity`, but only for a single diversity order. 
+the same manner as `rarefyDiversity`, but only for a single diversity order. 
 Significance testing across groups is performed using the delta of the bootstrap
 distributions between groups.
 
