@@ -119,10 +119,6 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #                                legend_title=legend_title, log_q=log_q, log_d=log_d,
 #                                xlim=xlim, ylim=ylim, silent=silent) })
 
-#### Clonality functions ####
-
-# bootstrap of clone abundance
-# rank abundance plot of clone bootstrap
 
 #### Calculation functions ####
 
@@ -376,8 +372,8 @@ calcDiversity <- function(p, q) {
 #'
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
-#' of seen clones, and applying the relative abundance correction described in 
-#' Chao et al, 2014.
+#' of seen clones, and applying the relative abundance correction and unseen clone
+#' frequency described in Chao et al, 2015.
 #'
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
 #' \code{min_q} to \code{max_q} incremented by \code{step_q}.  Variability in total 
@@ -395,11 +391,14 @@ calcDiversity <- function(p, q) {
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
 #'            Ecology. 1973 54(2):427-32.
-#'   \item  Chao,A. Nonparametric Estimation of the Number of Classes in a Population. 
-#'            Scand J Stat, 1984 11, 265270.
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
 #'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
 #'            A framework for sampling and estimation in species diversity studies. 
 #'            Ecol Monogr. 2014 84:45–67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
 #' }
 #'  
 #' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
@@ -638,6 +637,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, nboot=2000) {
     
     # TODO:  write plotDiversityTest function
+    # TODO:  convert to dplyr
     
     # Verify function arguments
     if (!is.data.frame(data)) {
@@ -774,7 +774,7 @@ testDiversity <- function(data, q, group, clone="CLONE", min_n=10, max_n=NULL, n
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
                                legend_title=NULL, log_q=TRUE, log_d=TRUE,
                                xlim=NULL, ylim=NULL, 
-                               annotate=c("both", "depth", "coverage", "none"),
+                               annotate=c("none", "depth", "coverage", "both"),
                                silent=FALSE, ...) {
     # Check arguments
     annotate <- match.arg(annotate)
