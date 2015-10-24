@@ -723,7 +723,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     
     # Combine all rows into unique data.frame
-    unique_df <- bind_rows(unique_list)
+    unique_df <- as.data.frame(bind_rows(unique_list))
     
     if (verbose) { .printVerbose(nseq, nrow(unique_df), discard_count) }
     return(unique_df)

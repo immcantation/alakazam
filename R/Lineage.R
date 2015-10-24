@@ -582,7 +582,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     
     # Extract inferred sequences from PHYLIP output
     inf_df <- getPhylipInferred(phylip_out)
-    clone@data <- rbind.fill(clone@data, inf_df)
+    clone@data <- as.data.frame(bind_rows(clone@data, inf_df))
 
     # Extract edge table from PHYLIP output 
     edges <- getPhylipEdges(phylip_out, id_map=id_map)
