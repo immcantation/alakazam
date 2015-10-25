@@ -133,8 +133,8 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                              max_mask=0, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE) {
     # Check for valid fields
-    check <- checkFields(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
-                                 text_fields, num_fields, seq_fields))
+    check <- checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
+                                  text_fields, num_fields, seq_fields))
     if (check != TRUE) { stop(check) }
     
     # Replace gaps with Ns and masked ragged ends

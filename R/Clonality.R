@@ -2,12 +2,13 @@
 
 #### Classes ####
 
+
 #### Methods ####
 
 
 #### Calculation functions ####
 
-#' Counts clones sizes
+#' Tabulates clones sizes
 #' 
 #' \code{countClones} determines the number of sequences and total copy number of 
 #' clonal groups.
@@ -49,7 +50,7 @@
 #' @export
 countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     # Check input
-    check <- checkFields(data, c(clone, copy, groups))
+    check <- checkColumns(data, c(clone, copy, groups))
     if (check != TRUE) { stop(check) }
     
     # Tabulate clonal abundance

@@ -17,7 +17,8 @@ Imports:
     iNEXT,
     lazyeval,
     methods,
-    scales
+    scales,
+    stringi
 Suggests:
     knitr
 VignetteBuilder: knitr

@@ -95,4 +95,5 @@
 #' @import   lazyeval
 #' @import   methods
 #' @import   scales
+#' @import   stringi
 NULL

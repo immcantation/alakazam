@@ -3,7 +3,8 @@ Version 0.2.1.beta:  October 24, 2015
 
 General:
 
-+ Removed plyr dependency. Added dplyr, iNEXT and lazyeval dependencies.
++ Removed plyr dependency. Added dplyr, iNEXT, lazyeval and stringi 
+  dependencies.
 + Renamed `getDNADistMatrix()` and `getAADistMatrix()` to `getDNAMatrix` and 
   `getAAMatrix()`, respectively.
 + Added `getSeqMatrix()` which calculates a pairwise distance matrix for a set 
@@ -15,6 +16,7 @@ Annotation:
 + Added removal of 'D' label (gene duplication) from gene names when parsed 
   with `getSegment()`, `getAllele()`, `getGene()` and `getFamily()`.  May be 
   disabled by providing the argument `strip_d=FALSE`.
++ Added `countGenes()` to tabulate V(D)J allele, gene and family usage.
 
 Clonality:
 

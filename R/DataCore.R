@@ -174,43 +174,43 @@ translateStrings <- function(strings, translation) {
 }
 
 
-# Check data.frame for valid fields and issue message if invalid
+# Check data.frame for valid columns and issue message if invalid
 #
-# @param   data    data.frame to check
-# @param   fields  vector of column names to check
-# @param   logic   one of "all" or "any" controlling whether all or at least one of
-#                  the fields must be valid
-# @return  TRUE is fields are valid and a string message if not.
-checkFields <- function(data, fields, logic=c("all", "any")) {
+# @param   data     data.frame to check
+# @param   columns  vector of column names to check
+# @param   logic    one of "all" or "any" controlling whether all or at least one of
+#                   the columns must be valid
+# @return  TRUE is columns are valid and a string message if not.
+checkColumns <- function(data, columns, logic=c("all", "any")) {
     # Check arguments
     logic <- match.arg(logic)
     
     data_names <- names(data)
     if (logic == "all") {
-        # Check that all fields exist
-        for (f in fields) {
+        # Check that all columns exist
+        for (f in columns) {
             if (!(f %in% data_names)) { 
                 msg <- paste("The column", f, "was not found") 
                 return(msg)
             }
         }        
         # Check that all values are not NA
-        for (f in fields) {
+        for (f in columns) {
             if (all(is.na(data[, f]))) { 
                 msg <- paste("The column", f, "contains no data") 
                 return(msg)
             }
         }
     } else if (logic == "any") {
-        # Check that fields exist
-        if (!any(fields %in% data_names)) {
-            msg <- paste("Input must contain at least one of the columns:", paste(fields, collapse=", "))
+        # Check that columns exist
+        if (!any(columns %in% data_names)) {
+            msg <- paste("Input must contain at least one of the columns:", paste(columns, collapse=", "))
             return(msg)
         }
         # Check that all values are not NA
-        invalid <- sapply(fields, function(f) all(is.na(data_names[, f])))
+        invalid <- sapply(columns, function(f) all(is.na(data_names[, f])))
         if (all(invalid)) { 
-            msg <- paste("None of the columns", paste(fields, collapse=", "), "contain data") 
+            msg <- paste("None of the columns", paste(columns, collapse=", "), "contain data") 
             return(msg)
         }
     }

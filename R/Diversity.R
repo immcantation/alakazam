@@ -433,7 +433,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # Check arguments
     method <- match.arg(method)
     
-    # TODO: replace with checkFields()
+    # TODO: replace with checkColumns()
     # Verify data
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
@@ -672,7 +672,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     # Check arguments
     method <- match.arg(method)
         
-    # TODO: replace with checkFields()
+    # TODO: replace with checkColumns()
     # Verify data
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
