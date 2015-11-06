@@ -59,6 +59,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
             group_by_(.dots=c(groups, clone)) %>%
             dplyr::summarize(seq_count=n()) %>%
             dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(seq_count)) %>%
             dplyr::rename_(.dots=c("clone"=clone))
     } else {
         clone_tab <- data %>% 
@@ -67,6 +68,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
                               copy_count=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
             dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE),
                           copy_freq=copy_count/sum(copy_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(copy_count)) %>%
             dplyr::rename_(.dots=c("clone"=clone))
     }
 

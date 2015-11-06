@@ -819,7 +819,7 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
 #' @family    sequence annotation functions
 #'
 #' @examples
-#' kappa_call <- c("Homsap IGKV1-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1D-39*01",
+#' kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
 #'                 "Homsap IGKJ5*01 F")
 #'
 #' getAllele(kappa_call)
@@ -857,8 +857,8 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
     
     # Strip D from gene names if required
     if (strip_d) {
-        #r <- gsub("(?<=[A-Z0-9])D(?=\\*|$)", "", r, perl=TRUE)
-        r <- gsub("(?<=[A-Z0-9])D(?=\\*|-|$)", "", r, perl=TRUE)
+        strip_regex <- paste0("(?<=[A-Z0-9])D(?=\\*|-|", sep, "|$)")
+        r <- gsub(strip_regex, "", r, perl=TRUE)
     }
     
     # Collapse to unique set if required

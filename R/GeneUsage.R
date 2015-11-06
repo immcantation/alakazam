@@ -107,6 +107,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL,
             group_by_(.dots=c(groups, gene)) %>%
             dplyr::summarize(seq_count=n()) %>%
             dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(seq_count)) %>%
             dplyr::rename_(.dots=c("gene"=gene))
     } else {
         gene_tab <- data %>% 
@@ -115,6 +116,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL,
                               copy_count=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
             dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE),
                           copy_freq=copy_count/sum(copy_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(copy_count)) %>%
             dplyr::rename_(.dots=c("gene"=gene))
     }
     

@@ -39,7 +39,6 @@ Diversity:
 + Added ability to add counts and coverage values to the legend in
   `potDiversityCurve()`.
 
-  
 
 Version 0.2.0:  June 15, 2015
 -------------------------------------------------------------------------------
