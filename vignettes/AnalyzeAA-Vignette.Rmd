@@ -1,0 +1,48 @@
+---
+title: 'Alakazam: Analysis of aminoacid properties'
+author: "Jason Anthony Vander Heiden"
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
+  html_document:
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+geometry: margin=1in
+fontsize: 11pt
+vignette: |
+  %\VignetteIndexEntry{Aminoacid properties analysis} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
+---
+
+
+Load Change-O data
+--------------------------------------------------------------------------------
+A small example Change-O tab-delimited database file is included in the 
+`alakazam` package. 
+
+```{r, eval=TRUE, warning=FALSE}
+library(alakazam)
+
+# Load Change-O file
+file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+df <- readChangeoDb(file)
+colnames(df)
+```
+
+Calculates amino acid properties of regions
+-------------------------------------------
+
+```{r, eval=TRUE, warning=FALSE}
+regions <- df$JUNCTION[1:10]
+regionProperties(regions)
+
+aacomp(regions[1])
+```
+
