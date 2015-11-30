@@ -23,13 +23,25 @@ names(HYDROPATHY) <- c("A", "R", "N", "D", "C",
 
 
 #' Translate nucleotide sequences to amino acids
-#'  
-#' Translate nucleotide sequences to AA using functions from seqinr.
-#'
+#' 
+#' \code{translateDNA} translates nucleotide sequences to AA using functions 
+#' from seqinr.
+#' 
 #' @param   seq   DNA sequence (a string) to be converted to AAs
 #' @param   trim  boolean flag to remove 3 nts from both ends of ntseq
 #' 
 #' @return  string, translated AA stretch
+#' 
+#' @seealso  \code{\link[seqinr]{translate}}.
+#' 
+#' @examples
+#' library(alakazam)
+#' # Load Change-O file
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' translateDNA(df$JUNCTION[1])
+#' translateDNA(df$JUNCTION[1], trim=TRUE)
+#' translateDNA("ACTGACTCGA")
 #' 
 #' @export
 translateDNA <- function (seq, trim=FALSE) {

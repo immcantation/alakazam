@@ -5,22 +5,26 @@ Date: 2015-11-30
 Author: Jason Anthony Vander Heiden, Namita Gupta
 Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
-Description: Core functionality, lineage reconstruction, and diversity analysis components
-    of the Change-O tool suite.
+Description: Core functionality, lineage reconstruction, and diversity analysis
+    components of the Change-O tool suite.
 License: CC BY-NC-SA 3.0
 URL: http://clip.med.yale.edu/changeo
 Depends:
     R (>= 3.0.0),
     ggplot2,
-    dplyr
+    dplyr,
+    Peptides
 Imports:
     igraph,
     iNEXT,
     lazyeval,
     methods,
     scales,
+    seqinr,
     stringi
 Suggests:
-    knitr
+    knitr,
+    testthat
 VignetteBuilder: knitr
 LazyData: true
+RoxygenNote: 5.0.1
