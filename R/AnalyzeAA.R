@@ -77,24 +77,23 @@ countOccurrences <- function(x, pattern) {
 
 #' Calculate GRAVY score
 #' 
-#' Calculates GRAVY score from a given AA sequence
+#' Calculates GRAVY hydrophobicity score from a given AA sequence using the
+#' function \code{hydrophobicity} from the \code{Peptides} package.
 #'
 #' @param   aa_seq          AA sequence (string) to have GRAVY calculated for
 #' @param   aa         	 	AA sequence (character vector) from aa_seq with no *
 #' 
 #' @return  numeric, GRAVY score
-#' 
+#'
+#' @seealso  \code{\link[Peptides]{hydrophobicity}}.
+#' @examples 
+#' aa_seq <- "CARDRSTPWRRGIASTTVRTSW"
+#' gravy(aa_seq)
+#' gravy(aa_seq, scale= "Aboderin")
 #' @export
-gravy <- function(aa_seq) {
-	#Create character vector from string
-  	aa <- s2c(as.character(aa_seq))
-  	#Ignore AAs that are "*"
-	
-	##TODO: figure this out...
-  	aa <- aa[aa != "X"]
- 	return(sum(HYDROPATHY[aa])/length(aa))
+gravy <- function(aa_seq, scale= "KyteDoolittle"){
+    Peptides::hydrophobicity(aa_seq, scale)
 }
-
 
 #' Calculates amino acid properties of regions
 #'
