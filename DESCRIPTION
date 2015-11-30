@@ -1,6 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.0.999
+Date: 2015-11-30
 Author: Jason Anthony Vander Heiden, Namita Gupta
 Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
