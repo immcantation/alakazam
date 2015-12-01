@@ -12,16 +12,16 @@ URL: http://clip.med.yale.edu/changeo
 Depends:
     R (>= 3.0.0),
     ggplot2,
-    dplyr,
-    Peptides
+    dplyr
 Imports:
     igraph,
     iNEXT,
     lazyeval,
     methods,
+    Peptides,
     scales,
     seqinr,
-    stringi
+    stringi,
 Suggests:
     knitr,
     testthat

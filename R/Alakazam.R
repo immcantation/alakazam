@@ -94,6 +94,7 @@
 #' @import   igraph
 #' @import   lazyeval
 #' @import   methods
+#' @import   Peptides
 #' @import   scales
 #' @import   stringi
 NULL
