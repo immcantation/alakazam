@@ -1,5 +1,8 @@
 # Common input/output and data structure manipulation functions for Alakazam
 
+#' @include Alakazam.R
+NULL
+
 #### File I/O functions ####
 
 #' Read a Change-O tab-delimited database file

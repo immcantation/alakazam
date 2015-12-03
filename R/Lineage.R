@@ -1,5 +1,8 @@
 # Ig lineage reconstruction via maximum parsimony
 
+#' @include Alakazam.R
+NULL
+
 #### Classes ####
 
 #' S4 class defining a clone
@@ -23,7 +26,7 @@
 #' @aliases      ChangeoClone
 #' @exportClass  ChangeoClone
 setClass("ChangeoClone", 
-         slots=c(data="data.frame",
+         slots=c(data="GenericDataFrame",
                  clone="character",
                  germline="character", 
                  v_gene="character", 

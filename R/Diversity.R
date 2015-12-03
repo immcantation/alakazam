@@ -1,5 +1,9 @@
 # Clonal diversity analysis
 
+#' @include Alakazam.R
+NULL
+
+
 #### Classes ####
 
 #' S4 class defining diversity curve 
@@ -27,7 +31,7 @@
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
 setClass("DiversityCurve", 
-         slots=c(data="data.frame", 
+         slots=c(data="GenericDataFrame", 
                  groups="character", 
                  n="numeric", 
                  coverage="numeric",
@@ -73,8 +77,8 @@ setClass("DiversityCurve",
 #' @aliases      DiversityTest
 #' @exportClass  DiversityTest
 DiversityTest <- setClass("DiversityTest", 
-         slots=c(tests="data.frame",
-                 summary="data.frame",
+         slots=c(tests="GenericDataFrame",
+                 summary="GenericDataFrame",
                  groups="character", 
                  q="numeric",
                  n="numeric", 
@@ -154,7 +158,7 @@ inferUnseenCount <- function(x) {
 # @param    m  the sequence count to rarefy to.
 #
 # @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-calcRarefiedDiversity <- function(x, q, m) {
+estimateRarefiedDiversity <- function(x, q, m) {
     x <- x[x >= 1]
     n <- sum(x)
     if (m > n) {
@@ -347,11 +351,6 @@ calcDiversity <- function(p, q) {
 #'                     is determined by the number of sequences. If a \code{copy} column
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
-#' @param    method    string defining the rarefaction method. One of \code{"depth"}, which
-#'                     rarefies to the same number of sequences for each group,
-#'                     \code{"coverage"}, which rarefies to the same degree of sample 
-#'                     completeness, or \code{"none"}, which does not perform any correction
-#'                     for differences in sampling depth or completeness.
 #' @param    min_q     minimum value of \eqn{q}.
 #' @param    max_q     maximum value of \eqn{q}.
 #' @param    step_q    value by which to increment \eqn{q}.
@@ -378,10 +377,8 @@ calcDiversity <- function(p, q) {
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
 #' \code{min_q} to \code{max_q} incremented by \code{step_q}.  Variability in total 
 #' sequence counts across unique values in the \code{group} column is corrected by
-#' repeated resampling from the estimated complete clonal distribution to either a 
-#' common number of sequences (\code{method="depth"}) or a common level of sample 
-#' coverage (\code{method="coverage"}). Details regarding determination of coverage 
-#' can be found in the \code{\link[iNEXT]{iNEXT}} package and Chao et al, 2014. 
+#' repeated resampling from the estimated complete clonal distribution to a 
+#' common number of sequences.
 #' 
 #' The diversity index (\eqn{D}) for each group is the mean value of over all resampling 
 #' realizations. Confidence intervals are derived using the standard deviation of the 
@@ -411,50 +408,31 @@ calcDiversity <- function(p, q) {
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
-#' # All groups do not pass default minimum thresholds using depth rarefaction
-#' div <- rarefyDiversity(df, "SAMPLE", method="coverage", step_q=1, max_q=10, nboot=100)
-#' plotDiversityCurve(div, legend_title="Sample")
-#'                    
-#' # Different groups fail the minimum count threshold when requiring higher coverage
-#' div <- rarefyDiversity(df, "SAMPLE", method="depth", min_c=0.2, step_q=1, max_q=10, nboot=100)
+#' # Group by sample identifier
+#' div <- rarefyDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier
-#' div <- rarefyDiversity(df, "ISOTYPE", method="depth", min_n=40, step_q=1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
-                            method=c("depth", "coverage", "none"), 
                             min_q=0, max_q=32, step_q=0.05, min_n=30, max_n=NULL, 
-                            min_c=0, ci=0.95, nboot=2000) {
-    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=30; max_n=NULL; min_c=0.1; ci=0.95; nboot=200
-    
-    # Check arguments
-    method <- match.arg(method)
-    
-    # TODO: replace with checkColumns()
-    # Verify data
+                            ci=0.95, nboot=2000) {
+    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=30; max_n=NULL; ci=0.95; nboot=200
+
+    # Check input
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
     }
+    check <- checkColumns(data, c(group, clone, copy))
+    if (check != TRUE) { stop(check) }
     
-    if (!(group %in% names(data))) {
-        stop(paste("The column", group, "does not exist in the input data.frame"))
-    } else {
-        data[[group]] <- as.character(data[[group]])
-    }
+    # Cast grouping to columns to character
+    data[, group] <- as.character(data[, group])
+    data[, clone] <- as.character(data[, clone])
 
-    if (!(clone %in% names(data))) {
-        stop(paste("The column", clone, "does not exist in the input data.frame"))
-    } else {
-        data[[clone]] <- as.character(data[[clone]])
-    }
-
-    if (!is.null(copy) && !(copy %in% names(data))) {
-        stop(paste("The column", copy, "does not exist in the input data.frame"))
-    }
-    
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
@@ -469,46 +447,22 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
                  group_by_(.dots=c(group)) %>%
-                 dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE), 
-                                  COVERAGE=iNEXT:::Chat.Ind(COUNT, SEQUENCES))
+                 dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
-    group_tab <- filter(group_tab, SEQUENCES >= min_n, COVERAGE >= min_c)
+    group_tab <- filter(group_tab, SEQUENCES >= min_n)
     group_keep <- as.character(group_tab[[group]])
     
-    if (method == "none") {
-        if (!is.null(max_n)) {
-            nsam <- setNames(pmin(group_tab$SEQUENCES, max_n), group_keep)
-        } else {
-            nsam <- setNames(group_tab$SEQUENCES, group_keep)
-        }
-    } else if (method == "depth") {
-        nsam <- min(group_tab$SEQUENCES, max_n)
-        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
-    } else if (method == "coverage") {
-        # Get lowest coverage
-        csam <- max(min(group_tab$COVERAGE), min_c)
+    nsam <- min(group_tab$SEQUENCES, max_n)
+    nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
 
-        # Infer depth from coverage curves
-        .fC <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
-        nsam <- setNames(numeric(length(group_keep)), group_keep)
-        for (g in group_keep) {
-            x <- clone_tab$COUNT[clone_tab[[group]] == g]
-            m <- group_tab$SEQUENCES[group_tab[[group]] == g]
-            nsam[g] <- floor(optimize(.fC, interval=c(1, m), x=x)$minimum)
-        }
-        # Filter to samples with enough sequences after coverage rarefaction
-        nsam <- nsam[nsam >= min_n]
-        group_keep <- names(nsam)
-    }
-    
     # Set diversity orders and confidence interval
     q <- seq(min_q, max_q, step_q)
     ci_z <- ci + (1 - ci) / 2
     
     # Warn if groups removed
     if (length(group_keep) < length(group_all)) {
-        warning("Not all groups passed thresholds min_n=", min_n, " and min_c=", min_c, 
-                ". Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
+        warning("Not all groups passed threshold min_n=", min_n, ".", 
+                "Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
     }
     
     # Generate diversity index and confidence intervals via resampling
@@ -518,22 +472,19 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     coverage <- setNames(numeric(length(group_keep)), group_keep)
     i <- 0
     for (g in group_keep) {
-        m <- nsam[g]
+        n <- nsam[g]
         
         # Get observed abundance
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        #div_obs <- calcRarefiedDiversity(abund_obs, q=q, m=m) 
-        #div_obs <- sapply(q, function(x) iNEXT:::Dqhat.Ind(abund_obs, q=x, m=m))
-        
+
         # Calculate rarefied coverage
-        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, m)
+        # TODO: swap this for internal function
+        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
         
         # Generate bootstrap distributions
         # TODO: swap this for internal function
         abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
-        sample_mat <- rmultinom(nboot, m, abund_inf)
-        #div_boot <- apply(sample_mat, 2, function(y) sapply(q, function(x) iNEXT:::Dqhat.Ind(y, q=x, m=m)))
-        #div_boot <- apply(sample_mat, 2, calcRarefiedDiversity, q=q, m=m)
+        sample_mat <- rmultinom(nboot, n, abund_inf)
         
         # Calculate diversity
         div_boot <- apply(sample_mat, 2, calcDiversity, q=q)
@@ -557,7 +508,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
     # Generate return object
     div <- new("DiversityCurve", 
-               data=as.data.frame(bind_rows(div_list, .id="group")), 
+               data=bind_rows(div_list, .id="group"), 
                groups=group_keep, 
                n=nsam,
                coverage=coverage,

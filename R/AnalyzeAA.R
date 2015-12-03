@@ -6,6 +6,10 @@
 # @version    0.2.0
 # @date       2015.06.19
 
+#' @include Alakazam.R
+NULL
+
+
 #### Constants ####
 
 # Possible regions

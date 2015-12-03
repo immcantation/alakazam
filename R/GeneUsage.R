@@ -1,5 +1,8 @@
 # Gene usage analysis
 
+#' @include Alakazam.R
+NULL
+
 #### Classes ####
 
 
