@@ -120,7 +120,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #'            Scand J Stat. 1984 11, 265270.
 #'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
 #'            A framework for sampling and estimation in species diversity studies. 
-#'            Ecol Monogr. 2014 84:45–67.
+#'            Ecol Monogr. 2014 84:45-67.
 #'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
 #'            generalizing the Good-Turing sample coverage theory. 
 #'            Ecology. 2015 96, 11891201.
