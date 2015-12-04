@@ -94,6 +94,15 @@
 #' @import   igraph
 #' @import   lazyeval
 #' @import   methods
+#' @import   Peptides
 #' @import   scales
 #' @import   stringi
 NULL
+
+
+#### Classes ####
+
+setOldClass("data.frame")
+setOldClass("tbl_df")
+setClassUnion("GenericDataFrame", c("data.frame", "tbl_df"))
+

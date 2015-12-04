@@ -1,5 +1,8 @@
 # Clonality analysis
 
+#' @include Alakazam.R
+NULL
+
 #### Classes ####
 
 
@@ -117,7 +120,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #'            Scand J Stat. 1984 11, 265270.
 #'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
 #'            A framework for sampling and estimation in species diversity studies. 
-#'            Ecol Monogr. 2014 84:45–67.
+#'            Ecol Monogr. 2014 84:45-67.
 #'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
 #'            generalizing the Good-Turing sample coverage theory. 
 #'            Ecology. 2015 96, 11891201.
@@ -136,6 +139,13 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @export
 estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nboot=2000) {
     #group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
+
+    # Check input
+    if (!is.data.frame(data)) {
+        stop("Input data is not a data.frame")
+    }
+    check <- checkColumns(data, c(group, clone, copy))
+    if (check != TRUE) { stop(check) }
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
@@ -167,6 +177,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
         nsam <- group_tab$SEQUENCES[group_tab[[group]] == g]
         
         # Infer complete abundance distribution
+        # TODO:  can be a single function (wrapper) for both this and rarefyDiversity
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
         p1 <- adjustObservedAbundance(abund_obs)
         p2 <- inferUnseenAbundance(abund_obs)

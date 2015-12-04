@@ -12,19 +12,29 @@ URL: http://clip.med.yale.edu/changeo
 Depends:
     R (>= 3.0.0),
     ggplot2,
-    dplyr,
-    Peptides
+    dplyr
 Imports:
     igraph,
     iNEXT,
     lazyeval,
     methods,
+    Peptides,
     scales,
     seqinr,
-    stringi
+    stringi,
 Suggests:
     knitr,
     testthat
 VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 5.0.1
+Collate:
+    'Alakazam.R'
+    'AnalyzeAA.R'
+    'Clonality.R'
+    'DataCore.R'
+    'Diversity.R'
+    'GeneUsage.R'
+    'Lineage.R'
+    'SeqCore.R'
+    'StatCore.R'

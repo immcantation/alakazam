@@ -1,5 +1,8 @@
 # Common DNA, amino acid, and gene annotation operations for Alakazam
 
+#' @include Alakazam.R
+NULL
+
 #### Constants ####
 
 #' Default colors

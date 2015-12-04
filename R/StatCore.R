@@ -1,5 +1,8 @@
 # Common statistics functions for Alakazam
 
+#' @include Alakazam.R
+NULL
+
 #' Weighted meta-analysis of p-values via Stouffer's method
 #'
 #' \code{stoufferMeta} combines multiple weighted p-values into a meta-analysis p-value

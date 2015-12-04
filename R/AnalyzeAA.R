@@ -6,6 +6,10 @@
 # @version    0.2.0
 # @date       2015.06.19
 
+#' @include Alakazam.R
+NULL
+
+
 #### Constants ####
 
 # Possible regions
@@ -337,8 +341,6 @@ extractNonCDR3Properties <- function(db, col = "SEQUENCE_IMGT", region = VDJ_REG
 #'  
 #' @param   db 		ChangeoDb or vector of nt or AA strings from CDR3 to extract
 #'					ChangeoDb has JUNCTION(def.) cols
-#' @param   col		Column to extract: SEQUENCE_IMGT(def.), GERMLINE_IMGT_D_MASK
-#' @param	region		string or vector of strings in VDJ_REGIONS, not "CDR3"
 #' @param	nt			boolean, T if the sequences are nt's
 #' @param	translate	boolean, T if the output will contain translated db
 #' 						functional only if nt = T
