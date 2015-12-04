@@ -124,78 +124,48 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #                                xlim=xlim, ylim=ylim, silent=silent) })
 
 
-#### Calculation functions ####
+#### Coverage functions ####
 
-# Calculate undetected species
-# 
-# Calculates the lower bound of undetected species counts using the Chao1 estimator.
-#
-# @param    x  vector of observed abundance counts.
-# 
-# @return   The count of undetected species.
-inferUnseenCount <- function(x) {
-    x <- x[x > 0]
-    n <- sum(x)
-    f1 <- sum(x == 1)
-    f2 <- sum(x == 2)
-    
-    if (f2 > 0) {
-        f0 <- ceiling(((n - 1) * f1^2) / (n * 2 * f2))
-    } else {
-        f0 <- ceiling(((n - 1) * f1 * (f1 - 1)) / (n * 2))
-    }
-    
-    return(f0)
-}
-
-
-# Calculates diversity under rarefaction
-# 
-# Calculates Hill numbers under rarefaction
-#
-# @param    x  vector of observed abundance counts.
-# @param    q  numeric vector of diversity orders.
-# @param    m  the sequence count to rarefy to.
-#
-# @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-estimateRarefiedDiversity <- function(x, q, m) {
-    x <- x[x >= 1]
-    n <- sum(x)
-    if (m > n) {
-        stop("m must be <= the total count of observed sequences.")
-    }
-    q[q == 1] <- 0.9999
-
-    # Tabulate frequency counts from 1:n
-    fk_n <- tabulate(x, nbins=n)
-    
-    # Calculate estimated fk(m)
-    fk_m <- sapply(1:m, function(k) sum(exp(lchoose(k:m, k) + 
-                                            lchoose(n - k:m, m - k) - 
-                                            lchoose(n, m))*fk_n[k:m]))
-    
-    #.fkm <- function(k) {
-    #    j <- k:m
-    #    sum(exp(lchoose(j, k) + lchoose(n - j, m - k) - lchoose(n, m))*fk_n[j])
-    #}
-    #fk <- sapply(1:m, function(k) sum(exp(lchoose(x, k) + lchoose(n - x, m - k) - lchoose(n, m))))
-    
-    # Calculate diversity
-    D <- sapply(q, function(r) sum((1:m / m)^r * fk_m)^(1 / (1 - r)))
-    
-    return(D)
-}
-
-
-# Calculate sample coverage
-# 
-# Calculates sample coverage of varying orders.
-#
-# @param    x  numeric vector of abundance as counts
-# @param    r  the coverage order to calculate
-# 
-# @return   The sample coverage of the given order \code{r}.
+#' Calculate sample coverage
+#' 
+#' \code{calcCoverage} calculates the sample coverage estimate, a measure of sample 
+#' completeness, for varying orders using the method of Chao et al, 2015, falling back 
+#' to the Chao1 method in the first order case.
+#'
+#' @param    x  numeric vector of abundance counts.
+#' @param    r  coverage order to calculate.
+#' 
+#' @return   The sample coverage of the given order \code{r}.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
+#' }
+#' 
+#' @seealso  
+#' Used by \code{\link{rarefyDiversity}}.
+#'           
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' # Calculate clone sizes
+#' clones <- countClones(df, groups="SAMPLE")
+#' # Calculate 1st order coverage for a single sample
+#' calcCoverage(clones$seq_count[clones$SAMPLE == "RL01"])
+#'
+#' @export
 calcCoverage <- function(x, r=1) {
+    # Use traditional calculation for 1st order coverage
+    if (r == 1) { return(calcChao1Coverage(x)) }
+    
+    # Use general form for 2nd order and higher coverage
+    x <- x[x >= 1]
     n <- sum(x)
     fr <- sum(x == r)
     fs <- sum(x == r + 1)
@@ -220,7 +190,7 @@ calcCoverage <- function(x, r=1) {
 # @param    x  a numeric vector of species abundance as counts
 #
 # @returns  Coverage estimate.
-chao1Coverage <- function(x) {
+calcChao1Coverage <- function(x) {
     x <- x[x >= 1]
     n <- sum(x)
     f1 <- sum(x == 1)
@@ -233,6 +203,52 @@ chao1Coverage <- function(x) {
     }
     
     return(rC1)
+}
+
+
+#### Abundance functions ####
+
+# Calculate undetected species
+# 
+# Calculates the lower bound of undetected species counts using the Chao1 estimator.
+#
+# @param    x  vector of observed abundance counts.
+# 
+# @return   The count of undetected species.
+inferUnseenCount <- function(x) {
+    x <- x[x > 0]
+    n <- sum(x)
+    f1 <- sum(x == 1)
+    f2 <- sum(x == 2)
+    
+    if (f2 > 0) {
+        f0 <- ceiling(((n - 1) * f1^2) / (n * 2 * f2))
+    } else {
+        f0 <- ceiling(((n - 1) * f1 * (f1 - 1)) / (n * 2))
+    }
+    
+    return(f0)
+}
+
+
+# Define undetected species relative abundances
+#
+# @param    x  vector of detected species abundance counts.
+# 
+# @return   An adjusted detected species relative abundance distribution.
+inferUnseenAbundance <- function(x) {
+    x <- x[x >= 1]
+    
+    # Coverage
+    rC1 <- calcCoverage(x, r=1)
+    
+    # Unseen count
+    f0 <- inferUnseenCount(x)
+    
+    # Assign unseen relative abundance
+    p <- rep((1 - rC1) / f0, f0)
+    
+    return(p)
 }
 
 
@@ -258,27 +274,204 @@ adjustObservedAbundance <- function(x) {
 }
 
 
-# Define undetected species relative abundances
-#
-# @param    x  vector of detected species abundance counts.
-# 
-# @return   An adjusted detected species relative abundance distribution.
-inferUnseenAbundance <- function(x) {
-    x <- x[x >= 1]
+#' Tabulates clones sizes
+#' 
+#' \code{countClones} determines the number of sequences and total copy number of 
+#' clonal groups.
+#'
+#' @param    data    data.frame with Change-O style columns containing clonal assignments.
+#' @param    groups  character vector defining \code{data} columns containing grouping 
+#'                   variables. If \code{group=NULL}, then do not group data.
+#' @param    copy    name of the \code{data} column containing copy numbers for each 
+#'                   sequence. If this value is specified, then total copy abundance
+#'                   is determined by the sum of copy numbers within each clonal group.
+#' @param    clone   name of the \code{data} column containing clone identifiers.
+#' 
+#' @return   A data.frame summarizing clone counts and frequencies with columns:
+#'           \itemize{
+#'             \item \code{clone}:       clone identifier.
+#'             \item \code{seq_count}:   total number of sequences for the clone.
+#'             \item \code{seq_freq}:    frequency of the clone as a fraction of the total
+#'                                       number of sequences within each group.
+#'             \item \code{copy_count}:  sum of the copy counts in the \code{copy} column.
+#'                                       Only present if the \code{copy} argument is 
+#'                                       specified.
+#'             \item \code{copy_freq}:   frequency of the clone as a fraction of the total
+#'                                       copy number within each group. Only present if 
+#'                                       the \code{copy} argument is specified.
+#'           }
+#'           Also includes additional columns specified in the \code{groups} argument.
+#' 
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' # Without copy numbers
+#' clones <- countClones(df, groups="SAMPLE")
+#'
+#' # With copy numbers and multiple groups
+#' clones <- countClones(df, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' 
+#' @export
+countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
+    # Check input
+    check <- checkColumns(data, c(clone, copy, groups))
+    if (check != TRUE) { stop(check) }
     
-    # Coverage
-    rC1 <- calcCoverage(x, r=1)
+    # Tabulate clonal abundance
+    if (is.null(copy)) {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(groups, clone)) %>%
+            dplyr::summarize(seq_count=n()) %>%
+            dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(seq_count)) %>%
+            dplyr::rename_(.dots=c("clone"=clone))
+    } else {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(groups, clone)) %>%
+            dplyr::summarize_(seq_count=interp(~length(x), x=as.name(clone)),
+                              copy_count=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
+            dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE),
+                          copy_freq=copy_count/sum(copy_count, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(copy_count)) %>%
+            dplyr::rename_(.dots=c("clone"=clone))
+    }
     
-    # Unseen count
-    f0 <- inferUnseenCount(x)
-    
-    # Assign unseen relative abundance
-    p <- rep((1 - rC1) / f0, f0)
-    
-    return(p)
+    return(clone_tab)
 }
 
 
+#' Estimates the complete clonal relative abundance distribution
+#' 
+#' \code{estimateAbundance} estimates the complete clonal relative abundance distribution 
+#' and confidence intervals on clone sizes using bootstrapping.
+#' 
+#' @param    data   data.frame with Change-O style columns containing clonal assignments.
+#' @param    group  name of the \code{data} column containing group identifiers.
+#' @param    clone  name of the \code{data} column containing clone identifiers.
+#' @param    copy   name of the \code{data} column containing copy numbers for each 
+#'                  sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                  is determined by the number of sequences. If a \code{copy} column
+#'                  is specified, then clone abundances is determined by the sum of 
+#'                  copy numbers within each clonal group.
+#' @param    ci     confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot  number of bootstrap realizations to generate.
+#' 
+#' @return   A data.frame with relative clonal abundance data and confidence intervals,
+#'           containing the following columns:
+#'           \itemize{
+#'             \item  \code{group}:  group identifier.
+#'             \item  \code{clone}:  clone identifier.
+#'             \item  \code{p}:      relative abundance of the clone.
+#'             \item  \code{lower}:  lower confidence inverval bound.
+#'             \item  \code{upper}:  upper confidence interval bound.
+#'             \item  \code{rank}:   the rank of the clone abundance.
+#'           }
+#'           
+#' @details
+#' The complete clonal abundance distribution determined inferred by using the Chao1 
+#' estimator to estimate the number of seen clones, and then applying the relative abundance 
+#' correction and unseen clone frequencies described in Chao et al, 2015.
+#'
+#' Confidence intervals are derived using the standard deviation of the resampling 
+#' realizations, as described in Chao et al, 2015.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45-67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
+#' }
+#' 
+#' @seealso  
+#' See \code{\link{rarefyDiversity}} for a similar application to clonal diversity.
+#'           
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+#'
+#' @export
+estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nboot=2000) {
+    #group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
+    
+    # Check input
+    if (!is.data.frame(data)) {
+        stop("Input data is not a data.frame")
+    }
+    check <- checkColumns(data, c(group, clone, copy))
+    if (check != TRUE) { stop(check) }
+    
+    # Tabulate clonal abundance
+    if (is.null(copy)) {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize(COUNT=n())
+    } else {
+        clone_tab <- data %>% 
+            group_by_(.dots=c(group, clone)) %>%
+            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
+    }
+    
+    # Summarize groups
+    group_tab <- clone_tab %>%
+        group_by_(.dots=c(group)) %>%
+        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+    group_set <- as.character(group_tab[[group]])
+    
+    # Set confidence interval
+    ci_z <- ci + (1 - ci) / 2
+    
+    # Generate diversity index and confidence intervals via resampling
+    cat("-> ESTIMATING ABUNDANCE\n")
+    pb <- txtProgressBar(min=0, max=length(group_set), initial=0, width=40, style=3)
+    abund_list <- list()
+    i <- 0
+    for (g in group_set) {
+        i <- i + 1
+        nsam <- group_tab$SEQUENCES[group_tab[[group]] == g]
+        
+        # Infer complete abundance distribution
+        # TODO:  can be a single function (wrapper) for both this and rarefyDiversity
+        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
+        p1 <- adjustObservedAbundance(abund_obs)
+        p2 <- inferUnseenAbundance(abund_obs)
+        p <- c(p1, p2)
+        names(p) <- c(clone_tab$CLONE[clone_tab[[group]] == g], 
+                      paste0("U", 1:length(p2)))
+        
+        # Bootstrap abundance
+        boot_mat <- rmultinom(nboot, nsam, p) / nsam
+        
+        # Assign confidence intervals based on variance of bootstrap realizations
+        boot_sd <- apply(boot_mat, 1, sd)
+        boot_err <- qnorm(ci_z) * boot_sd
+        p_lower <- pmax(p - boot_err, 0)
+        p_upper <- p + boot_err
+        
+        # Assemble and sort abundance data.frame
+        abund_df <- dplyr::data_frame(clone=names(p), p=p, lower=p_lower, upper=p_upper)
+        abund_df <- dplyr::arrange(abund_df, desc(p))
+        abund_df$rank <- 1:nrow(abund_df)
+        abund_list[[g]] <- abund_df
+        
+        setTxtProgressBar(pb, i)
+    }
+    cat("\n")
+    
+    return(bind_rows(abund_list, .id="group"))
+}
+
+
+#### Diversity functions ####
 
 #' Calculate the diversity index
 #' 
@@ -332,6 +525,44 @@ calcDiversity <- function(p, q) {
     p <- p / sum(p)
     # Calculate D for each q
     D <- sapply(q, function(x) sum(p^x)^(1 / (1 - x)))
+    
+    return(D)
+}
+
+
+# Calculates diversity under rarefaction
+# 
+# Calculates Hill numbers under rarefaction
+#
+# @param    x  vector of observed abundance counts.
+# @param    q  numeric vector of diversity orders.
+# @param    m  the sequence count to rarefy to.
+#
+# @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
+estimateRarefiedDiversity <- function(x, q, m) {
+    x <- x[x >= 1]
+    n <- sum(x)
+    if (m > n) {
+        stop("m must be <= the total count of observed sequences.")
+    }
+    q[q == 1] <- 0.9999
+    
+    # Tabulate frequency counts from 1:n
+    fk_n <- tabulate(x, nbins=n)
+    
+    # Calculate estimated fk(m)
+    fk_m <- sapply(1:m, function(k) sum(exp(lchoose(k:m, k) + 
+                                                lchoose(n - k:m, m - k) - 
+                                                lchoose(n, m))*fk_n[k:m]))
+    
+    #.fkm <- function(k) {
+    #    j <- k:m
+    #    sum(exp(lchoose(j, k) + lchoose(n - j, m - k) - lchoose(n, m))*fk_n[j])
+    #}
+    #fk <- sapply(1:m, function(k) sum(exp(lchoose(x, k) + lchoose(n - x, m - k) - lchoose(n, m))))
+    
+    # Calculate diversity
+    D <- sapply(q, function(r) sum((1:m / m)^r * fk_m)^(1 / (1 - r)))
     
     return(D)
 }
@@ -532,17 +763,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'                     is determined by the number of sequences. If a \code{copy} column
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
-#' @param    method    string defining the rarefaction method. One of \code{"depth"}, which
-#'                     rarefies to the same number of sequences for each group,
-#'                     \code{"coverage"}, which rarefies to the same degree of sample 
-#'                     completeness, or \code{"none"}, which does not perform any correction
-#'                     for differences in sampling depth or completeness.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
-#' @param    min_c     minimum coverage required to retain a group. A group with lower 
-#'                     coverage \code{min_c} prior to rarefaction will be excluded.
 #' @param    nboot     number of bootstrap realizations to perform.
 #' 
 #' @return   A \code{\link{DiversityTest}} object containing p-values and summary statistics.
@@ -558,11 +782,8 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'
 #' Variability in total sequence counts across unique values in the \code{group} column is 
 #' corrected by repeated resampling from the estimated complete clonal distribution to 
-#' either a common number of sequences (\code{method="depth"}) or a common level of sample 
-#' coverage (\code{method="coverage"}). Details regarding determination of coverage 
-#' can be found in the \code{\link[iNEXT]{iNEXT}} package and Chao et al, 2014. 
-#' The diversity index estimate (\eqn{D}) for each group is the mean value 
-#' of over all bootstrap realizations. 
+#' a common number of sequences. The diversity index estimate (\eqn{D}) for each group is 
+#' the mean value of over all bootstrap realizations. 
 #' 
 #' Significance of the difference in diversity index (\eqn{D}) between groups is tested by 
 #' constructing a bootstrap delta distribution for each pair of unique values in the 
@@ -612,36 +833,24 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
-                          method=c("depth", "coverage", "none"), 
-                          min_n=30, max_n=NULL, min_c=0, nboot=2000) {
-    #group="SAMPLE"; clone="CLONE"; copy=NULL; method="depth"; q=1; min_n=30; max_n=NULL; min_c=0.1; nboot=200
+                          min_n=30, max_n=NULL, nboot=2000) {
+    #group="SAMPLE"; clone="CLONE"; copy=NULL; q=1; min_n=30; max_n=NULL; nboot=200
     
     # TODO:  write plotDiversityTest function
 
     # Check arguments
     method <- match.arg(method)
         
-    # TODO: replace with checkColumns()
-    # Verify data
+    # Check input
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
     }
+    check <- checkColumns(data, c(group, clone, copy))
+    if (check != TRUE) { stop(check) }
     
-    if (!(group %in% names(data))) {
-        stop(paste("The column", group, "does not exist in the input data.frame"))
-    } else {
-        data[[group]] <- as.character(data[[group]])
-    }
-    
-    if (!(clone %in% names(data))) {
-        stop(paste("The column", clone, "does not exist in the input data.frame"))
-    } else {
-        data[[clone]] <- as.character(data[[clone]])
-    }
-    
-    if (!is.null(copy) && !(copy %in% names(data))) {
-        stop(paste("The column", copy, "does not exist in the input data.frame"))
-    }
+    # Cast grouping to columns to character
+    data[, group] <- as.character(data[, group])
+    data[, clone] <- as.character(data[, clone])
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
@@ -657,42 +866,19 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by_(.dots=c(group)) %>%
-        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE), 
-                         COVERAGE=iNEXT:::Chat.Ind(COUNT, SEQUENCES))
+        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
-    group_tab <- filter(group_tab, SEQUENCES >= min_n, COVERAGE >= min_c)
+    group_tab <- filter(group_tab, SEQUENCES >= min_n)
     group_keep <- as.character(group_tab[[group]])
     
-    if (method == "none") {
-        if (!is.null(max_n)) {
-            nsam <- setNames(pmin(group_tab$SEQUENCES, max_n), group_keep)
-        } else {
-            nsam <- setNames(group_tab$SEQUENCES, group_keep)
-        }
-    } else if (method == "depth") {
-        nsam <- min(group_tab$SEQUENCES, max_n)
-        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
-    } else if (method == "coverage") {
-        # Get lowest coverage
-        csam <- max(min(group_tab$COVERAGE), min_c)
-        
-        # Infer depth from coverage curves
-        .fC <- function(m, x) { abs(csam - iNEXT:::Chat.Ind(x, m)) }
-        nsam <- setNames(numeric(length(group_keep)), group_keep)
-        for (g in group_keep) {
-            x <- clone_tab$COUNT[clone_tab[[group]] == g]
-            m <- group_tab$SEQUENCES[group_tab[[group]] == g]
-            nsam[g] <- floor(optimize(.fC, interval=c(1, m), x=x)$minimum)
-        }
-        # Filter to samples with enough sequences after coverage rarefaction
-        nsam <- nsam[nsam >= min_n]
-        group_keep <- names(nsam)
-    }
+    # Set number of samples per group
+    nsam <- min(group_tab$SEQUENCES, max_n)
+    nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
     
     # Warn if groups removed
     if (length(group_keep) < length(group_all)) {
-        warning("Not all groups passed thresholds min_n=", min_n, " and min_c=", min_c, 
-                ". Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
+        warning("Not all groups passed threshold min_n=", min_n, ". ", 
+                "Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
     }
 
     # Generate diversity index and confidence intervals via resampling
@@ -763,6 +949,79 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 
 #### Plotting functions ####
 
+#' Plots a clonal abundance distribution
+#' 
+#' \code{plotAbundance} plots the results from estimating the complete clonal relative 
+#' abundance distribution. The distribution is plotted as a log rank abundance 
+#' distribution.
+#' 
+#' @param    data          data.frame returned by \link{estimateAbundance}.
+#' @param    colors        named character vector whose names are values in the 
+#'                         \code{group} column of \code{data} and whose values are 
+#'                         colors to assign to those group names.
+#' @param    main_title    string specifying the plot title.
+#' @param    legend_title  string specifying the legend title.
+#' @param    xlim          numeric vector of two values specifying the 
+#'                         \code{c(lower, upper)} x-axis limits.
+#' @param    ylim          numeric vector of two values specifying the 
+#'                         \code{c(lower, upper)} y-axis limits.
+#' @param    silent        if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                         object; if \code{FALSE} draw the plot.
+#' @param    ...           additional arguments to pass to ggplot2::theme.
+#'
+#' @return   A \code{ggplot} object defining the plot.
+#' 
+#' @seealso  
+#' See \code{\link{estimateAbundance}} for generating the input abundance distribution.
+#' Plotting is performed with \code{\link{ggplot}}.
+#'           
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' # Plot
+#' abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+#' plotAbundance(abund)
+#' 
+#' @export
+plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance", 
+                          legend_title=NULL, xlim=NULL, ylim=NULL, 
+                          silent=FALSE, ...) {
+    # TODO: additional styles. rank abundance, box/violin
+    
+    # Define base plot elements
+    g1 <- ggplot(data, aes(x=rank, y=p, group=group)) + 
+        ggtitle(main_title) + 
+        getBaseTheme() + 
+        xlab('Rank') +
+        ylab('Abundance') +
+        scale_x_log10(limits=xlim,
+                      breaks=trans_breaks('log10', function(x) 10^x),
+                      labels=trans_format('log10', math_format(10^.x))) +
+        scale_y_continuous(labels=percent) +
+        geom_ribbon(aes(ymin=lower, ymax=upper, fill=group), alpha=0.4) +
+        geom_line(aes(color=group))
+    
+    # Set colors and legend
+    if (!is.null(colors)) {
+        g1 <- g1 + scale_color_manual(name=legend_title, values=colors) +
+            scale_fill_manual(name=legend_title, values=colors)
+    } else {
+        g1 <- g1 + scale_color_discrete(name=legend_title) +
+            scale_fill_discrete(name=legend_title)
+    }
+    
+    # Add additional theme elements
+    g1 <- g1 + do.call(theme, list(...))
+    
+    # Plot
+    if (!silent) { plot(g1) }
+    
+    invisible(g1)
+}
+
+
 #' Plot the results of rarefyDiversity
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
@@ -801,7 +1060,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- rarefyDiversity(df, "SAMPLE", min_c=0.1, step_q=0.1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #' 
 #' @export
