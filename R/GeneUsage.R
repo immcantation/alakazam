@@ -80,9 +80,12 @@ orderGenes <- function(genes) {
 #' genes <- countGenes(df, gene="V_CALL", groups="SAMPLE", mode="allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", mode="family")
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", mode="gene")
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", mode="allele")
+#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#'                     copy="DUPCOUNT", mode="family")
+#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#'                     copy="DUPCOUNT", mode="gene")
+#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#'                     copy="DUPCOUNT", mode="allele")
 #' 
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, 

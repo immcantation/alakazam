@@ -358,8 +358,6 @@ calcDiversity <- function(p, q) {
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
-#' @param    min_c     minimum coverage required to retain a group. A group with lower 
-#'                     coverage \code{min_c} prior to rarefaction will be excluded.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
 #' 
