@@ -91,12 +91,16 @@
 #' 
 #' @import   dplyr
 #' @import   ggplot2
-#' @import   igraph
 #' @import   lazyeval
 #' @import   methods
 #' @import   Peptides
 #' @import   scales
 #' @import   stringi
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph vertex_attr
+#' @importFrom igraph set_vertex_attr
+#' @importFrom igraph V
+#' @importFrom igraph E
 NULL
 
 

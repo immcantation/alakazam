@@ -14,7 +14,7 @@ Depends:
     ggplot2,
     dplyr
 Imports:
-    igraph,
+    igraph (>= 1.0.0),
     iNEXT,
     lazyeval,
     methods,

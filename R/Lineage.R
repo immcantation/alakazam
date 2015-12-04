@@ -393,26 +393,26 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
 # @return  an igraph graph object
 phylipToGraph <- function(edges, clone) {
     # Create igraph object
-    g <- graph.data.frame(edges, directed=T)
+    g <- igraph::graph_from_data_frame(edges, directed=T)
     
     # Add germline sequence
-    germ_idx <- which(V(g)$name == "Germline")
-    g <- set.vertex.attribute(g, "sequence", index=germ_idx, clone@germline)
+    germ_idx <- which(igraph::V(g)$name == "Germline")
+    g <- igraph::set_vertex_attr(g, "sequence", index=germ_idx, clone@germline)
     
     # Add sample sequences and names
-    clone_idx <- match(clone@data[, "SEQUENCE_ID"], V(g)$name) 
-    g <- set.vertex.attribute(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE"])
+    clone_idx <- match(clone@data[, "SEQUENCE_ID"], igraph::V(g)$name) 
+    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE"])
     
     # Add annotations
     ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE"))]
     for (n in ann_fields) {
-        g <- set.vertex.attribute(g, n, index=germ_idx, NA)
-        g <- set.vertex.attribute(g, n, index=clone_idx, clone@data[, n])
+        g <- igraph::set_vertex_attr(g, n, index=germ_idx, NA)
+        g <- igraph::set_vertex_attr(g, n, index=clone_idx, clone@data[, n])
     }
     
     # Add edge and vertex labels
-    V(g)$label <- V(g)$name
-    E(g)$label <- E(g)$weight
+    igraph::V(g)$label <- igraph::V(g)$name
+    igraph::E(g)$label <- igraph::E(g)$weight
     
     # Add graph attributes
     g$clone <- clone@clone
@@ -530,7 +530,7 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' ly <- layout.reingold.tilford(graph, root="Germline", circular=F, flip.y=T)
+#' ly <- layout_as_tree(graph, root="Germline", circular=F, flip.y=T)
 #' plot(graph, layout=ly)
 #' }
 #' 
