@@ -206,6 +206,35 @@ calcChao1Coverage <- function(x) {
 }
 
 
+# Calculates diversity under rarefaction
+# 
+# Calculates Hill numbers under rarefaction
+#
+# @param    x  vector of observed abundance counts.
+# @param    m  the sequence count to rarefy to.
+#
+# @return   The first order coverage estimate
+inferRarefiedCoverage <- function(x, m) {
+    x <- x[x >= 1]
+    n <- sum(x)
+    if (m > n) {
+        stop("m must be <= the total count of observed sequences.")
+    }
+    
+    # Unrarefied case
+    if (m == n) {
+        return(calcCoverage(x, r=1))
+    }
+    
+    # Calculate rarefied coverage
+    # TODO: Read up on this and fix
+    #rC1 <- iNEXT:::Chat.Ind(x, m)
+    y <- x[(n - x) >= m]
+    rC1 <- 1 - sum(y/n * exp(lgamma(n - y + 1) - lgamma(n - y - m + 1) - lgamma(n) + lgamma(n - m)))
+    
+    return(rC1)
+}
+
 #### Abundance functions ####
 
 # Calculate undetected species
@@ -216,7 +245,7 @@ calcChao1Coverage <- function(x) {
 # 
 # @return   The count of undetected species.
 inferUnseenCount <- function(x) {
-    x <- x[x > 0]
+    x <- x[x >= 1]
     n <- sum(x)
     f1 <- sum(x == 1)
     f2 <- sum(x == 2)
@@ -539,7 +568,7 @@ calcDiversity <- function(p, q) {
 # @param    m  the sequence count to rarefy to.
 #
 # @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-estimateRarefiedDiversity <- function(x, q, m) {
+inferRarefiedDiversity <- function(x, q, m) {
     x <- x[x >= 1]
     n <- sum(x)
     if (m > n) {
@@ -552,8 +581,8 @@ estimateRarefiedDiversity <- function(x, q, m) {
     
     # Calculate estimated fk(m)
     fk_m <- sapply(1:m, function(k) sum(exp(lchoose(k:m, k) + 
-                                                lchoose(n - k:m, m - k) - 
-                                                lchoose(n, m))*fk_n[k:m]))
+                                            lchoose(n - k:m, m - k) - 
+                                            lchoose(n, m))*fk_n[k:m]))
     
     #.fkm <- function(k) {
     #    j <- k:m
@@ -649,7 +678,7 @@ estimateRarefiedDiversity <- function(x, q, m) {
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             min_q=0, max_q=32, step_q=0.05, min_n=30, max_n=NULL, 
                             ci=0.95, nboot=2000) {
-    #group="SAMPLE"; clone="CLONE"; copy="DUPCOUNT"; method="depth"; min_q=0; max_q=32; step_q=0.05; min_n=30; max_n=NULL; ci=0.95; nboot=200
+    #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
     # Check input
     if (!is.data.frame(data)) {
@@ -663,6 +692,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     data[, clone] <- as.character(data[, clone])
 
     # Tabulate clonal abundance
+    # TODO: Can this be replaced by countClones?
     if (is.null(copy)) {
         clone_tab <- data %>% 
             group_by_(.dots=c(group, clone)) %>%
@@ -681,6 +711,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     group_tab <- filter(group_tab, SEQUENCES >= min_n)
     group_keep <- as.character(group_tab[[group]])
     
+    # Set number of samples sequence
     nsam <- min(group_tab$SEQUENCES, max_n)
     nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
 
@@ -707,12 +738,16 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
 
         # Calculate rarefied coverage
-        # TODO: swap this for internal function
-        coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
+        #coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
+        coverage[g] <- inferRarefiedCoverage(abund_obs, n)
         
+        # Estimate complete abundance distribution
+        #abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
+        p1 <- adjustObservedAbundance(abund_obs)
+        p2 <- inferUnseenAbundance(abund_obs)
+        abund_inf <- c(p1, p2)
+
         # Generate bootstrap distributions
-        # TODO: swap this for internal function
-        abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         sample_mat <- rmultinom(nboot, n, abund_inf)
         
         # Calculate diversity
@@ -890,10 +925,14 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
         g <- group_keep[i]
         m <- nsam[g]
         
-        # Generate bootstrap distributions
+        # Estimate complete abundance distribution
+        #abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
         abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        # TODO: swap this for internal function
-        abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
+        p1 <- adjustObservedAbundance(abund_obs)
+        p2 <- inferUnseenAbundance(abund_obs)
+        abund_inf <- c(p1, p2)
+
+        # Generate bootstrap distributions
         sample_mat <- rmultinom(nboot, m, abund_inf)
         
         # Calculate diversity

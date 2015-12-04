@@ -15,7 +15,6 @@ Depends:
     dplyr
 Imports:
     igraph (>= 1.0.0),
-    iNEXT,
     lazyeval,
     methods,
     Peptides,
