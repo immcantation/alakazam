@@ -28,12 +28,25 @@ of the diversity index, as proposed by Hill in:
         Ecology 54, 427-432 (1973).
 
 Coupled with resampling strategies to correct for variations in sequencing 
-depth. This package provides two approaches to assessing diversity: 
+depth, as well as inferrence of complete clonal abundance distributions as 
+described in:
 
-1. Generation of a smooth diversity (D) curve over a range of diversity orders 
-(q) using `rarefyDiversity`.
+    Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+        A framework for sampling and estimation in species diversity studies. 
+        Ecol Monogr. 2014 84:45-67.
+    Chao A, et al. Unveiling the species-rank abundance distribution by 
+        generalizing the Good-Turing sample coverage theory. 
+        Ecology. 2015 96, 11891201.
+
+This package provides methods for the inferrence of a complete clonal 
+abundance distribution, using the `estimateAbundance` function, along with 
+two approaches to assess diversity of these distributions: 
+
+1. Generation of a smooth diversity (D) curve over a range of diversity orders (q) 
+using `rarefyDiversity`.
 2. A significance test of the diversity (D) at a fixed diversity order (q) using 
 `testDiversity`.
+
 
 Load Change-O data
 --------------------------------------------------------------------------------
@@ -42,13 +55,59 @@ A small example Change-O tab-delimited database file is included in the
 (column) to be present in the Change-O file, as well as an additional grouping 
 column. In this example we will use the grouping columns `SAMPLE` and `ISOTYPE`.
 
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
 
 # Load Change-O file
 file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 df <- readChangeoDb(file)
 ```
+
+Generate a clonal abundance curve
+--------------------------------------------------------------------------------
+
+A simple table of the observed clonal abundance counts and frequencies may be
+generated using the `countClones` function either without copy numbers, where
+the size of each clone is determined by the number of sequence members:
+
+```{r, eval=TRUE, warning=FALSE}
+# Partitions the data based on the SAMPLE column
+clones <- countClones(df, groups="SAMPLE")
+head(clones, 5)
+```
+
+You may also specify a column containing the abundance count of each sequence 
+(usually copy numbers), that will including weighting of each clone size by the 
+corresponding abundance count. Furthermore, multiple grouping columns may be
+specified such that `SEQ_FREQ` (unwieghted clone size as a fraction
+of total sequences in the group) and `COPY_FREQ` (weighted faction) are 
+normalized to within multiple group data partitions.
+
+```{r, eval=TRUE, warning=FALSE}
+# Partitions the data based on both the SAMPLE and ISOTYPE columns
+# Weights the clone sizes by the DUPCOUNT column
+clones <- countClones(df, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+head(clones, 5)
+```
+
+While `countClones` will report observed abundances, it will not correct the
+distribution nor provide confidence intervals. A complete clonal abundance 
+distribution may be inferred using the `estimateAbundance` function with
+confidence intervals derived via bootstrapping.  This output may be visualized
+using the `plotAbundance` function.
+
+```{r, eval=TRUE, results='hide', warning=FALSE, fig.width=6, fig.height=4}
+# Partitions the data on the SAMPLE column
+# Calculates a 95% confidence interval via 200 bootstrap realizations
+clones <- estimateAbundance(df, group="SAMPLE", ci=0.95, nboot=200)
+```
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+head(clones, 5)
+
+# Plots a rank abundance curve of the relative clonal abundances
+p1 <- plotAbundance(clones, legend_title="Sample")
+```
+
 
 Generate a diversity curve
 --------------------------------------------------------------------------------
@@ -61,27 +120,27 @@ orders (q) to generate a smooth curve.
 # Compare diversity curve across values in the "SAMPLE" column
 # q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
-# 2000 resampling realizations are performed (nboot=2000)
+# 2000 resampling realizations are performed (nboot=200)
 sample_div <- rarefyDiversity(df, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
-                                 ci=0.95, nboot=2000)
+                                 ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
 isotype_div <- rarefyDiversity(df, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
-                                  step_q=0.05, ci=0.95, nboot=2000)
+                                  step_q=0.05, ci=0.95, nboot=200)
 ```
 
 ```{r, eval=TRUE, fig.width=6, fig.height=4}
 # Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
 # Indicate number of sequences resampled from each group in the title
 sample_main <- paste0("Sample diversity (n=", sample_div@n, ")")
-p1 <- plotDiversityCurve(sample_div, main_title=sample_main, 
+p2 <- plotDiversityCurve(sample_div, main_title=sample_main, 
                          legend_title="Sample", log_q=TRUE, log_d=TRUE)
 
 # Plot isotype diversity using default set of Ig isotype colors
 isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
-p2 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
+p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
                          legend_title="Isotype", log_q=TRUE, log_d=TRUE)
 ```
 
@@ -94,8 +153,8 @@ distributions between groups.
 
 ```{r, eval=TRUE, results='hide'}
 # Test diversity at q=0 (species richness) across values in the "SAMPLE" column
-# 2000 bootstrap realizations are performed (nboot=2000)
-sample_test <- testDiversity(df, 0, "SAMPLE", nboot=2000)
+# 2000 bootstrap realizations are performed (nboot=200)
+sample_test <- testDiversity(df, 0, "SAMPLE", nboot=200)
 ```
 ```{r, eval=TRUE}
 sample_test
@@ -104,7 +163,7 @@ sample_test
 # Test diversity across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_test <- testDiversity(df, 2, "ISOTYPE", min_n=30, nboot=2000)
+isotype_test <- testDiversity(df, 2, "ISOTYPE", min_n=30, nboot=200)
 ```
 ```{r, eval=TRUE}
 isotype_test

@@ -56,14 +56,14 @@ orderGenes <- function(genes) {
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies with
 #'           columns:
 #'           \itemize{
-#'             \item \code{gene}:        name of the family, gene or allele
-#'             \item \code{seq_count}:   total number of sequences for the gene.
-#'             \item \code{seq_freq}:    frequency of the gene as a fraction of the total
+#'             \item \code{GENE}:        name of the family, gene or allele
+#'             \item \code{SEQ_COUNT}:   total number of sequences for the gene.
+#'             \item \code{SEQ_FREQ}:    frequency of the gene as a fraction of the total
 #'                                       number of sequences within each grouping.
-#'             \item \code{copy_count}:  sum of the copy counts in the \code{copy} column.
+#'             \item \code{COPY_COUNT}:  sum of the copy counts in the \code{copy} column.
 #'                                       for each gene. Only present if the \code{copy} 
 #'                                       argument is specified.
-#'             \item \code{copy_freq}:   frequency of the gene as a fraction of the total
+#'             \item \code{COPY_FREQ}:   frequency of the gene as a fraction of the total
 #'                                       copy number within each group. Only present if 
 #'                                       the \code{copy} argument is specified.
 #'           }
@@ -111,23 +111,23 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL,
     if (is.null(copy)) {
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
-            dplyr::summarize(seq_count=n()) %>%
-            dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(seq_count)) %>%
-            dplyr::rename_(.dots=c("gene"=gene))
+            dplyr::summarize(SEQ_COUNT=n()) %>%
+            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(SEQ_COUNT)) %>%
+            dplyr::rename_(.dots=c("GENE"=gene))
     } else {
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
-            dplyr::summarize_(seq_count=interp(~length(x), x=as.name(gene)),
-                              copy_count=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate(seq_freq=seq_count/sum(seq_count, na.rm=TRUE),
-                          copy_freq=copy_count/sum(copy_count, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(copy_count)) %>%
-            dplyr::rename_(.dots=c("gene"=gene))
+            dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(gene)),
+                              COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
+            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
+                          COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(COPY_COUNT)) %>%
+            dplyr::rename_(.dots=c("GENE"=gene))
     }
     
     # Order genes
-    gene_tab$gene <- factor(gene_tab$gene, levels=orderGenes(gene_tab$gene))
+    gene_tab$GENE <- factor(gene_tab$GENE, levels=orderGenes(gene_tab$GENE))
     
     return(gene_tab)
 }
