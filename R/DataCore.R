@@ -241,3 +241,30 @@ getBaseTheme <- function() {
     
     return(base_theme)
 }
+
+#' Plot multiple ggplot objects
+#' 
+#' @param   ...    ggplot objects to plot
+#' @param   ncol   number of columns in the plot 
+#' @return  NULL
+#' 
+#' @references  
+#' http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)
+#' @export
+multiggplot <- function(..., ncol=1) {
+    p <- list(...)
+    n <- length(p)
+    layout <- matrix(seq(1, ncol*ceiling(n/ncol)), ncol=ncol, nrow=ceiling(n/ncol))
+    
+    # Plot
+    if (n == 1) {
+        plot(p[[1]])
+    } else {
+        grid::grid.newpage()
+        grid::pushViewport(grid::viewport(layout=grid::grid.layout(nrow(layout), ncol(layout))))
+        for (i in 1:n) {
+            idx <- as.data.frame(which(layout == i, arr.ind=T))
+            plot(p[[i]], vp=grid::viewport(layout.pos.row = idx$row, layout.pos.col=idx$col))
+        }
+    }
+}
