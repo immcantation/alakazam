@@ -30,7 +30,7 @@ NULL
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
 setClass("DiversityCurve", 
-         slots=c(data="GenericDataFrame", 
+         slots=c(data="data.frame", 
                  groups="character", 
                  n="numeric", 
                  nboot="numeric", 
@@ -75,8 +75,8 @@ setClass("DiversityCurve",
 #' @aliases      DiversityTest
 #' @exportClass  DiversityTest
 DiversityTest <- setClass("DiversityTest", 
-         slots=c(tests="GenericDataFrame",
-                 summary="GenericDataFrame",
+         slots=c(tests="data.frame",
+                 summary="data.frame",
                  groups="character", 
                  q="numeric",
                  n="numeric", 
@@ -766,7 +766,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
     # Generate return object
     div <- new("DiversityCurve", 
-               data=bind_rows(div_list, .id="group"), 
+               data=as.data.frame(bind_rows(div_list, .id="group")), 
                groups=group_keep, 
                n=nsam,
                nboot=nboot, 

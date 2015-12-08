@@ -62,34 +62,34 @@ translateDNA <- function (seq, trim=FALSE) {
 }
 
 
-#' Calculates GRAVY hydrophobicity score from a given AA sequence.
+#' Calculates GRAVY hydrophobicity score from a given amino acid sequence.
 #'
-#' @param   aa_seq          AA sequence (string) to have GRAVY calculated for
-#' @param   aa         	 	AA sequence (character vector) from aa_seq with no *
+#' @param    seq  string defining the amino acid sequence.
 #' 
-#' @return  numeric, GRAVY score
+#' @return   GRAVY score for the sequence.
 #'
 #' @examples 
-#' aa_seq <- "CARDRSTPWRRGIASTTVRTSW"
-#' gravy(aa_seq)
-#' gravy(aa_seq, scale= "Aboderin")
+#' seq <- "CARDRSTPWRRGIASTTVRTSW"
+#' gravy(seq)
+#'
 #' @export
-gravy <- function(aa_seq, scale= "KyteDoolittle"){
+gravy <- function(seq) {
     # Create character vector from string
-    aa <- unlist(strsplit(as.character(aa_seq), ""))
+    aa <- unlist(strsplit(as.character(seq), ""))
     # Ignore AAs that are "*" and "X"
     aa <- aa[aa != "X" & aa != "*"]
     return(sum(HYDROPATHY[aa])/length(aa))
 }
 
-#' Count patterns
-#' 
-#' Counts the number of times a "pattern" occurs in "x", a string
-#'
-#' @param   x            	a string (usually amino acids)
-#' @param   pattern         regular expression to be matched in string
-#'  
-#' @return  numeric, number of times the regular expression was found
+
+# Count patterns
+# 
+# Counts the number of times a "pattern" occurs in "x", a string
+#
+# @param   x        a string (usually amino acids)
+# @param   pattern  regular expression to be matched in string
+#  
+# @return  number of times the regular expression was found
 countOccurrences <- function(x, pattern) {
     return(sum(gregexpr(pattern, x)[[1]] > 0))
 }
@@ -134,10 +134,10 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
     # Calculate region lengths
     aa_length <- sapply(region_aa, nchar)
     # Count occurrence of each amino acid pattern for each sequence
-    out_df <- data.frame(matrix(0,nrow=length(region_aa),ncol=length(patterns)))
+    out_df <- data.frame(matrix(0, nrow=length(region_aa), ncol=length(patterns)))
     names(out_df) <- paste(region_name, names(patterns), sep="_")
     for(i in 1:length(patterns)) {
-        out_df[,i] <- sapply(region_aa, countOccurrences, patterns[i]) / aa_length
+        out_df[, i] <- sapply(region_aa, countOccurrences, patterns[i]) / aa_length
     }
     return(out_df)
 }

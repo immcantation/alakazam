@@ -104,9 +104,3 @@
 NULL
 
 
-#### Classes ####
-
-setOldClass("data.frame")
-setOldClass("tbl_df")
-setClassUnion("GenericDataFrame", c("data.frame", "tbl_df"))
-

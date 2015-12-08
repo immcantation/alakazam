@@ -26,7 +26,7 @@ NULL
 #' @aliases      ChangeoClone
 #' @exportClass  ChangeoClone
 setClass("ChangeoClone", 
-         slots=c(data="GenericDataFrame",
+         slots=c(data="data.frame",
                  clone="character",
                  germline="character", 
                  v_gene="character", 
@@ -158,7 +158,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
     clone <- new("ChangeoClone", 
-                 data=tmp_df,
+                 data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
                  germline=maskSeqGaps(data[[germ]][1], outer_only=FALSE), 
                  v_gene=getGene(data[[vcall]][1]), 
@@ -381,7 +381,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     
     # Remove rows from clone
     keep_clone <- clone@data[["SEQUENCE_ID"]] %in% unique(c(edges$from, edges$to))
-    clone@data <- clone@data[keep_clone, ]
+    clone@data <- as.data.frame(clone@data[keep_clone, ])
     
     return(list(edges=edges, clone=clone))
 }
