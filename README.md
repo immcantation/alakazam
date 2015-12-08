@@ -1,19 +1,23 @@
 Alakazam
 -------------------------------------------------------------------------------
-July 3, 2015  
-Version 0.2.1.beta
+December 8, 2015  
+Version 0.2.0.99
 
-Lineage and diversity R package of the Change-O suite.
+Lineage, diversity, gene usage and amino acid property R package of the 
+Change-O suite.
 
 Dependencies
 -------------------------------------------------------------------------------
 R 3.0  
 R packages
 
-  -  ggplot2
-  -  igraph
-  -  plyr
-  -  scales
+  - dplyr
+  - ggplot2
+  - igraph
+  - Peptides
+  - scales
+  - seqinr
+  - stringi
 
 Mercurial Configuration
 -------------------------------------------------------------------------------

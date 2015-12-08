@@ -1,14 +1,24 @@
-Version 0.2.1.beta:  October 24, 2015
+Version 0.2.0.999:  December 8, 2015
 -------------------------------------------------------------------------------
 
 General:
 
-+ Removed plyr dependency. Added dplyr, iNEXT, lazyeval and stringi 
-  dependencies.
++ Removed plyr dependency.
++ Added dplyr, lazyeval and stringi dependencies.
++ Added strict requirement for igraph version >= 1.0.0.
 + Renamed `getDNADistMatrix()` and `getAADistMatrix()` to `getDNAMatrix` and 
   `getAAMatrix()`, respectively.
 + Added `getSeqMatrix()` which calculates a pairwise distance matrix for a set 
   of sequences.
++ Modified default plot sizing to be more appropriate for export to PDF 
+  figures with 7-8 inch width.
++ Added `multiggplot()` function for performing multiple panel plots.
+
+Amino Acid Analysis:
+
++ Migrated amino acid property analysis from Change-O CTL to alakazam. 
+  Includes the new functions `gravy()`, `countPatterns()` and 
+  `regionProperties()`.
 
 Annotation:
 
@@ -18,26 +28,20 @@ Annotation:
   disabled by providing the argument `strip_d=FALSE`.
 + Added `countGenes()` to tabulate V(D)J allele, gene and family usage.
 
-Clonality:
+Diversity:
 
 + Added several functions related to analysis of clone size distributions, 
   including `countClones()`, `estimateAbundance()` and `plotAbundance`.
-  
-Diversity:
-
 + Renamed `resampleDiversity()` to `rarefyDiversity()` and changed many of
   the internals. Bootstrapping is now performed on an inferred complete
-  relative abundance distribution, using methods from the iNEXT package.
+  relative abundance distribution.
 + Added support for inclusion of copy number in clone size determination
   within `rarefyDiversity()` and `testDiversity()`.
-+ Added coverage based rarefaction and no rarefaction to the options for 
-  resampling strategies in `rarefyDiversity()`.
 + Diversity scores and confiderence intervals within `rarefyDiversity()`
   and `testDiversity()` are now calculated using the mean and standard 
   deviation of the bootstrap realizations, rather than the median and
   upper/lower quantiles.
-+ Added ability to add counts and coverage values to the legend in
-  `potDiversityCurve()`.
++ Added ability to add counts to the legend in `potDiversityCurve()`.
 
 
 Version 0.2.0:  June 15, 2015

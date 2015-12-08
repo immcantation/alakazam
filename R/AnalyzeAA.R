@@ -1,10 +1,4 @@
-# Obtain CDR3 (or any other region) properties, can be nt or AA 
-# 
-# @author     Ruoyi Jiang
-# @copyright  Copyright 2015 Kleinstein Lab, Yale University. All rights reserved
-# @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    0.2.0
-# @date       2015.06.19
+# Amino acid sequence properties
 
 #' @include Alakazam.R
 NULL

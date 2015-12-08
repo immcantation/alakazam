@@ -1070,9 +1070,9 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #' @param    ylim            numeric vector of two values specifying the 
 #'                           \code{c(lower, upper)} y-axis limits.
 #' @param    annotate        string defining whether to added values to the group labels 
-#'                           of the legend showing sequence counts (\code{"depth"}),
-#'                           coverage (\code{"coverage"}), both counts and coverage 
-#'                           (\code{"both"}), or neither (\code{"none"}).
+#'                           of the legend. When \code{"none"} (default) is specified no
+#'                           annotations are added. Specifying (\code{"depth"}) adds 
+#'                           sequence counts to the labels.
 #' @param    silent          if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                           object; if \code{FALSE} draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
@@ -1095,7 +1095,7 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
                                legend_title=NULL, log_q=TRUE, log_d=TRUE,
                                xlim=NULL, ylim=NULL, 
-                               annotate=c("none", "depth", "coverage", "both"),
+                               annotate=c("none", "depth"),
                                silent=FALSE, ...) {
     # Check arguments
     annotate <- match.arg(annotate)
@@ -1106,15 +1106,6 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     } else if (annotate == "depth") {
         group_labels <- setNames(paste0(data@groups, 
                                         " (N=", data@n, ")"), 
-                                 data@groups)
-    } else if (annotate == "coverage") {
-        group_labels <- setNames(paste0(data@groups, 
-                                        " (C=", round(data@coverage, 3), ")"), 
-                                 data@groups)
-    } else if (annotate == "both") {
-        group_labels <- setNames(paste0(data@groups, 
-                                        " (N=", data@n, 
-                                        ", C=", round(data@coverage, 3), ")"), 
                                  data@groups)
     }
     
