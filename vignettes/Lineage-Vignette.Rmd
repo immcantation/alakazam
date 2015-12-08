@@ -5,7 +5,7 @@ date: '`r Sys.Date()`'
 output:
   pdf_document:
     dev: pdf
-    fig_height: null
+    fig_height: 4
     fig_width: 7.5
     highlight: pygments
     toc: yes
@@ -41,7 +41,7 @@ A small example Change-O tab-delimited database file is included in the
 * `J_CALL`
 * `JUNCTION_LENGTH`
 
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
 
 # Load Change-O file
@@ -95,9 +95,8 @@ output. This is created in the system temporary location (according to
 deleting files is somewhat rude).  In most cases, you will want to set 
 `rm_temp=TRUE` to delete this folder.
 
-```{r, eval=TRUE}
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(igraph)
-
 # Run PHYLIP and parse output
 dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
@@ -159,23 +158,27 @@ Multiple lineage trees may be generated at once, by splitting the Change-O
 data.frame on the clone column.
 
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
-library(plyr)
+library(dplyr)
+
 # Preprocess clones
-clone_list <- dlply(df, "CLONE", makeChangeoClone, 
-                    text_fields=c("SAMPLE", "ISOTYPE"), 
-                    num_fields="DUPCOUNT")
+clones <- df %>%
+    group_by(CLONE) %>%
+    do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
+                                num_fields="DUPCOUNT"))
+
 # Build lineages
-graph_list <- llply(clone_list, buildPhylipLineage, 
-                    dnapars_exec=dnapars_exec, rm_temp=TRUE)
+dnapars_exec <- "~/apps/phylip-3.69/dnapars"
+graphs <- lapply(clones$CHANGEO, buildPhylipLineage, 
+                 dnapars_exec=dnapars_exec, rm_temp=TRUE)
 ```
 
 ```{r, eval=TRUE}
 # Note, clones with only a single sequence will not be processed.
 # A warning will be generated and NULL will be returned by buildPhylipLineage
 # These entries may be removed for clarity
-graph_list[sapply(graph_list, is.null)] <- NULL
+graphs[sapply(graphs, is.null)] <- NULL
 
 # Leaving a subset of clones
-length(clone_list)
-length(graph_list)
+nrow(clones)
+length(graphs)
 ```

@@ -357,7 +357,7 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
     # Convert string to character vector
     x <- unlist(strsplit(seq1, ""))
     y <- unlist(strsplit(seq2, ""))
-    
+
     # Determine non-ignored positions
     i <- !((x %in% ignore) | (y %in% ignore))
     
@@ -576,7 +576,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     if (!all(sapply(subset(data, select=seq_fields), is.character))) {
         stop("All seq_fields columns must be of type 'character'")
     }
-    seq_len <- nchar(data[, seq])
+    seq_len <- nchar(data[[seq]])
     if (any(seq_len != seq_len[1])) {
         warning("All sequences are not the same length")
     }
@@ -598,7 +598,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Intialize COLLAPSE_COUNT with 1 for each sequence
     if(add_count) {
-        data[, "COLLAPSE_COUNT"] <- rep(1, nrow(data))
+        data[["COLLAPSE_COUNT"]] <- rep(1, nrow(data))
         num_fields <- c(num_fields, "COLLAPSE_COUNT")
     }
     
@@ -610,10 +610,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     
     # Build distance matrix
-    d_mat <- matrix(TRUE, nseq, nseq, dimnames=list(data[, id], data[, id]))
+    d_mat <- matrix(TRUE, nseq, nseq, dimnames=list(data[[id]], data[[id]]))
     for (i in 1:(nseq - 1)) {
         for (j in (i + 1):nseq) {
-            d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[i, seq], data[j, seq], ignore)
+            d_mat[i, j] <- d_mat[j, i] <- testSeqEqual(data[[seq]][i], data[[seq]][j], ignore)
         }
     }
     
@@ -636,7 +636,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 
     # Return single sequence if all sequence belong to ambiguous clusters
     if (discard_count == nrow(d_mat)) {
-        inform_len <- .informativeLength(data[, seq])
+        inform_len <- .informativeLength(data[[seq]])
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         return(data[which.max(inform_len), ])
     }
@@ -672,16 +672,16 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     
     # Collapse duplicate sets and append entries to unique data.frame
-    unique_list <- list(data[data[, id] %in% uniq_taxa, ])
+    unique_list <- list(data[data[[id]] %in% uniq_taxa, ])
     for (taxa in dup_taxa) {
         # Define row indices of identical sequences
-        idx <- which(data[, id] %in% taxa)
+        idx <- which(data[[id]] %in% taxa)
         tmp_df <- data[idx[1], ]
         
         if (length(idx) > 1) {
             # Define set of text fields for row
             for (f in text_fields) {
-                f_set <- na.omit(data[idx, f])
+                f_set <- na.omit(data[[f]][idx])
                 if (length(f_set) > 0) {
                     f_set <- unlist(strsplit(f_set, sep))
                     f_set <- sort(unique(f_set))
@@ -694,7 +694,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             
             # Sum numeric fields
             for (f in num_fields) {
-                f_set <- na.omit(data[idx, f])
+                f_set <- na.omit(data[[f]][idx])
                 if (length(f_set) > 0) { 
                     f_val <- sum(f_set) 
                 } else { 
@@ -705,7 +705,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             
             # Select sequence fields with fewest Ns
             for (f in seq_fields) {
-                f_set <- na.omit(data[idx, f])
+                f_set <- na.omit(data[[f]][idx])
                 if (length(f_set) > 0) {
                     f_len <- .informativeLength(f_set)
                     f_val <- f_set[which.max(f_len)]
@@ -717,7 +717,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             
             # Assign id and sequence with least number of Ns
             seq_set <- data[idx, c(id, seq)]
-            inform_len <- .informativeLength(seq_set[, seq])
+            inform_len <- .informativeLength(seq_set[[seq]])
             tmp_df[, c(id, seq)] <- seq_set[which.max(inform_len), c(id, seq)]
         }
         

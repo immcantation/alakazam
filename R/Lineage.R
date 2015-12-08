@@ -142,8 +142,8 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
-    tmp_df[, seq] <- maskSeqGaps(tmp_df[, seq], outer_only=FALSE)
-    tmp_df[, seq] <- maskSeqEnds(tmp_df[, seq], max_mask=max_mask, trim=FALSE)
+    tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], outer_only=FALSE)
+    tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], max_mask=max_mask, trim=FALSE)
     
     # Remove duplicates
     tmp_df <- collapseDuplicates(tmp_df, id=id, seq=seq, text_fields=text_fields, 
@@ -159,11 +159,11 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
     clone <- new("ChangeoClone", 
                  data=tmp_df,
-                 clone=as.character(data[1, clone]),
-                 germline=maskSeqGaps(data[1, germ], outer_only=FALSE), 
-                 v_gene=getGene(data[1, vcall]), 
-                 j_gene=getGene(data[1, jcall]), 
-                 junc_len=data[1, junc_len])
+                 clone=as.character(data[[clone]][1]),
+                 germline=maskSeqGaps(data[[germ]][1], outer_only=FALSE), 
+                 v_gene=getGene(data[[vcall]][1]), 
+                 j_gene=getGene(data[[jcall]][1]), 
+                 junc_len=data[[junc_len]][1])
     
     return(clone)
 }
@@ -184,11 +184,11 @@ writePhylipInput <- function(clone, path) {
             sprintf("SAM%-6s", 1:nseq))
     v2 <- c(nchar(clone@germline),
             clone@germline, 
-            clone@data[, "SEQUENCE"])
+            clone@data[["SEQUENCE"]])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[, "SEQUENCE_ID"])
+    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["SEQUENCE_ID"]])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
@@ -340,9 +340,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
         if (edges$from[i] == "Germline") {
             seq1 <- clone@germline
         } else {
-            seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE"]
+            seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
         }
-        seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE"]
+        seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
         edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)        
     }
     
@@ -364,9 +364,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
             if (edges$from[i] == "Germline") {
                 seq1 <- clone@germline
             } else {
-                seq1 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$from[i], "SEQUENCE"]
+                seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
             }
-            seq2 <- clone@data[clone@data[, "SEQUENCE_ID"] == edges$to[i], "SEQUENCE"]
+            seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
             edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)      
         }
         
@@ -380,7 +380,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     }
     
     # Remove rows from clone
-    keep_clone <- clone@data[, "SEQUENCE_ID"] %in% unique(c(edges$from, edges$to))
+    keep_clone <- clone@data[["SEQUENCE_ID"]] %in% unique(c(edges$from, edges$to))
     clone@data <- clone@data[keep_clone, ]
     
     return(list(edges=edges, clone=clone))
@@ -400,14 +400,14 @@ phylipToGraph <- function(edges, clone) {
     g <- igraph::set_vertex_attr(g, "sequence", index=germ_idx, clone@germline)
     
     # Add sample sequences and names
-    clone_idx <- match(clone@data[, "SEQUENCE_ID"], igraph::V(g)$name) 
-    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[, "SEQUENCE"])
+    clone_idx <- match(clone@data[["SEQUENCE_ID"]], igraph::V(g)$name) 
+    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[["SEQUENCE"]])
     
     # Add annotations
     ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE"))]
     for (n in ann_fields) {
         g <- igraph::set_vertex_attr(g, n, index=germ_idx, NA)
-        g <- igraph::set_vertex_attr(g, n, index=clone_idx, clone@data[, n])
+        g <- igraph::set_vertex_attr(g, n, index=clone_idx, clone@data[[n]])
     }
     
     # Add edge and vertex labels
@@ -544,7 +544,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     }
     
     # Check fields
-    seq_len = unique(nchar(clone@data[, "SEQUENCE"]))
+    seq_len = unique(nchar(clone@data[["SEQUENCE"]]))
     germ_len = ifelse(length(clone@germline) == 0, 0, nchar(clone@germline))
     if(germ_len == 0) {
         stop("Clone ", clone@clone, "does not contain a germline sequence.")

@@ -54,7 +54,7 @@ translateDNA <- function (seq, trim=FALSE) {
 	# e.g. "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
 	if (trim) { seq <- substr(seq, 4, nchar(seq) - 3) }
     if(nchar(seq) >= 3) {
-	    aa <- paste(seqinr::translate(unlist(stringi::stri_split_boundaries(seq, type="character"))), collapse="")
+	    aa <- paste(seqinr::translate(unlist(strsplit(seq, ""))), collapse="")
 	} else {
 	    aa <- NA
 	}
@@ -76,7 +76,7 @@ translateDNA <- function (seq, trim=FALSE) {
 #' @export
 gravy <- function(aa_seq, scale= "KyteDoolittle"){
     # Create character vector from string
-    aa <- unlist(stringi::stri_split_boundaries(as.character(aa_seq), type="character"))
+    aa <- unlist(strsplit(as.character(aa_seq), ""))
     # Ignore AAs that are "*" and "X"
     aa <- aa[aa != "X" & aa != "*"]
     return(sum(HYDROPATHY[aa])/length(aa))

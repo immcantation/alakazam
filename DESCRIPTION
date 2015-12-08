@@ -30,9 +30,8 @@ RoxygenNote: 5.0.1
 Collate:
     'Alakazam.R'
     'AnalyzeAA.R'
-    'DataCore.R'
+    'Core.R'
     'Diversity.R'
     'GeneUsage.R'
     'Lineage.R'
-    'SeqCore.R'
-    'StatCore.R'
+    'Sequence.R'
