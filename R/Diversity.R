@@ -669,7 +669,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
-                            min_q=0, max_q=32, step_q=0.05, min_n=30, max_n=NULL, 
+                            min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
                             ci=0.95, nboot=2000) {
     #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
@@ -681,8 +681,8 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     if (check != TRUE) { stop(check) }
     
     # Cast grouping to columns to character
-    data[, group] <- as.character(data[, group])
-    data[, clone] <- as.character(data[, clone])
+    data[[group]] <- as.character(data[[group]])
+    data[[clone]] <- as.character(data[[clone]])
 
     # Tabulate clonal abundance
     # TODO: Can this be replaced by countClones?
@@ -873,8 +873,8 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     if (check != TRUE) { stop(check) }
     
     # Cast grouping to columns to character
-    data[, group] <- as.character(data[, group])
-    data[, clone] <- as.character(data[, clone])
+    data[[group]] <- as.character(data[[group]])
+    data[[clone]] <- as.character(data[[clone]])
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
