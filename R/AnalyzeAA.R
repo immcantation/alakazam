@@ -38,20 +38,30 @@ names(HYDROPATHY) <- c("A", "R", "N", "D", "C",
 #' # Load Change-O file
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
+#' 
+#' seq <- df$JUNCTION[1:3]
 #' translateDNA(df$JUNCTION[1])
 #' translateDNA(df$JUNCTION[1], trim=TRUE)
 #' translateDNA("ACTGACTCGA")
 #' 
 #' @export
 translateDNA <- function (seq, trim=FALSE) {
-	# Returns object seq with 3 nucleotides removed from each end
-	# e.g. "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
+    # Function to translate a single string
+    .translate <- function(x) {
+        if (nchar(x) >= 3) {
+            paste(seqinr::translate(unlist(strsplit(x, ""))), collapse="")
+        } else {
+            NA
+        }
+    }
+    
+    # Remove 3 nucleotides from each end
+	# Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
 	if (trim) { seq <- substr(seq, 4, nchar(seq) - 3) }
-    if(nchar(seq) >= 3) {
-	    aa <- paste(seqinr::translate(unlist(strsplit(seq, ""))), collapse="")
-	} else {
-	    aa <- NA
-	}
+    
+    # Apply translation
+    aa <- sapply(seq, .translate)
+
     return(aa)
 }
 

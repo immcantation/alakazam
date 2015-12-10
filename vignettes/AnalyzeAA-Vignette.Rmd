@@ -46,3 +46,9 @@ regionProperties(regions)
 aacomp(regions[1])
 ```
 
+```
+cdr <- extractVRegion(df$SEQUENCE_IMGT, region=c("CDR1", "CDR2"))
+translateDNA(cdr[1,1])
+```
+
+
