@@ -29,32 +29,73 @@ HYDROPATHY <- c("A"=+1.8,
                 "Y"=-1.3, 
                 "V"=+4.2)
 
+# Bulkiness (side chain volume/length) index scores
+# Zimmerman et al, 1968
+# TODO:  I don't see this in the Peptides package. Maybe it's there, maybe it isn't?
+BULKINESS <- c("A"=11.50, 
+               "R"=14.28, 
+               "N"=12.82, 
+               "D"=11.68, 
+               "C"=13.46,
+               "Q"=14.45, 
+               "E"=13.57, 
+               "G"=3.40, 
+               "H"=13.69, 
+               "I"=21.40,
+               "L"=21.40, 
+               "K"=15.71, 
+               "M"=16.25, 
+               "F"=19.8, 
+               "P"=17.43,
+               "S"=9.47, 
+               "T"=15.77, 
+               "W"=21.67, 
+               "Y"=18.03, 
+               "V"=21.57)
+
+
 #### General sequence functions ####
 
 #' Build an asymetrical hydropathy distance matrix
 #'
-#' \code{getHydropathyMatrix} returns an asymmetrical distance matrix for hydrophobicity
-#' changes between amino acid characters according to the Kyte & Doolittle scale.
+#' \code{getPropertyMatrix} returns an asymmetrical distance matrix for property
+#' changes between amino acid characters.
 #' 
-#' @return   A \code{matrix} of amino acid character hydrophobicity distances with row and 
+#' @param    property   string defining the type of property to calculate the distance for.
+#'                      One of \code{c("hydropathy", "bulkiness")}. \code{"hydropathy"}
+#'                      returns a matrix of hydrophobicity differences according to the 
+#'                      Kyte & Doolittle scale. \code{"bulkiness"} returns a distance 
+#'                      matrix according to the Zimmerman et al bulkiness index.
+#'                      
+#' @return   A \code{matrix} of amino acid character distances with row and 
 #'           column names indicating the character pair.
 #' 
 #' @seealso  Create a distance matrix for \code{\link{getSeqDistance}}.
 #'           See \link{getAAMatrix} for an amino acid Hamming distance matrix.
 #' 
 #' @examples
-#' getHydropathyMatrix()
+#' getPropertyMatrix("hydro")
+#' getPropertyMatrix("bulk")
 #' 
 #' @export
-getHydropathyMatrix <- function() {
-    n <- length(HYDROPATHY)
+getPropertyMatrix <- function(property) {
+    # Check arguments
+    property <- match.arg(property, c("hydropathy", "bulkiness"))
+    
+    if (property == "hydropathy") {
+        prop_data <- HYDROPATHY
+    } else if (property == "bulkiness") {
+        prop_data <- BULKINESS
+    }
+    
+    n <- length(prop_data)
     # Define Hamming distance matrix
     dist_mat <- matrix(0, n + 2, n + 2)
-    colnames(dist_mat) <- rownames(dist_mat) <- c(names(HYDROPATHY), "X", "-")
+    colnames(dist_mat) <- rownames(dist_mat) <- c(names(prop_data), "X", "-")
     for (i in 1:n) {
         for (j in i:n) {
-            dist_mat[i, j] <- HYDROPATHY[j] - HYDROPATHY[i]
-            dist_mat[j, i] <- HYDROPATHY[i] - HYDROPATHY[j]
+            dist_mat[i, j] <- prop_data[j] - prop_data[i]
+            dist_mat[j, i] <- prop_data[i] - prop_data[j]
         }
     }
     
@@ -71,10 +112,17 @@ getHydropathyMatrix <- function() {
 #'                      changes may be asymmetrical, \code{seq1} defines the starting sequence.
 #' @param    seq2       character string containing an amino acid or DNA sequence. As property 
 #'                      changes may be asymmetrical, \code{seq2} defines the ending sequence.
+#' @param    property   string defining the type of property to calculate the distance for.
+#'                      One of \code{c("hydropathy", "bulkiness")}.
+#'                      \itemize{
+#'                        \item \code{"hydropathy"}  distance is hydrophobicity differences 
+#'                                                   according to the Kyte & Doolittle scale. 
+#'                        \item \code{"bulkiness"}   distance is side chain bulk differences 
+#'                                                   according to the Zimmerman et al 
+#'                                                   bulkiness index.
+#'                      }
 #' @param    nt         specify \code{TRUE} if the sequence(s) are DNA and require translation
 #'                      before calculating distance.
-#' @param    property   string defining the type of property to calculate the distance for.
-#'                      One of \code{c("hydropathy")}.
 #' @param    normalize  string defining the normalization method.  If \code{"length"} then the
 #'                      distance is normalized by the number of shared unambiguous positions
 #'                      (informative positions). If \code{"none"} then no normalization is 
@@ -82,23 +130,26 @@ getHydropathyMatrix <- function() {
 #'
 #' @return   Numerical distance for the given property from \code{seq1} to \code{seq2}.
 #' 
-#' @seealso  Raw distance matrix can get generated using \code{\link{getHydropathMatrix}}.
+#' @seealso  Raw distance matrix can get generated using \code{\link{getPropertyMatrix}}.
 #'           
 #' @examples
-#' # Unambiguous DNA seqences
-#' getPropertyDistance("ATGGCC", "ATGGGC", nt=TRUE)
-#' getPropertyDistance("ATGGCC", "ATGGGC", nt=TRUE, normalize="none")
+#' # Hydrophobicity of unambiguous DNA seqences
+#' getPropertyDistance("ATGGCC", "ATGGGC", "hydro", nt=TRUE)
+#' getPropertyDistance("ATGGCC", "ATGGGC", "hydro", nt=TRUE, normalize="none")
+#' # Bulkiness of unambiguous DNA seqences
+#' getPropertyDistance("ATGGCC", "ATGGGC", "bulk", nt=TRUE)
+#' getPropertyDistance("ATGGCC", "ATGGGC", "bulk", nt=TRUE, normalize="none")
 #' 
 #' # Amino acid sequence with ambiguous (X) positions
-#' getPropertyDistance("AYQXG", "ATXXG")
-#' getPropertyDistance("AYQXG", "ATXXG", normalize="none")
+#' getPropertyDistance("AYQXG", "ATXXG", "hydro")
+#' getPropertyDistance("AYQXG", "ATXXG", "hydro", normalize="none")
 #' 
 #' 
 #' @export
-getPropertyDistance <- function(seq1, seq2, nt=FALSE, property=c("hydropathy"),
+getPropertyDistance <- function(seq1, seq2, property, nt=FALSE, 
                                 normalize=c("length", "none")) {
     # Check arguments
-    property <- match.arg(property)
+    property <- match.arg(property, c("hydropathy", "bulkiness"))
     normalize <- match.arg(normalize)
     
     # Check input
@@ -107,10 +158,8 @@ getPropertyDistance <- function(seq1, seq2, nt=FALSE, property=c("hydropathy"),
     }
     
     # Define property distances
-    if (property == "hydropathy") {
-        dist_mat <- getHydropathyMatrix()
-    }
-    
+    dist_mat <- getPropertyMatrix(property)
+
     # Translate
     if (nt) { 
         seq1 <- translateDNA(seq1) 
