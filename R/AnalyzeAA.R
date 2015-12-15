@@ -53,6 +53,30 @@ BULKINESS <- c("A"=11.50,
                "Y"=18.03, 
                "V"=21.57)
 
+# Polarity index scores
+# Grantham, 1974
+# TODO:  I don't see this exact data in the Peptides package. Maybe it's there, maybe it isn't?
+POLARITY <- c("A"=8.1, 
+              "R"=10.5, 
+              "N"=11.6, 
+              "D"=13.0, 
+              "C"=5.5,
+              "Q"=10.5, 
+              "E"=12.3, 
+              "G"=9.0, 
+              "H"=10.4, 
+              "I"=5.2,
+              "L"=4.9, 
+              "K"=11.3, 
+              "M"=5.7, 
+              "F"=5.2, 
+              "P"=8.0,
+              "S"=9.2, 
+              "T"=8.6, 
+              "W"=5.4, 
+              "Y"=6.2, 
+              "V"=5.9)
+
 
 #### General sequence functions ####
 
@@ -62,11 +86,16 @@ BULKINESS <- c("A"=11.50,
 #' changes between amino acid characters.
 #' 
 #' @param    property   string defining the type of property to calculate the distance for.
-#'                      One of \code{c("hydropathy", "bulkiness")}. \code{"hydropathy"}
-#'                      returns a matrix of hydrophobicity differences according to the 
-#'                      Kyte & Doolittle scale. \code{"bulkiness"} returns a distance 
-#'                      matrix according to the Zimmerman et al bulkiness index.
-#'                      
+#'                      One of \code{c("hydropathy", "bulkiness", "polarity")}. 
+#'                      \itemize{
+#'                        \item \code{"hydropathy"} returns a matrix of hydrophobicity 
+#'                                                  differences according to the 
+#'                                                  Kyte & Doolittle scale. 
+#'                        \item \code{"bulkiness"}  side chain bulkiness to the 
+#'                                                  Zimmerman et al bulkiness index.
+#'                        \item \code{"polarity"}   side chain polarity according to the
+#'                                                  Grantham scale.
+#'                      }
 #' @return   A \code{matrix} of amino acid character distances with row and 
 #'           column names indicating the character pair.
 #' 
@@ -80,12 +109,14 @@ BULKINESS <- c("A"=11.50,
 #' @export
 getPropertyMatrix <- function(property) {
     # Check arguments
-    property <- match.arg(property, c("hydropathy", "bulkiness"))
+    property <- match.arg(property, c("hydropathy", "bulkiness", "polarity"))
     
     if (property == "hydropathy") {
         prop_data <- HYDROPATHY
     } else if (property == "bulkiness") {
         prop_data <- BULKINESS
+    } else if (property == "polarity") {
+        prop_data <- POLARITY
     }
     
     n <- length(prop_data)
@@ -120,6 +151,8 @@ getPropertyMatrix <- function(property) {
 #'                        \item \code{"bulkiness"}   distance is side chain bulk differences 
 #'                                                   according to the Zimmerman et al 
 #'                                                   bulkiness index.
+#'                        \item \code{"polarity"}    distince is side chain polarity differences
+#'                                                   according to the Grantham scale.
 #'                      }
 #' @param    nt         specify \code{TRUE} if the sequence(s) are DNA and require translation
 #'                      before calculating distance.
@@ -134,11 +167,14 @@ getPropertyMatrix <- function(property) {
 #'           
 #' @examples
 #' # Hydrophobicity of unambiguous DNA seqences
-#' getPropertyDistance("ATGGCC", "ATGGGC", "hydro", nt=TRUE)
-#' getPropertyDistance("ATGGCC", "ATGGGC", "hydro", nt=TRUE, normalize="none")
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "hydro", nt=TRUE)
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "hydro", nt=TRUE, normalize="none")
 #' # Bulkiness of unambiguous DNA seqences
-#' getPropertyDistance("ATGGCC", "ATGGGC", "bulk", nt=TRUE)
-#' getPropertyDistance("ATGGCC", "ATGGGC", "bulk", nt=TRUE, normalize="none")
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "bulk", nt=TRUE)
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "bulk", nt=TRUE, normalize="none")
+#' # Polarity of unambiguous DNA seqences
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "polar", nt=TRUE)
+#' getPropertyDistance("ATGGCCCGA", "ATGGGCCGT", "polar", nt=TRUE, normalize="none")
 #' 
 #' # Amino acid sequence with ambiguous (X) positions
 #' getPropertyDistance("AYQXG", "ATXXG", "hydro")
@@ -149,7 +185,7 @@ getPropertyMatrix <- function(property) {
 getPropertyDistance <- function(seq1, seq2, property, nt=FALSE, 
                                 normalize=c("length", "none")) {
     # Check arguments
-    property <- match.arg(property, c("hydropathy", "bulkiness"))
+    property <- match.arg(property, c("hydropathy", "bulkiness", "polarity"))
     normalize <- match.arg(normalize)
     
     # Check input
