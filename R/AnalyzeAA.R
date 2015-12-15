@@ -139,7 +139,15 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
     aa_length <- sapply(region_aa, nchar)
     # Count occurrence of each amino acid pattern for each sequence
     out_df <- data.frame(matrix(0, nrow=length(region_aa), ncol=length(patterns)))
-    names(out_df) <- paste(region_name, names(patterns), sep="_")
+    # If patterns are unnamed, make the names X1...Xn
+    if(is.null(names(patterns))) { names(patterns) <- names(out_df) }
+    # If region name, append to names of patterns
+    if(region_name != '') { 
+        names(out_df) <- paste(region_name, names(patterns), sep="_") 
+    } else {
+        names(out_df) <- names(patterns)
+    }
+    # Iterate over patterns
     for(i in 1:length(patterns)) {
         out_df[, i] <- sapply(region_aa, countOccurrences, patterns[i]) / aa_length
     }
