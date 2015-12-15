@@ -134,7 +134,7 @@ getPropertyMatrix <- function(property) {
 }
 
 
-#' Calculate distance between two sequences
+#' Calculate chemical property distance between two sequences
 #' 
 #' \code{getPropertyDistance} calculates the distance (change) in chemical properties 
 #' between two amino acid sequences, excluding ambiguous positions.
@@ -192,10 +192,17 @@ getPropertyDistance <- function(seq1, seq2, property, nt=FALSE,
     if (nchar(seq1) != nchar(seq2)) {
         stop("seq1 and seq2 must be equal in length")
     }
-    
-    # Define property distances
-    dist_mat <- getPropertyMatrix(property)
 
+    # Define property distances
+    #dist_mat <- getPropertyMatrix(property)
+    if (property == "hydropathy") {
+        prop_data <- HYDROPATHY
+    } else if (property == "bulkiness") {
+        prop_data <- BULKINESS
+    } else if (property == "polarity") {
+        prop_data <- POLARITY
+    }
+    
     # Translate
     if (nt) { 
         seq1 <- translateDNA(seq1) 
@@ -211,10 +218,10 @@ getPropertyDistance <- function(seq1, seq2, property, nt=FALSE,
     seq1 <- seq1[i]
     seq2 <- seq2[i]
     n <- length(seq1)
-    
+
     # Calculate distance
-    d <- sapply(1:n, function(x) { dist_mat[seq1[x], seq2[x]] })
-    d <- sum(d)
+    #d <- sum(sapply(1:n, function(x) { dist_mat[seq1[x], seq2[x]] }))
+    d <- sum(prop_data[seq2] - prop_data[seq1])
     
     if (normalize == "length") {
         d <- d / n
