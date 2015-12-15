@@ -169,9 +169,9 @@ getDNAMatrix <- function(gap=-1) {
     }
     
     # Add gap characters
-    sub_mat[c(".", "-"), c(".", "-")] <- 1 
-    sub_mat[c(".", "-"), 1:15] <- 1 - gap 
-    sub_mat[1:15, c(".", "-")] <- 1 - gap
+    sub_mat[c("-", "."), c("-", ".")] <- 1 
+    sub_mat[c("-", "."), 1:15] <- 1 - gap 
+    sub_mat[1:15, c("-", ".")] <- 1 - gap
     
     return(1 - sub_mat)
 }
@@ -179,12 +179,12 @@ getDNAMatrix <- function(gap=-1) {
 #' Build an AA distance matrix
 #'
 #' \code{getAAMatrix} returns a Hamming distance matrix for IUPAC ambiguous
-#' AA characters.
+#' amino acid characters.
 #' 
-#' @return   A \code{matrix} of AA character distances with row and column names 
+#' @return   A \code{matrix} of amino acid character distances with row and column names 
 #'           indicating the character pair.
 #' 
-#' @seealso  Creates AA distance matrix for \code{\link{getSeqDistance}}.
+#' @seealso  Creates an amino acid distance matrix for \code{\link{getSeqDistance}}.
 #'           See \link{getDNAMatrix} for nucleotide distances.
 #' 
 #' @examples

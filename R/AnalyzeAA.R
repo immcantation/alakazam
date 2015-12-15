@@ -6,18 +6,137 @@ NULL
 
 #### Constants ####
 
-# Possible regions
-VDJ_REGIONS <- c("CDR1", "CDR2", "CDR3", "FWR1", "FWR2", "FWR3")
-
 # Hydropathy index scores
-HYDROPATHY <- c(+1.8, -4.5, -3.5, -3.5, +2.5,
-                -3.5, -3.5, -0.4, -3.2, +4.5,
-                +3.8, -3.9, +1.9, +2.8, -1.6,
-                -0.8, -0.7, -0.9, -1.3, +4.2)
-names(HYDROPATHY) <- c("A", "R", "N", "D", "C",
-                       "Q", "E", "G", "H", "I",
-                       "L", "K", "M", "F", "P",
-                       "S", "T", "W", "Y", "V")	
+# Equivalent to Peptides::H$KyteDoolittle
+HYDROPATHY <- c("A"=+1.8, 
+                "R"=-4.5, 
+                "N"=-3.5, 
+                "D"=-3.5, 
+                "C"=+2.5,
+                "Q"=-3.5, 
+                "E"=-3.5, 
+                "G"=-0.4, 
+                "H"=-3.2, 
+                "I"=+4.5,
+                "L"=+3.8, 
+                "K"=-3.9, 
+                "M"=+1.9, 
+                "F"=+2.8, 
+                "P"=-1.6,
+                "S"=-0.8, 
+                "T"=-0.7, 
+                "W"=-0.9, 
+                "Y"=-1.3, 
+                "V"=+4.2)
+
+#### General sequence functions ####
+
+#' Build an asymetrical hydropathy distance matrix
+#'
+#' \code{getHydropathyMatrix} returns an asymmetrical distance matrix for hydrophobicity
+#' changes between amino acid characters according to the Kyte & Doolittle scale.
+#' 
+#' @return   A \code{matrix} of amino acid character hydrophobicity distances with row and 
+#'           column names indicating the character pair.
+#' 
+#' @seealso  Create a distance matrix for \code{\link{getSeqDistance}}.
+#'           See \link{getAAMatrix} for an amino acid Hamming distance matrix.
+#' 
+#' @examples
+#' getHydropathyMatrix()
+#' 
+#' @export
+getHydropathyMatrix <- function() {
+    n <- length(HYDROPATHY)
+    # Define Hamming distance matrix
+    dist_mat <- matrix(0, n + 2, n + 2)
+    colnames(dist_mat) <- rownames(dist_mat) <- c(names(HYDROPATHY), "X", "-")
+    for (i in 1:n) {
+        for (j in i:n) {
+            dist_mat[i, j] <- HYDROPATHY[j] - HYDROPATHY[i]
+            dist_mat[j, i] <- HYDROPATHY[i] - HYDROPATHY[j]
+        }
+    }
+    
+    return(dist_mat)
+}
+
+
+#' Calculate distance between two sequences
+#' 
+#' \code{getPropertyDistance} calculates the distance (change) in chemical properties 
+#' between two amino acid sequences, excluding ambiguous positions.
+#'
+#' @param    seq1       character string containing an amino acid or DNA sequence. As property 
+#'                      changes may be asymmetrical, \code{seq1} defines the starting sequence.
+#' @param    seq2       character string containing an amino acid or DNA sequence. As property 
+#'                      changes may be asymmetrical, \code{seq2} defines the ending sequence.
+#' @param    nt         specify \code{TRUE} if the sequence(s) are DNA and require translation
+#'                      before calculating distance.
+#' @param    property   string defining the type of property to calculate the distance for.
+#'                      One of \code{c("hydropathy")}.
+#' @param    normalize  string defining the normalization method.  If \code{"length"} then the
+#'                      distance is normalized by the number of shared unambiguous positions
+#'                      (informative positions). If \code{"none"} then no normalization is 
+#'                      performed.
+#'
+#' @return   Numerical distance for the given property from \code{seq1} to \code{seq2}.
+#' 
+#' @seealso  Raw distance matrix can get generated using \code{\link{getHydropathMatrix}}.
+#'           
+#' @examples
+#' # Unambiguous DNA seqences
+#' getPropertyDistance("ATGGCC", "ATGGGC", nt=TRUE)
+#' getPropertyDistance("ATGGCC", "ATGGGC", nt=TRUE, normalize="none")
+#' 
+#' # Amino acid sequence with ambiguous (X) positions
+#' getPropertyDistance("AYQXG", "ATXXG")
+#' getPropertyDistance("AYQXG", "ATXXG", normalize="none")
+#' 
+#' 
+#' @export
+getPropertyDistance <- function(seq1, seq2, nt=FALSE, property=c("hydropathy"),
+                                normalize=c("length", "none")) {
+    # Check arguments
+    property <- match.arg(property)
+    normalize <- match.arg(normalize)
+    
+    # Check input
+    if (nchar(seq1) != nchar(seq2)) {
+        stop("seq1 and seq2 must be equal in length")
+    }
+    
+    # Define property distances
+    if (property == "hydropathy") {
+        dist_mat <- getHydropathyMatrix()
+    }
+    
+    # Translate
+    if (nt) { 
+        seq1 <- translateDNA(seq1) 
+        seq2 <- translateDNA(seq2) 
+    }
+    
+    # Convert string to character vector
+    seq1 <- unlist(strsplit(seq1, ""), use.names=FALSE)
+    seq2 <- unlist(strsplit(seq2, ""), use.names=FALSE)
+    
+    # Remove positions that are ambiguous in either sequence
+    i <- !(seq1 %in% c("X", "-", ".")) & !(seq2 %in% c("X", "-", "."))
+    seq1 <- seq1[i]
+    seq2 <- seq2[i]
+    n <- length(seq1)
+    
+    # Calculate distance
+    d <- sapply(1:n, function(x) { dist_mat[seq1[x], seq2[x]] })
+    d <- sum(d)
+    
+    if (normalize == "length") {
+        d <- d / n
+    }
+    
+    return(d)
+}
 
 
 #' Translate nucleotide sequences to amino acids
@@ -65,6 +184,8 @@ translateDNA <- function (seq, trim=FALSE) {
     return(aa)
 }
 
+
+#### Chemical property functions ####
 
 #' Calculates GRAVY hydrophobicity score from a given amino acid sequence.
 #'
