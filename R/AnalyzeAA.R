@@ -218,8 +218,8 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
 #' @examples 
 #' db <- data.frame("JUNCTION"=c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
 #'                               "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
-#'                               "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
-#' regionProperties(db, sequenceColumn="JUNCTION", nt=TRUE, trim=TRUE, region_name="CDR3")
+#'                               "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC"))
+#' regionProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
 #' 
 #' @export
 regionProperties <- function(data, seq="JUNCTION", 
@@ -227,6 +227,8 @@ regionProperties <- function(data, seq="JUNCTION",
     #nt=T
     #trim=T
     #region_name=NULL
+    
+    region <- as.vector(data[,seq])
     
     if (nt) {
         # Check for sequences that are too short
