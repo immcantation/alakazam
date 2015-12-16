@@ -224,10 +224,11 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
 #' @export
 regionProperties <- function(data, seq="JUNCTION", 
                              nt=FALSE, trim=FALSE, label=NULL) {
-    #nt=T
-    #trim=T
-    #region_name=NULL
     
+    if (length(seq)>1) {
+        seq <- seq[1]
+        warning("seq must be a vector of length 1. Only the first element will be used. ")
+    }
     region <- as.vector(data[,seq])
     
     if (nt) {
