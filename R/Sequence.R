@@ -110,6 +110,35 @@ IUPAC_AA <-  list("A"="A",
                   "Z"=c("E","Q"))
 
 
+#' Amino acid abbreviation translations
+#' 
+#' A mapping of short to long amino acid abbreviations.
+#' 
+#' @format  Named character vector defining abbreviation mappings.
+#' 
+#' @name   AA_TRANS
+AA_TRANS <- c("A"="Ala",
+              "R"="Arg",
+              "N"="Asn",
+              "D"="Asp",
+              "C"="Cys",
+              "Q"="Gln",
+              "E"="Glu",
+              "G"="Gly",
+              "H"="His",
+              "I"="Ile",
+              "L"="Leu",
+              "K"="Lys",
+              "M"="Met",
+              "F"="Phe",
+              "P"="Pro",
+              "S"="Ser",
+              "T"="Thr",
+              "W"="Trp",
+              "Y"="Tyr",
+              "V"="Val")
+
+
 #' IMGT V-segment regions
 #'
 #' A list defining the boundaries of V-segment framework regions (FWRs) and complementarity 
@@ -366,6 +395,50 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 
 
 #### Sequence manipulation functions ####
+
+#' Translate nucleotide sequences to amino acids
+#' 
+#' \code{translateDNA} translates nucleotide sequences to amino acid sequences.
+#' 
+#' @param   seq   vector of strings defining DNA sequence(s) to be converted to translated.
+#' @param   trim  boolean flag to remove 3 nts from both ends of seq
+#'          (converts IMGT junction to CDR3 region).
+#' 
+#' @return  A vector of translated sequence strings.
+#' 
+#' @seealso  \code{\link[seqinr]{translate}}.
+#' 
+#' @examples
+#' library(alakazam)
+#' # Load Change-O file
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' 
+#' translateDNA(df$JUNCTION[1:3])
+#' translateDNA(df$JUNCTION[1:3], trim=TRUE)
+#' translateDNA("ACTGACTCGA")
+#' 
+#' @export
+translateDNA <- function (seq, trim=FALSE) {
+    # Function to translate a single string
+    .translate <- function(x) {
+        if (nchar(x) >= 3) {
+            paste(seqinr::translate(unlist(strsplit(x, ""))), collapse="")
+        } else {
+            NA
+        }
+    }
+    
+    # Remove 3 nucleotides from each end
+    # Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
+    if (trim) { seq <- substr(seq, 4, nchar(seq) - 3) }
+    
+    # Apply translation
+    aa <- sapply(seq, .translate, USE.NAMES=FALSE)
+    
+    return(aa)
+}
+
 
 #' Masks gap characters in DNA sequences
 #' 
