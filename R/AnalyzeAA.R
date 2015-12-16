@@ -7,75 +7,15 @@ NULL
 #### Constants ####
 
 # Hydropathy index scores
-# Equivalent to Peptides::H$KyteDoolittle
-HYDROPATHY <- c("A"=+1.8, 
-                "R"=-4.5, 
-                "N"=-3.5, 
-                "D"=-3.5, 
-                "C"=+2.5,
-                "Q"=-3.5, 
-                "E"=-3.5, 
-                "G"=-0.4, 
-                "H"=-3.2, 
-                "I"=+4.5,
-                "L"=+3.8, 
-                "K"=-3.9, 
-                "M"=+1.9, 
-                "F"=+2.8, 
-                "P"=-1.6,
-                "S"=-0.8, 
-                "T"=-0.7, 
-                "W"=-0.9, 
-                "Y"=-1.3, 
-                "V"=+4.2)
+# TODO: seqinr::aaindex[[151]]$I
 
 # Bulkiness (side chain volume/length) index scores
 # Zimmerman et al, 1968
-# TODO:  I don't see this in the Peptides package. Maybe it's there, maybe it isn't?
-BULKINESS <- c("A"=11.50, 
-               "R"=14.28, 
-               "N"=12.82, 
-               "D"=11.68, 
-               "C"=13.46,
-               "Q"=14.45, 
-               "E"=13.57, 
-               "G"=3.40, 
-               "H"=13.69, 
-               "I"=21.40,
-               "L"=21.40, 
-               "K"=15.71, 
-               "M"=16.25, 
-               "F"=19.8, 
-               "P"=17.43,
-               "S"=9.47, 
-               "T"=15.77, 
-               "W"=21.67, 
-               "Y"=18.03, 
-               "V"=21.57)
+# TODO: seqinr::aaindex[[399]]$I
 
 # Polarity index scores
 # Grantham, 1974
-# TODO:  I don't see this exact data in the Peptides package. Maybe it's there, maybe it isn't?
-POLARITY <- c("A"=8.1, 
-              "R"=10.5, 
-              "N"=11.6, 
-              "D"=13.0, 
-              "C"=5.5,
-              "Q"=10.5, 
-              "E"=12.3, 
-              "G"=9.0, 
-              "H"=10.4, 
-              "I"=5.2,
-              "L"=4.9, 
-              "K"=11.3, 
-              "M"=5.7, 
-              "F"=5.2, 
-              "P"=8.0,
-              "S"=9.2, 
-              "T"=8.6, 
-              "W"=5.4, 
-              "Y"=6.2, 
-              "V"=5.9)
+# TODO: seqinr::aaindex[[111]]$I
 
 
 #### General sequence functions ####
@@ -279,9 +219,10 @@ translateDNA <- function (seq, trim=FALSE) {
 
 #### Chemical property functions ####
 
-#' Calculates GRAVY hydrophobicity score from a given amino acid sequence.
+#' Calculates GRAVY hydrophobicity score of amino acid sequences.
 #'
-#' @param    seq  string defining the amino acid sequence.
+#' @param    seq           vector of amino acid sequences.
+#' @param    hydropathy    named vector defining hydropathy values for each amino acid.
 #' 
 #' @return   GRAVY score for the sequence.
 #'
@@ -290,12 +231,78 @@ translateDNA <- function (seq, trim=FALSE) {
 #' gravy(seq)
 #'
 #' @export
-gravy <- function(seq) {
+gravy <- function(seq, hydropathy=NULL) {
+    if(is.null(hydropathy)) {
+        data(aaindex, package="seqinr", envir=environment())
+        hydropathy <- aaindex[[151]]$I
+    }
+    names(hydropathy) <- alakazam::translateStrings(names(hydropathy),
+                                                    AA_TRANS)
     # Create character vector from string
-    aa <- unlist(strsplit(as.character(seq), ""))
-    # Ignore AAs that are "*" and "X"
-    aa <- aa[aa != "X" & aa != "*"]
-    return(sum(HYDROPATHY[aa])/length(aa))
+    aa <- strsplit(as.character(seq), "")
+    # Function to translate a single string
+    .gravy <- function(x) {
+        # Ignore AAs that are "*" and "X"
+        x <- x[x != "X" & x != "*"]
+        sum(hydropathy[x])/length(x)
+    }
+    aa_gravy <- sapply(aa, .gravy)
+    return(aa_gravy)
+}
+
+
+#' Calculates aliphatic index of amino acid sequences.
+#'
+#' @param    seq           vector of amino acid sequences.
+#' 
+#' @return   aliphatic index for the sequence.
+#'
+#' @examples 
+#' seq <- "CARDRSTPWRRGIASTTVRTSW"
+#' aliphatic(seq)
+#'
+#' @export
+aliphatic <- function(seq) {
+    # TODO: Why are we normalizing aliphatic index by length?
+    n_ala <- countOccurrences(seq, "[A]")
+    n_val <- countOccurrences(seq, "[V]")
+    n_leu_ile <- countOccurrences(seq, "[LI]")
+    a <- 2.9
+    b <- 3.9
+    aa_aliphatic = (n_ala + a*n_val + b*n_leu_ile) / nchar(seq)
+    return(aa_aliphatic)
+}
+
+
+#' Calculates charge of amino acid sequences.
+#'
+#' @param    seq           vector of amino acid sequences.
+#' @param    ph            environmental pH.
+#' @param    pk            named vector defining pK values for each amino acid.
+#' 
+#' @return   charge of the sequence.
+#'
+#' @examples 
+#' seq <- "CARDRSTPWRRGIASTTVRTSW"
+#' charge(seq)
+#'
+#' @export
+charge <- function(seq, ph=7, pk=NULL) {
+    if(is.null(pk)) {
+        data(pK, package="seqinr", envir=environment())
+        pk <- pK$EMBOSS
+        names(pk) <- rownames(pK)
+    }
+    names(pk) <- alakazam::translateStrings(names(pk), AA_TRANS)
+    carg <- countOccurrences(seq, "R") * (1/(1 + 10^(1 * (ph - pk["R"]))))
+    chis <- countOccurrences(seq, "H") * (1/(1 + 10^(1 * (ph - pk["H"]))))
+    clys <- countOccurrences(seq, "K") * (1/(1 + 10^(1 * (ph - pk["K"]))))
+    casp <- countOccurrences(seq, "D") * (-1/(1 + 10^(-1 * (ph - pk["D"]))))
+    cglu <- countOccurrences(seq, "E") * (-1/(1 + 10^(-1 * (ph - pk["E"]))))
+    ccys <- countOccurrences(seq, "C") * (-1/(1 + 10^(-1 * (ph - pk["C"]))))
+    ctyr <- countOccurrences(seq, "Y") * (-1/(1 + 10^(-1 * (ph - pk["Y"]))))
+    aa_charge <- carg + clys + chis + casp + cglu + ctyr + ccys
+    return(aa_charge)
 }
 
 
@@ -308,7 +315,7 @@ gravy <- function(seq) {
 #  
 # @return  number of times the regular expression was found
 countOccurrences <- function(x, pattern) {
-    return(sum(gregexpr(pattern, x)[[1]] > 0))
+    return(sapply(gregexpr(pattern, x), function(y) { sum(y>0) }))
 }
 
 
@@ -344,12 +351,12 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
         
         # Translate all regions from nt to aa
         region_aa <- rep("", length(region))
-        region_aa[not_empty] <- sapply(region[not_empty], translateDNA, trim=trim)
+        region_aa[not_empty] <- translateDNA(region[not_empty], trim=trim)
     } else {
         region_aa <- region
     }
     # Calculate region lengths
-    aa_length <- sapply(region_aa, nchar)
+    aa_length <- nchar(region_aa)
     # Count occurrence of each amino acid pattern for each sequence
     out_df <- data.frame(matrix(0, nrow=length(region_aa), ncol=length(patterns)))
     # If patterns are unnamed, make the names X1...Xn
@@ -362,33 +369,36 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
     }
     # Iterate over patterns
     for(i in 1:length(patterns)) {
-        out_df[, i] <- sapply(region_aa, countOccurrences, patterns[i]) / aa_length
+        out_df[, i] <- countOccurrences(region_aa, patterns[i]) / aa_length
     }
     return(out_df)
 }
 
 
-#' Calculates amino acid properties of regions
+#' Calculates amino acid properties of a sequence region
 #'
-#' Obtain data.frame of Region properties. Note this can be used for any region. 
+#' Obtain data.frame of region properties. Note this can be used for any region. 
 #'
-#' @param   region        character vector of either nucleotide or amino acid sequences.
+#' @param   data          \code{data.frame} containing sequence data.
+#' @param   seq           \code{character} name of the column containing input 
+#'                        sequences.
 #' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA.
 #' @param   trim          if \code{TRUE} remove the first and last codon/amino acids from each
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
-#' @param   region_name   name of region to add as prefix to output column names.
+#' @param   label         name of region to add as prefix to output column names.
 #' 
 #' @return  data.frame, with columns for each property
 #' 
 #' @examples 
-#' region <- c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
-#'             "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
-#'             "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
-#' regionProperties(region, nt=TRUE, trim=TRUE, region_name="CDR3")
+#' db <- data.frame("JUNCTION"=c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
+#'                               "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
+#'                               "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
+#' regionProperties(db, sequenceColumn="JUNCTION", nt=TRUE, trim=TRUE, region_name="CDR3")
 #' 
 #' @export
-regionProperties <- function(region, nt=FALSE, trim=FALSE, region_name="REGION") {
+regionProperties <- function(data, seq="JUNCTION", 
+                             nt=FALSE, trim=FALSE, label=NULL) {
     #nt=T
     #trim=T
     #region_name=NULL
@@ -399,15 +409,15 @@ regionProperties <- function(region, nt=FALSE, trim=FALSE, region_name="REGION")
         #message(paste(length(not_empty), "Region sequences found."))
         
         # Translate all regions from nt to aa
-        region_aa <- rep("", length(region))
-        region_aa[not_empty] <- sapply(region[not_empty], translateDNA, trim=trim)
+        region_aa <- character(length(region))
+        region_aa[not_empty] <- translateDNA(region[not_empty], trim=trim)
         #message("Region translated to amino acids.")
     } else {
         region_aa <- region
     }
     
     # Calculate region lengths
-    aa_length <- sapply(region_aa, nchar)
+    aa_length <- nchar(region_aa)
 
     # GRAVY (Grand Average of Hydropathy) index
     # Some documentation: http://web.expasy.org/tools/protparam/protparam-doc.html
@@ -415,30 +425,25 @@ regionProperties <- function(region, nt=FALSE, trim=FALSE, region_name="REGION")
     aa_gravy <- sapply(region_aa, gravy)
     
     # Count the fraction of aa that are positively charged
-    aa_positive <- sapply(region_aa, countOccurrences, "[RK]") / aa_length
+    aa_positive <- countOccurrences(region_aa, "[RK]") / aa_length
     
     # Count fraction of aa that are negatively charged
-    aa_negative <- sapply(region_aa, countOccurrences, "[DE]") / aa_length
+    aa_negative <- countOccurrences(region_aa, "[DE]") / aa_length
     
-    # TODO: Why are we normalizing aliphatic index by length?
     # Aliphatic index
     # Some documentation: http://web.expasy.org/tools/protparam/protparam-doc.html
-    n_ala <- sapply(region_aa, countOccurrences, "[A]")
-    n_val <- sapply(region_aa, countOccurrences, "[V]")
-    n_leu_ile <- sapply(region_aa, countOccurrences, "[LI]")
-    a <- 2.9
-    b <- 3.9
-    aa_aliphatic = (n_ala + a*n_val + b*n_leu_ile) / aa_length
+    aa_aliphatic = sapply(region_aa, aliphatic)
 
     # Count fraction of aa that are aromatic
-    aa_aromatic <- sapply(region_aa, countOccurrences, "[FWHY]") / aa_length
+    aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_length
     
     # Return the data.frame with amino acid properties
     out_df <- data.frame(AA_LENGTH=aa_length, GRAVY=aa_gravy, 
                          AA_POSITIVE=aa_positive, AA_NEGATIVE=aa_negative, 
                          ALIPHATIC=aa_aliphatic, AROMATIC=aa_aromatic)
-    colnames(out_df) <- paste0(region_name, "_", colnames(out_df))
+    # If no label, use sequence column name
+    if(is.null(label)) { label <- sequenceColumn }
+    colnames(out_df) <- paste0(label, "_", colnames(out_df))
     
-    return(out_df)
-    
+    return(cbind(db, out_df))
 }
