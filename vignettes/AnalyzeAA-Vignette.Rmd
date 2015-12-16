@@ -27,28 +27,27 @@ Load Change-O data
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. 
 
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
 
 # Load Change-O file
 file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
-df <- readChangeoDb(file)
-colnames(df)
+db <- readChangeoDb(file)
+colnames(db)
 ```
 
-Calculates amino acid properties of regions
+Calculate amino acid properties of regions
 -------------------------------------------
+Multiple amino acid properties of a nucleotide or amino acide sequence can be obtained with the function `regionProperties`.  In this example we will retrieve the amino acid properties of the DNA `JUNCTION` sequences in the Change-O file. We will add a the prefix `JUNCTION` to the output column names.
 
 ```{r, eval=TRUE, warning=FALSE}
-regions <- df$JUNCTION[1:10]
-regionProperties(regions)
-
-aacomp(regions[1])
+junction_properties <- regionProperties(db, seq="JUNCTION", nt=TRUE, trim=FALSE, label="JUNCTION")
+head(junction_properties)
 ```
 
+R Session information
+-------
+```{r}
+sessionInfo()
 ```
-cdr <- extractVRegion(df$SEQUENCE_IMGT, region=c("CDR1", "CDR2"))
-translateDNA(cdr[1,1])
-```
-
 
