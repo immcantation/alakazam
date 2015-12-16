@@ -6,6 +6,28 @@ NULL
 
 #### Constants ####
 
+# Amino acid abbreviation translation table
+AA_TRANS <- c("A"="Ala",
+              "R"="Arg",
+              "N"="Asn",
+              "D"="Asp",
+              "C"="Cys",
+              "Q"="Gln",
+              "E"="Glu",
+              "G"="Gly",
+              "H"="His",
+              "I"="Ile",
+              "L"="Leu",
+              "K"="Lys",
+              "M"="Met",
+              "F"="Phe",
+              "P"="Pro",
+              "S"="Ser",
+              "T"="Thr",
+              "W"="Trp",
+              "Y"="Tyr",
+              "V"="Val")
+
 # Hydropathy index scores
 # TODO: seqinr::aaindex[[151]]$I
 
