@@ -270,7 +270,7 @@ regionProperties <- function(data, seq="JUNCTION",
                          AA_POSITIVE=aa_positive, AA_NEGATIVE=aa_negative, 
                          ALIPHATIC=aa_aliphatic, AROMATIC=aa_aromatic)
     # If no label, use sequence column name
-    if(is.null(label)) { label <- sequenceColumn }
+    if(is.null(label)) { label <- seq }
     colnames(out_df) <- paste0(label, "_", colnames(out_df))
     
     return(cbind(db, out_df))
