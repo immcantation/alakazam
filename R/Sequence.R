@@ -118,6 +118,7 @@ IUPAC_AA <-  list("A"="A",
 #'          three-letter abbreviation mappings.
 #' 
 #' @name   AA_TRANS
+#' @export
 AA_TRANS <- c("A"="Ala",
               "R"="Arg",
               "N"="Asn",

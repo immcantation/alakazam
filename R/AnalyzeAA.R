@@ -65,7 +65,7 @@ getPropertyData <- function(property){
 #' \enumerate{
 #'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
 #'            of a protein. J Mol Biol. 157, 105-32 (1982).
-#' 
+#' }
 #' @seealso 
 #' For additional hydrophobicity indices see \code{\link[seqinr]{aaindex}}.
 #'
@@ -84,11 +84,12 @@ getPropertyData <- function(property){
 #' gravy(seq, hydropathy=h)
 #' 
 #' @export
-gravy <- function(seq, hydropathy=NULL) {
+gravy <- function(seq, hydropathy=NULL, nt=FALSE) {
     # Get hydrophobicity scores
     if (is.null(hydropathy)) {
         hydropathy <- getPropertyData("hydro")
     }
+    seq <- if (nt) { translateDNA(seq, trim=FALSE) } else { seq }
     # Create character vector from string
     aa <- strsplit(as.character(seq), "")
     
@@ -290,6 +291,10 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
 #' @param   label         name of sequence region to add as prefix to output column names.
+#' @param   hydropathy   named numerical vector defining hydropathy index values for 
+#'                       each amino acid, where names are single-letter amino acid 
+#'                       character codes. If \code{NULL}, then the Kyte & Doolittle
+#'                       scale is used.
 #' 
 #' @return  A modified \code{data} data.frame with the following columns:
 #'          \itemize{
@@ -328,7 +333,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' prop[, c(1, 15:18)]
 #' 
 #' @export
-regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL) {
+regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, hydropathy=NULL) {
     # Check input
     if (length(seq) > 1) {
         stop("You may specify only one sequence column. seq must be a vector of length 1.")
@@ -344,7 +349,7 @@ regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=N
     aa_length <- nchar(region_aa, keepNA=TRUE)
 
     # Hydrophobicity
-    aa_gravy <- gravy(region_aa)
+    aa_gravy <- gravy(region_aa, hydropathy)
 
     # Aliphatic index
     aa_aliphatic <- aliphatic(region_aa)
