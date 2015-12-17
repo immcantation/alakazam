@@ -46,6 +46,112 @@ getPropertyData <- function(property){
 }
 
 
+#' Calculates the average bulkiness of amino acid sequences
+#'
+#' \code{bulk} calculates the average bulkiness score of amino acid sequences. 
+#' Non-informative positions are excluded, where non-informative is defined as any 
+#' character in \code{c("X", "-", ".", "*")}.
+#' 
+#' @param    seq         vector of strings containing amino acid sequences.
+#' @param    bulkiness   named numerical vector defining bulkiness scores for 
+#'                       each amino acid, where names are single-letter amino acid 
+#'                       character codes. If \code{NULL}, then the Zimmerman et al, 1968
+#'                       scale is used.
+#' 
+#' @return   A vector of bulkiness scores for the sequence(s).
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Zimmerman JM, Eliezer N, Simha R. The characterization of amino acid sequences 
+#'            in proteins by statistical methods. J Theor Biol 21, 170-201 (1968).
+#' }
+#' @seealso 
+#' For additional size related indices see \code{\link[seqinr]{aaindex}}.
+#'
+#' @examples
+#' # Default bulkiness scale
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
+#' bulk(seq)
+#'
+#' # Use the Grantham, 1974 side chain volumn scores from the seqinr package
+#' library(seqinr)
+#' data(aaindex)
+#' x <- aaindex[["GRAR740103"]]$I
+#' # Rename the score vector to use single-letter codes
+#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' # Calculate average volume
+#' bulk(seq, bulkiness=x)
+#' 
+#' @export
+bulk <- function(seq, bulkiness=NULL) {
+    # Get bulkiness scores
+    if (is.null(bulkiness)) {
+        bulkiness <- getPropertyData("bulk")
+    }
+    # Remove non-informative positions
+    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
+    # Create character vector from string
+    aa <- strsplit(seq, "")
+    # Calculate average bulkiness
+    aa_bulk <- sapply(aa, function(x) sum(bulkiness[x]) / length(x))
+    
+    return(aa_bulk)
+}
+
+
+#' Calculates the average polarity of amino acid sequences
+#'
+#' \code{polar} calculates the average polarity score of amino acid sequences. 
+#' Non-informative positions are excluded, where non-informative is defined as any 
+#' character in \code{c("X", "-", ".", "*")}.
+#' 
+#' @param    seq         vector of strings containing amino acid sequences.
+#' @param    polarity    named numerical vector defining polarity scores for 
+#'                       each amino acid, where names are single-letter amino acid 
+#'                       character codes. If \code{NULL}, then the Grantham, 1974
+#'                       scale is used.
+#' 
+#' @return   A vector of bulkiness scores for the sequence(s).
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Grantham R. Amino acid difference formula to help explain protein evolution. 
+#'            Science 185, 862-864 (1974).
+#' }
+#' @seealso 
+#' For additional size related indices see \code{\link[seqinr]{aaindex}}.
+#'
+#' @examples
+#' # Default scale
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
+#' polar(seq)
+#'
+#' # Use the Zimmerman et al, 1968 polarity scale from the seqinr package
+#' library(seqinr)
+#' data(aaindex)
+#' x <- aaindex[["ZIMJ680103"]]$I
+#' # Rename the score vector to use single-letter codes
+#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' # Calculate polarity
+#' polar(seq, polarity=x)
+#' 
+#' @export
+polar <- function(seq, polarity=NULL) {
+    # Get bulkiness scores
+    if (is.null(polarity)) {
+        polarity <- getPropertyData("polarity")
+    }
+    # Remove non-informative positions
+    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
+    # Create character vector from string
+    aa <- strsplit(seq, "")
+    # Calculate average polarity
+    aa_polar <- sapply(aa, function(x) sum(polarity[x]) / length(x))
+    
+    return(aa_polar)
+}
+
+
 #' Calculates the hydrophobicity of amino acid sequences
 #'
 #' \code{gravy} calculates the Grand Average of Hydrophobicity (GRAVY) index 
@@ -77,30 +183,25 @@ getPropertyData <- function(property){
 #' # Use the Kidera et al, 1985 scores from the seqinr package
 #' library(seqinr)
 #' data(aaindex)
-#' h <- aaindex[["KIDA850101"]]$I
+#' x <- aaindex[["KIDA850101"]]$I
 #' # Rename the score vector to use single-letter codes
-#' names(h) <- translateStrings(names(h), AA_TRANS)
+#' names(x) <- translateStrings(names(x), AA_TRANS)
 #' # Calculate hydrophobicity
-#' gravy(seq, hydropathy=h)
+#' gravy(seq, hydropathy=x)
 #' 
 #' @export
-gravy <- function(seq, hydropathy=NULL, nt=FALSE) {
+gravy <- function(seq, hydropathy=NULL) {
     # Get hydrophobicity scores
     if (is.null(hydropathy)) {
         hydropathy <- getPropertyData("hydro")
     }
-    seq <- if (nt) { translateDNA(seq, trim=FALSE) } else { seq }
+
+    # Remove non-informative positions
+    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
     # Create character vector from string
-    aa <- strsplit(as.character(seq), "")
-    
-    # Function to translate a single string
-    .gravy <- function(x) {
-        # Ignore AAs that are non-informative
-        x <- x[!(x %in% c("X", "-", ".", "*"))]
-        sum(hydropathy[x]) / length(x)
-    }
-    
-    aa_gravy <- sapply(aa, .gravy)
+    aa <- strsplit(seq, "")
+    # Calculate GRAVY
+    aa_gravy <- sapply(aa, function(x) sum(hydropathy[x]) / length(x))
     
     return(aa_gravy)
 }
@@ -278,10 +379,11 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 }
 
 
-#' Calculates amino acid properties for sequence data
+#' Calculates amino acid chemical properties for sequence data
 #'
-#' \code{regionProperties} calculates amino acid sequences properties, including
-#' length, hydrophobicity, aliphatic index and net charge.
+#' \code{aminoAcidProperties} calculates amino acid sequence chemical properties, including
+#' length, hydrophobicity, bulkiness, polarity, aliphatic index, net charge, acidic residue
+#' content, basic residue content, and aromatic reside content.
 #'
 #' @param   data          \code{data.frame} containing sequence data.
 #' @param   seq           \code{character} name of the column containing input 
@@ -300,28 +402,63 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #'          \itemize{
 #'            \item  \code{*_AA_LENGTH}:     number of amino acids.
 #'            \item  \code{*_AA_GRAVY}:      grand average of hydrophobicity (GRAVY) index.
+#'            \item  \code{*_AA_BULK}:       average bulkiness of amino acids.
 #'            \item  \code{*_AA_ALIPHATIC}:  aliphatic index.
+#'            \item  \code{*_AA_POLARITY}:   average polarity of amino acids.
 #'            \item  \code{*_AA_CHARGE}:     normalized net charge.
+#'            \item  \code{*_AA_BASIC}:      fraction of informative positions that are 
+#'                                           Arg, His or Lys.
+#'            \item  \code{*_AA_ACIDIC}:     fraction of informative positions that are 
+#'                                           Asp or Glu.
+#'            \item  \code{*_AA_AROMATIC}:   fraction of informative positions that are 
+#'                                           His, Phe, Trp or Tyr.
+#'            
 #'          }
 #'          
 #'          Where \code{*} is the value from \code{label} or the name specified for 
 #'          \code{seq} if \code{label=NULL}.
+#'          
 #' @details 
+#' For all properties except for length, non-informative positions are excluded, 
+#' where non-informative is defined as any character in \code{c("X", "-", ".", "*")}.
 #' 
-#' #' @references
+#' The scores for GRAVY, bulkiness and polarity are calculated as simple averages of the 
+#' scores for each informative positions. The basic, acid and aromatic indices are 
+#' calculated as the fraction of informative positions falling into the given category.
+#' 
+#' The aliphatic index is calculated using the Ikai, 1980 method.
+#' 
+#' The net charge is calculated using the method of Moore, 1985, excluding the N-terminus and
+#' C-terminus charges, and normalizing by the number of informative positions.  The default 
+#' pH for the calculation is 7.4.
+#' 
+#' The following data sources were used for the default property scores:
+#' \itemize{
+#'   \item  hydropathy:  Kyte & Doolittle, 1982.  
+#'   \item  bulkiness:   Zimmerman et al, 1968. 
+#'   \item  polarity:    Grantham, 1974.
+#'   \item  pK:          EMBOSS.
+#' }
+#' 
+#' @references
 #' \enumerate{
-#'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
-#'            of a protein. J Mol Biol. 157, 105-32 (1982).
+#'   \item  Zimmerman JM, Eliezer N, Simha R. The characterization of amino acid sequences 
+#'            in proteins by statistical methods. J Theor Biol 21, 170-201 (1968).
+#'   \item  Grantham R. Amino acid difference formula to help explain protein evolution. 
+#'            Science 185, 862-864 (1974).
 #'   \item  Ikai AJ. Thermostability and aliphatic index of globular proteins. 
 #'            J Biochem. 88, 1895-1898 (1980).
+#'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
+#'            of a protein. J Mol Biol. 157, 105-32 (1982).
 #'   \item  Moore DS. Amino acid and peptide net charges: A simple calculational procedure. 
 #'            Biochem Educ. 13, 10-11 (1985).
+#'   \item  \url{http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html}
 #' }
 #' 
 #' @seealso 
 #' See \link{countPatterns} for counting the occurance of specific amino acid subsequences.
-#' See \link{gravy}, \link{aliphatic} and \link{charge} for functions that calculate the
-#' included properties individually.
+#' See \link{gravy}, \link{bulk}, \link{aliphatic}, \link{polar} and \link{charge} for functions 
+#' that calculate the included properties individually.
 #' 
 #' @examples
 #' # Load example data
@@ -330,10 +467,10 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' df <- df[c(1,10,100), ]
 #' 
 #' prop <- regionProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
-#' prop[, c(1, 15:18)]
+#' prop[, c(1, 15:23)]
 #' 
 #' @export
-regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, hydropathy=NULL) {
+aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, hydropathy=NULL) {
     # Check input
     if (length(seq) > 1) {
         stop("You may specify only one sequence column. seq must be a vector of length 1.")
@@ -347,30 +484,36 @@ regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=N
 
     # Calculate region lengths
     aa_length <- nchar(region_aa, keepNA=TRUE)
-
     # Hydrophobicity
     aa_gravy <- gravy(region_aa, hydropathy)
-
+    # Bulkiness
+    aa_bulk <- bulk(region_aa)
     # Aliphatic index
     aa_aliphatic <- aliphatic(region_aa)
-    
+    # Net charge
+    aa_polarity <- polar(region_aa)
     # Net charge
     aa_charge <- charge(region_aa)
-    
-    # TODO: move these into a separate amino acid composition function
-    # TODO: Should only include informative positions in the denominator
-    # Count the fraction of aa that are positively charged
-    #aa_positive <- countOccurrences(region_aa, "[RK]") / aa_length
-    # Count fraction of aa that are negatively charged
-    #aa_negative <- countOccurrences(region_aa, "[DE]") / aa_length
+
+    # Count of informative positions
+    aa_info <-  nchar(gsub("[X\\.\\*-]", "", region_aa), keepNA=TRUE)
+    # Fraction of amino acid that are basic
+    aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
+    # Fraction of amino acid that are acidic
+    aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
     # Count fraction of aa that are aromatic
-    #aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_length
+    aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
     
     # Return the data.frame with amino acid properties
     out_df <- data.frame(AA_LENGTH=aa_length, 
                          AA_GRAVY=aa_gravy, 
+                         AA_BULK=aa_bulk,
                          AA_ALIPHATIC=aa_aliphatic,
-                         AA_CHARGE=aa_charge)
+                         AA_POLARITY=aa_polarity,
+                         AA_CHARGE=aa_charge,
+                         AA_BASIC=aa_basic,
+                         AA_ACIDIC=aa_acidic,
+                         AA_AROMATIC=aa_aromatic)
     
     # If no label, use sequence column name
     if (is.null(label)) { label <- seq }
