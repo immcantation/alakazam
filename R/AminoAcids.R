@@ -466,14 +466,15 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' df <- readChangeoDb(file)
 #' df <- df[c(1,10,100), ]
 #' 
-#' prop <- regionProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
+#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
 #' prop[, c(1, 15:23)]
 #' 
 #' @export
-aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, hydropathy=NULL) {
+aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, 
+                                hydropathy=NULL) {
     # Check input
     if (length(seq) > 1) {
-        stop("You may specify only one sequence column. seq must be a vector of length 1.")
+        stop("You may specify only one sequence column; seq must be a vector of length 1.")
     }
     check <- checkColumns(data, seq)
     if (check != TRUE) { stop(check) }
