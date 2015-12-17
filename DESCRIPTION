@@ -17,7 +17,6 @@ Imports:
     igraph (>= 1.0.0),
     lazyeval,
     methods,
-    Peptides,
     scales,
     seqinr,
     stringi,

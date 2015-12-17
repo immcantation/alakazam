@@ -39,25 +39,50 @@ getPropertyData <- function(property){
     } else if (property == "charge") {
         # EMBOSS
         data(pK, package="seqinr", envir=environment())
-        scores <- pK$EMBOSS
-        names(scores) <- rownames(scores)
+        scores <- setNames(pK[["EMBOSS"]], rownames(pK))
     }
     
     return(scores)
 }
 
 
-#' Calculates GRAVY hydrophobicity score of amino acid sequences.
+#' Calculates the hydrophobicity of amino acid sequences
 #'
-#' @param    seq           vector of amino acid sequences.
-#' @param    hydropathy    named vector defining hydropathy values for each amino acid.
+#' \code{gravy} calculates the Grand Average of Hydrophobicity (GRAVY) index 
+#' of amino acid sequences using the method of Kyte & Doolittle. Non-informative
+#' positions are excluded, where non-informative is defined as any character in 
+#' \code{c("X", "-", ".", "*")}.
 #' 
-#' @return   GRAVY score for the sequence.
+#' @param    seq         vector of strings containing amino acid sequences.
+#' @param    hydropathy  named numerical vector defining hydropathy index values for 
+#'                       each amino acid, where names are single-letter amino acid 
+#'                       character codes. If \code{NULL}, then the Kyte & Doolittle
+#'                       scale is used.
+#' 
+#' @return   A vector of GRAVY scores for the sequence(s).
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
+#'            of a protein. J Mol Biol. 157, 105-32 (1982).
+#' 
+#' @seealso 
+#' For additional hydrophobicity indices see \code{\link[seqinr]{aaindex}}.
 #'
-#' @examples 
-#' seq <- "CARDRSTPWRRGIASTTVRTSW"
+#' @examples
+#' # Default scale
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
 #' gravy(seq)
 #'
+#' # Use the Kidera et al, 1985 scores from the seqinr package
+#' library(seqinr)
+#' data(aaindex)
+#' h <- aaindex[["KIDA850101"]]$I
+#' # Rename the score vector to use single-letter codes
+#' names(h) <- translateStrings(names(h), AA_TRANS)
+#' # Calculate hydrophobicity
+#' gravy(seq, hydropathy=h)
+#' 
 #' @export
 gravy <- function(seq, hydropathy=NULL) {
     # Get hydrophobicity scores
@@ -66,66 +91,118 @@ gravy <- function(seq, hydropathy=NULL) {
     }
     # Create character vector from string
     aa <- strsplit(as.character(seq), "")
+    
     # Function to translate a single string
     .gravy <- function(x) {
-        # Ignore AAs that are "*" and "X"
+        # Ignore AAs that are non-informative
         x <- x[!(x %in% c("X", "-", ".", "*"))]
-        sum(hydropathy[x])/length(x)
+        sum(hydropathy[x]) / length(x)
     }
+    
     aa_gravy <- sapply(aa, .gravy)
+    
     return(aa_gravy)
 }
 
 
-#' Calculates aliphatic index of amino acid sequences.
-#'
-#' @param    seq vector of amino acid sequences.
+#' Calculates the aliphatic index of amino acid sequences
 #' 
-#' @return   aliphatic index for the sequence.
+#' \code{aliphatic} calculates the aliphatic index of amino acid sequences using 
+#' the method of Ikai. Non-informative positions are excluded, where non-informative 
+#' is defined as any character in \code{c("X", "-", ".", "*")}.
 #'
+#' @param    seq  vector of strings containing amino acid sequences.
+#' 
+#' @return   A vector of the aliphatic indices for the sequence(s).
+#'
+#' @references 
+#' \enumerate{
+#'   \item  Ikai AJ. Thermostability and aliphatic index of globular proteins. 
+#'            J Biochem. 88, 1895-1898 (1980).
+#' }
+#' 
 #' @examples 
-#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "ASTQMYVRT")
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
 #' aliphatic(seq)
 #'
 #' @export
 aliphatic <- function(seq) {
-    n_ala <- countOccurrences(seq, "[A]")
-    n_val <- countOccurrences(seq, "[V]")
-    n_leu_ile <- countOccurrences(seq, "[LI]")
-    aa_aliphatic = (n_ala + 2.9 * n_val + 3.9 * n_leu_ile) / nchar(seq)
+    # Remove non-informative positions
+    seq <- gsub("[X\\.\\*-]", "", seq)
+    
+    # Calculate aliphatic index
+    ala <- countOccurrences(seq, "[A]")
+    val <- countOccurrences(seq, "[V]")
+    leu_ile <- countOccurrences(seq, "[LI]")
+    aa_aliphatic = (ala + 2.9 * val + 3.9 * leu_ile) / nchar(seq, keepNA=TRUE)
     
     return(aa_aliphatic)
 }
 
 
-#' Calculates charge of amino acid sequences.
+#' Calculates the net charge of amino acid sequences.
 #'
-#' @param    seq  vector of amino acid sequences.
-#' @param    pH   environmental pH.
-#' @param    pK   named vector defining pK values for each amino acid.
+#' \code{charge} calculates the net charge of amino acid sequences using 
+#' the method of Moore, 1985, with exclusion of the C-terminus and N-terminus charges.
 #' 
-#' @return   charge of the sequence.
+#' @param    seq        vector strings defining of amino acid sequences.
+#' @param    pH         environmental pH.
+#' @param    pK         named vector defining pK values for each charged amino acid,
+#'                      where names are the single-letter amino acid character codes
+#'                      \code{c("R", "H", "K", "D", "E", "C", "Y")}). If \code{NULL}, 
+#'                      then the EMBOSS scale is used.
+#' @param    normalize  if \code{TRUE} then divide the net charge of each amino acid 
+#'                      sequence by the number of informative positions. Non-informative 
+#'                      position are defined by the presence any character in 
+#'                      \code{c("X", "-", ".", "*")}. If \code{FALSE} then return the raw
+#'                      net charge.
+#' 
+#' @return   A vector of net charges for the sequence(s).
 #'
+#' @references
+#' \enumerate{
+#'   \item  Moore DS. Amino acid and peptide net charges: A simple calculational procedure. 
+#'            Biochem Educ. 13, 10-11 (1985).
+#'   \item  \url{http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html}
+#'   }
+#'   
+#' @seealso 
+#' For additional pK scales see \code{\link[seqinr]{pK}}.
+#' 
 #' @examples 
-#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "ASTQMYVRT") 
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT") 
+#' # Normalized charge
 #' charge(seq)
+#' # Unnormalized charge
+#' charge(seq, normalize=FALSE)
+#' 
+#' # Use the Murray et al, 2006 scores from the seqinr package
+#' library(seqinr)
+#' data(pK)
+#' x <- setNames(pK[["Murray"]], rownames(pK))
+#' # Calculate charge
+#' charge(seq, pK=x, normalize=FALSE)
 #'
 #' @export
-charge <- function(seq, pH=7.4, pK=NULL) {
+charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
     # Get charge data
     if(is.null(pK)) {
         pK <- getPropertyData("charge")
     }
     
     # Calculate charge
-    carg <- countOccurrences(seq, "R") * (1/(1 + 10^(1 * (pH - pK["R"]))))
-    chis <- countOccurrences(seq, "H") * (1/(1 + 10^(1 * (pH - pK["H"]))))
-    clys <- countOccurrences(seq, "K") * (1/(1 + 10^(1 * (pH - pK["K"]))))
-    casp <- countOccurrences(seq, "D") * (-1/(1 + 10^(-1 * (pH - pK["D"]))))
-    cglu <- countOccurrences(seq, "E") * (-1/(1 + 10^(-1 * (pH - pK["E"]))))
-    ccys <- countOccurrences(seq, "C") * (-1/(1 + 10^(-1 * (pH - pK["C"]))))
-    ctyr <- countOccurrences(seq, "Y") * (-1/(1 + 10^(-1 * (pH - pK["Y"]))))
-    aa_charge <- carg + clys + chis + casp + cglu + ctyr + ccys
+    arg <- countOccurrences(seq, "R") * (1/(1 + 10^(1 * (pH - pK["R"]))))
+    his <- countOccurrences(seq, "H") * (1/(1 + 10^(1 * (pH - pK["H"]))))
+    lys <- countOccurrences(seq, "K") * (1/(1 + 10^(1 * (pH - pK["K"]))))
+    asp <- countOccurrences(seq, "D") * (-1/(1 + 10^(-1 * (pH - pK["D"]))))
+    glu <- countOccurrences(seq, "E") * (-1/(1 + 10^(-1 * (pH - pK["E"]))))
+    cys <- countOccurrences(seq, "C") * (-1/(1 + 10^(-1 * (pH - pK["C"]))))
+    tyr <- countOccurrences(seq, "Y") * (-1/(1 + 10^(-1 * (pH - pK["Y"]))))
+    aa_charge <- arg + lys + his + asp + glu + tyr + cys
+    
+    if (normalize) {
+        aa_charge <- aa_charge / nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
+    }
     
     return(aa_charge)
 }
@@ -140,55 +217,55 @@ charge <- function(seq, pH=7.4, pK=NULL) {
 #  
 # @return  number of times the regular expression was found
 countOccurrences <- function(x, pattern) {
-    return(sapply(gregexpr(pattern, x), function(y) { sum(y>0) }))
+    return(sapply(gregexpr(pattern, x), function(y) { sum(y > 0) }))
 }
 
 
-#' Count amino acid patterns
+#' Count sequence patterns
 #' 
-#' Counts the fraction of times amino acid patterns occur in sequences.
+#' \code{countPatterns} counts the fraction of times a set of character patterns occur 
+#' in a set of sequences.
 #'
-#' @param   region      character vector of either nucleotide or amino acid sequences.
-#' @param   patterns    list of amino acid patterns to count in seq. If list is named,
-#'                      names will become column names of output data.frame.
-#' @param   nt		    boolean, TRUE if the sequences (or sequence) are DNA.
-#' @param   trim        if \code{TRUE} remove the first and last codon/amino acids from each
-#'                      sequence before calculating properties. If \code{FALSE} do
-#'                      not modify input sequences.
-#' @param   region_name   name of region to add as prefix to output column names.
+#' @param   seq         character vector of either DNA or amino acid sequences.
+#' @param   patterns    list of sequence patterns to count in each sequence. If the 
+#'                      list is named, then names will be assigned as the column names of 
+#'                      output data.frame.
+#' @param   nt		    if \code{TRUE} then \code{seq} are DNA sequences and require 
+#'                      translations before performing the pattern search.
+#' @param   trim        if \code{TRUE} remove the first and last codon or amino acid from 
+#'                      each sequence before the pattern search. If \code{FALSE} do
+#'                      not modify the input sequences.
+#' @param   label       string defining a label to add as a prefix to the output 
+#'                      column names.
 #'  
-#' @return  data.frame, fraction of times each amino acid pattern was found.
+#' @return  A data.frame containing the fraction of times each sequence pattern was 
+#'          found.
 #' 
 #' @examples 
-#' region <- c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
-#'             "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
-#'             "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
-#' patterns <- c("A","V","[LI]")
-#' names(patterns) <- c("ARG","VAL","ISO_LEU")
-#' countPatterns(region, patterns, nt=TRUE, trim=TRUE, region_name="CDR3")
+#' seq <- c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
+#'          "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
+#'          "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
+#' patterns <- c("A", "V", "[LI]")
+#' names(patterns) <- c("ARG", "VAL", "ISO_LEU")
+#' countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="CDR3")
 #'             
 #' @export
-countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="REGION") {
+countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
     # Translate sequences if nucleotide
-    if (nt) {
-        # Check for sequences that are too short
-        not_empty <- which(nchar(region) > 2)
-        
-        # Translate all regions from nt to aa
-        region_aa <- rep("", length(region))
-        region_aa[not_empty] <- translateDNA(region[not_empty], trim=trim)
-    } else {
-        region_aa <- region
-    }
+    region_aa <- if (nt) { translateDNA(seq, trim=trim) } else { seq }
+    
+    # TODO: Check that NA is passed through correctly.
+    # TODO: What is the proper length normalization? With or without non-informative position?
+    
     # Calculate region lengths
-    aa_length <- nchar(region_aa)
+    aa_length <- nchar(region_aa, keepNA=TRUE)
     # Count occurrence of each amino acid pattern for each sequence
     out_df <- data.frame(matrix(0, nrow=length(region_aa), ncol=length(patterns)))
     # If patterns are unnamed, make the names X1...Xn
     if(is.null(names(patterns))) { names(patterns) <- names(out_df) }
     # If region name, append to names of patterns
-    if(region_name != '') { 
-        names(out_df) <- paste(region_name, names(patterns), sep="_") 
+    if(label != '') { 
+        names(out_df) <- paste(label, names(patterns), sep="_") 
     } else {
         names(out_df) <- names(patterns)
     }
@@ -200,9 +277,10 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
 }
 
 
-#' Calculates amino acid properties of a sequence region
+#' Calculates amino acid properties for sequence data
 #'
-#' Obtain data.frame of region properties. Note this can be used for any region. 
+#' \code{regionProperties} calculates amino acid sequences properties, including
+#' length, hydrophobicity, aliphatic index and net charge.
 #'
 #' @param   data          \code{data.frame} containing sequence data.
 #' @param   seq           \code{character} name of the column containing input 
@@ -211,67 +289,87 @@ countPatterns <- function(region, patterns, nt=FALSE, trim=FALSE, region_name="R
 #' @param   trim          if \code{TRUE} remove the first and last codon/amino acids from each
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
-#' @param   label         name of region to add as prefix to output column names.
+#' @param   label         name of sequence region to add as prefix to output column names.
 #' 
-#' @return  data.frame, with columns for each property
+#' @return  A modified \code{data} data.frame with the following columns:
+#'          \itemize{
+#'            \item  \code{*_AA_LENGTH}:     number of amino acids.
+#'            \item  \code{*_AA_GRAVY}:      grand average of hydrophobicity (GRAVY) index.
+#'            \item  \code{*_AA_ALIPHATIC}:  aliphatic index.
+#'            \item  \code{*_AA_CHARGE}:     normalized net charge.
+#'          }
+#'          
+#'          Where \code{*} is the value from \code{label} or the name specified for 
+#'          \code{seq} if \code{label=NULL}.
+#' @details 
 #' 
-#' @examples 
-#' db <- data.frame("JUNCTION"=c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
-#'                               "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
-#'                               "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC"))
-#' regionProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
+#' #' @references
+#' \enumerate{
+#'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
+#'            of a protein. J Mol Biol. 157, 105-32 (1982).
+#'   \item  Ikai AJ. Thermostability and aliphatic index of globular proteins. 
+#'            J Biochem. 88, 1895-1898 (1980).
+#'   \item  Moore DS. Amino acid and peptide net charges: A simple calculational procedure. 
+#'            Biochem Educ. 13, 10-11 (1985).
+#' }
+#' 
+#' @seealso 
+#' See \link{countPatterns} for counting the occurance of specific amino acid subsequences.
+#' See \link{gravy}, \link{aliphatic} and \link{charge} for functions that calculate the
+#' included properties individually.
+#' 
+#' @examples
+#' # Load example data
+#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' df <- readChangeoDb(file)
+#' df <- df[c(1,10,100), ]
+#' 
+#' prop <- regionProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
+#' prop[, c(1, 15:18)]
 #' 
 #' @export
-regionProperties <- function(data, seq="JUNCTION", 
-                             nt=FALSE, trim=FALSE, label=NULL) {
-    
-    if (length(seq)>1) {
-        seq <- seq[1]
-        warning("seq must be a vector of length 1. Only the first element will be used. ")
+regionProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL) {
+    # Check input
+    if (length(seq) > 1) {
+        stop("You may specify only one sequence column. seq must be a vector of length 1.")
     }
-    region <- as.vector(data[,seq])
+    check <- checkColumns(data, seq)
+    if (check != TRUE) { stop(check) }
     
-    if (nt) {
-        # Check for sequences that are too short
-        not_empty <- which(nchar(region) > 2)
-        #message(paste(length(not_empty), "Region sequences found."))
-        
-        # Translate all regions from nt to aa
-        region_aa <- character(length(region))
-        region_aa[not_empty] <- translateDNA(region[not_empty], trim=trim)
-        #message("Region translated to amino acids.")
-    } else {
-        region_aa <- region
-    }
-    
+    # Get sequence vector and translate if required
+    region <- as.character(data[[seq]])
+    region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
+
     # Calculate region lengths
-    aa_length <- nchar(region_aa)
+    aa_length <- nchar(region_aa, keepNA=TRUE)
 
-    # GRAVY (Grand Average of Hydropathy) index
-    # Some documentation: http://web.expasy.org/tools/protparam/protparam-doc.html
-    # Produces NA if there is a stop codon.
-    aa_gravy <- sapply(region_aa, gravy)
-    
-    # Count the fraction of aa that are positively charged
-    aa_positive <- countOccurrences(region_aa, "[RK]") / aa_length
-    
-    # Count fraction of aa that are negatively charged
-    aa_negative <- countOccurrences(region_aa, "[DE]") / aa_length
-    
+    # Hydrophobicity
+    aa_gravy <- gravy(region_aa)
+
     # Aliphatic index
-    # Some documentation: http://web.expasy.org/tools/protparam/protparam-doc.html
-    aa_aliphatic = sapply(region_aa, aliphatic)
-
+    aa_aliphatic <- aliphatic(region_aa)
+    
+    # Net charge
+    aa_charge <- charge(region_aa)
+    
+    # TODO: move these into a separate amino acid composition function
+    # TODO: Should only include informative positions in the denominator
+    # Count the fraction of aa that are positively charged
+    #aa_positive <- countOccurrences(region_aa, "[RK]") / aa_length
+    # Count fraction of aa that are negatively charged
+    #aa_negative <- countOccurrences(region_aa, "[DE]") / aa_length
     # Count fraction of aa that are aromatic
-    aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_length
+    #aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_length
     
     # Return the data.frame with amino acid properties
-    out_df <- data.frame(AA_LENGTH=aa_length, GRAVY=aa_gravy, 
-                         AA_POSITIVE=aa_positive, AA_NEGATIVE=aa_negative, 
-                         ALIPHATIC=aa_aliphatic, AROMATIC=aa_aromatic)
+    out_df <- data.frame(AA_LENGTH=aa_length, 
+                         AA_GRAVY=aa_gravy, 
+                         AA_ALIPHATIC=aa_aliphatic,
+                         AA_CHARGE=aa_charge)
+    
     # If no label, use sequence column name
-    if(is.null(label)) { label <- seq }
+    if (is.null(label)) { label <- seq }
     colnames(out_df) <- paste0(label, "_", colnames(out_df))
     
-    return(cbind(db, out_df))
+    return(cbind(data, out_df))
 }

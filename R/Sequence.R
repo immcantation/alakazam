@@ -112,9 +112,10 @@ IUPAC_AA <-  list("A"="A",
 
 #' Amino acid abbreviation translations
 #' 
-#' A mapping of short to long amino acid abbreviations.
+#' Mappings of amino acid abbreviations.
 #' 
-#' @format  Named character vector defining abbreviation mappings.
+#' @format  Named character vector defining single-letter character codes to 
+#'          three-letter abbreviation mappings.
 #' 
 #' @name   AA_TRANS
 AA_TRANS <- c("A"="Ala",
