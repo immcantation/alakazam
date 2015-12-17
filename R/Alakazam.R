@@ -24,47 +24,64 @@
 #' 
 #' @section  File I/O:
 #' \itemize{
-#'   \item  \code{\link{readChangeoDb}}:  Input Change-O style files.
-#'   \item  \code{\link{writeChangeoDb}}:  Output Change-O style files.
+#'   \item  \code{\link{readChangeoDb}}:        Input Change-O style files.
+#'   \item  \code{\link{writeChangeoDb}}:       Output Change-O style files.
 #' }
 #' 
 #' @section  Sequence cleaning:
 #' \itemize{
-#'   \item  \code{\link{maskSeqEnds}}:         Mask ragged ends.
-#'   \item  \code{\link{maskSeqGaps}}:         Mask gap characters.
-#'   \item  \code{\link{collapseDuplicates}}:  Remove duplicate sequences.
+#'   \item  \code{\link{maskSeqEnds}}:          Mask ragged ends.
+#'   \item  \code{\link{maskSeqGaps}}:          Mask gap characters.
+#'   \item  \code{\link{collapseDuplicates}}:   Remove duplicate sequences.
 #' }
 #' 
 #' @section  Lineage reconstruction:
 #' \itemize{
-#'   \item  \code{\link{makeChangeoClone}}:    Clean sequences for lineage reconstruction.
-#'   \item  \code{\link{buildPhylipLineage}}:  Perform lineage reconstruction of Ig sequences.
+#'   \item  \code{\link{makeChangeoClone}}:     Clean sequences for lineage reconstruction.
+#'   \item  \code{\link{buildPhylipLineage}}:   Perform lineage reconstruction of Ig sequences.
 #' }
 #' 
 #' @section  Diversity analysis:
 #' \itemize{
-#'   \item  \code{\link{rarefyDiversity}}:   Generate clonal diversity curves.
-#'   \item  \code{\link{plotDiversityCurve}}:  Plot clonal diversity curves.
-#'   \item  \code{\link{testDiversity}}:       Test significance of clonal diversity scores.
+#'   \item  \code{\link{countClones}}:          Calculate clonal abundance.
+#'   \item  \code{\link{estimateAbundance}}:    Infer complete clonal abundance distribution with
+#'                                              confidence intervals.
+#'   \item  \code{\link{rarefyDiversity}}:      Generate clonal diversity curves.
+#'   \item  \code{\link{testDiversity}}:        Test significance of clonal diversity scores.
+#'   \item  \code{\link{plotAbundance}}:        Plot clone size distribution as a rank-abundance 
+#'                                              curve.
+#'   \item  \code{\link{plotDiversityCurve}}:   Plot clonal diversity curves.
 #' }
 #' 
-#' @section  Ig sequence annotation:
+#' @section  Ig and TCR sequence annotation:
 #' \itemize{
-#'   \item  \code{\link{extractVRegion}}:      Extract CDRs and FWRs sub-sequences.
-#'   \item  \code{\link{getAllele}}:           Get V(D)J allele names.
-#'   \item  \code{\link{getGene}}:             Get V(D)J gene names.
-#'   \item  \code{\link{getFamily}}:           Get V(D)J family names.
+#'   \item  \code{\link{countGenes}}:           Calculate Ig and TCR allele, gene and family usage.
+#'   \item  \code{\link{extractVRegion}}:       Extract CDRs and FWRs sub-sequences.
+#'   \item  \code{\link{getAllele}}:            Get V(D)J allele names.
+#'   \item  \code{\link{getGene}}:              Get V(D)J gene names.
+#'   \item  \code{\link{getFamily}}:            Get V(D)J family names.
 #' }
 #' 
 #' @section  Sequence distance calculation:
 #' \itemize{
-#'   \item  \code{\link{getSeqDistance}}:      Calculate Hamming distance between sequences.
-#'   \item  \code{\link{testSeqEqual}}:        Test sequences for equality.
+#'   \item  \code{\link{getSeqDistance}}:       Calculate Hamming distance between sequences.
+#'   \item  \code{\link{getSeqMatrix}}:         Calculate a matrix of pairwise Hamming distances 
+#'                                              for a sequence set.
+#'   \item  \code{\link{testSeqEqual}}:         Test sequences for equality.
+#' }
+#' 
+#' @section  Amino acid propertes:
+#' \itemize{
+#'   \item  \code{\link{translateDNA}}:         Translate DNA sequences to amino acid sequences.
+#'   \item  \code{\link{aminoAcidProperties}}:  Calculate various chemical properties of amino acid 
+#'                                              sequences.
+#'   \item  \code{\link{countPatterns}}:        Count patterns in sequences.
+#'                                              
 #' }
 #' 
 #' @section  General data manipulation:
 #' \itemize{
-#'   \item  \code{\link{translateStrings}}:    Perform multiple string replacement operations.
+#'   \item  \code{\link{translateStrings}}:     Perform multiple string replacement operations.
 #' } 
 #' 
 #' @seealso

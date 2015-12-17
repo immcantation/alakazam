@@ -1,7 +1,7 @@
 Alakazam
 -------------------------------------------------------------------------------
-December 8, 2015  
-Version 0.2.0.99
+December 18, 2015  
+Version 0.2.1
 
 Lineage, diversity, gene usage and amino acid property R package of the 
 Change-O suite.
@@ -14,7 +14,7 @@ R packages
   - dplyr
   - ggplot2
   - igraph
-  - Peptides
+  - lazyeval
   - scales
   - seqinr
   - stringi

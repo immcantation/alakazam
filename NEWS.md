@@ -1,4 +1,4 @@
-Version 0.2.0.999:  December 8, 2015
+Version 0.2.0.999:  December 18, 2015
 -------------------------------------------------------------------------------
 
 General:
@@ -17,8 +17,8 @@ General:
 Amino Acid Analysis:
 
 + Migrated amino acid property analysis from Change-O CTL to alakazam. 
-  Includes the new functions `gravy()`, `countPatterns()` and 
-  `regionProperties()`.
+  Includes the new functions `gravy()`, `bulk()`, `aliphatic()`, `polar()`, 
+  `charge()`, `countPatterns()` and `aminoAcidProperties()`.
 
 Annotation:
 
@@ -31,7 +31,7 @@ Annotation:
 Diversity:
 
 + Added several functions related to analysis of clone size distributions, 
-  including `countClones()`, `estimateAbundance()` and `plotAbundance`.
+  including `countClones()`, `estimateAbundance()` and `plotAbundance()`.
 + Renamed `resampleDiversity()` to `rarefyDiversity()` and changed many of
   the internals. Bootstrapping is now performed on an inferred complete
   relative abundance distribution.
@@ -41,7 +41,7 @@ Diversity:
   and `testDiversity()` are now calculated using the mean and standard 
   deviation of the bootstrap realizations, rather than the median and
   upper/lower quantiles.
-+ Added ability to add counts to the legend in `potDiversityCurve()`.
++ Added ability to add counts to the legend in `plotDiversityCurve()`.
 
 
 Version 0.2.0:  June 15, 2015
