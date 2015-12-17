@@ -16,21 +16,21 @@ test_that("gravy", {
     expect_equal(gravy(aa_seq),-0.918, tolerance = .001)
 })
 
-test_that("getProperties", {
-    seq_aa <- db$JUNCTION[1:5]
-    junction_gravy <- gravy(seq_aa, nt=TRUE)
-    junction_properties <- regionProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
+test_that("aminoAcidProperties", {
+    seq_aa <- translateDNA(db$JUNCTION[1:5])
+    
+    junction_gravy <- gravy(seq_aa)
+    junction_properties <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
                                             trim=FALSE, label="JUNCTION")
     expect_equal(junction_gravy,junction_properties$JUNCTION_AA_GRAVY, tolerance = .001)
     
-    data(aaindex)
+    data(aaindex, package="seqinr")
     h <- aaindex[["KIDA850101"]]$I
     # Rename the score vector to use single-letter codes
     names(h) <- translateStrings(names(h), AA_TRANS)
     
-    seq_aa <- db$JUNCTION[1:5]
-    junction_gravy <- gravy(seq_aa, hydropathy =  h, nt=TRUE)
-    junction_properties <- regionProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
+    junction_gravy <- gravy(seq_aa, hydropathy =  h)
+    junction_properties <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
                                             trim=FALSE, label="JUNCTION",
                                             hydropathy = h)
     expect_equal(junction_gravy,junction_properties$JUNCTION_AA_GRAVY, tolerance = .001)
