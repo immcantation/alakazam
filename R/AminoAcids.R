@@ -392,7 +392,8 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' content, basic residue content, and aromatic residue content.
 #'
 #' @param   data          \code{data.frame} containing sequence data.
-#' @param   properties    A vector of properties to be calculated
+#' @param   property      vector strings specifying the properties to be calculated. Defaults
+#'                        to calculating all defined properties.
 #' @param   seq           \code{character} name of the column containing input 
 #'                        sequences.
 #' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA and will be translated.
@@ -471,27 +472,39 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' df <- readChangeoDb(file)
 #' df <- df[c(1,10,100), ]
 #' 
-#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
-#' prop[, c(1, 15:23)]
+#' # Calculate default amino acid properties from amino acid sequences
+#' # Use a custom output column prefix
+#' df$JUNCTION_TRANS <- translateDNA(df$JUNCTION)
+#' prop <- aminoAcidProperties(df, seq="JUNCTION_TRANS", label="JUNCTION")
+#' prop[, c(1, 16:24)]
+#
+#' # Calculate default amino acid properties from DNA sequences
+#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE)
+#' prop[, c(1, 16:24)]
 #' 
-#' # Use the Grantham, 1974 side chain volume scores from the seqinr package and pH=7
+#' # Use the Grantham, 1974 side chain volume scores from the seqinr package
+#' # Set pH=7.0 for the charge calculation
+#' # Calculate only average volume and charge
+#' # Remove the head and tail amino acids from the junction, thus making it the CDR3
 #' library(seqinr)
 #' data(aaindex)
 #' x <- aaindex[["GRAR740103"]]$I
 #' # Rename the score vector to use single-letter codes
 #' names(x) <- translateStrings(names(x), AA_TRANS)
-#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
-#' prop[, c(1, 15:23)]
+#' # Calculate properties
+#' prop <- aminoAcidProperties(df, property=c("bulk", "charge"), seq="JUNCTION", nt=TRUE, 
+#'                             trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
+#' prop[, c(1, 16:17)]
 #'
 #' @export
-aminoAcidProperties <- function(data, properties=c("length", "gravy", "bulk",
-                                                   "aliphatic","polarity","charge","basic","acidic",
-                                                   "aromatic"),
+aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
+                                                 "aliphatic","polarity","charge",
+                                                 "basic","acidic", "aromatic"),
                                 seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
-    properties <- match.arg(properties, several.ok = TRUE)
+    # Check arguments
+    properties <- match.arg(property, several.ok=TRUE)
     
-    ## Define the data.frame that will be returned
-    ## with amino acid properties
+    # Define the data.frame that will be returned with amino acid properties
     prop_colnames <- list(
         "length"    = "AA_LENGTH",
         "gravy"     = "AA_GRAVY",
@@ -507,11 +520,11 @@ aminoAcidProperties <- function(data, properties=c("length", "gravy", "bulk",
     if (is.null(label)) { label <- seq }
     prop_colnames <- lapply(prop_colnames, function(x) { paste(label,x,sep="_") })
     
-    out_df <- data.frame(matrix(NA, nrow=nrow(data), ncol=length(properties)))
-    colnames(out_df) <- prop_colnames[properties]
+    out_df <- data.frame(matrix(NA, nrow=nrow(data), ncol=length(property)))
+    colnames(out_df) <- prop_colnames[property]
     
-    ## Check if out_df colum names already existed in data
-    ## if yes, throw warning
+    # Check if out_df column names already existed in data
+    # if yes, throw warning
     check <- checkColumns(data, colnames(out_df))
     if (any(check == TRUE)) { warning("Duplicated columns found. Overwriting previous values.")}
     # Check input
@@ -533,35 +546,35 @@ aminoAcidProperties <- function(data, properties=c("length", "gravy", "bulk",
     region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
     
     # Calculate region lengths
-    if ("length" %in% properties) {
+    if ("length" %in% property) {
         aa_length <- nchar(region_aa, keepNA=TRUE)
         out_df[,prop_colnames$length] <- aa_length
     }
     # Average hydrophobicity
-    if ("gravy" %in% properties) {
+    if ("gravy" %in% property) {
         #aa_gravy <- gravy(region_aa, hydropathy)
         aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
         out_df[,prop_colnames$gravy] <- aa_gravy
     }
     # Average bulkiness
-    if ("bulk" %in% properties) {
+    if ("bulk" %in% property) {
         #aa_bulk <- bulk(region_aa)
         aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
         out_df[,prop_colnames$bulk] <- aa_bulk
     }
-    if ("aliphatic" %in% properties) {
+    if ("aliphatic" %in% property) {
         # Normalizes aliphatic index
         aa_aliphatic <- aliphatic(region_aa)
         out_df[,prop_colnames$aliphatic] <- aa_aliphatic
     }
     # Average polarity
-    if ("polarity" %in% properties) {
+    if ("polarity" %in% property) {
         #aa_polarity <- polar(region_aa)
         aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
         out_df[,prop_colnames$polarity] <- aa_polarity
     }
     # Normalized net charge
-    if ("charge" %in% properties) {
+    if ("charge" %in% property) {
         #aa_charge <- charge(region_aa)
         aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
         out_df[,prop_colnames$charge] <- aa_charge
@@ -570,17 +583,17 @@ aminoAcidProperties <- function(data, properties=c("length", "gravy", "bulk",
     # Count of informative positions
     aa_info <-  nchar(gsub("[X\\.\\*-]", "", region_aa), keepNA=TRUE)
     # Fraction of amino acid that are basic
-    if ("basic" %in% properties) {
+    if ("basic" %in% property) {
         aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
         out_df[,prop_colnames$basic] <- aa_basic
     }
     # Fraction of amino acid that are acidic
-    if ("acidic" %in% properties) {
+    if ("acidic" %in% property) {
         aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
         out_df[,prop_colnames$acidic] <- aa_acidic
     }
     # Count fraction of aa that are aromatic
-    if ("aromatic" %in% properties) {
+    if ("aromatic" %in% property) {
         aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
         out_df[,prop_colnames$aromatic] <- aa_aromatic
     }

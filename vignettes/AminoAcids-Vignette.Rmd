@@ -1,5 +1,5 @@
 ---
-title: 'Alakazam: Analysis of aminoacid chemical properties'
+title: 'Alakazam: Analysis of amino acid physicochemical chemical properties'
 author: "Jason Anthony Vander Heiden"
 date: '`r Sys.Date()`'
 output:
@@ -18,7 +18,7 @@ output:
 geometry: margin=1in
 fontsize: 11pt
 vignette: |
-  %\VignetteIndexEntry{Analysis of aminoacid chemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
 ---
 
 
@@ -56,7 +56,7 @@ db_props[1:5,15:23]
 The Grand Average of Hydrophobicity (GRAVY) index can be obtained with  the function `aminoAcidProperties` setting `properties="gravy"`. By default, it will use the method of Kyte & Doolittle, excluding from the calculations those position in the amino acid sequence considered non-informative (.,-,*,X).
 
 ```{r, eval=TRUE, warning=FALSE}
-db_g <- aminoAcidProperties(db, seq="JUNCTION", properties="gravy",
+db_g <- aminoAcidProperties(db, seq="JUNCTION", property="gravy",
                           nt=TRUE,trim=FALSE, label="CDR3")
 ## Several columns have been added, starting with the prefix CDR3
 colnames(db_g)
@@ -73,7 +73,7 @@ data(aaindex)
 h <- aaindex[["KIDA850101"]]$I
 # Rename the score vector to use single-letter codes
 names(h) <- translateStrings(names(h), AA_TRANS)
-db_g_h <- aminoAcidProperties(db, seq="JUNCTION", properties="gravy", nt=TRUE, trim=FALSE, label="CDR3", hydropathy=h)
+db_g_h <- aminoAcidProperties(db, seq="JUNCTION", property="gravy", nt=TRUE, trim=FALSE, label="CDR3", hydropathy=h)
 colnames(db_g_h)
 db_g_h[1:5,15]
 ```
@@ -84,7 +84,7 @@ To calculate the *average bulkiness* of amino acids using the Grantham, 1974 sid
 x <- aaindex[["GRAR740103"]]$I
 # Rename the score vector to use single-letter codes
 names(x) <- translateStrings(names(x), AA_TRANS)
-db_props_bulk <- aminoAcidProperties(db, seq="JUNCTION", properties="bulk", nt=TRUE, trim=FALSE, label="CDR3", bulkiness=x, pH=7.0)
+db_props_bulk <- aminoAcidProperties(db, seq="JUNCTION", property="bulk", nt=TRUE, trim=FALSE, label="CDR3", bulkiness=x, pH=7.0)
 colnames(db_props_bulk)
 db_props_bulk[1:5,15]
 ```
