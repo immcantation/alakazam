@@ -21,9 +21,9 @@ vignette: |
   %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
 ---
 The `alakazam` package includes a set of function to analyze the physicochemical 
-properties of Ig and TCR amino acid sequence. Of particular interest is the analysis of 
-CDR3 properties, which this vignette will demonstration. However, the same process
-can be applies to other regions simply by altering the sequence data column used.
+properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 
+CDR3 properties, which this vignette will demonstate. However, the same process
+can be applied to other regions simply by altering the sequence data column used.
 
     Wu YC, et al. High-throughput immunoglobulin repertoire analysis distinguishes 
         between human IgM memory and switched memory B-cell populations. 
@@ -48,7 +48,7 @@ db <- readChangeoDb(file)
 
 Calculate the properties of amino acid sequences
 --------------------------------------------------------------------------------
-Multiple amino acid chemical properties can be obtained with the function 
+Multiple amino acid physicochemical properties can be obtained with the function 
 `aminoAcidProperties`. The available properties are:
 
 * `length`: total amino acid count
@@ -63,12 +63,12 @@ Multiple amino acid chemical properties can be obtained with the function
 
 This example demonstrates how to calculate all of the available amino acid 
 properties from DNA sequences found in `JUNCTION` column of the Change-O file 
-previously load. 
+previously loaded. 
 
-Translate of the DNA sequences to amino acid sequences is accomplished by 
+Translation of the DNA sequences to amino acid sequences is accomplished by 
 specifying the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
 sequence we specify the argument `trim=TRUE` which will strip the first and last
-codon (the conserved resiudes) prior to analysis. The prefix `CDR3` is added
+codon (the conserved residues) prior to analysis. The prefix `CDR3` is added
 to the output column names using the `label="CDR3"` argument.
 
 ```{r, eval=TRUE, warning=FALSE}
@@ -83,7 +83,7 @@ db_props[1:5, c(1, 15:23)]
 
 A subset of the properties may be calculated using the `property` argument of
 `aminoAcidProperties`.  For example, calculations may be restricted only the 
-grand average of hydrophobicity index (`gravy`) and normalized net charge by
+grand average of hydrophobicity (`gravy`) index and normalized net charge by
 specifying `property=c("gravy", "charge")`. 
 
 ```{r, eval=TRUE, warning=FALSE}
@@ -95,12 +95,13 @@ db_props[1:5, c(1, 15:16)]
 ## Using user defined scales ##
 
 Each property has a default scale setting, but users may specify alternate scales 
-if they wish. The example that follows shows how to import and use the
+if they wish. The following example shows how to import and use the
 Kidera et al, 1985 hydrophobicity scale and the Murrary et al, 2006 pK values from 
 the `seqinr` package instead of the defaults for calculating the GRAVY index and 
 net charge.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
+# Load the relevant data objects from the seqinr package
 library(seqinr)
 data(aaindex)
 data(pK)
@@ -118,7 +119,7 @@ db_props[1:5, c(1, 15:16)]
 
 The `aminoAcidProperties` function provides a convenient wrapper for calculating
 multiple properties at once from a data.frame. If a vector of a specific property is
-required this may be accomplished using one of the work functions:
+required this may be accomplished using one of the worker functions:
 
 * `gravy`: grand average of hydrophobicity
 * `bulk`: average bulkiness
@@ -127,7 +128,7 @@ required this may be accomplished using one of the work functions:
 * `charge`: net charge
 * `countPatterns`: counts the occurrence of patterns in amino acid sequences
 
-Input to each function must be vector of amino acid sequences.
+The input to each function must be vector of amino acid sequences.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Translate junction DNA sequences to amino acids and trim first and last codons
@@ -160,7 +161,7 @@ countPatterns(cdr3, c(ACIDIC="[DE]"), label="CDR3")
 Default scales
 --------------------------------------------------------------------------------
 
-The following references were used for the default physiochemical scales:
+The following references were used for the default physicochemical scales:
 
 * Aliphatic index:  
   Ikai AJ. Thermostability and aliphatic index of globular proteins. 
