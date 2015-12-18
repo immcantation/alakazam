@@ -473,6 +473,15 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
 #' prop[, c(1, 15:23)]
 #' 
+#' # Use the Grantham, 1974 side chain volumn scores from the seqinr package and pH=7
+#' library(seqinr)
+#' data(aaindex)
+#' x <- aaindex[["GRAR740103"]]$I
+#' # Rename the score vector to use single-letter codes
+#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
+#' prop[, c(1, 15:23)]
+#'
 #' @export
 aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
     # Check input
