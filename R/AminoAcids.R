@@ -338,8 +338,8 @@ countOccurrences <- function(x, pattern) {
 #' @param   patterns    list of sequence patterns to count in each sequence. If the 
 #'                      list is named, then names will be assigned as the column names of 
 #'                      output data.frame.
-#' @param   nt		    if \code{TRUE} then \code{seq} are DNA sequences and require 
-#'                      translations before performing the pattern search.
+#' @param   nt		    if \code{TRUE} then \code{seq} are DNA sequences and and will be 
+#'                      translated before performing the pattern search.
 #' @param   trim        if \code{TRUE} remove the first and last codon or amino acid from 
 #'                      each sequence before the pattern search. If \code{FALSE} do
 #'                      not modify the input sequences.
@@ -387,14 +387,14 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 
 #' Calculates amino acid chemical properties for sequence data
 #'
-#' \code{aminoAcidProperties} calculates amino acid sequence chemical properties, including
+#' \code{aminoAcidProperties} calculates amino acid sequence physicochemical properties, including
 #' length, hydrophobicity, bulkiness, polarity, aliphatic index, net charge, acidic residue
-#' content, basic residue content, and aromatic reside content.
+#' content, basic residue content, and aromatic residue content.
 #'
 #' @param   data          \code{data.frame} containing sequence data.
 #' @param   seq           \code{character} name of the column containing input 
 #'                        sequences.
-#' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA.
+#' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA and will be translated.
 #' @param   trim          if \code{TRUE} remove the first and last codon/amino acids from each
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
@@ -473,7 +473,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE, trim=TRUE, label="CDR3")
 #' prop[, c(1, 15:23)]
 #' 
-#' # Use the Grantham, 1974 side chain volumn scores from the seqinr package and pH=7
+#' # Use the Grantham, 1974 side chain volume scores from the seqinr package and pH=7
 #' library(seqinr)
 #' data(aaindex)
 #' x <- aaindex[["GRAR740103"]]$I

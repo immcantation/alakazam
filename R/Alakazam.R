@@ -73,7 +73,7 @@
 #' @section  Amino acid propertes:
 #' \itemize{
 #'   \item  \code{\link{translateDNA}}:         Translate DNA sequences to amino acid sequences.
-#'   \item  \code{\link{aminoAcidProperties}}:  Calculate various chemical properties of amino acid 
+#'   \item  \code{\link{aminoAcidProperties}}:  Calculate various physicochemical properties of amino acid 
 #'                                              sequences.
 #'   \item  \code{\link{countPatterns}}:        Count patterns in sequences.
 #'                                              

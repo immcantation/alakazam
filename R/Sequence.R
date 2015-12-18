@@ -402,8 +402,8 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 #' 
 #' \code{translateDNA} translates nucleotide sequences to amino acid sequences.
 #' 
-#' @param   seq   vector of strings defining DNA sequence(s) to be converted to translated.
-#' @param   trim  boolean flag to remove 3 nts from both ends of seq
+#' @param   seq     vector of strings defining DNA sequence(s) to be converted to translated.
+#' @param   trim    boolean flag to remove 3 nts from both ends of seq
 #'          (converts IMGT junction to CDR3 region).
 #' 
 #' @return  A vector of translated sequence strings.
