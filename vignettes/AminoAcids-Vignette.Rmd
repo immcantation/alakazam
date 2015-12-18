@@ -44,6 +44,7 @@ library(alakazam)
 # Load Change-O file
 file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 db <- readChangeoDb(file)
+db <- db[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
 ```
 
 Calculate the properties of amino acid sequences
@@ -74,9 +75,7 @@ to the output column names using the `label="CDR3"` argument.
 ```{r, eval=TRUE, warning=FALSE}
 db_props <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, 
                                 label="CDR3")
-
-# Several columns have been added, starting with the prefix CDR3
-db_props[1:5, c(1, 15:23)]
+db_props[-2]
 ```
 
 ## Obtaining properties individually ##
@@ -89,7 +88,7 @@ specifying `property=c("gravy", "charge")`.
 ```{r, eval=TRUE, warning=FALSE}
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"),
                                 nt=TRUE, trim=TRUE, label="CDR3")
-db_props[1:5, c(1, 15:16)]
+db_props[-2]
 ```
 
 ## Using user defined scales ##
@@ -112,7 +111,7 @@ names(h) <- translateStrings(names(h), AA_TRANS)
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
                                 nt=TRUE, trim=TRUE, label="CDR3", 
                                 hydropathy=h, pK=p)
-db_props[1:5, c(1, 15:16)]
+db_props[-2]
 ```
 
 ## Getting vectors of individual properties ##
@@ -132,7 +131,7 @@ The input to each function must be vector of amino acid sequences.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Translate junction DNA sequences to amino acids and trim first and last codons
-cdr3 <- translateDNA(db$JUNCTION[1:5], trim=TRUE)
+cdr3 <- translateDNA(db$JUNCTION, trim=TRUE)
 
 # Grand average of hydrophobicity
 gravy(cdr3)

@@ -476,17 +476,15 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' # Load example data
 #' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 #' df <- readChangeoDb(file)
-#' df <- df[c(1,10,100), ]
+#' df <- df[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
 #' 
 #' # Calculate default amino acid properties from amino acid sequences
 #' # Use a custom output column prefix
 #' df$JUNCTION_TRANS <- translateDNA(df$JUNCTION)
-#' prop <- aminoAcidProperties(df, seq="JUNCTION_TRANS", label="JUNCTION")
-#' prop[, c(1, 16:24)]
+#' aminoAcidProperties(df, seq="JUNCTION_TRANS", label="JUNCTION")
 #
 #' # Calculate default amino acid properties from DNA sequences
-#' prop <- aminoAcidProperties(df, seq="JUNCTION", nt=TRUE)
-#' prop[, c(1, 16:24)]
+#' aminoAcidProperties(df, seq="JUNCTION", nt=TRUE)
 #' 
 #' # Use the Grantham, 1974 side chain volume scores from the seqinr package
 #' # Set pH=7.0 for the charge calculation
@@ -498,9 +496,8 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' # Rename the score vector to use single-letter codes
 #' names(x) <- translateStrings(names(x), AA_TRANS)
 #' # Calculate properties
-#' prop <- aminoAcidProperties(df, property=c("bulk", "charge"), seq="JUNCTION", nt=TRUE, 
-#'                             trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
-#' prop[, c(1, 16:17)]
+#' aminoAcidProperties(df, property=c("bulk", "charge"), seq="JUNCTION", nt=TRUE, 
+#'                     trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
 #'
 #' @export
 aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
