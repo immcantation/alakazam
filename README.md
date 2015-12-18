@@ -19,17 +19,6 @@ R packages
   - seqinr
   - stringi
 
-Mercurial Configuration
--------------------------------------------------------------------------------
-Update Mercurial .hgignore file with:  
-```
-syntax: glob
-  .*
-  *.Rproj
-  man/*.Rd
-  inst/doc/*
-```
-
 Build Instructions
 -------------------------------------------------------------------------------
 Install build dependencies:
