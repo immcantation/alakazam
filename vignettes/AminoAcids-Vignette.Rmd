@@ -51,29 +51,9 @@ colnames(db_props)
 db_props[1:5,15:23]
 ```
 
-It is possible to use user provided scales. Here we demonstrate how to use the Kidera et al, 1985 scores from the `seqinr` package for the calculation of the *GRAVY index*.
+## Obtaining properties individually ##
 
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
-library(seqinr)
-data(aaindex)
-h <- aaindex[["KIDA850101"]]$I
-# Rename the score vector to use single-letter codes
-names(h) <- translateStrings(names(h), AA_TRANS)
-db_props_h <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=FALSE, label="CDR3", hydropathy=h)
-db_props_h[1:5,15:23]
-```
-
-To calculate the *average bulkiness* of amino acids using the Grantham, 1974 side chain volumn scores from the seqinr package and pH=7:
-
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
-x <- aaindex[["GRAR740103"]]$I
-# Rename the score vector to use single-letter codes
-names(x) <- translateStrings(names(x), AA_TRANS)
-db_props_bulk <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=FALSE, label="CDR3", bulkiness=x, pH=7.0)
-db_props_bulk[1:5,15:23]
-```
-
-## The properties can also be obtained individually ##
+The Grand Average of Hydrophobicity (GRAVY) index can be obtained with  the function `aminoAcidProperties` setting `properties="gravy"`. By default, it will use the method of Kyte & Doolittle, excluding from the calculations those position in the amino acid sequence considered non-informative (.,-,*,X).
 
 ```{r, eval=TRUE, warning=FALSE}
 db_g <- aminoAcidProperties(db, seq="JUNCTION", properties="gravy",
@@ -83,28 +63,30 @@ colnames(db_g)
 db_g[1:5,15]
 ```
 
-### GRAVY index ###
+## Using user defined scales ##
 
-The Grand Average of Hydrophobicity (GRAVY) index can be obtained with  the function `gravy`. By default, it will use the method of Kyte & Doolittle, excluding from the calculations those position in the amino acid sequence considered non-informative (.,-,*,X).
+It is possible to use user provided scales. Here we demonstrate how to use the Kidera et al, 1985 scores from the `seqinr` package for the calculation of the *GRAVY index*. 
 
-```{r, eval=TRUE, warning=FALSE}
-## Translate nucleotides to amino acids
-seq_aa <- translateDNA(db$JUNCTION)
-cdr3_gravy <- gravy(seq_aa)
-cdr3_gravy[1:5]
-```
-
-It is possible to use other hydrophobicity scales. Here we demonstrate how to use the Kidera et al, 1985 scores from the `seqinr` package
-
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(seqinr)
 data(aaindex)
 h <- aaindex[["KIDA850101"]]$I
 # Rename the score vector to use single-letter codes
 names(h) <- translateStrings(names(h), AA_TRANS)
-# Calculate hydrophobicity
-cdr3_gravy_kidera <- gravy(seq_aa, hydropathy=h)
-cdr3_gravy_kidera[1:5]
+db_g_h <- aminoAcidProperties(db, seq="JUNCTION", properties="gravy", nt=TRUE, trim=FALSE, label="CDR3", hydropathy=h)
+colnames(db_g_h)
+db_g_h[1:5,15]
+```
+
+To calculate the *average bulkiness* of amino acids using the Grantham, 1974 side chain volumn scores from the seqinr package and pH=7:
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+x <- aaindex[["GRAR740103"]]$I
+# Rename the score vector to use single-letter codes
+names(x) <- translateStrings(names(x), AA_TRANS)
+db_props_bulk <- aminoAcidProperties(db, seq="JUNCTION", properties="bulk", nt=TRUE, trim=FALSE, label="CDR3", bulkiness=x, pH=7.0)
+colnames(db_props_bulk)
+db_props_bulk[1:5,15]
 ```
 
 # R Session #
