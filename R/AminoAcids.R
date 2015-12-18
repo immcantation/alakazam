@@ -392,6 +392,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' content, basic residue content, and aromatic residue content.
 #'
 #' @param   data          \code{data.frame} containing sequence data.
+#' @param   properties    A vector of properties to be calculated
 #' @param   seq           \code{character} name of the column containing input 
 #'                        sequences.
 #' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA and will be translated.
@@ -483,7 +484,36 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' prop[, c(1, 15:23)]
 #'
 #' @export
-aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
+aminoAcidProperties <- function(data, properties=c("length", "gravy", "bulk",
+                                                   "aliphatic","polarity","charge","basic","acidic",
+                                                   "aromatic"),
+                                seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
+    properties <- match.arg(properties, several.ok = TRUE)
+    
+    ## Define the data.frame that will be returned
+    ## with amino acid properties
+    prop_colnames <- list(
+        "length"    = "AA_LENGTH",
+        "gravy"     = "AA_GRAVY",
+        "bulk"      = "AA_BULK",
+        "aliphatic" = "AA_ALIPHATIC",
+        "polarity"  = "AA_POLARITY",
+        "charge"    = "AA_CHARGE",
+        "basic"     = "AA_BASIC",
+        "acidic"    = "AA_ACIDIC",
+        "aromatic"  = "AA_AROMATIC"
+    )
+    # If no label, use sequence column name
+    if (is.null(label)) { label <- seq }
+    prop_colnames <- lapply(prop_colnames, function(x) { paste(label,x,sep="_") })
+    
+    out_df <- data.frame(matrix(NA, nrow=nrow(data), ncol=length(properties)))
+    colnames(out_df) <- prop_colnames[properties]
+    
+    ## Check if out_df colum names already existed in data
+    ## if yes, throw warning
+    check <- checkColumns(data, colnames(out_df))
+    if (any(check == TRUE)) { warning("Duplicated columns found. Overwriting previous values.")}
     # Check input
     if (length(seq) > 1) {
         stop("You may specify only one sequence column; seq must be a vector of length 1.")
@@ -501,47 +531,60 @@ aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, labe
     # Get sequence vector and translate if required
     region <- as.character(data[[seq]])
     region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
-
+    
     # Calculate region lengths
-    aa_length <- nchar(region_aa, keepNA=TRUE)
+    if ("length" %in% properties) {
+        aa_length <- nchar(region_aa, keepNA=TRUE)
+        out_df[,prop_colnames$length] <- aa_length
+    }
     # Average hydrophobicity
-    #aa_gravy <- gravy(region_aa, hydropathy)
-    aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
+    if ("gravy" %in% properties) {
+        #aa_gravy <- gravy(region_aa, hydropathy)
+        aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
+        out_df[,prop_colnames$gravy] <- aa_gravy
+    }
     # Average bulkiness
-    #aa_bulk <- bulk(region_aa)
-    aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
-    # Normalizes aliphatic index
-    aa_aliphatic <- aliphatic(region_aa)
+    if ("bulk" %in% properties) {
+        #aa_bulk <- bulk(region_aa)
+        aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
+        out_df[,prop_colnames$bulk] <- aa_bulk
+    }
+    if ("aliphatic" %in% properties) {
+        # Normalizes aliphatic index
+        aa_aliphatic <- aliphatic(region_aa)
+        out_df[,prop_colnames$aliphatic] <- aa_aliphatic
+    }
     # Average polarity
-    #aa_polarity <- polar(region_aa)
-    aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
+    if ("polarity" %in% properties) {
+        #aa_polarity <- polar(region_aa)
+        aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
+        out_df[,prop_colnames$polarity] <- aa_polarity
+    }
     # Normalized net charge
-    #aa_charge <- charge(region_aa)
-    aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
-
+    if ("charge" %in% properties) {
+        #aa_charge <- charge(region_aa)
+        aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
+        out_df[,prop_colnames$charge] <- aa_charge
+    }
+    
     # Count of informative positions
     aa_info <-  nchar(gsub("[X\\.\\*-]", "", region_aa), keepNA=TRUE)
     # Fraction of amino acid that are basic
-    aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
+    if ("basic" %in% properties) {
+        aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
+        out_df[,prop_colnames$basic] <- aa_basic
+    }
     # Fraction of amino acid that are acidic
-    aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
+    if ("acidic" %in% properties) {
+        aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
+        out_df[,prop_colnames$acidic] <- aa_acidic
+    }
     # Count fraction of aa that are aromatic
-    aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
-    
-    # Return the data.frame with amino acid properties
-    out_df <- data.frame(AA_LENGTH=aa_length, 
-                         AA_GRAVY=aa_gravy, 
-                         AA_BULK=aa_bulk,
-                         AA_ALIPHATIC=aa_aliphatic,
-                         AA_POLARITY=aa_polarity,
-                         AA_CHARGE=aa_charge,
-                         AA_BASIC=aa_basic,
-                         AA_ACIDIC=aa_acidic,
-                         AA_AROMATIC=aa_aromatic)
-    
-    # If no label, use sequence column name
-    if (is.null(label)) { label <- seq }
-    colnames(out_df) <- paste0(label, "_", colnames(out_df))
-    
-    return(cbind(data, out_df))
+    if ("aromatic" %in% properties) {
+        aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
+        out_df[,prop_colnames$aromatic] <- aa_aromatic
+    }
+    data_cols <- colnames(data) %in% colnames(out_df) == FALSE
+    return(cbind(data[,data_cols], out_df))
 }
+

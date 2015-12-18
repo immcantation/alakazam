@@ -29,10 +29,10 @@ test_that("aminoAcidProperties", {
     # Rename the score vector to use single-letter codes
     names(h) <- translateStrings(names(h), AA_TRANS)
     
-    junction_gravy <- gravy(seq_aa, hydropathy =  h)
-    junction_properties <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
+    junction_gravy_h <- gravy(seq_aa, hydropathy =  h)
+    junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
                                             trim=FALSE, label="JUNCTION",
                                             hydropathy = h)
-    expect_equal(junction_gravy,junction_properties$JUNCTION_AA_GRAVY, tolerance = .001)
+    expect_equal(junction_gravy_h,junction_properties_h$JUNCTION_AA_GRAVY, tolerance = .001)
     
 })
