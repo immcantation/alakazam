@@ -28,7 +28,7 @@ LazyData: true
 RoxygenNote: 5.0.1
 Collate:
     'Alakazam.R'
-    'AnalyzeAA.R'
+    'AminoAcids.R'
     'Core.R'
     'Diversity.R'
     'GeneUsage.R'

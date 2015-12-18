@@ -1,0 +1,85 @@
+---
+title: 'Alakazam: Analysis of aminoacid chemical properties'
+author: "Jason Anthony Vander Heiden"
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
+  html_document:
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+geometry: margin=1in
+fontsize: 11pt
+vignette: |
+  %\VignetteIndexEntry{Analysis of aminoacid chemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
+---
+
+
+
+# Load Change-O data #
+
+A small example Change-O tab-delimited database file is included in the 
+`alakazam` package. 
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+library(alakazam)
+
+# Load Change-O file
+file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+db <- readChangeoDb(file)
+colnames(db)
+```
+
+# Calculate the properties of amino acid sequences #
+
+Multiple amino acid chemical properties can be obtained with the function `aminoAcidProperties`. The available properties are `length`, `hydrophobicity`, `bulkiness`, `polarity`, aliphatic index (`aliphatic`), net charge (`charge`), acidic residue content (`acidic`), basic residue content (`basic`), and aromatic reside content (`aromatic`).
+
+In this example we calculate all the available amino acid properties of the DNA sequences found in column `JUNCTION` of the Change-O file we previously loaded. We use `nt = TRUE` to specify we have DNA sequences that will need to be translated into amino acid sequences prior calculating the properties. We add the prefix `CDR3` to the output column names.
+
+```{r, eval=TRUE, warning=FALSE}
+db <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE,
+                                        trim=FALSE, label="CDR3")
+## Several columns have been added, starting with the prefix CDR3
+colnames(db)
+
+db[1:5,15:23]
+```
+
+## The properties can also be obtained individually ##
+
+### GRAVY index ###
+
+The Grand Average of Hydrophobicity (GRAVY) index can be obtained with  the function `gravy`. By default, it will use the method of Kyte & Doolittle, excluding from the calculations those position in the amino acid sequence considered non-informative (.,-,*,X).
+
+```{r, eval=TRUE, warning=FALSE}
+## Translate nucleotides to amino acids
+seq_aa <- translateDNA(db$JUNCTION)
+cdr3_gravy <- gravy(seq_aa)
+cdr3_gravy[1:5]
+```
+
+It is possible to use other hydrophobicity scales. Here we demonstrate how to use the Kidera et al, 1985 scores from the `seqinr` package
+
+```{r, eval=TRUE, warning=FALSE}
+library(seqinr)
+data(aaindex)
+h <- aaindex[["KIDA850101"]]$I
+# Rename the score vector to use single-letter codes
+names(h) <- translateStrings(names(h), AA_TRANS)
+# Calculate hydrophobicity
+cdr3_gravy_kidera <- gravy(seq_aa, hydropathy=h)
+cdr3_gravy_kidera[1:5]
+```
+
+# R Session #
+
+```{r}
+sessionInfo()
+```
