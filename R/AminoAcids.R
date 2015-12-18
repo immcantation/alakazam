@@ -453,11 +453,17 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #'   \item  Grantham R. Amino acid difference formula to help explain protein evolution. 
 #'            Science 185, 862-864 (1974).
 #'   \item  Ikai AJ. Thermostability and aliphatic index of globular proteins. 
-#'            J Biochem. 88, 1895-1898 (1980).
+#'            J Biochem 88, 1895-1898 (1980).
 #'   \item  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
-#'            of a protein. J Mol Biol. 157, 105-32 (1982).
+#'            of a protein. J Mol Biol 157, 105-32 (1982).
 #'   \item  Moore DS. Amino acid and peptide net charges: A simple calculational procedure. 
-#'            Biochem Educ. 13, 10-11 (1985).
+#'            Biochem Educ 13, 10-11 (1985).
+#'   \item  Wu YC, et al. High-throughput immunoglobulin repertoire analysis distinguishes 
+#'            between human IgM memory and switched memory B-cell populations. 
+#'            Blood 116, 1070-8 (2010).
+#'   \item  Wu YC, et al. The relationship between CD27 negative and positive B cell 
+#'            populations in human peripheral blood. 
+#'            Front Immunol 2, 1-12 (2011).
 #'   \item  \url{http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html}
 #' }
 #' 
@@ -548,36 +554,36 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     # Calculate region lengths
     if ("length" %in% property) {
         aa_length <- nchar(region_aa, keepNA=TRUE)
-        out_df[,prop_colnames$length] <- aa_length
+        out_df[, prop_colnames$length] <- aa_length
     }
     # Average hydrophobicity
     if ("gravy" %in% property) {
         #aa_gravy <- gravy(region_aa, hydropathy)
         aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
-        out_df[,prop_colnames$gravy] <- aa_gravy
+        out_df[, prop_colnames$gravy] <- aa_gravy
     }
     # Average bulkiness
     if ("bulk" %in% property) {
         #aa_bulk <- bulk(region_aa)
         aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
-        out_df[,prop_colnames$bulk] <- aa_bulk
+        out_df[, prop_colnames$bulk] <- aa_bulk
     }
     if ("aliphatic" %in% property) {
         # Normalizes aliphatic index
         aa_aliphatic <- aliphatic(region_aa)
-        out_df[,prop_colnames$aliphatic] <- aa_aliphatic
+        out_df[, prop_colnames$aliphatic] <- aa_aliphatic
     }
     # Average polarity
     if ("polarity" %in% property) {
         #aa_polarity <- polar(region_aa)
         aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
-        out_df[,prop_colnames$polarity] <- aa_polarity
+        out_df[, prop_colnames$polarity] <- aa_polarity
     }
     # Normalized net charge
     if ("charge" %in% property) {
         #aa_charge <- charge(region_aa)
         aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
-        out_df[,prop_colnames$charge] <- aa_charge
+        out_df[, prop_colnames$charge] <- aa_charge
     }
     
     # Count of informative positions
@@ -585,19 +591,20 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     # Fraction of amino acid that are basic
     if ("basic" %in% property) {
         aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
-        out_df[,prop_colnames$basic] <- aa_basic
+        out_df[, prop_colnames$basic] <- aa_basic
     }
     # Fraction of amino acid that are acidic
     if ("acidic" %in% property) {
         aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
-        out_df[,prop_colnames$acidic] <- aa_acidic
+        out_df[, prop_colnames$acidic] <- aa_acidic
     }
     # Count fraction of aa that are aromatic
     if ("aromatic" %in% property) {
         aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
-        out_df[,prop_colnames$aromatic] <- aa_aromatic
+        out_df[, prop_colnames$aromatic] <- aa_aromatic
     }
+    
     data_cols <- colnames(data) %in% colnames(out_df) == FALSE
-    return(cbind(data[,data_cols], out_df))
+    return(cbind(data[, data_cols], out_df))
 }
 

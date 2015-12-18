@@ -1,6 +1,6 @@
 ---
-title: 'Alakazam: Analysis of amino acid physicochemical chemical properties'
-author: "Jason Anthony Vander Heiden"
+title: 'Alakazam: Analysis of amino acid physicochemical properties'
+author: "Susanna Marquez"
 date: '`r Sys.Date()`'
 output:
   pdf_document:
@@ -20,11 +20,21 @@ fontsize: 11pt
 vignette: |
   %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
 ---
+The `alakazam` package includes a set of function to analyze the physicochemical 
+properties of Ig and TCR amino acid sequence. Of particular interest is the analysis of 
+CDR3 properties, which this vignette will demonstration. However, the same process
+can be applies to other regions simply by altering the sequence data column used.
+
+    Wu YC, et al. High-throughput immunoglobulin repertoire analysis distinguishes 
+        between human IgM memory and switched memory B-cell populations. 
+        Blood 116, 1070-8 (2010).
+    Wu YC, et al. The relationship between CD27 negative and positive B cell 
+        populations in human peripheral blood. 
+        Front Immunol 2, 1-12 (2011).
 
 
-
-# Load Change-O data #
-
+Load Change-O data
+--------------------------------------------------------------------------------
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. 
 
@@ -34,63 +44,137 @@ library(alakazam)
 # Load Change-O file
 file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
 db <- readChangeoDb(file)
-colnames(db)
 ```
 
-# Calculate the properties of amino acid sequences #
+Calculate the properties of amino acid sequences
+--------------------------------------------------------------------------------
+Multiple amino acid chemical properties can be obtained with the function 
+`aminoAcidProperties`. The available properties are:
 
-Multiple amino acid chemical properties can be obtained with the function `aminoAcidProperties`. The available properties are `length`, `hydrophobicity`, `bulkiness`, `polarity`, aliphatic index (`aliphatic`), net charge (`charge`), acidic residue content (`acidic`), basic residue content (`basic`), and aromatic reside content (`aromatic`).
+* `length`: total amino acid count
+* `gravy`: grand average of hydrophobicity
+* `bulkiness`: average bulkiness
+* `polarity`: average polarity
+* `aliphatic`: normalized aliphatic index
+* `charge`: normalized net charge
+* `acidic`: acidic side chain content
+* `basic`: basic side chain residue content
+* `aromatic`: aromatic side chain content
 
-In this example we calculate all the available amino acid properties of the DNA sequences found in column `JUNCTION` of the Change-O file we previously loaded. We use `nt = TRUE` to specify we have DNA sequences that will need to be translated into amino acid sequences prior calculating the properties. We add the prefix `CDR3` to the output column names.
+This example demonstrates how to calculate all of the available amino acid 
+properties from DNA sequences found in `JUNCTION` column of the Change-O file 
+previously load. 
+
+Translate of the DNA sequences to amino acid sequences is accomplished by 
+specifying the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
+sequence we specify the argument `trim=TRUE` which will strip the first and last
+codon (the conserved resiudes) prior to analysis. The prefix `CDR3` is added
+to the output column names using the `label="CDR3"` argument.
 
 ```{r, eval=TRUE, warning=FALSE}
-db_props <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE,
-                            trim=FALSE, label="CDR3")
-## Several columns have been added, starting with the prefix CDR3
-colnames(db_props)
-db_props[1:5,15:23]
+db_props <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, 
+                                label="CDR3")
+
+# Several columns have been added, starting with the prefix CDR3
+db_props[1:5, c(1, 15:23)]
 ```
 
 ## Obtaining properties individually ##
 
-The Grand Average of Hydrophobicity (GRAVY) index can be obtained with  the function `aminoAcidProperties` setting `properties="gravy"`. By default, it will use the method of Kyte & Doolittle, excluding from the calculations those position in the amino acid sequence considered non-informative (.,-,*,X).
+A subset of the properties may be calculated using the `property` argument of
+`aminoAcidProperties`.  For example, calculations may be restricted only the 
+grand average of hydrophobicity index (`gravy`) and normalized net charge by
+specifying `property=c("gravy", "charge")`. 
 
 ```{r, eval=TRUE, warning=FALSE}
-db_g <- aminoAcidProperties(db, seq="JUNCTION", property="gravy",
-                          nt=TRUE,trim=FALSE, label="CDR3")
-## Several columns have been added, starting with the prefix CDR3
-colnames(db_g)
-db_g[1:5,15]
+db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"),
+                                nt=TRUE, trim=TRUE, label="CDR3")
+db_props[1:5, c(1, 15:16)]
 ```
 
 ## Using user defined scales ##
 
-It is possible to use user provided scales. Here we demonstrate how to use the Kidera et al, 1985 scores from the `seqinr` package for the calculation of the *GRAVY index*. 
+Each property has a default scale setting, but users may specify alternate scales 
+if they wish. The example that follows shows how to import and use the
+Kidera et al, 1985 hydrophobicity scale and the Murrary et al, 2006 pK values from 
+the `seqinr` package instead of the defaults for calculating the GRAVY index and 
+net charge.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(seqinr)
 data(aaindex)
+data(pK)
 h <- aaindex[["KIDA850101"]]$I
-# Rename the score vector to use single-letter codes
+p <- setNames(pK[["Murray"]], rownames(pK))
+# Rename the hydrophobicity vector to use single-letter codes
 names(h) <- translateStrings(names(h), AA_TRANS)
-db_g_h <- aminoAcidProperties(db, seq="JUNCTION", property="gravy", nt=TRUE, trim=FALSE, label="CDR3", hydropathy=h)
-colnames(db_g_h)
-db_g_h[1:5,15]
+db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
+                                nt=TRUE, trim=TRUE, label="CDR3", 
+                                hydropathy=h, pK=p)
+db_props[1:5, c(1, 15:16)]
 ```
 
-To calculate the *average bulkiness* of amino acids using the Grantham, 1974 side chain volumn scores from the seqinr package and pH=7:
+## Getting vectors of individual properties ##
+
+The `aminoAcidProperties` function provides a convenient wrapper for calculating
+multiple properties at once from a data.frame. If a vector of a specific property is
+required this may be accomplished using one of the work functions:
+
+* `gravy`: grand average of hydrophobicity
+* `bulk`: average bulkiness
+* `polar`: average polarity
+* `aliphatic`: aliphatic index
+* `charge`: net charge
+* `countPatterns`: counts the occurrence of patterns in amino acid sequences
+
+Input to each function must be vector of amino acid sequences.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
-x <- aaindex[["GRAR740103"]]$I
-# Rename the score vector to use single-letter codes
-names(x) <- translateStrings(names(x), AA_TRANS)
-db_props_bulk <- aminoAcidProperties(db, seq="JUNCTION", property="bulk", nt=TRUE, trim=FALSE, label="CDR3", bulkiness=x, pH=7.0)
-colnames(db_props_bulk)
-db_props_bulk[1:5,15]
+# Translate junction DNA sequences to amino acids and trim first and last codons
+cdr3 <- translateDNA(db$JUNCTION[1:5], trim=TRUE)
+
+# Grand average of hydrophobicity
+gravy(cdr3)
+
+# Average bulkiness
+bulk(cdr3)
+
+# Average polarity
+polar(cdr3)
+
+# Normalized aliphatic index
+aliphatic(cdr3)
+# Unnormalized aliphatic index
+aliphatic(cdr3, normalize=FALSE)
+
+# Normalized net charge
+charge(cdr3)
+# Unnormalized net charge
+charge(cdr3, normalize=FALSE)
+
+# Count of acidic amino acids
+# Takes a named list of regular expressions
+countPatterns(cdr3, c(ACIDIC="[DE]"), label="CDR3")
 ```
 
-# R Session #
+Default scales
+--------------------------------------------------------------------------------
 
-```{r}
-sessionInfo()
-```
+The following references were used for the default physiochemical scales:
+
+* Aliphatic index:  
+  Ikai AJ. Thermostability and aliphatic index of globular proteins. 
+        J Biochem 88, 1895-1898 (1980).
+* Bulkiness scale:  
+  Zimmerman JM, Eliezer N, Simha R. The characterization of amino acid sequences 
+    in proteins by statistical methods. 
+    J Theor Biol 21, 170-201 (1968).
+* Hydrophobicity scale:  
+  Kyte J, Doolittle RF. A simple method for displaying the hydropathic character 
+    of a protein.
+    J Mol Biol 157, 105-32 (1982).
+* pK values:  
+  \url{http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html}
+* Polarity scale:  
+  Grantham R. Amino acid difference formula to help explain protein evolution. 
+    Science 185, 862-864 (1974).
