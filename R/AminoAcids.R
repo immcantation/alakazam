@@ -213,8 +213,13 @@ gravy <- function(seq, hydropathy=NULL) {
 #' the method of Ikai. Non-informative positions are excluded, where non-informative 
 #' is defined as any character in \code{c("X", "-", ".", "*")}.
 #'
-#' @param    seq  vector of strings containing amino acid sequences.
-#' 
+#' @param    seq        vector of strings containing amino acid sequences.
+#' @param    normalize  if \code{TRUE} then divide the aliphatic index of each amino acid 
+#'                      sequence by the number of informative positions. Non-informative 
+#'                      position are defined by the presence any character in 
+#'                      \code{c("X", "-", ".", "*")}. If \code{FALSE} then return the raw
+#'                      aliphatic index.
+#'                      
 #' @return   A vector of the aliphatic indices for the sequence(s).
 #'
 #' @references 
@@ -228,15 +233,16 @@ gravy <- function(seq, hydropathy=NULL) {
 #' aliphatic(seq)
 #'
 #' @export
-aliphatic <- function(seq) {
-    # Remove non-informative positions
-    seq <- gsub("[X\\.\\*-]", "", seq)
-    
+aliphatic <- function(seq, normalize=TRUE) {
     # Calculate aliphatic index
     ala <- countOccurrences(seq, "[A]")
     val <- countOccurrences(seq, "[V]")
     leu_ile <- countOccurrences(seq, "[LI]")
-    aa_aliphatic = (ala + 2.9 * val + 3.9 * leu_ile) / nchar(seq, keepNA=TRUE)
+    aa_aliphatic = ala + 2.9 * val + 3.9 * leu_ile
+    
+    if (normalize) {
+        aa_aliphatic <- aa_aliphatic / nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
+    }
     
     return(aa_aliphatic)
 }
@@ -393,10 +399,8 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
 #' @param   label         name of sequence region to add as prefix to output column names.
-#' @param   hydropathy   named numerical vector defining hydropathy index values for 
-#'                       each amino acid, where names are single-letter amino acid 
-#'                       character codes. If \code{NULL}, then the Kyte & Doolittle
-#'                       scale is used.
+#' @param   ...           additional named arguments to pass to the functions 
+#'                        \link{gravy}, \link{bulk}, \link{aliphatic}, \link{polar} or \link{charge}.
 #' 
 #' @return  A modified \code{data} data.frame with the following columns:
 #'          \itemize{
@@ -470,8 +474,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' prop[, c(1, 15:23)]
 #' 
 #' @export
-aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, 
-                                hydropathy=NULL) {
+aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
     # Check input
     if (length(seq) > 1) {
         stop("You may specify only one sequence column; seq must be a vector of length 1.")
@@ -479,22 +482,33 @@ aminoAcidProperties <- function(data, seq="JUNCTION", nt=FALSE, trim=FALSE, labe
     check <- checkColumns(data, seq)
     if (check != TRUE) { stop(check) }
     
+    # Assign ellipsis arguments to correct function
+    dots <- list(...)
+    args_gravy <- dots[names(dots) %in% names(formals(gravy))]
+    args_bulk <- dots[names(dots) %in% names(formals(bulk))]
+    args_polar <- dots[names(dots) %in% names(formals(polar))]
+    args_charge <- dots[names(dots) %in% names(formals(charge))]
+    
     # Get sequence vector and translate if required
     region <- as.character(data[[seq]])
     region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
 
     # Calculate region lengths
     aa_length <- nchar(region_aa, keepNA=TRUE)
-    # Hydrophobicity
-    aa_gravy <- gravy(region_aa, hydropathy)
-    # Bulkiness
-    aa_bulk <- bulk(region_aa)
-    # Aliphatic index
+    # Average hydrophobicity
+    #aa_gravy <- gravy(region_aa, hydropathy)
+    aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
+    # Average bulkiness
+    #aa_bulk <- bulk(region_aa)
+    aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
+    # Normalizes aliphatic index
     aa_aliphatic <- aliphatic(region_aa)
-    # Net charge
-    aa_polarity <- polar(region_aa)
-    # Net charge
-    aa_charge <- charge(region_aa)
+    # Average polarity
+    #aa_polarity <- polar(region_aa)
+    aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
+    # Normalized net charge
+    #aa_charge <- charge(region_aa)
+    aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
 
     # Count of informative positions
     aa_info <-  nchar(gsub("[X\\.\\*-]", "", region_aa), keepNA=TRUE)
