@@ -541,6 +541,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     dots <- list(...)
     args_gravy <- dots[names(dots) %in% names(formals(gravy))]
     args_bulk <- dots[names(dots) %in% names(formals(bulk))]
+    args_aliphatic <- dots[names(dots) %in% names(formals(aliphatic))]
     args_polar <- dots[names(dots) %in% names(formals(polar))]
     args_charge <- dots[names(dots) %in% names(formals(charge))]
     
@@ -567,7 +568,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     }
     if ("aliphatic" %in% property) {
         # Normalizes aliphatic index
-        aa_aliphatic <- aliphatic(region_aa)
+        aa_aliphatic <- do.call('aliphatic', c(list(seq=region_aa), args_aliphatic))
         out_df[, prop_colnames$aliphatic] <- aa_aliphatic
     }
     # Average polarity
