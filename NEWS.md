@@ -1,3 +1,12 @@
+Version 0.2.1.999:  December 21, 2015
+-------------------------------------------------------------------------------
+
+Amino Acid Analysis:
+
++ Fixed bug where arguments for the `aliphatic()` function were not being
+  passed through the ellipsis argument of `aminoAcidProperties()`.
+  
+
 Version 0.2.1:  December 18, 2015
 -------------------------------------------------------------------------------
 
