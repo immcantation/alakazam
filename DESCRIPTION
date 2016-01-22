@@ -7,7 +7,7 @@ Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Core functionality, lineage reconstruction, and diversity analysis
     components of the Change-O tool suite.
-License: CC BY-NC-SA 3.0
+License: CC BY-NC-SA 4.0
 URL: http://clip.med.yale.edu/changeo
 Depends:
     R (>= 3.0.0),

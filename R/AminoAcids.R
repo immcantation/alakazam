@@ -21,25 +21,26 @@ NULL
 getPropertyData <- function(property){
     property <- match.arg(property, c("hydropathy", "bulkiness", "polarity" ,"charge"))
     
+    # Setup new environment to avoid R CMD check NOTE
+    e1 <- new.env(parent=environment())
+    data(aaindex, package="seqinr", envir=e1)
+    data(pK, package="seqinr", envir=e1)
+    
     if (property == "hydropathy") {
         # Kyte & Doolittle, 1982.
-        data(aaindex, package="seqinr", envir=environment())
-        scores <- aaindex[["KYTJ820101"]]$I
+        scores <- with(e1, aaindex[["KYTJ820101"]]$I)
         names(scores) <- translateStrings(names(scores), AA_TRANS)
     } else if (property == "bulkiness") {
         # Zimmerman et al, 1968.
-        data(aaindex, package="seqinr", envir=environment())
-        scores <- aaindex[["ZIMJ680102"]]$I
+        scores <- with(e1, aaindex[["ZIMJ680102"]]$I)
         names(scores) <- translateStrings(names(scores), AA_TRANS)
     } else if (property == "polarity") {
         # Grantham, 1974
-        data(aaindex, package="seqinr", envir=environment())
-        scores <- aaindex[["GRAR740102"]]$I
+        scores <- with(e1, aaindex[["GRAR740102"]]$I)
         names(scores) <- translateStrings(names(scores), AA_TRANS)
     } else if (property == "charge") {
         # EMBOSS
-        data(pK, package="seqinr", envir=environment())
-        scores <- setNames(pK[["EMBOSS"]], rownames(pK))
+        scores <- with(e1, setNames(pK[["EMBOSS"]], rownames(pK)))
     }
     
     return(scores)

@@ -112,17 +112,17 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL,
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(SEQ_COUNT)) %>%
+            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+            dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
             dplyr::rename_(.dots=c("GENE"=gene))
     } else {
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
             dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(gene)),
                               COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
-                          COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(COPY_COUNT)) %>%
+            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
+                           COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
+            dplyr::arrange_(.dots="desc(COPY_COUNT)") %>%
             dplyr::rename_(.dots=c("GENE"=gene))
     }
     

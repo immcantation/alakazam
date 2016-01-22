@@ -352,17 +352,17 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
         clone_tab <- data %>% 
             group_by_(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(SEQ_COUNT)) %>%
+            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+            dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
             dplyr::rename_(.dots=c("CLONE"=clone))
     } else {
         clone_tab <- data %>% 
             group_by_(.dots=c(groups, clone)) %>%
             dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(clone)),
                               COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
-                          COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(COPY_COUNT)) %>%
+            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
+                           COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
+            dplyr::arrange_(.dots="desc(COPY_COUNT)") %>%
             dplyr::rename_(.dots=c("CLONE"=clone))
     }
     
@@ -452,7 +452,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
     # Summarize groups
     group_tab <- clone_tab %>%
         group_by_(.dots=c(group)) %>%
-        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_set <- as.character(group_tab[[group]])
     
     # Set confidence interval
@@ -487,7 +487,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
         
         # Assemble and sort abundance data.frame
         abund_df <- dplyr::data_frame(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
-        abund_df <- dplyr::arrange(abund_df, desc(P))
+        abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
         abund_df$RANK <- 1:nrow(abund_df)
         abund_list[[g]] <- abund_df
         
@@ -698,10 +698,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
-                 group_by_(.dots=c(group)) %>%
-                 dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+        group_by_(.dots=c(group)) %>%
+        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_all <- as.character(group_tab[[group]])
-    group_tab <- filter(group_tab, SEQUENCES >= min_n)
+    group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
     
     # Set number of samples sequence
@@ -890,9 +890,9 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by_(.dots=c(group)) %>%
-        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_all <- as.character(group_tab[[group]])
-    group_tab <- filter(group_tab, SEQUENCES >= min_n)
+    group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
     
     # Set number of samples per group
@@ -1017,9 +1017,11 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
                           legend_title=NULL, xlim=NULL, ylim=NULL, 
                           silent=FALSE, ...) {
     # TODO: additional styles. rank abundance, box/violin
-    
+
+    # Stupid hack for check NOTE about `.x` in math_format
+    .x <- NULL    
     # Define base plot elements
-    g1 <- ggplot(data, aes(x=RANK, y=P, group=GROUP)) + 
+    g1 <- ggplot(data, aes_string(x="RANK", y="P", group="GROUP")) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('Rank') +
@@ -1028,8 +1030,8 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
                       breaks=trans_breaks('log10', function(x) 10^x),
                       labels=trans_format('log10', math_format(10^.x))) +
         scale_y_continuous(labels=percent) +
-        geom_ribbon(aes(ymin=LOWER, ymax=UPPER, fill=GROUP), alpha=0.4) +
-        geom_line(aes(color=GROUP))
+        geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill="GROUP"), alpha=0.4) +
+        geom_line(aes_string(color="GROUP"))
     
     # Set colors and legend
     if (!is.null(colors)) {
@@ -1109,14 +1111,16 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
                                  data@groups)
     }
     
+    # Stupid hack for check NOTE about `.x` in math_format
+    .x <- NULL
     # Define base plot elements
-    p1 <- ggplot(data@data, aes(x=q, y=D, group=group)) + 
+    p1 <- ggplot(data@data, aes_string(x="q", y="D", group="group")) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('q') +
         ylab(expression(''^q * D)) +
-        geom_ribbon(aes(ymin=lower, ymax=upper, fill=group), alpha=0.4) +
-        geom_line(aes(color=group))
+        geom_ribbon(aes_string(ymin="lower", ymax="upper", fill="group"), alpha=0.4) +
+        geom_line(aes_string(color="group"))
     
     # Set colors and legend
     if (!is.null(colors)) {
