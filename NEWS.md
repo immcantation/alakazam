@@ -1,5 +1,9 @@
-Version 0.2.1.999:  December 21, 2015
+Version 0.2.1.999:  January 22, 2016
 -------------------------------------------------------------------------------
+
+General:
+
++ Updated license from CC BY-NC-SA 3.0 to CC BY-NC-SA 4.0.
 
 Amino Acid Analysis:
 
