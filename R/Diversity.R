@@ -1027,9 +1027,9 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
         xlab('Rank') +
         ylab('Abundance') +
         scale_x_log10(limits=xlim,
-                      breaks=trans_breaks('log10', function(x) 10^x),
-                      labels=trans_format('log10', math_format(10^.x))) +
-        scale_y_continuous(labels=percent) +
+                      breaks=scales::trans_breaks('log10', function(x) 10^x),
+                      labels=scales::trans_format('log10', scales::math_format(10^.x))) +
+        scale_y_continuous(labels=scales::percent) +
         geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill="GROUP"), alpha=0.4) +
         geom_line(aes_string(color="GROUP"))
     
@@ -1133,18 +1133,18 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     # Set x-axis style
     if (log_q) {
-        p1 <- p1 + scale_x_continuous(trans=log2_trans(), limits=xlim,
-                                      breaks=trans_breaks('log2', function(x) 2^x),
-                                      labels=trans_format('log2', math_format(2^.x)))
+        p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(), limits=xlim,
+                                      breaks=scales::trans_breaks('log2', function(x) 2^x),
+                                      labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
         p1 <- p1 + scale_x_continuous(limits=xlim)
     }
     
     # Set y-axis style
     if (log_d) {
-        p1 <- p1 + scale_y_continuous(trans=log2_trans(), limits=ylim,
-                                      breaks=trans_breaks('log2', function(x) 2^x),
-                                      labels=trans_format('log2', math_format(2^.x)))
+        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(), limits=ylim,
+                                      breaks=scales::trans_breaks('log2', function(x) 2^x),
+                                      labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
         p1 <- p1 + scale_y_continuous(limits=ylim)
     }
