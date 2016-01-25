@@ -44,7 +44,7 @@ library(alakazam)
 # Load Change-O file
 file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 db <- readChangeoDb(file)
-db <- db[c(1, 10, 100), c("SEQUENCE_ID", "JUNCTION")]
+db <- db[db$SAMPLE == "RL01", ]
 ```
 
 Calculate the properties of amino acid sequences
@@ -72,23 +72,51 @@ sequence we specify the argument `trim=TRUE` which will strip the first and last
 codon (the conserved residues) prior to analysis. The prefix `CDR3` is added
 to the output column names using the `label="CDR3"` argument.
 
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, fig.width=7.5, fig.height=6}
 db_props <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, 
                                 label="CDR3")
-db_props[-2]
+
+# The full set of properties are calculated by default
+dplyr::select(db_props[1:3, ], starts_with("CDR3"))
+
+# Plot a subset of the properties
+tmp_theme <- theme_bw() + theme(legend.position="bottom")
+g1 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_LENGTH)) + tmp_theme +
+    ggtitle("CDR3 length") + 
+    xlab("Isotype") + ylab("Amino acids") +
+    scale_fill_manual(name="Isotype", values=IG_COLORS) +
+    geom_boxplot(aes(fill=ISOTYPE))
+g2 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_GRAVY)) + tmp_theme + 
+    ggtitle("CDR3 hydrophobicity") + 
+    xlab("Isotype") + ylab("GRAVY") +
+    scale_fill_manual(name="Isotype", values=IG_COLORS) +
+    geom_boxplot(aes(fill=ISOTYPE))
+g3 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_BASIC)) + tmp_theme +
+    ggtitle("CDR3 basic residues") + 
+    xlab("Isotype") + ylab("Basic residues") +
+    scale_y_continuous(labels=scales::percent) +
+    scale_fill_manual(name="Isotype", values=IG_COLORS) +
+    geom_boxplot(aes(fill=ISOTYPE))
+g4 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_ACIDIC)) + tmp_theme +
+    ggtitle("CDR3 acidic residues") + 
+    xlab("Isotype") + ylab("Acidic residues") +
+    scale_y_continuous(labels=scales::percent) +
+    scale_fill_manual(name="Isotype", values=IG_COLORS) +
+    geom_boxplot(aes(fill=ISOTYPE))
+multiggplot(g1, g2, g3, g4, ncol=2)
 ```
 
 ## Obtaining properties individually ##
 
 A subset of the properties may be calculated using the `property` argument of
-`aminoAcidProperties`.  For example, calculations may be restricted only the 
-grand average of hydrophobicity (`gravy`) index and normalized net charge by
-specifying `property=c("gravy", "charge")`. 
+`aminoAcidProperties`.  For example, calculations may be restricted to only the 
+grand average of hydrophobicity (`gravy`) index and normalized net charge 
+(`charge`) by specifying `property=c("gravy", "charge")`. 
 
 ```{r, eval=TRUE, warning=FALSE}
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"),
                                 nt=TRUE, trim=TRUE, label="CDR3")
-db_props[-2]
+dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ```
 
 ## Using user defined scales ##
@@ -111,7 +139,7 @@ names(h) <- translateStrings(names(h), AA_TRANS)
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
                                 nt=TRUE, trim=TRUE, label="CDR3", 
                                 hydropathy=h, pK=p)
-db_props[-2]
+dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ```
 
 ## Getting vectors of individual properties ##
@@ -131,7 +159,7 @@ The input to each function must be vector of amino acid sequences.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Translate junction DNA sequences to amino acids and trim first and last codons
-cdr3 <- translateDNA(db$JUNCTION, trim=TRUE)
+cdr3 <- translateDNA(db$JUNCTION[1:3], trim=TRUE)
 
 # Grand average of hydrophobicity
 gravy(cdr3)

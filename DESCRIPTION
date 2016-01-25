@@ -9,7 +9,9 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
              person("Daniel", "Gadala-Maria", role=c("ctb"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("ctb"), 
-                    email="susanna.marquez@yale.edu"))
+                    email="susanna.marquez@yale.edu"),
+             person("Roy", "Jiang", role=c("ctb"), 
+                    email="ruoyi.jiang@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Core functionality, lineage reconstruction, and diversity analysis
     components of the Change-O tool suite.
