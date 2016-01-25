@@ -475,7 +475,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' df <- df[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
 #' 

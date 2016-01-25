@@ -149,7 +149,7 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #'           
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Calculate clone sizes
@@ -332,7 +332,7 @@ adjustObservedAbundance <- function(x) {
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Without copy numbers
@@ -422,7 +422,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #'           
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' abund <- estimateAbundance(df, "SAMPLE", nboot=100)
@@ -656,7 +656,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Group by sample identifier
@@ -853,7 +853,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' @examples  
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
@@ -1005,7 +1005,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #'           
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Plot
@@ -1086,7 +1086,7 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # All groups pass default minimum sampling threshold of 10 sequences

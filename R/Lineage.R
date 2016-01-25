@@ -517,7 +517,7 @@ phylipToGraph <- function(edges, clone) {
 #' @examples
 #' \dontrun{
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Preprocess clone

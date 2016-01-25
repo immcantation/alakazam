@@ -42,9 +42,9 @@ A small example Change-O tab-delimited database file is included in the
 library(alakazam)
 
 # Load Change-O file
-file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 db <- readChangeoDb(file)
-db <- db[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
+db <- db[c(1, 10, 100), c("SEQUENCE_ID", "JUNCTION")]
 ```
 
 Calculate the properties of amino acid sequences

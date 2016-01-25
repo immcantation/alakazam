@@ -413,7 +413,7 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 #' @examples
 #' library(alakazam)
 #' # Load Change-O file
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' translateDNA(df$JUNCTION[1:3])
@@ -840,7 +840,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' clone <- subset(df, CLONE == 164)
 #'

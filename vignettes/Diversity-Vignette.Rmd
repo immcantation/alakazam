@@ -59,7 +59,7 @@ column. In this example we will use the grouping columns `SAMPLE` and `ISOTYPE`.
 library(alakazam)
 
 # Load Change-O file
-file <- system.file("extdata", "changeo_demo.tab", package="alakazam")
+file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
 df <- readChangeoDb(file)
 ```
 
