@@ -20,6 +20,7 @@ Depends:
     ggplot2,
     dplyr
 Imports:
+    grid,
     igraph (>= 1.0.0),
     lazyeval,
     methods,
