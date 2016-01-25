@@ -820,7 +820,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' for all bootstrap realizations, yeilding a distribution of \code{nboot} total deltas; where 
 #' \eqn{group-a} is the group with the greater mean \eqn{D}. The p-value for hypothesis 
 #' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution 
-#' function of the bootstrap delta distribution, multipled by 2 for the two-tailed correction.
+#' function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.
 #' 
 #' @note
 #' This method may inflate statistical significance when clone sizes are uniformly small,
