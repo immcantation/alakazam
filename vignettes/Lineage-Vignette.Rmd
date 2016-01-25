@@ -126,7 +126,7 @@ plot(graph)
 
 The default layout and attributes are not very pretty. We can modify the 
 graphical parameter in the usual igraph ways. A tree layout can be built using 
-the `layout.reingold.tilford` layout with assignment of the root position to the 
+the `layout_as_tree` layout with assignment of the root position to the 
 germline sequence, which is named "Germline" in the object returned by 
 `buildPhylipLineage`.
 
