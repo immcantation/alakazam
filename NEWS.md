@@ -4,6 +4,7 @@ Version 0.2.1.999:  January 22, 2016
 General:
 
 + Updated license from CC BY-NC-SA 3.0 to CC BY-NC-SA 4.0.
++ Internal changes to conform to CRAN policies.
 
 Amino Acid Analysis:
 

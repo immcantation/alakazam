@@ -1,9 +1,15 @@
 Package: alakazam
 Type: Package
 Version: 0.2.1.999
-Date: 2015-12-21
-Author: Jason Anthony Vander Heiden, Namita Gupta
-Maintainer: Jason Anthony Vander Heiden <jason.vanderheiden@yale.edu>
+Date: 2016-01-25
+Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
+                    email="jason.vanderheiden@yale.edu"),
+             person("Namita", "Gupta", role=c("ctb"), 
+                    email="namita.gupta@yale.edu"),
+             person("Daniel", "Gadala-Maria", role=c("ctb"), 
+                    email="daniel.gadala-maria@yale.edu"),
+             person("Susanna", "Marquez", role=c("ctb"), 
+                    email="susanna.marquez@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Core functionality, lineage reconstruction, and diversity analysis
     components of the Change-O tool suite.
