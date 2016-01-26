@@ -183,7 +183,7 @@ translateStrings <- function(strings, translation) {
 # @param   columns  vector of column names to check
 # @param   logic    one of "all" or "any" controlling whether all or at least one of
 #                   the columns must be valid
-# @return  TRUE is columns are valid and a string message if not.
+# @return  TRUE if columns are valid and a string message if not.
 checkColumns <- function(data, columns, logic=c("all", "any")) {
     # Check arguments
     logic <- match.arg(logic)
