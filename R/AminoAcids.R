@@ -235,14 +235,24 @@ gravy <- function(seq, hydropathy=NULL) {
 #'
 #' @export
 aliphatic <- function(seq, normalize=TRUE) {
+    
+    ## Initialize aa_aliphatic
+    aa_aliphatic <- rep(NA,length(seq))
+    valid_aa_idx <- isValidAASeq(seq)
+    
     # Calculate aliphatic index
     ala <- countOccurrences(seq, "[A]")
     val <- countOccurrences(seq, "[V]")
     leu_ile <- countOccurrences(seq, "[LI]")
-    aa_aliphatic = ala + 2.9 * val + 3.9 * leu_ile
+    
+    ## Fill only for valid aminoacids
+    aa_aliphatic[valid_aa_idx] = ala[valid_aa_idx] + 
+        2.9 * val[valid_aa_idx] + 
+        3.9 * leu_ile[valid_aa_idx]
     
     if (normalize) {
-        aa_aliphatic <- aa_aliphatic / nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
+        aa_aliphatic[valid_aa_idx] <- aa_aliphatic[valid_aa_idx] / 
+            nchar(gsub("[X\\.\\*-]", "", seq[valid_aa_idx]), keepNA=TRUE)
     }
     
     return(aa_aliphatic)
