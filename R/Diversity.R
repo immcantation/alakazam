@@ -9,15 +9,22 @@ NULL
 #' S4 class defining diversity curve 
 #'
 #' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
-#' orders (\eqn{q}).
+#' orders (\eqn{Q}).
 #' 
 #' @slot  data      data.frame defining the diversity curve with the following columns:
 #'                  \itemize{
-#'                    \item  \code{q}:      diversity order.
-#'                    \item  \code{D}:      median diversity index over all bootstrap 
-#'                                          realizations.
-#'                    \item  \code{lower}:  lower confidence inverval bound.
-#'                    \item  \code{upper}:  upper confidence interval bound.
+#'                    \item  \code{GROUP}:    group label.
+#'                    \item  \code{Q}:        diversity order.
+#'                    \item  \code{D}:        mean diversity index over all bootstrap 
+#'                                            realizations.
+#'                    \item  \code{D_SD}:     standard deviation of the diversity index 
+#'                                            over all bootstrap realizations.
+#'                    \item  \code{D_LOWER}:  diversity lower confidence inverval bound.
+#'                    \item  \code{D_UPPER}:  diversity upper confidence interval bound.
+#'                    \item  \code{E}:        evenness index calculated as \code{D} 
+#'                                            divided by \code{D} at \code{Q=0}.
+#'                    \item  \code{E_LOWER}:  evenness lower confidence inverval bound.
+#'                    \item  \code{E_UPPER}:  eveness upper confidence interval bound.
 #'                  }
 #' @slot  groups    character vector of groups retained in the diversity calculation.
 #' @slot  n         numeric vector indication the number of sequences sampled from each group.
@@ -45,10 +52,6 @@ setClass("DiversityCurve",
 #'                 \itemize{
 #'                   \item  \code{test}:          string listing the two groups tested.
 #'                   \item  \code{pvalue}:        p-value for the test.
-#'                   \item  \code{delta_median}:  median of the \eqn{D} bootstrap delta 
-#'                                                distribution for the test.
-#'                   \item  \code{delta_mad}:     median absolute deviation of the \eqn{D} 
-#'                                                bootstrap delta distribution for the test.
 #'                   \item  \code{delta_mean}:    mean of the \eqn{D} bootstrap delta 
 #'                                                distribution for the test.
 #'                   \item  \code{delta_sd}:      standard deviation of the \eqn{D} 
@@ -58,9 +61,6 @@ setClass("DiversityCurve",
 #'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
 #'                 \itemize{
 #'                   \item  \code{group}:   the name of the group.
-#'                   \item  \code{median}:  median of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{mad}:     median absolute deviation of the \eqn{D} 
-#'                                          bootstrap distribution.
 #'                   \item  \code{mean}:    mean of the \eqn{D} bootstrap distribution.
 #'                   \item  \code{sd}:      standard deviation of the \eqn{D} bootstrap 
 #'                                          distribution.
@@ -389,12 +389,12 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @return   A data.frame with relative clonal abundance data and confidence intervals,
 #'           containing the following columns:
 #'           \itemize{
-#'             \item  \code{group}:  group identifier.
-#'             \item  \code{clone}:  clone identifier.
-#'             \item  \code{p}:      relative abundance of the clone.
-#'             \item  \code{lower}:  lower confidence inverval bound.
-#'             \item  \code{upper}:  upper confidence interval bound.
-#'             \item  \code{rank}:   the rank of the clone abundance.
+#'             \item  \code{GROUP}:  group identifier.
+#'             \item  \code{CLONE}:  clone identifier.
+#'             \item  \code{P}:      relative abundance of the clone.
+#'             \item  \code{LOWER}:  lower confidence inverval bound.
+#'             \item  \code{UPPER}:  upper confidence interval bound.
+#'             \item  \code{RANK}:   the rank of the clone abundance.
 #'           }
 #'           
 #' @details
@@ -712,6 +712,11 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     q <- seq(min_q, max_q, step_q)
     ci_z <- ci + (1 - ci) / 2
     
+    # Check for q=0 and set index of q=0 
+    q0 <- (0 %in% q)
+    if (!q0) { q <- c(0, q) }
+    qi <- which(q == 0)
+    
     # Warn if groups removed
     if (length(group_keep) < length(group_all)) {
         warning("Not all groups passed threshold min_n=", min_n, ".", 
@@ -747,17 +752,30 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
         div_boot <- apply(sample_mat, 2, calcDiversity, q=q)
         #cover_boot <- apply(sample_mat, 2, calcCoverage, r=1)
         
-        # Assign confidence intervals based on variance of bootstrap realizations
+        # Assign observed diversity and standard deviation from bootstrap realizations
         div_obs <- apply(div_boot, 1, mean)
-        sd_boot <- apply(div_boot, 1, sd)
-        err_boot <- qnorm(ci_z) * sd_boot
-        div_lower <- pmax(div_obs - err_boot, 0)
-        div_upper <- div_obs + err_boot
+        div_sd <- apply(div_boot, 1, sd)
+        # Diversity confidence intervals
+        div_error <- qnorm(ci_z) * div_sd
+        div_lower <- pmax(div_obs - div_error, 0)
+        div_upper <- div_obs + div_error
+        # Evenness
+        even_obs <- div_obs / div_obs[qi]
+        even_lower <- div_lower / div_obs[qi]
+        even_upper <- div_upper / div_obs[qi]
         
-        # Build result matrix object
-        div_list[[g]] <- as.data.frame(matrix(c(q, div_obs, div_lower, div_upper),
-                                       nrow=length(q), ncol=4, 
-                                       dimnames=list(NULL, c("q", "D", "lower", "upper"))))
+        # Build result matrix        
+        result_mat <- matrix(c(q, div_obs, div_sd, div_lower, div_upper,
+                               even_obs, even_lower, even_upper),
+                             nrow=length(q), ncol=8, 
+                             dimnames=list(NULL, c("Q", "D", "D_SD", "D_LOWER", "D_UPPER",
+                                                   "E", "E_LOWER", "E_UPPER")))
+        
+        # Remove q=0 if required
+        if (!q0) { result_mat <- result_mat[-qi, ] }
+        
+        # Update list with results
+        div_list[[g]] <- as.data.frame(result_mat)
         
         setTxtProgressBar(pb, i <- i + 1)
     }
@@ -766,7 +784,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
     # Generate return object
     div <- new("DiversityCurve", 
-               data=as.data.frame(bind_rows(div_list, .id="group")), 
+               data=as.data.frame(bind_rows(div_list, .id="GROUP")), 
                groups=group_keep, 
                n=nsam,
                nboot=nboot, 
@@ -1114,13 +1132,13 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     # Define base plot elements
-    p1 <- ggplot(data@data, aes_string(x="q", y="D", group="group")) + 
+    p1 <- ggplot(data@data, aes_string(x="Q", y="D", group="GROUP")) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('q') +
         ylab(expression(''^q * D)) +
-        geom_ribbon(aes_string(ymin="lower", ymax="upper", fill="group"), alpha=0.4) +
-        geom_line(aes_string(color="group"))
+        geom_ribbon(aes_string(ymin="D_LOWER", ymax="D_UPPER", fill="GROUP"), alpha=0.4) +
+        geom_line(aes_string(color="GROUP"))
     
     # Set colors and legend
     if (!is.null(colors)) {
