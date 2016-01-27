@@ -11,6 +11,11 @@ Amino Acid Analysis:
 + Fixed bug where arguments for the `aliphatic()` function were not being
   passed through the ellipsis argument of `aminoAcidProperties()`.
 + Improved amino acid analysis vignette.
+
+Diversity:
+
++ Added evenness and bootstrap standard deviation to `rarefyDiversity()` 
+  output.
   
 
 Version 0.2.1:  December 18, 2015
