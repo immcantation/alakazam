@@ -222,32 +222,6 @@ checkColumns <- function(data, columns, logic=c("all", "any")) {
     return(TRUE)
 }
 
-# Validate AA sequence
-#
-# @param   seq     data.frame to check
-# @return  TRUE if the sequences is valid and FALSE if not
-isValidAASeq <- function(seq) {
-    
-    ## Get valid amino acids from seqinr
-    ## for consistency with `gravy` and other
-    ## amino acid properties that don't consider
-    ## amino acid ambiguities and special encoded amino acids
-    ## http://pir.georgetown.edu/resid/faq.shtml#q01
-    e1 <- new.env(parent=environment())
-    data(aaindex, package="seqinr", envir=e1)
-    scores <- with(e1, aaindex[["KYTJ820101"]]$I)
-    valid_AA <- translateStrings(names(scores), AA_TRANS)
-    
-    ## Omit check for non informative positions X.*-
-    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
-    
-    .isValid <- function(aa) {
-        all(aa %in% valid_AA)
-    }
-    
-    sapply(strsplit(seq,""), .isValid)
-}
-
 #### Plotting functions ####
 
 # Define universal plot settings

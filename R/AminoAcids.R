@@ -41,7 +41,7 @@ getPropertyData <- function(property){
     } else if (property == "charge") {
         # EMBOSS
         scores <- with(e1, setNames(pK[["EMBOSS"]], rownames(pK)))
-    }
+    } 
     
     return(scores)
 }
@@ -235,24 +235,16 @@ gravy <- function(seq, hydropathy=NULL) {
 #'
 #' @export
 aliphatic <- function(seq, normalize=TRUE) {
-    
-    ## Initialize aa_aliphatic
-    aa_aliphatic <- rep(NA,length(seq))
-    valid_aa_idx <- isValidAASeq(seq)
-    
-    # Calculate aliphatic index
+    # Calculate aliphatic index for valid amino acids
     ala <- countOccurrences(seq, "[A]")
     val <- countOccurrences(seq, "[V]")
     leu_ile <- countOccurrences(seq, "[LI]")
     
-    ## Fill only for valid aminoacids
-    aa_aliphatic[valid_aa_idx] = ala[valid_aa_idx] + 
-        2.9 * val[valid_aa_idx] + 
-        3.9 * leu_ile[valid_aa_idx]
+    aa_aliphatic = ala + 2.9 * val + 3.9 * leu_ile
     
     if (normalize) {
-        aa_aliphatic[valid_aa_idx] <- aa_aliphatic[valid_aa_idx] / 
-            nchar(gsub("[X\\.\\*-]", "", seq[valid_aa_idx]), keepNA=TRUE)
+        aa_aliphatic <- aa_aliphatic / 
+            nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
     }
     
     return(aa_aliphatic)
@@ -304,6 +296,7 @@ aliphatic <- function(seq, normalize=TRUE) {
 #'
 #' @export
 charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
+    
     # Get charge data
     if(is.null(pK)) {
         pK <- getPropertyData("charge")
@@ -326,6 +319,34 @@ charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
     return(aa_charge)
 }
 
+#' Validate AA sequence
+#'
+#' @param   seq     data.frame to check
+#' @return  TRUE if the sequences is valid and FALSE if not
+#' @examples 
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVR--XX","CARJ") 
+#' isValidAASeq(seq)
+#' @export
+isValidAASeq <- function(seq) {
+    
+    ## Get valid amino acids from seqinr
+    ## for consistency with `gravy` and other
+    ## amino acid properties that don't consider
+    ## amino acid ambiguities and special encoded amino acids
+    ## http://pir.georgetown.edu/resid/faq.shtml#q01
+    e1 <- new.env(parent=environment())
+    data(aaindex, package="seqinr", envir=e1)
+    scores <- with(e1, aaindex[["KYTJ820101"]]$I)
+    valid_AA <- translateStrings(names(scores), AA_TRANS)
+    
+    ## Remove non informative positions X.*-
+    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
+    
+    .isValid <- function(aa) {
+        all(aa %in% valid_AA)
+    }
+    sapply(strsplit(seq,""), .isValid)
+}
 
 # Count patterns
 # 
@@ -560,39 +581,49 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     region <- as.character(data[[seq]])
     region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
     
+    ## Will retrieve properties for valid sequences only
+    ## keep index to fill results data.frame
+    valid_seq <- isValidAASeq(region_aa)
+    if (any(valid_seq == F) ){
+        not_valid_num <- sum(!valid_seq)
+        warning(paste0("Found ", not_valid_num , " sequences with non valid amino acid symbols"))
+    }
+    valid_seq_idx <- which(valid_seq)
+    region_aa <- region_aa[valid_seq_idx]
+    
     # Calculate region lengths
     if ("length" %in% property) {
         aa_length <- nchar(region_aa, keepNA=TRUE)
-        out_df[, prop_colnames$length] <- aa_length
+        out_df[valid_seq_idx , prop_colnames$length] <- aa_length
     }
     # Average hydrophobicity
     if ("gravy" %in% property) {
         #aa_gravy <- gravy(region_aa, hydropathy)
         aa_gravy <- do.call('gravy', c(list(seq=region_aa), args_gravy))
-        out_df[, prop_colnames$gravy] <- aa_gravy
+        out_df[valid_seq_idx , prop_colnames$gravy] <- aa_gravy
     }
     # Average bulkiness
     if ("bulk" %in% property) {
         #aa_bulk <- bulk(region_aa)
         aa_bulk <- do.call('bulk', c(list(seq=region_aa), args_bulk))
-        out_df[, prop_colnames$bulk] <- aa_bulk
+        out_df[valid_seq_idx , prop_colnames$bulk] <- aa_bulk
     }
     if ("aliphatic" %in% property) {
         # Normalizes aliphatic index
         aa_aliphatic <- do.call('aliphatic', c(list(seq=region_aa), args_aliphatic))
-        out_df[, prop_colnames$aliphatic] <- aa_aliphatic
+        out_df[valid_seq_idx , prop_colnames$aliphatic] <- aa_aliphatic
     }
     # Average polarity
     if ("polarity" %in% property) {
         #aa_polarity <- polar(region_aa)
         aa_polarity <- do.call('polar', c(list(seq=region_aa), args_polar))
-        out_df[, prop_colnames$polarity] <- aa_polarity
+        out_df[valid_seq_idx , prop_colnames$polarity] <- aa_polarity
     }
     # Normalized net charge
     if ("charge" %in% property) {
         #aa_charge <- charge(region_aa)
         aa_charge <- do.call('charge', c(list(seq=region_aa), args_charge))
-        out_df[, prop_colnames$charge] <- aa_charge
+        out_df[valid_seq_idx , prop_colnames$charge] <- aa_charge
     }
     
     # Count of informative positions
@@ -600,17 +631,17 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     # Fraction of amino acid that are basic
     if ("basic" %in% property) {
         aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
-        out_df[, prop_colnames$basic] <- aa_basic
+        out_df[valid_seq_idx , prop_colnames$basic] <- aa_basic
     }
     # Fraction of amino acid that are acidic
     if ("acidic" %in% property) {
         aa_acidic <- countOccurrences(region_aa, "[DE]") / aa_info
-        out_df[, prop_colnames$acidic] <- aa_acidic
+        out_df[valid_seq_idx , prop_colnames$acidic] <- aa_acidic
     }
     # Count fraction of aa that are aromatic
     if ("aromatic" %in% property) {
         aa_aromatic <- countOccurrences(region_aa, "[FWHY]") / aa_info
-        out_df[, prop_colnames$aromatic] <- aa_aromatic
+        out_df[valid_seq_idx , prop_colnames$aromatic] <- aa_aromatic
     }
     
     data_cols <- colnames(data) %in% colnames(out_df) == FALSE
