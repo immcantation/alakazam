@@ -18,8 +18,8 @@ output:
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
-  %\VignetteIndexEntry{Diversity analysis} 
   %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteIndexEntry{Diversity analysis} 
   %\usepackage[utf8]{inputenc}
 ---
 

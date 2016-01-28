@@ -18,8 +18,8 @@ output:
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
-  %\VignetteIndexEntry{Ig lineage reconstruction}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteIndexEntry{Ig lineage reconstruction} 
   %\usepackage[utf8]{inputenc}
 ---
 
