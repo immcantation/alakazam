@@ -135,7 +135,7 @@ data(pK)
 h <- aaindex[["KIDA850101"]]$I
 p <- setNames(pK[["Murray"]], rownames(pK))
 # Rename the hydrophobicity vector to use single-letter codes
-names(h) <- translateStrings(names(h), AA_TRANS)
+names(h) <- translateStrings(names(h), ABBREV_AA)
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
                                 nt=TRUE, trim=TRUE, label="CDR3", 
                                 hydropathy=h, pK=p)
