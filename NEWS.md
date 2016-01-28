@@ -1,4 +1,4 @@
-Version 0.2.1.999:  January 25, 2016
+Version 0.2.2:  January 28, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -11,6 +11,8 @@ Amino Acid Analysis:
 + Fixed bug where arguments for the `aliphatic()` function were not being
   passed through the ellipsis argument of `aminoAcidProperties()`.
 + Improved amino acid analysis vignette.
++ Added check for correctness of amino acids sequences to `aminoAcidProperties()`.
++ Renamed `AA_TRANS` to `ABBREV_AA`.
 
 Diversity:
 
