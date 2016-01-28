@@ -17,8 +17,10 @@ output:
     toc: yes
 geometry: margin=1in
 fontsize: 11pt
-vignette: |
-  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
+vignette: >
+  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
 ---
 The `alakazam` package includes a set of function to analyze the physicochemical 
 properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 
