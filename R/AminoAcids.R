@@ -329,7 +329,7 @@ charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
 #' @param    seq  character vector of sequences to check.
 #' 
 #' @return   A logical vector with \code{TRUE} for each valid amino acid sequences 
-#'           and \code {FALSE} for each invalid sequence.
+#'           and \code{FALSE} for each invalid sequence.
 #' @seealso 
 #' See \code{\link{ABBREV_AA}} for the set of non-ambiguous amino acid characters.
 #' See \code{\link{IUPAC_AA}} for the full set of ambiguous amino acid characters.
