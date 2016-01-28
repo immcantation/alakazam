@@ -334,18 +334,18 @@ isValidAASeq <- function(seq) {
     ## amino acid properties that don't consider
     ## amino acid ambiguities and special encoded amino acids
     ## http://pir.georgetown.edu/resid/faq.shtml#q01
-    e1 <- new.env(parent=environment())
-    data(aaindex, package="seqinr", envir=e1)
-    scores <- with(e1, aaindex[["KYTJ820101"]]$I)
-    valid_AA <- translateStrings(names(scores), AA_TRANS)
-    
-    ## Remove non informative positions X.*-
-    seq <- gsub("[X\\.\\*-]", "", as.character(seq))
+    ## Also include here characters for non informative positions
+    valid_AA <- c(names(AA_TRANS),"X",".","*","-")
     
     .isValid <- function(aa) {
         all(aa %in% valid_AA)
     }
     sapply(strsplit(seq,""), .isValid)
+    
+#    valid_AA <- paste(c(names(AA_TRANS),"X.*-"),collapse="")
+#    valid <- !grepl(paste0("[^",valid_AA,"]"), seq) & !is.na(seq)
+#    valid
+    
 }
 
 # Count patterns

@@ -54,7 +54,11 @@ test_that("aminoAcidProperties", {
     expect_equal(junction_properties_na$JUNCTION_AA_CHARGE,c(NA,0,NA,0),tolerance = .001)
     expect_equal(junction_properties_na$JUNCTION_AA_BASIC,c(NA,0,NA,0),tolerance = .001)
     expect_equal(junction_properties_na$JUNCTION_AA_ACIDIC,c(NA,0,NA,0),tolerance = .001)
-    
-    
+    expect_equal(isValidAASeq(db[1:4,"JUNCTION"]),c(F,T,F,T))
+    expect_warning(aminoAcidProperties(db[1:4,], seq="JUNCTION", nt=FALSE,
+                                       trim=FALSE, label="JUNCTION",
+                                       hydropathy = h, property = "length"),
+                   "2 sequences"
+                   )
 })
 
