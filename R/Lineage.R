@@ -33,6 +33,15 @@ setClass("ChangeoClone",
                  j_gene="character", 
                  junc_len="numeric"))
 
+#### Data ####
+
+#' Example Ig lineage trees
+#'
+#' A set of Ig lineage trees generated from the \code{extdata/ExampleDb.gz} file.
+#'
+#' @format   A list of igraph objects output by \code{\link{buildPhylipLineage}}.
+"ExampleTrees"
+
 
 #### Preprocessing functions ####
 
@@ -517,7 +526,7 @@ phylipToGraph <- function(edges, clone) {
 #' @examples
 #' \dontrun{
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Preprocess clone

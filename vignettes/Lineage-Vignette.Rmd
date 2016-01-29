@@ -45,9 +45,11 @@ A small example Change-O tab-delimited database file is included in the
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
+library(igraph)
+library(dplyr)
 
 # Load Change-O file
-file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(file)
 
 # Select clone
@@ -97,19 +99,26 @@ output. This is created in the system temporary location (according to
 deleting files is somewhat rude).  In most cases, you will want to set 
 `rm_temp=TRUE` to delete this folder.
 
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
-library(igraph)
+```{r, eval=FALSE}
 # Run PHYLIP and parse output
 dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+```
 
-# Clone annotations
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Load data insted of running phylip
+# Clone 164 is at index 5
+graph <- ExampleTrees[[5]]
+```
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+# The graph has shared annotations for the clone
 data.frame(CLONE=graph$clone,
            JUNCTION_LENGTH=graph$junc_len,
            V_GENE=graph$v_gene,
            J_GENE=graph$j_gene)
 
-# Sequence annotations
+# The vertices have sequence specific annotations
 data.frame(SEQUENCE_ID=V(graph)$name, 
            ISOTYPE=V(graph)$ISOTYPE,
            DUPCOUNT=V(graph)$DUPCOUNT)
@@ -160,18 +169,23 @@ Multiple lineage trees may be generated at once, by splitting the Change-O
 data.frame on the clone column.
 
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
-library(dplyr)
-
 # Preprocess clones
 clones <- df %>%
     group_by(CLONE) %>%
     do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
                                 num_fields="DUPCOUNT"))
+```
 
+```{r, eval=FALSE}
 # Build lineages
 dnapars_exec <- "~/apps/phylip-3.69/dnapars"
 graphs <- lapply(clones$CHANGEO, buildPhylipLineage, 
                  dnapars_exec=dnapars_exec, rm_temp=TRUE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Load data insted of running phylip
+graphs <- ExampleTrees
 ```
 
 ```{r, eval=TRUE}
@@ -180,7 +194,7 @@ graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
 # These entries may be removed for clarity
 graphs[sapply(graphs, is.null)] <- NULL
 
-# Leaving a subset of clones
-nrow(clones)
-length(graphs)
+# The set of tree may then be subset by node count for further 
+# analysis, if desired.
+graphs[sapply(graphs, vcount) >= 5]
 ```

@@ -18,24 +18,28 @@ Description: Core functionality, lineage reconstruction, and diversity analysis,
 License: CC BY-NC-SA 4.0
 URL: http://clip.med.yale.edu/changeo
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
+LazyData: true
+BuildVignettes: true
+VignetteBuilder: knitr
 Depends:
     R (>= 3.0.0),
-    ggplot2,
-    dplyr
+    ggplot2
 Imports:
+    dplyr,
+    graphics,
     grid,
     igraph (>= 1.0.0),
     lazyeval,
     methods,
     scales,
     seqinr,
+    stats,
     stringi,
+    utils
 Suggests:
     knitr,
     rmarkdown,
     testthat
-VignetteBuilder: knitr
-LazyData: true
 RoxygenNote: 5.0.1
 Collate:
     'Alakazam.R'

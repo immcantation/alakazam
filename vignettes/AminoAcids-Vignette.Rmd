@@ -44,7 +44,7 @@ A small example Change-O tab-delimited database file is included in the
 library(alakazam)
 
 # Load Change-O file
-file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 db <- readChangeoDb(file)
 db <- db[db$SAMPLE == "RL01", ]
 ```

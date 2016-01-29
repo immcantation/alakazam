@@ -1,4 +1,4 @@
-file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 db <- readChangeoDb(file)
 
 test_that("translateDNA", {
