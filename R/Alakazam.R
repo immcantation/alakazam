@@ -120,3 +120,16 @@
 NULL
 
 
+#### Sysdata ####
+
+# 1x20 vector of default amino acid hydropathy scores
+# HYDROPATHY_KYTJ82
+
+# 1x20 vector of default amino acid bulkiness scores
+# BULKINESS_ZIMJ68
+
+# 1x20 vector of default amino acid polarity scores
+# POLARITY_GRAR74
+
+# 1x7 vector of default amino acid pK values
+# PK_EMBOSS
