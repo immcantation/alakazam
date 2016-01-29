@@ -112,7 +112,8 @@
 #' @importFrom  scales    log2_trans log10_trans trans_breaks trans_format
 #'                        math_format percent scientific
 #' @importFrom  seqinr    translate
-#' @importFrom  stats     na.omit setNames ecdf 
+#' @importFrom  stats     na.omit setNames ecdf sd cor cov median mad
+#'                        dbinom pbinom qbinom rbinom
 #'                        dnorm pnorm qnorm rnorm
 #'                        dmultinom rmultinom
 #' @importFrom  stringi   stri_extract_first_regex stri_replace_first_regex

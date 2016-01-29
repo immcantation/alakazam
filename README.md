@@ -1,7 +1,7 @@
 Alakazam
 -------------------------------------------------------------------------------
-January 28, 2016  
-Version 0.2.8
+January 29, 2016  
+Version 0.2.2
 
 Lineage, diversity, gene usage and amino acid property analysis R package of 
 the Change-O suite.

@@ -1,4 +1,4 @@
-Version 0.2.2:  January 28, 2016
+Version 0.2.2:  January 29, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -18,7 +18,11 @@ Diversity:
 
 + Added evenness and bootstrap standard deviation to `rarefyDiversity()` 
   output.
-  
+
+Lineage:
+
++ Added `ExampleTrees` data with example output from `buildPhylipLineage()`.
+
 
 Version 0.2.1:  December 18, 2015
 -------------------------------------------------------------------------------
