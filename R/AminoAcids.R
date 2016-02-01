@@ -5,48 +5,6 @@ NULL
 
 #### Chemical property functions ####
 
-# Wrapper function to pull amino acid property vectors from seqinr
-#
-# @param    property  string defining the property. One of
-#                     \code(c("hydropathy", "bulkiness", "polarity", "charge"))
-#
-# @return   A vector of scores for the given property with single
-#           character amino acid labels.
-#
-# @examples
-# getPropertyData("hydro")
-# getPropertyData("bulk")
-# getPropertyData("polar")
-# getPropertyData("charge")
-getPropertyData <- function(property){
-    property <- match.arg(property, c("hydropathy", "bulkiness", "polarity" ,"charge"))
-    
-    # Setup new environment to avoid R CMD check NOTE
-    e1 <- new.env(parent=environment())
-    data(aaindex, package="seqinr", envir=e1)
-    data(pK, package="seqinr", envir=e1)
-    
-    if (property == "hydropathy") {
-        # Kyte & Doolittle, 1982.
-        scores <- with(e1, aaindex[["KYTJ820101"]]$I)
-        names(scores) <- translateStrings(names(scores), AA_TRANS)
-    } else if (property == "bulkiness") {
-        # Zimmerman et al, 1968.
-        scores <- with(e1, aaindex[["ZIMJ680102"]]$I)
-        names(scores) <- translateStrings(names(scores), AA_TRANS)
-    } else if (property == "polarity") {
-        # Grantham, 1974
-        scores <- with(e1, aaindex[["GRAR740102"]]$I)
-        names(scores) <- translateStrings(names(scores), AA_TRANS)
-    } else if (property == "charge") {
-        # EMBOSS
-        scores <- with(e1, setNames(pK[["EMBOSS"]], rownames(pK)))
-    } 
-    
-    return(scores)
-}
-
-
 #' Calculates the average bulkiness of amino acid sequences
 #'
 #' \code{bulk} calculates the average bulkiness score of amino acid sequences. 
@@ -79,7 +37,7 @@ getPropertyData <- function(property){
 #' data(aaindex)
 #' x <- aaindex[["GRAR740103"]]$I
 #' # Rename the score vector to use single-letter codes
-#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate average volume
 #' bulk(seq, bulkiness=x)
 #' 
@@ -87,7 +45,7 @@ getPropertyData <- function(property){
 bulk <- function(seq, bulkiness=NULL) {
     # Get bulkiness scores
     if (is.null(bulkiness)) {
-        bulkiness <- getPropertyData("bulk")
+        bulkiness <- BULKINESS_ZIMJ68
     }
     # Remove non-informative positions
     seq <- gsub("[X\\.\\*-]", "", as.character(seq))
@@ -132,7 +90,7 @@ bulk <- function(seq, bulkiness=NULL) {
 #' data(aaindex)
 #' x <- aaindex[["ZIMJ680103"]]$I
 #' # Rename the score vector to use single-letter codes
-#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate polarity
 #' polar(seq, polarity=x)
 #' 
@@ -140,7 +98,7 @@ bulk <- function(seq, bulkiness=NULL) {
 polar <- function(seq, polarity=NULL) {
     # Get bulkiness scores
     if (is.null(polarity)) {
-        polarity <- getPropertyData("polarity")
+        polarity <- POLARITY_GRAR74
     }
     # Remove non-informative positions
     seq <- gsub("[X\\.\\*-]", "", as.character(seq))
@@ -186,7 +144,7 @@ polar <- function(seq, polarity=NULL) {
 #' data(aaindex)
 #' x <- aaindex[["KIDA850101"]]$I
 #' # Rename the score vector to use single-letter codes
-#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate hydrophobicity
 #' gravy(seq, hydropathy=x)
 #' 
@@ -194,7 +152,7 @@ polar <- function(seq, polarity=NULL) {
 gravy <- function(seq, hydropathy=NULL) {
     # Get hydrophobicity scores
     if (is.null(hydropathy)) {
-        hydropathy <- getPropertyData("hydro")
+        hydropathy <- HYDROPATHY_KYTJ82
     }
 
     # Remove non-informative positions
@@ -299,7 +257,7 @@ charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
     
     # Get charge data
     if(is.null(pK)) {
-        pK <- getPropertyData("charge")
+        pK <- PK_EMBOSS
     }
     
     # Calculate charge
@@ -319,30 +277,43 @@ charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
     return(aa_charge)
 }
 
-#' Validate AA sequence
+#' Validate amino acid sequences
 #'
-#' @param   seq     data.frame to check
-#' @return  TRUE if the sequences is valid and FALSE if not
+#' \code{isValidAASeq} checks that a set of sequences are valid non-ambiguous 
+#' amino acid sequences. A sequence is considered valid if it contains only 
+#' characters in the the non-ambiguous IUPAC character set or any characters in 
+#' \code{c("X", ".", "-", "*")}.
+#'  
+#' @param    seq  character vector of sequences to check.
+#' 
+#' @return   A logical vector with \code{TRUE} for each valid amino acid sequences 
+#'           and \code{FALSE} for each invalid sequence.
+#' @seealso 
+#' See \code{\link{ABBREV_AA}} for the set of non-ambiguous amino acid characters.
+#' See \code{\link{IUPAC_AA}} for the full set of ambiguous amino acid characters.
+#' 
 #' @examples 
-#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVR--XX","CARJ") 
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVR--XX", "CARJ", "10") 
 #' isValidAASeq(seq)
+#' 
 #' @export
 isValidAASeq <- function(seq) {
     
-    ## Get valid amino acids from seqinr
-    ## for consistency with `gravy` and other
-    ## amino acid properties that don't consider
-    ## amino acid ambiguities and special encoded amino acids
-    ## http://pir.georgetown.edu/resid/faq.shtml#q01
-    ## Also include here characters for non informative positions
-    valid_AA <- c(names(AA_TRANS),"X",".","*","-")
+    # Get valid amino acids from seqinr
+    # for consistency with `gravy` and other
+    # amino acid properties that don't consider
+    # amino acid ambiguities and special encoded amino acids
+    # http://pir.georgetown.edu/resid/faq.shtml#q01
+    # Also include here characters for non informative positions
+    valid_AA <- c(names(ABBREV_AA), "X", ".", "*", "-")
     
     .isValid <- function(aa) {
         all(aa %in% valid_AA)
     }
-    sapply(strsplit(seq,""), .isValid)
     
-#    valid_AA <- paste(c(names(AA_TRANS),"X.*-"),collapse="")
+    return(sapply(strsplit(seq, ""), .isValid))
+    
+#    valid_AA <- paste(c(names(ABBREV_AA),"X.*-"),collapse="")
 #    valid <- !grepl(paste0("[^",valid_AA,"]"), seq) & !is.na(seq)
 #    valid
     
@@ -506,7 +477,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' df <- df[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
 #' 
@@ -526,7 +497,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' data(aaindex)
 #' x <- aaindex[["GRAR740103"]]$I
 #' # Rename the score vector to use single-letter codes
-#' names(x) <- translateStrings(names(x), AA_TRANS)
+#' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate properties
 #' aminoAcidProperties(df, property=c("bulk", "charge"), seq="JUNCTION", nt=TRUE, 
 #'                     trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
@@ -537,7 +508,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
                                                  "basic","acidic", "aromatic"),
                                 seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
     # Check arguments
-    properties <- match.arg(property, several.ok=TRUE)
+    property <- match.arg(property, several.ok=TRUE)
     
     # Define the data.frame that will be returned with amino acid properties
     prop_colnames <- list(

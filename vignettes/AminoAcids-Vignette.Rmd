@@ -17,8 +17,10 @@ output:
     toc: yes
 geometry: margin=1in
 fontsize: 11pt
-vignette: |
-  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\VignetteEngine{knitr::rmarkdown} %\usepackage[utf8]{inputenc}
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} 
+  %\usepackage[utf8]{inputenc}
 ---
 The `alakazam` package includes a set of function to analyze the physicochemical 
 properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 
@@ -42,7 +44,7 @@ A small example Change-O tab-delimited database file is included in the
 library(alakazam)
 
 # Load Change-O file
-file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 db <- readChangeoDb(file)
 db <- db[db$SAMPLE == "RL01", ]
 ```
@@ -135,7 +137,7 @@ data(pK)
 h <- aaindex[["KIDA850101"]]$I
 p <- setNames(pK[["Murray"]], rownames(pK))
 # Rename the hydrophobicity vector to use single-letter codes
-names(h) <- translateStrings(names(h), AA_TRANS)
+names(h) <- translateStrings(names(h), ABBREV_AA)
 db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
                                 nt=TRUE, trim=TRUE, label="CDR3", 
                                 hydropathy=h, pK=p)

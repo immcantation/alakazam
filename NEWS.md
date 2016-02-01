@@ -1,4 +1,4 @@
-Version 0.2.1.999:  January 25, 2016
+Version 0.2.2:  January 29, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -11,12 +11,18 @@ Amino Acid Analysis:
 + Fixed bug where arguments for the `aliphatic()` function were not being
   passed through the ellipsis argument of `aminoAcidProperties()`.
 + Improved amino acid analysis vignette.
++ Added check for correctness of amino acids sequences to `aminoAcidProperties()`.
++ Renamed `AA_TRANS` to `ABBREV_AA`.
 
 Diversity:
 
 + Added evenness and bootstrap standard deviation to `rarefyDiversity()` 
   output.
-  
+
+Lineage:
+
++ Added `ExampleTrees` data with example output from `buildPhylipLineage()`.
+
 
 Version 0.2.1:  December 18, 2015
 -------------------------------------------------------------------------------

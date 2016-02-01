@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
-Version: 0.2.1.999
-Date: 2016-01-28
+Version: 0.2.2
+Date: 2016-01-29
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("ctb"), 
@@ -11,30 +11,37 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
              person("Susanna", "Marquez", role=c("ctb"), 
                     email="susanna.marquez@yale.edu"),
              person("Roy", "Jiang", role=c("ctb"), 
-                    email="ruoyi.jiang@yale.edu"))
+                    email="ruoyi.jiang@yale.edu"),
+             person("Steven", "Kleinstein", role=c("ctb"), 
+                    email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
-Description: Core functionality, lineage reconstruction, and diversity analysis
-    components of the Change-O tool suite.
+Description: Core functionality, lineage reconstruction, and diversity analysis,
+    and amino acid property analysis components of the Change-O tool suite.
 License: CC BY-NC-SA 4.0
 URL: http://clip.med.yale.edu/changeo
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
+LazyData: true
+BuildVignettes: true
+VignetteBuilder: knitr
 Depends:
     R (>= 3.0.0),
-    ggplot2,
-    dplyr
+    ggplot2
 Imports:
+    dplyr,
+    graphics,
     grid,
     igraph (>= 1.0.0),
     lazyeval,
     methods,
     scales,
     seqinr,
+    stats,
     stringi,
+    utils
 Suggests:
     knitr,
+    rmarkdown,
     testthat
-VignetteBuilder: knitr
-LazyData: true
 RoxygenNote: 5.0.1
 Collate:
     'Alakazam.R'

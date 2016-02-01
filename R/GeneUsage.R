@@ -71,7 +71,7 @@ orderGenes <- function(genes) {
 #'
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' # Without copy numbers

@@ -42,7 +42,7 @@ NULL
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' 
 #' # Subset columns and convert sequence fields to upper case
 #' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"), seq_upper=TRUE)

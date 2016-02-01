@@ -1,4 +1,4 @@
-file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 db <- readChangeoDb(file)
 
 test_that("translateDNA", {
@@ -27,7 +27,7 @@ test_that("aminoAcidProperties", {
     data(aaindex, package="seqinr")
     h <- aaindex[["KIDA850101"]]$I
     # Rename the score vector to use single-letter codes
-    names(h) <- translateStrings(names(h), AA_TRANS)
+    names(h) <- translateStrings(names(h), ABBREV_AA)
     
     junction_gravy_h <- gravy(seq_aa, hydropathy =  h)
     junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,

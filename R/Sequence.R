@@ -19,6 +19,21 @@ NULL
 #'                              \code{c("TRA", "TRB", "TRD", "TRG")}.
 #' }
 #' 
+#' @examples 
+#' # IG_COLORS as an isotype color set for ggplot
+#' isotype <- c("IgG", "IgM", "IgM", "IgA")
+#' df <- data.frame(x=1:4, y=1:4, iso=isotype)
+#' g1 <- ggplot(df, aes(x=x, y=y, color=iso)) + 
+#'     scale_color_manual(name="Isotype", values=IG_COLORS) +
+#'     geom_point(size=10)
+#' plot(g1)
+#' 
+#' # DNA_COLORS to translate nucleotide values to a vector of colors 
+#' # for use in base graphics plots
+#' seq <- c("A", "T", "T", "C")
+#' colors <- translateStrings(seq, setNames(names(DNA_COLORS), DNA_COLORS))
+#' plot(1:4, 1:4, col=colors, pch=16, cex=6)
+#' 
 #' @name   DEFAULT_COLORS
 NULL
 
@@ -117,28 +132,33 @@ IUPAC_AA <-  list("A"="A",
 #' @format  Named character vector defining single-letter character codes to 
 #'          three-letter abbreviation mappings.
 #' 
-#' @name   AA_TRANS
+#' @name   ABBREV_AA
+#' 
+#' @examples 
+#' aa <- c("Ala", "Ile", "Trp")
+#' translateStrings(aa, ABBREV_AA)
+#' 
 #' @export
-AA_TRANS <- c("A"="Ala",
-              "R"="Arg",
-              "N"="Asn",
-              "D"="Asp",
-              "C"="Cys",
-              "Q"="Gln",
-              "E"="Glu",
-              "G"="Gly",
-              "H"="His",
-              "I"="Ile",
-              "L"="Leu",
-              "K"="Lys",
-              "M"="Met",
-              "F"="Phe",
-              "P"="Pro",
-              "S"="Ser",
-              "T"="Thr",
-              "W"="Trp",
-              "Y"="Tyr",
-              "V"="Val")
+ABBREV_AA <- c("A"="Ala",
+               "R"="Arg",
+               "N"="Asn",
+               "D"="Asp",
+               "C"="Cys",
+               "Q"="Gln",
+               "E"="Glu",
+               "G"="Gly",
+               "H"="His",
+               "I"="Ile",
+               "L"="Leu",
+               "K"="Lys",
+               "M"="Met",
+               "F"="Phe",
+               "P"="Pro",
+               "S"="Ser",
+               "T"="Thr",
+               "W"="Trp",
+               "Y"="Tyr",
+               "V"="Val")
 
 
 #' IMGT V-segment regions
@@ -413,7 +433,7 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 #' @examples
 #' library(alakazam)
 #' # Load Change-O file
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' 
 #' translateDNA(df$JUNCTION[1:3])
@@ -840,7 +860,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' 
 #' @examples
 #' # Load example data
-#' file <- system.file("extdata", "changeo_demo.gz", package="alakazam")
+#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
 #' clone <- subset(df, CLONE == 164)
 #'
