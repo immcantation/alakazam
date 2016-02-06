@@ -418,6 +418,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' }
 #' 
 #' @seealso  
+#' See \code{\link{plotAbundance}} for plotting of the abundance distribution.
 #' See \code{\link{rarefyDiversity}} for a similar application to clonal diversity.
 #'           
 #' @examples
