@@ -401,7 +401,7 @@ getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
 #' @export
 testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
     # Test that sequences lengths are equal
-    if (nchar(seq1) != nchar(seq2)) {
+    if (stri_length(seq1) != stringi::stri_length(seq2)) {
         return(FALSE)
     }
     
@@ -444,7 +444,7 @@ testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
 translateDNA <- function (seq, trim=FALSE) {
     # Function to translate a single string
     .translate <- function(x) {
-        if (nchar(x) >= 3) {
+        if (stri_length(x) >= 3) {
             paste(seqinr::translate(unlist(strsplit(x, ""))), collapse="")
         } else {
             NA
@@ -453,7 +453,7 @@ translateDNA <- function (seq, trim=FALSE) {
     
     # Remove 3 nucleotides from each end
     # Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
-    if (trim) { seq <- substr(seq, 4, nchar(seq) - 3) }
+    if (trim) { seq <- substr(seq, 4, stri_length(seq) - 3) }
     
     # Apply translation
     aa <- sapply(seq, .translate, USE.NAMES=FALSE)
@@ -548,7 +548,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
     # Mask to minimal inner sequence length
     left_mask <- min(max(left_lengths[, 1]), max_mask)
     right_mask <- min(max(right_lengths[, 1]), max_mask)
-    seq_lengths <- nchar(seq)
+    seq_lengths <- stri_length(seq)
     if (trim) {
         seq <- substr(seq, left_mask + 1, seq_lengths - right_mask)
     } else {
@@ -671,7 +671,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     if (!all(sapply(subset(data, select=seq_fields), is.character))) {
         stop("All seq_fields columns must be of type 'character'")
     }
-    seq_len <- nchar(data[[seq]])
+    seq_len <- stri_length(data[[seq]])
     if (any(seq_len != seq_len[1])) {
         warning("All sequences are not the same length")
     }
@@ -688,7 +688,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Define function to count informative positions in sequences
     .informativeLength <- function(x) {
-        nchar(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
+        stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
     
     # Intialize COLLAPSE_COUNT with 1 for each sequence

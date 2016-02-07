@@ -188,7 +188,7 @@ gravy <- function(seq, hydropathy=NULL) {
 #' }
 #' 
 #' @examples 
-#' seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
+#' seq <- c("CARDRSTPWRRGIASTTVRTSW", NA, "XXTQMYVRT")
 #' aliphatic(seq)
 #'
 #' @export
@@ -201,8 +201,7 @@ aliphatic <- function(seq, normalize=TRUE) {
     aa_aliphatic = ala + 2.9 * val + 3.9 * leu_ile
     
     if (normalize) {
-        aa_aliphatic <- aa_aliphatic / 
-            nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
+        aa_aliphatic <- aa_aliphatic / stri_length(gsub("[X\\.\\*-]", "", seq))
     }
     
     return(aa_aliphatic)
@@ -271,7 +270,7 @@ charge <- function(seq, pH=7.4, pK=NULL, normalize=TRUE) {
     aa_charge <- arg + lys + his + asp + glu + tyr + cys
     
     if (normalize) {
-        aa_charge <- aa_charge / nchar(gsub("[X\\.\\*-]", "", seq), keepNA=TRUE)
+        aa_charge <- aa_charge / stri_length(gsub("[X\\.\\*-]", "", seq))
     }
     
     return(aa_charge)
@@ -369,7 +368,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
     # TODO: What is the proper length normalization? With or without non-informative position?
     
     # Calculate region lengths
-    aa_length <- nchar(region_aa, keepNA=TRUE)
+    aa_length <- stri_length(region_aa)
     # Count occurrence of each amino acid pattern for each sequence
     out_df <- data.frame(matrix(0, nrow=length(region_aa), ncol=length(patterns)))
     # If patterns are unnamed, make the names X1...Xn
@@ -564,7 +563,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     
     # Calculate region lengths
     if ("length" %in% property) {
-        aa_length <- nchar(region_aa, keepNA=TRUE)
+        aa_length <- stri_length(region_aa)
         out_df[valid_seq_idx , prop_colnames$length] <- aa_length
     }
     # Average hydrophobicity
@@ -598,7 +597,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     }
     
     # Count of informative positions
-    aa_info <-  nchar(gsub("[X\\.\\*-]", "", region_aa), keepNA=TRUE)
+    aa_info <-  stri_length(gsub("[X\\.\\*-]", "", region_aa))
     # Fraction of amino acid that are basic
     if ("basic" %in% property) {
         aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info

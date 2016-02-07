@@ -191,7 +191,7 @@ writePhylipInput <- function(clone, path) {
     v1 <- c(sprintf('%-9s', nseq + 1),
             sprintf("%-9s", "Germline"), 
             sprintf("SAM%-6s", 1:nseq))
-    v2 <- c(nchar(clone@germline),
+    v2 <- c(stri_length(clone@germline),
             clone@germline, 
             clone@data[["SEQUENCE"]])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
@@ -553,8 +553,8 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     }
     
     # Check fields
-    seq_len = unique(nchar(clone@data[["SEQUENCE"]]))
-    germ_len = ifelse(length(clone@germline) == 0, 0, nchar(clone@germline))
+    seq_len = unique(stri_length(clone@data[["SEQUENCE"]]))
+    germ_len = ifelse(length(clone@germline) == 0, 0, stri_length(clone@germline))
     if(germ_len == 0) {
         stop("Clone ", clone@clone, "does not contain a germline sequence.")
     }
