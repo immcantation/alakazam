@@ -1,6 +1,6 @@
 Alakazam
 -------------------------------------------------------------------------------
-February 7, 2016  
+February 9, 2016  
 Version 0.2.3
 
 Lineage, diversity, gene usage and amino acid property analysis R package of 
@@ -8,7 +8,7 @@ the Change-O suite.
 
 Dependencies
 -------------------------------------------------------------------------------
-R 3.1.0  
+R 3.1.2  
 R packages
 
   - dplyr

@@ -5,7 +5,8 @@ General:
 
 + Fixed a bug wherein the package would not build on R < 3.2.0 due to changes
   in `base::nchar()`.
-  
++ Changed R dependency to R >= 3.1.2.
+
 
 Version 0.2.2:  January 29, 2016
 -------------------------------------------------------------------------------
