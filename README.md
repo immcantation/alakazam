@@ -1,6 +1,6 @@
 Alakazam
 -------------------------------------------------------------------------------
-February 9, 2016  
+February 10, 2016  
 Version 0.2.3
 
 Lineage, diversity, gene usage and amino acid property analysis R package of 

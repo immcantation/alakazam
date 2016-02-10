@@ -659,8 +659,6 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
                                sep=",", verbose=FALSE) {
-    # TODO:  Should seq_fields collapse by consensus?  This should never matter if they are subsequences of seq.
-    
     # Verify column classes and exit if they are incorrect
     if (!all(sapply(subset(data, select=text_fields), is.character))) {
         stop("All text_fields columns must be of type 'character'")
