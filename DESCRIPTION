@@ -1,10 +1,10 @@
 Package: alakazam
 Type: Package
 Version: 0.2.3
-Date: 2016-02-10
+Date: 2016-02-19
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
-             person("Namita", "Gupta", role=c("ctb"), 
+             person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
              person("Daniel", "Gadala-Maria", role=c("ctb"), 
                     email="daniel.gadala-maria@yale.edu"),
@@ -12,7 +12,7 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
                     email="susanna.marquez@yale.edu"),
              person("Roy", "Jiang", role=c("ctb"), 
                     email="ruoyi.jiang@yale.edu"),
-             person("Steven", "Kleinstein", role=c("ctb"), 
+             person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Core functionality, lineage reconstruction, and diversity analysis,
