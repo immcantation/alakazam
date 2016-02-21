@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.3
-Date: 2016-02-19
+Date: 2016-02-21
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -15,8 +15,9 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
-Description: Core functionality, lineage reconstruction, and diversity analysis,
-    and amino acid property analysis components of the Change-O tool suite.
+Description: Provides immunoglobulin (Ig) sequence lineage reconstruction, 
+    diversity analysis, and amino acid property analysis. Also provides
+    core functonality for other tools in the Change-O suite.
 License: CC BY-NC-SA 4.0
 URL: http://clip.med.yale.edu/changeo
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
