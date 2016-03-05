@@ -103,27 +103,28 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
-#' @importFrom  dplyr     do n desc %>%
-#'                        as_data_frame data_frame data_frame_
-#'                        bind_cols bind_rows combine
-#'                        filter filter_ select select_ arrange arrange_
-#'                        group_by group_by_ ungroup
-#'                        mutate mutate_ transmute transmute_
-#'                        rename rename_ summarize summarize_
-#' @importFrom  igraph    V E graph_from_data_frame
-#'                        vertex_attr set_vertex_attr
-#' @importFrom  lazyeval  interp
-#' @importFrom  scales    log2_trans log10_trans trans_breaks trans_format
-#'                        math_format percent scientific
-#' @importFrom  seqinr    translate
-#' @importFrom  stats     na.omit setNames ecdf sd cor cov median mad
-#'                        dbinom pbinom qbinom rbinom
-#'                        dnorm pnorm qnorm rnorm
-#'                        dmultinom rmultinom
-#' @importFrom  stringi   stri_dup stri_flatten stri_join stri_length 
-#'                        stri_count_boundaries stri_count_regex 
-#'                        stri_extract_all_regex stri_extract_first_regex  
-#'                        stri_replace_all_regex stri_replace_first_regex
+#' @importFrom  data.table  fread
+#' @importFrom  dplyr       do n desc %>%
+#'                          as_data_frame data_frame data_frame_
+#'                          bind_cols bind_rows combine
+#'                          filter filter_ select select_ arrange arrange_
+#'                          group_by group_by_ ungroup
+#'                          mutate mutate_ transmute transmute_
+#'                          rename rename_ summarize summarize_
+#' @importFrom  igraph      V E graph_from_data_frame
+#'                          vertex_attr set_vertex_attr
+#' @importFrom  lazyeval    interp
+#' @importFrom  scales      log2_trans log10_trans trans_breaks trans_format
+#'                          math_format percent scientific
+#' @importFrom  seqinr      translate
+#' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
+#'                          dbinom pbinom qbinom rbinom
+#'                          dnorm pnorm qnorm rnorm
+#'                          dmultinom rmultinom
+#' @importFrom  stringi     stri_dup stri_flatten stri_join stri_length 
+#'                          stri_count_boundaries stri_count_regex 
+#'                          stri_extract_all_regex stri_extract_first_regex  
+#'                          stri_replace_all_regex stri_replace_first_regex
 NULL
 
 

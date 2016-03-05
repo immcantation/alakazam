@@ -44,8 +44,11 @@ NULL
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' 
+#' # Read all columns in and convert sequence fields to upper case
+#' df <- readChangeoDb(file)
+#' 
 #' # Subset columns and convert sequence fields to upper case
-#' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"), seq_upper=TRUE)
+#' df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"))
 #' 
 #' # Drop columns and do not alter sequence field case
 #' df <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
@@ -57,28 +60,37 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
                      "GERMLINE_IMGT", "GERMLINE_IMGT_D_MASK")
     text_columns <- c("SEQUENCE_ID", "CLONE", "SAMPLE")
     
-    # Read file
-    db_df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
-    
-    # Select columns
-    select_columns <- colnames(db_df)
-    if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
-    if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
-    db_df <- subset(db_df, select=select_columns)
-    
+    df <- tryCatch({ 
+            # Attempt to use fread
+            data.table::fread(file, sep="\t", header=TRUE, stringsAsFactors=FALSE,
+                              na.strings=c("", "NA", "None"), select=select, drop=drop,
+                              data.table=FALSE)
+        }, error=function(e) {
+            # Read file using read.delim if fread fails
+            #message("Failed to read file with fread. Falling back to read.table.")
+            df <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
+            
+            # Select columns
+            select_columns <- colnames(df)
+            if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
+            if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
+            
+            subset(df, select=select_columns)
+        })    
+
     # Convert sequence fields to upper case
     if (seq_upper) {
-        for (x in intersect(seq_columns, select_columns)) {
-            db_df[, x] <- toupper(db_df[, x]) 
+        for (x in intersect(seq_columns, names(df))) {
+            df[, x] <- toupper(df[, x]) 
         }
     }
     
     # Convert text fields to character
-    for (x in intersect(text_columns, select_columns)) {
-        db_df[, x] <- as.character(db_df[, x])
+    for (x in intersect(text_columns, names(df))) {
+        df[, x] <- as.character(df[, x])
     }
     
-    return(db_df)
+    return(df)
 }
 
 
