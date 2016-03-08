@@ -69,6 +69,7 @@ test_that("rarefyDiversity", {
         stringsAsFactors = F
     )
     
+    expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
     
     set.seed <- 25
@@ -91,4 +92,18 @@ test_that("rarefyDiversity", {
         "E_UPPER" = c(0.6419791, 0.6981115, 0.2549316, 1.1225783),
         stringsAsFactors = F
     )
+    expect_equal(colnames(obs), colnames(exp))
+})
+
+test_that("testDiversity", {
+    set.seed(3)
+    # Groups under the size threshold are excluded and a warning message is issued.
+    div <- testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
+    expect_equal(div@tests$pvalue, 0)
+    expect_equal(div@summary$mean, c(87.65, 63.92), tolerance=0.001)
+    
+    set.seed(3)
+    div <- testDiversity(rbind(df,df), "SAMPLE", q=0, min_n=30, nboot=100)
+    expect_equal(div@tests$pvalue, 0.88)
+    expect_equal(div@summary$mean, c(78.63, 79.58), tolerance=0.001)
 })
