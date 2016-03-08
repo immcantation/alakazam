@@ -1,3 +1,12 @@
+Version 0.2.3.999:  March 5, 2016
+-------------------------------------------------------------------------------
+
+General:
+
++ Added data.table dependency
++ Modified `readChangeoDb()` to wrap `data.table::fread()` instead of 
+  `utils::read.table()` if the input file is not compressed.
+
 Version 0.2.3:  February 22, 2016
 -------------------------------------------------------------------------------
 
