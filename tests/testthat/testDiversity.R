@@ -29,10 +29,10 @@ test_that("estimateAbundance", {
                  c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
                  tolerance=0.001)
     expect_equal(abund$LOWER[c(1:3,8:10)],
-                 c(0.004948741, 0, 0, 0, 0, 0),
+                 c(0.001102, 0.000786, 0, 0, 0, 0),
                  tolerance = 0.001)
     expect_equal(abund$UPPER[45:50],
-                 c(0.007361, 0.006869, 0.009082, 0.007361,0.008476, 0.005986),
+                 c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
                  tolerance = 0.001)
     expect_equal(abund$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
 })
@@ -100,7 +100,7 @@ test_that("testDiversity", {
     # Groups under the size threshold are excluded and a warning message is issued.
     div <- testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
     expect_equal(div@tests$pvalue, 0)
-    expect_equal(div@summary$mean, c(87.65, 63.92), tolerance=0.001)
+    expect_equal(div@summary$mean, c(88.10, 63.11), tolerance=0.001)
     
     set.seed(3)
     div <- testDiversity(rbind(df,df), "SAMPLE", q=0, min_n=30, nboot=100)

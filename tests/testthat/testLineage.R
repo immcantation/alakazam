@@ -78,14 +78,14 @@ test_that("buildPhylipLineage", {
         graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
         
         expect_true(inherits(graph, "igraph"))
-        expect_equal(vcount(graph), 5)
-        expect_equal(ecount(graph), 4)
-        expect_true(is.directed(graph))
+        expect_equal(igraph::vcount(graph), 5)
+        expect_equal(igraph::ecount(graph), 4)
+        expect_true(igraph::is.directed(graph))
         
-        expect_equal(graph_attr_names(graph),
+        expect_equal(igraph::graph_attr_names(graph),
                      c("clone", "v_gene", "j_gene", "junc_len"))
         
-        expect_equal(graph_attr(graph),
+        expect_equal(igraph::graph_attr(graph),
                      list("clone"="164", "v_gene"="IGHV3-48","j_gene"="IGHJ2",
                        "junc_len"=66))
         
@@ -101,7 +101,7 @@ test_that("buildPhylipLineage", {
                        "GAGGTGCAGCTGGTGGAGTCTGGGGGANNNGGCTTGGTACAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTCNNNNNNNNNNNNAGTAGTTATGAAATGAACTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATACATTAGTAGTAGTNNNNNNGGTAGTACCATATACTACGCAGACTCTGTGAAGNNNGGCCGATCCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCTGTTTATTACTGTGCGAGAGATTTGGCGCTCGATAGTAGTGGTTATTACCCTAGCTACTGGTACTTCGATCTCTGGGGCCGTGGCACCCTGGTCACTGTCTCCTCAG"
                      ))
         
-        expect_equal(vertex_attr_names(graph),
+        expect_equal(igraph::vertex_attr_names(graph),
                      c("name", "sequence", "SAMPLE", "ISOTYPE", "DUPCOUNT", 
                        "COLLAPSE_COUNT", "label"))
 
