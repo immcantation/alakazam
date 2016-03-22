@@ -21,64 +21,64 @@
 #' 
 #' @section  File I/O:
 #' \itemize{
-#'   \item  \code{\link{readChangeoDb}}:        Input Change-O style files.
-#'   \item  \code{\link{writeChangeoDb}}:       Output Change-O style files.
+#'   \item  \link{readChangeoDb}:        Input Change-O style files.
+#'   \item  \link{writeChangeoDb}:       Output Change-O style files.
 #' }
 #' 
 #' @section  Sequence cleaning:
 #' \itemize{
-#'   \item  \code{\link{maskSeqEnds}}:          Mask ragged ends.
-#'   \item  \code{\link{maskSeqGaps}}:          Mask gap characters.
-#'   \item  \code{\link{collapseDuplicates}}:   Remove duplicate sequences.
+#'   \item  \link{maskSeqEnds}:          Mask ragged ends.
+#'   \item  \link{maskSeqGaps}:          Mask gap characters.
+#'   \item  \link{collapseDuplicates}:   Remove duplicate sequences.
 #' }
 #' 
 #' @section  Lineage reconstruction:
 #' \itemize{
-#'   \item  \code{\link{makeChangeoClone}}:     Clean sequences for lineage reconstruction.
-#'   \item  \code{\link{buildPhylipLineage}}:   Perform lineage reconstruction of Ig sequences.
+#'   \item  \link{makeChangeoClone}:     Clean sequences for lineage reconstruction.
+#'   \item  \link{buildPhylipLineage}:   Perform lineage reconstruction of Ig sequences.
 #' }
 #' 
 #' @section  Diversity analysis:
 #' \itemize{
-#'   \item  \code{\link{countClones}}:          Calculate clonal abundance.
-#'   \item  \code{\link{estimateAbundance}}:    Infer complete clonal abundance distribution with
-#'                                              confidence intervals.
-#'   \item  \code{\link{rarefyDiversity}}:      Generate clonal diversity curves.
-#'   \item  \code{\link{testDiversity}}:        Test significance of clonal diversity scores.
-#'   \item  \code{\link{plotAbundance}}:        Plot clone size distribution as a rank-abundance 
-#'                                              curve.
-#'   \item  \code{\link{plotDiversityCurve}}:   Plot clonal diversity curves.
+#'   \item  \link{countClones}:          Calculate clonal abundance.
+#'   \item  \link{estimateAbundance}:    Infer complete clonal abundance distribution with
+#'                                       confidence intervals.
+#'   \item  \link{rarefyDiversity}:      Generate clonal diversity curves.
+#'   \item  \link{testDiversity}:        Test significance of clonal diversity scores.
+#'   \item  \link{plotAbundance}:        Plot clone size distribution as a rank-abundance 
+#'                                       curve.
+#'   \item  \link{plotDiversityCurve}:   Plot clonal diversity curves.
 #' }
 #' 
 #' @section  Ig and TCR sequence annotation:
 #' \itemize{
-#'   \item  \code{\link{countGenes}}:           Calculate Ig and TCR allele, gene and family usage.
-#'   \item  \code{\link{extractVRegion}}:       Extract CDRs and FWRs sub-sequences.
-#'   \item  \code{\link{getAllele}}:            Get V(D)J allele names.
-#'   \item  \code{\link{getGene}}:              Get V(D)J gene names.
-#'   \item  \code{\link{getFamily}}:            Get V(D)J family names.
+#'   \item  \link{countGenes}:           Calculate Ig and TCR allele, gene and family usage.
+#'   \item  \link{extractVRegion}:       Extract CDRs and FWRs sub-sequences.
+#'   \item  \link{getAllele}:            Get V(D)J allele names.
+#'   \item  \link{getGene}:              Get V(D)J gene names.
+#'   \item  \link{getFamily}:            Get V(D)J family names.
 #' }
 #' 
 #' @section  Sequence distance calculation:
 #' \itemize{
-#'   \item  \code{\link{getSeqDistance}}:       Calculate Hamming distance between sequences.
-#'   \item  \code{\link{getSeqMatrix}}:         Calculate a matrix of pairwise Hamming distances 
-#'                                              for a sequence set.
-#'   \item  \code{\link{testSeqEqual}}:         Test sequences for equality.
+#'   \item  \link{getSeqDistance}:       Calculate Hamming distance between sequences.
+#'   \item  \link{getSeqMatrix}:         Calculate a matrix of pairwise Hamming distances 
+#'                                       for a sequence set.
+#'   \item  \link{testSeqEqual}:         Test sequences for equality.
 #' }
 #' 
 #' @section  Amino acid propertes:
 #' \itemize{
-#'   \item  \code{\link{translateDNA}}:         Translate DNA sequences to amino acid sequences.
-#'   \item  \code{\link{aminoAcidProperties}}:  Calculate various physicochemical properties of amino acid 
-#'                                              sequences.
-#'   \item  \code{\link{countPatterns}}:        Count patterns in sequences.
+#'   \item  \link{translateDNA}:         Translate DNA sequences to amino acid sequences.
+#'   \item  \link{aminoAcidProperties}:  Calculate various physicochemical properties of amino acid 
+#'                                       sequences.
+#'   \item  \link{countPatterns}:        Count patterns in sequences.
 #'                                              
 #' }
 #' 
 #' @section  General data manipulation:
 #' \itemize{
-#'   \item  \code{\link{translateStrings}}:     Perform multiple string replacement operations.
+#'   \item  \link{translateStrings}:     Perform multiple string replacement operations.
 #' } 
 #' 
 #' @name     alakazam

@@ -15,11 +15,16 @@ output:
     highlight: pygments
     theme: readable
     toc: yes
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
+    toc: yes
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteIndexEntry{Ig lineage reconstruction} 
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Ig lineage reconstruction}
   %\usepackage[utf8]{inputenc}
 ---
 

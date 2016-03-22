@@ -15,13 +15,19 @@ output:
     highlight: pygments
     theme: readable
     toc: yes
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
+    toc: yes
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} 
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties}
   %\usepackage[utf8]{inputenc}
 ---
+
 The `alakazam` package includes a set of function to analyze the physicochemical 
 properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 
 CDR3 properties, which this vignette will demonstate. However, the same process

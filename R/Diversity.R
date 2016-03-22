@@ -145,7 +145,7 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' }
 #' 
 #' @seealso  
-#' Used by \code{\link{rarefyDiversity}}.
+#' Used by \link{rarefyDiversity}.
 #'           
 #' @examples
 #' # Load example data
@@ -418,8 +418,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' }
 #' 
 #' @seealso  
-#' See \code{\link{plotAbundance}} for plotting of the abundance distribution.
-#' See \code{\link{rarefyDiversity}} for a similar application to clonal diversity.
+#' See \link{plotAbundance} for plotting of the abundance distribution.
+#' See \link{rarefyDiversity} for a similar application to clonal diversity.
 #'           
 #' @examples
 #' # Load example data
@@ -532,7 +532,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
 #'            Ecology. 1973 54(2):427-32.
 #' }
 #' 
-#' @seealso  Used by \code{\link{rarefyDiversity}} and \code{\link{testDiversity}}.
+#' @seealso  Used by \link{rarefyDiversity} and \link{testDiversity}.
 #' 
 #' @examples
 #' # May define p as clonal member counts
@@ -615,11 +615,11 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
 #' 
-#' @return   A \code{\link{DiversityCurve}} object summarizing the diversity scores.
+#' @return   A \link{DiversityCurve} object summarizing the diversity scores.
 #' 
 #' @details
 #' Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
-#' proposed by Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
+#' proposed by Hill (Hill, 1973). See \link{calcDiversity} for further details.
 #'
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -650,10 +650,10 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'            Ecology. 2015 96, 11891201.
 #' }
 #'  
-#' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
-#'           \code{\link{DiversityCurve}} for the return object. 
-#'           See \code{\link{testDiversity}} for significance testing.
-#'           See \code{\link{plotDiversityCurve}} for plotting the return object.
+#' @seealso  See \link{calcDiversity} for the basic calculation and 
+#'           \link{DiversityCurve} for the return object. 
+#'           See \link{testDiversity} for significance testing.
+#'           See \link{plotDiversityCurve} for plotting the return object.
 #' 
 #' @examples
 #' # Load example data
@@ -816,11 +816,11 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'                     if automatically determined from the size of the largest group.
 #' @param    nboot     number of bootstrap realizations to perform.
 #' 
-#' @return   A \code{\link{DiversityTest}} object containing p-values and summary statistics.
+#' @return   A \link{DiversityTest} object containing p-values and summary statistics.
 #' 
 #' @details
 #' Clonal diversity is calculated using the generalized diversity index proposed by 
-#' Hill (Hill, 1973). See \code{\link{calcDiversity}} for further details.
+#' Hill (Hill, 1973). See \link{calcDiversity} for further details.
 #' 
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -864,10 +864,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'            Ecology. 2015 96, 11891201.
 #' }
 #' 
-#' @seealso  See \code{\link{calcDiversity}} for the basic calculation and 
-#'           \code{\link{DiversityTest}} for the return object. 
-#'           See \code{\link{rarefyDiversity}} for curve generation.
-#'           See \code{\link{ecdf}} for computation of the empirical cumulative 
+#' @seealso  See \link{calcDiversity} for the basic calculation and 
+#'           \link{DiversityTest} for the return object. 
+#'           See \link{rarefyDiversity} for curve generation.
+#'           See \link{ecdf} for computation of the empirical cumulative 
 #'           distribution function.
 #' 
 #' @examples  
@@ -1018,8 +1018,8 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  
-#' See \code{\link{estimateAbundance}} for generating the input abundance distribution.
-#' Plotting is performed with \code{\link{ggplot}}.
+#' See \link{estimateAbundance} for generating the input abundance distribution.
+#' Plotting is performed with \link{ggplot}.
 #'           
 #' @examples
 #' # Load example data
@@ -1074,8 +1074,8 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
 #'
-#' @param    data            \code{\link{DiversityCurve}} object returned by 
-#'                           \code{\link{rarefyDiversity}}.
+#' @param    data            \link{DiversityCurve} object returned by 
+#'                           \link{rarefyDiversity}.
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -1099,8 +1099,8 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #'
 #' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @seealso  See \code{\link{rarefyDiversity}} for generating \code{\link{DiversityCurve}}
-#'           objects for input. Plotting is performed with \code{\link{ggplot}}.
+#' @seealso  See \link{rarefyDiversity} for generating \link{DiversityCurve}
+#'           objects for input. Plotting is performed with \link{ggplot}.
 #' 
 #' @examples
 #' # Load example data

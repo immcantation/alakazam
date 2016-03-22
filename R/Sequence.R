@@ -196,7 +196,7 @@ IMGT_REGIONS <- list("FWR1"=c(1, 78),
 #'           indicating the character pair. By default, distances will be either 0 
 #'           (equivalent), 1 (non-equivalent or missing), or -1 (gap). 
 #' 
-#' @seealso  Creates DNA distance matrix for \code{\link{getSeqDistance}}.
+#' @seealso  Creates DNA distance matrix for \link{getSeqDistance}.
 #'           See \link{getAAMatrix} for amino acid distances.
 #' 
 #' @examples
@@ -235,7 +235,7 @@ getDNAMatrix <- function(gap=-1) {
 #' @return   A \code{matrix} of amino acid character distances with row and column names 
 #'           indicating the character pair.
 #' 
-#' @seealso  Creates an amino acid distance matrix for \code{\link{getSeqDistance}}.
+#' @seealso  Creates an amino acid distance matrix for \link{getSeqDistance}.
 #'           See \link{getDNAMatrix} for nucleotide distances.
 #' 
 #' @examples
@@ -263,7 +263,7 @@ getAAMatrix <- function() {
 #' @param    seq1      character string containing a DNA sequence.
 #' @param    seq2      character string containing a DNA sequence.
 #' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-#'                     matrix returned by \code{\link{getDNAMatrix}}. If gap 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
 #'                     characters, \code{c("-", ".")}, are assigned a value of -1 
 #'                     in \code{dist_mat} then contiguous gaps of any run length,
 #'                     which are not present in both sequences, will be counted as a 
@@ -274,8 +274,8 @@ getAAMatrix <- function() {
 #' @return   Numerical distance between \code{seq1} and \code{seq2}.
 #' 
 #' @seealso  Nucleotide distance matrix may be built with 
-#'           \code{\link{getDNAMatrix}}. Amino acid distance matrix may be built
-#'           with \code{\link{getAAMatrix}}.
+#'           \link{getDNAMatrix}. Amino acid distance matrix may be built
+#'           with \link{getAAMatrix}.
 #'           
 #' @examples
 #' # Ungapped examples
@@ -324,7 +324,7 @@ getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
 #'
 #' @param    seq       character vector containing a DNA sequences.
 #' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-#'                     matrix returned by \code{\link{getDNAMatrix}}. If gap 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
 #'                     characters, \code{c("-", ".")}, are assigned a value of -1 
 #'                     in \code{dist_mat} then contiguous gaps of any run length,
 #'                     which are not present in both sequences, will be counted as a 
@@ -336,9 +336,9 @@ getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
 #'           If \code{seq} is a named vector, row and columns names will be added 
 #'           accordingly.
 #' 
-#' @seealso  Uses \code{\link{getSeqDistance}} for calculating distances between pairs.
-#'           Nucleotide distance matrix may be built with \code{\link{getDNAMatrix}}. 
-#'           Amino acid distance matrix may be built with \code{\link{getAAMatrix}}. 
+#' @seealso  Uses \link{getSeqDistance} for calculating distances between pairs.
+#'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
+#'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
 #'           
 #' @examples
 #' # Gaps will be treated as Ns with a gap=0 distance matrix
@@ -385,7 +385,7 @@ getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
 #'           Sequences of unequal length will always return \code{FALSE} regardless of
 #'           their character values.
 #' 
-#' @seealso  Used by \code{\link{collapseDuplicates}}.
+#' @seealso  Used by \link{collapseDuplicates}.
 #' 
 #' @examples
 #' # Ignore gaps
@@ -618,8 +618,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
 #' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
 #' 
-#' @seealso  Equality is tested with \code{\link{testSeqEqual}}.  For IUPAC ambiguous 
-#'           character codes see \code{\link{IUPAC_DNA}}.
+#' @seealso  Equality is tested with \link{testSeqEqual}.  For IUPAC ambiguous 
+#'           character codes see \link{IUPAC_DNA}.
 #' @family   sequence manipulation functions
 #'
 #' @examples
@@ -846,7 +846,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #'            corresponding to the specified regions and a row for each entry in 
 #'            \code{sequences}.
 #' 
-#' @seealso   IMGT-gapped region boundaries are defined in \code{\link{IMGT_REGIONS}}.          
+#' @seealso   IMGT-gapped region boundaries are defined in \link{IMGT_REGIONS}.          
 #' @family    sequence annotation functions
 #' 
 #' @references
@@ -891,7 +891,7 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
 #' Get Ig segment allele, gene and family names
 #' 
 #' \code{getSegment} performs generic matching of delimited segment calls with a custom regular 
-#' expression. \code{\link{getAllele}}, \code{\link{getGene}} and \code{\link{getFamily}} extract 
+#' expression. \link{getAllele}, \link{getGene} and \link{getFamily} extract 
 #' the allele, gene and family names, respectively, from a character vector of immunoglobulin (Ig) 
 #' or TCR segment allele calls in IMGT format.
 #'

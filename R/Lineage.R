@@ -19,7 +19,7 @@ NULL
 #' @slot     j_gene    string defining the J segment gene call.
 #' @slot     junc_len  numeric junction length (nucleotide count).
 #' 
-#' @seealso  See \code{\link{makeChangeoClone}} and \code{\link{buildPhylipLineage}} for use.
+#' @seealso  See \link{makeChangeoClone} and \link{buildPhylipLineage} for use.
 #'           
 #' @name         ChangeoClone-class
 #' @rdname       ChangeoClone-class
@@ -39,7 +39,7 @@ setClass("ChangeoClone",
 #'
 #' A set of Ig lineage trees generated from the \code{extdata/ExampleDb.gz} file.
 #'
-#' @format   A list of igraph objects output by \code{\link{buildPhylipLineage}}.
+#' @format   A list of igraph objects output by \link{buildPhylipLineage}.
 "ExampleTrees"
 
 
@@ -84,7 +84,7 @@ setClass("ChangeoClone",
 #'                        COLLAPSE_COUNT during duplicate removal that indicates the 
 #'                        number of sequences that were collapsed.
 #'
-#' @return   A \code{\link{ChangeoClone}} object containing the modified clone.
+#' @return   A \link{ChangeoClone} object containing the modified clone.
 #'
 #' @details
 #' The input data.frame (\code{data}) must columns for each of the required column name 
@@ -114,10 +114,10 @@ setClass("ChangeoClone",
 #' \code{germ}, \code{vcall}, \code{jcall}, \code{junc_len} and \code{clone} columns, 
 #' respectively. For any given clone, each value in these columns should be identical.
 #'  
-#' @seealso  Executes in order \code{\link{maskSeqGaps}}, \code{\link{maskSeqEnds}}
-#'           and \code{\link{collapseDuplicates}}. 
-#'           Returns a \code{\link{ChangeoClone}} object which serves as input to
-#'           \code{\link{buildPhylipLineage}}.
+#' @seealso  Executes in order \link{maskSeqGaps}, \link{maskSeqEnds}
+#'           and \link{collapseDuplicates}. 
+#'           Returns a \link{ChangeoClone} object which serves as input to
+#'           \link{buildPhylipLineage}.
 #' 
 #' @examples
 #' # Example Change-O data.frame
@@ -438,7 +438,7 @@ phylipToGraph <- function(edges, clone) {
 #' \code{buildPhylipLineage} reconstructs an Ig lineage via maximum parsimony using the 
 #' dnapars application of the PHYLIP package.
 #' 
-#' @param    clone         \code{\link{ChangeoClone}} object containing clone data.
+#' @param    clone         \link{ChangeoClone} object containing clone data.
 #' @param    dnapars_exec  path to the PHYLIP dnapars executable.
 #' @param    rm_temp       if \code{TRUE} delete the temporary directory after running dnapars;
 #'                         if \code{FALSE} keep the temporary directory.
@@ -517,10 +517,10 @@ phylipToGraph <- function(edges, clone) {
 #'            Sci Transl Med. 2014 6(248):248ra107.
 #' }
 #'   
-#' @seealso  Takes as input a \code{\link{ChangeoClone}}. 
-#'           Temporary directories are created with \code{\link{makeTempDir}}.
-#'           Distance is calculated using \code{\link{getSeqDistance}}. 
-#'           See \code{\link{igraph}} and \code{\link{igraph.plotting}} for working 
+#' @seealso  Takes as input a \link{ChangeoClone}. 
+#'           Temporary directories are created with \link{makeTempDir}.
+#'           Distance is calculated using \link{getSeqDistance}. 
+#'           See \link{igraph} and \link{igraph.plotting} for working 
 #'           with igraph \code{graph} objects. 
 #'
 #' @examples

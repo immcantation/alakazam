@@ -37,7 +37,7 @@ NULL
 #'             \item  GERMLINE_IMGT_D_MASK
 #'           }
 #'                   
-#' @seealso  Wraps \code{\link{read.table}}.
+#' @seealso  Wraps \link{read.table}.
 #' @family   file input and output functions
 #' 
 #' @examples
@@ -96,7 +96,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 
 #' Write a Change-O tab-delimited database file
 #' 
-#' \code{writeChangeoDb} is a simple wrapper around \code{\link{write.table}} with defaults 
+#' \code{writeChangeoDb} is a simple wrapper around \link{write.table} with defaults 
 #' appropriate for writing a Change-O tab-delimited database file from a data.frame.
 #'
 #' @param    data  data.frame of Change-O data.
@@ -104,7 +104,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' 
 #' @return   NULL
 #' 
-#' @seealso  Wraps \code{\link{write.table}}.
+#' @seealso  Wraps \link{write.table}.
 #' @family   file input and output functions
 #' 
 #' @examples
@@ -128,8 +128,8 @@ writeChangeoDb <- function(data, file) {
 #' 
 #' @return   The path to the temporary folder.
 #' 
-#' @seealso  This is just a wrapper for \code{\link{tempfile}} and 
-#'           \code{\link{dir.create}}.
+#' @seealso  This is just a wrapper for \link{tempfile} and 
+#'           \link{dir.create}.
 #' @family   file input and output functions
 #' 
 #' @examples
@@ -162,9 +162,9 @@ makeTempDir <- function(prefix) {
 #' \code{strings} value or it will not be replaced.  Values that do not have a replacement
 #' named in the \code{translation} parameter will not be modified.
 #' 
-#' Replacement is accomplished using \code{\link{gsub}}.
+#' Replacement is accomplished using \link{gsub}.
 #' 
-#' @seealso  See \code{\link{gsub}} for single value replacement in the base package.
+#' @seealso  See \link{gsub} for single value replacement in the base package.
 #' 
 #' @examples
 #' # Using a vector translation
