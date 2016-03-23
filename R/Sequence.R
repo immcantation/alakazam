@@ -474,7 +474,7 @@ translateDNA <- function (seq, trim=FALSE) {
 #' @return   A modified \code{seq} vector with \code{"N"} in place of \code{c("-", ".")} 
 #'           characters.
 #' 
-#' @family   sequence manipulation functions
+#' @seealso  See \link{maskSeqEnds} for masking ragged edges.
 #'           
 #' @examples
 #' maskSeqGaps(c("ATG-C", "CC..C"))
@@ -522,7 +522,7 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 #'                     than masked with \code{"N"} characters.
 #' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
 #' 
-#' @family   sequence manipulation functions
+#' @seealso   See \link{maskSeqGaps} for masking internal gaps.
 #' 
 #' @examples
 #' # Default behavior uniformly masks ragged ends
@@ -620,7 +620,6 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' 
 #' @seealso  Equality is tested with \link{testSeqEqual}.  For IUPAC ambiguous 
 #'           character codes see \link{IUPAC_DNA}.
-#' @family   sequence manipulation functions
 #'
 #' @examples
 #' # Example Change-O data.frame
@@ -887,7 +886,6 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' 
 #' @seealso  Equality is tested with \link{testSeqEqual}.  For IUPAC ambiguous 
 #'           character codes see \link{IUPAC_DNA}.
-#' @family   sequence manipulation functions
 #'
 #' @examples
 #' # Example Change-O data.frame
@@ -1109,8 +1107,7 @@ rcpp_collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #'            corresponding to the specified regions and a row for each entry in 
 #'            \code{sequences}.
 #' 
-#' @seealso   IMGT-gapped region boundaries are defined in \link{IMGT_REGIONS}.          
-#' @family    sequence annotation functions
+#' @seealso   IMGT-gapped region boundaries are defined in \link{IMGT_REGIONS}.
 #' 
 #' @references
 #' \enumerate{
@@ -1175,7 +1172,7 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
 #' @references
 #'   \url{http://imgt.org}
 #'
-#' @family    sequence annotation functions
+#' @seealso  \link{countGenes}
 #'
 #' @examples
 #' kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",

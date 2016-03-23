@@ -37,8 +37,8 @@ NULL
 #'             \item  GERMLINE_IMGT_D_MASK
 #'           }
 #'                   
-#' @seealso  Wraps \link{read.table}.
-#' @family   file input and output functions
+#' @seealso  Wraps \link{read.table} and \link[data.table]{fread}. 
+#'           See \link{writeChangeoDb} for writing to Change-O files.
 #' 
 #' @examples
 #' # Load example data
@@ -104,8 +104,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' 
 #' @return   NULL
 #' 
-#' @seealso  Wraps \link{write.table}.
-#' @family   file input and output functions
+#' @seealso  Wraps \link{write.table}. See \link{readChangeoDb} for reading to Change-O files.
 #' 
 #' @examples
 #' \dontrun{
@@ -130,7 +129,6 @@ writeChangeoDb <- function(data, file) {
 #' 
 #' @seealso  This is just a wrapper for \link{tempfile} and 
 #'           \link{dir.create}.
-#' @family   file input and output functions
 #' 
 #' @examples
 #' makeTempDir("Clone50")
