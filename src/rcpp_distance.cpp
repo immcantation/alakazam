@@ -189,7 +189,7 @@ all.equal(validChars("ATC-C.T", "AT--.TT"), c(0,1,2,4,5,6))
 //' 
 //' @export
 // [[Rcpp::export]]
-int rcpp_getSeqDistance(std::string seq1, 
+double rcpp_getSeqDistance(std::string seq1, 
                         std::string seq2, 
                         NumericMatrix dist_mat) {
     
@@ -228,7 +228,7 @@ int rcpp_getSeqDistance(std::string seq1,
     int d_seen = 0;
     int indels = 0;
     // sum(d[d>0])
-    int d_sum = 0;
+    double d_sum = 0;
     
     for (int i = 0; i < len_seqs; i++)
     {
@@ -259,7 +259,7 @@ int rcpp_getSeqDistance(std::string seq1,
         }    
         
         // distance for current i
-        int d_i = dist_mat(row_idx, col_idx);
+        double d_i = dist_mat(row_idx, col_idx);
         
         if (d_i > 0){
             // Sum distance
@@ -273,7 +273,7 @@ int rcpp_getSeqDistance(std::string seq1,
         d_seen = d_i;
     }
     
-    int distance = d_sum + indels;
+    double distance = d_sum + indels;
     return (distance);
 }
 
@@ -326,7 +326,7 @@ NumericMatrix rcpp_getSeqMatrix (StringVector rownames, NumericMatrix dist_mat) 
             std::string row_seq = as<std::string>(rownames[i]);
             std::string col_seq = as<std::string>(rownames[j]);
             
-            int distance = rcpp_getSeqDistance(row_seq, col_seq, dist_mat);
+            double distance = rcpp_getSeqDistance(row_seq, col_seq, dist_mat);
             
             // write to output matrix
             rmat(i,j) = distance;

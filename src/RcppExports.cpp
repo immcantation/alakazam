@@ -42,7 +42,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_getSeqDistance
-int rcpp_getSeqDistance(std::string seq1, std::string seq2, NumericMatrix dist_mat);
+double rcpp_getSeqDistance(std::string seq1, std::string seq2, NumericMatrix dist_mat);
 RcppExport SEXP alakazam_rcpp_getSeqDistance(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
