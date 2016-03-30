@@ -35,3 +35,99 @@ getDistanceMatrix <- function(rownames) {
     .Call('alakazam_getDistanceMatrix', PACKAGE = 'alakazam', rownames)
 }
 
+#' @export
+validChars <- function(seq1, seq2) {
+    .Call('alakazam_validChars', PACKAGE = 'alakazam', seq1, seq2)
+}
+
+#' Calculate distance between two sequences
+#' 
+#' \code{getSeqDistance} calculates the distance between two DNA sequences.
+#'
+#' @param    seq1      character string containing a DNA sequence.
+#' @param    seq2      character string containing a DNA sequence.
+#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
+#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
+#'                     in \code{dist_mat} then contiguous gaps of any run length,
+#'                     which are not present in both sequences, will be counted as a 
+#'                     distance of 1. Meaning, indels of any length will increase
+#'                     the sequence distance by 1. Gap values other than -1 will 
+#'                     return a distance that does not consider indels as a special case.
+#'
+#' @return   Numerical distance between \code{seq1} and \code{seq2}.
+#' 
+#' @seealso  Nucleotide distance matrix may be built with 
+#'           \link{getDNAMatrix}. Amino acid distance matrix may be built
+#'           with \link{getAAMatrix}.
+#'           
+#' @examples
+#' # Ungapped examples
+#' getSeqDistance("ATGGC", "ATGGG")
+#' getSeqDistance("ATGGC", "ATG??")
+#' 
+#' # Gaps will be treated as Ns with a gap=0 distance matrix
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0))
+#' 
+#' # Gaps will be treated as universally non-matching characters with gap=1
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1))
+#' 
+#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
+#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' # Gaps of equivalent run lengths are not counted as gaps
+#' getSeqDistance("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1))
+#'
+#' # Overlapping runs of gap characters are counted as a single gap
+#' getSeqDistance("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' getSeqDistance("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' getSeqDistance("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' # Discontiguous runs of gap characters each count as separate gaps
+#' getSeqDistance("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' @export
+rcpp_getSeqDistance <- function(seq1, seq2, dist_mat) {
+    .Call('alakazam_rcpp_getSeqDistance', PACKAGE = 'alakazam', seq1, seq2, dist_mat)
+}
+
+#' Calculate pairwise distances between sequences
+#' 
+#' \code{getSeqMatrix} calculates all pairwise distance between a set of sequences.
+#'
+#' @param    seq       character vector containing a DNA sequences.
+#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
+#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
+#'                     in \code{dist_mat} then contiguous gaps of any run length,
+#'                     which are not present in both sequences, will be counted as a 
+#'                     distance of 1. Meaning, indels of any length will increase
+#'                     the sequence distance by 1. Gap values other than -1 will 
+#'                     return a distance that does not consider indels as a special case.
+#'
+#' @return   A matrix of numerical distance between each entry in \code{seq}. 
+#'           If \code{seq} is a named vector, row and columns names will be added 
+#'           accordingly.
+#' 
+#' @seealso  Uses \link{getSeqDistance} for calculating distances between pairs.
+#'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
+#'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
+#'           
+#' @examples
+#' # Gaps will be treated as Ns with a gap=0 distance matrix
+#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=0))
+#' 
+#' # Gaps will be treated as universally non-matching characters with gap=1
+#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=1))
+#' 
+#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
+#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' @export
+rcpp_getSeqMatrix <- function(rownames, dist_mat) {
+    .Call('alakazam_rcpp_getSeqMatrix', PACKAGE = 'alakazam', rownames, dist_mat)
+}
+

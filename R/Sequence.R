@@ -270,6 +270,7 @@ getAAMatrix <- function() {
 #'                     distance of 1. Meaning, indels of any length will increase
 #'                     the sequence distance by 1. Gap values other than -1 will 
 #'                     return a distance that does not consider indels as a special case.
+#' @param   rcpp       Use the Rcpp version of the code
 #'
 #' @return   Numerical distance between \code{seq1} and \code{seq2}.
 #' 
@@ -303,7 +304,10 @@ getAAMatrix <- function() {
 #' getSeqDistance("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
 #' 
 #' @export
-getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
+getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1), rcpp=FALSE) {
+    if (rcpp) {
+        return(rcpp_getSeqDistance(seq1, seq2, dist_mat))
+    }
     # Convert string to character vector
     seq1 <- unlist(strsplit(seq1, ""))
     seq2 <- unlist(strsplit(seq2, ""))
@@ -313,7 +317,7 @@ getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
     # Calculate distance
     d <- sapply(1:length(seq1), function(x) { dist_mat[seq1[x], seq2[x]] })
     indels <- sum(rle(d)$values == -1)
-    
+
     return(sum(d[d >= 0]) + indels)
 }
 
@@ -331,6 +335,7 @@ getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
 #'                     distance of 1. Meaning, indels of any length will increase
 #'                     the sequence distance by 1. Gap values other than -1 will 
 #'                     return a distance that does not consider indels as a special case.
+#' @param    rcpp      Use the Rcpp version of the code                    
 #'
 #' @return   A matrix of numerical distance between each entry in \code{seq}. 
 #'           If \code{seq} is a named vector, row and columns names will be added 
@@ -354,7 +359,10 @@ getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
 #'              dist_mat=getDNAMatrix(gap=-1))
 #' 
 #' @export
-getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
+getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1), rcpp=F) {
+    if (rcpp) {
+        return(rcpp_getSeqMatrix(seq,dist_mat))
+    }
     # Build distance matrix
     n <- length(seq)
     d_mat <- matrix(0, n, n)
@@ -379,7 +387,8 @@ getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
 #'
 #' @param    seq1    character string containing a DNA sequence.
 #' @param    seq2    character string containing a DNA sequence.
-#' @param    ignore  vector of characters to ignore when testing for equality.
+#' @param    ignore  vector of characters to ignore when testing for equality.\
+#' @param    rcpp    use the Rcpp version of the code
 #' 
 #' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
 #'           Sequences of unequal length will always return \code{FALSE} regardless of
@@ -399,7 +408,10 @@ getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
 #' testSeqEqual("AT--T", "ATGGC", ignore="N")
 #' 
 #' @export
-testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
+testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?"), rcpp=F) {
+    if (rcpp) {
+        return(testSeqEqual(seq1,seq2,ignore))
+    }
     # Test that sequences lengths are equal
     if (stri_length(seq1) != stringi::stri_length(seq2)) {
         return(FALSE)

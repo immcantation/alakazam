@@ -29,3 +29,40 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// validChars
+IntegerVector validChars(std::string seq1, std::string seq2);
+RcppExport SEXP alakazam_validChars(SEXP seq1SEXP, SEXP seq2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
+    __result = Rcpp::wrap(validChars(seq1, seq2));
+    return __result;
+END_RCPP
+}
+// rcpp_getSeqDistance
+int rcpp_getSeqDistance(std::string seq1, std::string seq2, NumericMatrix dist_mat);
+RcppExport SEXP alakazam_rcpp_getSeqDistance(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
+    __result = Rcpp::wrap(rcpp_getSeqDistance(seq1, seq2, dist_mat));
+    return __result;
+END_RCPP
+}
+// rcpp_getSeqMatrix
+NumericMatrix rcpp_getSeqMatrix(StringVector rownames, NumericMatrix dist_mat);
+RcppExport SEXP alakazam_rcpp_getSeqMatrix(SEXP rownamesSEXP, SEXP dist_matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< StringVector >::type rownames(rownamesSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
+    __result = Rcpp::wrap(rcpp_getSeqMatrix(rownames, dist_mat));
+    return __result;
+END_RCPP
+}
