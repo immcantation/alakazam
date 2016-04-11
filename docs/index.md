@@ -20,13 +20,13 @@ Alakazam serves five main purposes:
 Related Projects
 -------------------------------------------------------------------------------
 
-* [pRESTO](http://presto.readthedocs.org>) - 
+* [pRESTO](http://presto.readthedocs.org) - 
   Raw read assembly, quality control and UMI processing 
-* [Change-O](http://changeo.readthedocs.org>) - 
+* [Change-O](http://changeo.readthedocs.org) - 
   V(D)J alignment standardization and clonal clustering
-* [SHazaM](http://kleinstein.bitbucket.org/shazam) - 
+* [SHazaM](http://shazam.readthedocs.org) - 
   Mutation profiling and selection strength quantification
-* [TIgGER](http://kleinstein.bitbucket.org/tigger) - 
+* [TIgGER](http://clip.med.yale.edu/tigger) - 
   Polymorphism detection and genotyping
 
 Dependencies
