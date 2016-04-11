@@ -1,0 +1,72 @@
+site_name: alakazam
+theme: readthedocs
+markdown_extensions:
+  - def_list
+  - sane_lists
+  - smarty
+  - toc:
+      permalink: True
+docs_dir: 'docs'
+pages:
+  - About:
+    - 'Introduction': index.md
+    - 'Download & Installation': install.md
+    - 'Package Overview': topics/alakazam.md
+  - Vignettes:
+    - 'Analysis of amino acid physicochemical properties': vignettes/AminoAcids-Vignette.md
+    - 'Diversity analysis': vignettes/Diversity-Vignette.md
+    - 'Ig lineage reconstruction': vignettes/Lineage-Vignette.md
+  - Help Topics:
+    - 'File I/O':
+      - topics/readChangeoDb.md
+      - topics/writeChangeoDb.md
+    - 'Sequence Cleaning and Manipulation':
+      - topics/collapseDuplicates.md
+      - topics/maskSeqEnds.md
+      - topics/maskSeqGaps.md
+      - topics/translateDNA.md
+      - topics/isValidAASeq.md
+    - 'Lineage Reconstruction':
+      - topics/buildPhylipLineage.md
+      - topics/makeChangeoClone.md
+      - topics/ChangeoClone-class.md
+    - 'Diversity Analysis':
+      - topics/calcCoverage.md
+      - topics/calcDiversity.md
+      - topics/countClones.md
+      - topics/estimateAbundance.md
+      - topics/rarefyDiversity.md
+      - topics/testDiversity.md
+      - topics/plotAbundance.md
+      - topics/plotDiversityCurve.md
+      - topics/DiversityCurve-class.md
+      - topics/DiversityTest-class.md
+    - 'Ig and TCR sequence annotation':
+      - topics/countGenes.md
+      - topics/getSegment.md
+      - topics/extractVRegion.md
+    - 'Sequence distance calculation':
+      - topics/getAAMatrix.md
+      - topics/getDNAMatrix.md
+      - topics/getSeqDistance.md
+      - topics/getSeqMatrix.md
+      - topics/testSeqEqual.md
+    - 'Amino acid propertes':
+      - topics/aminoAcidProperties.md
+      - topics/countPatterns.md
+      - topics/aliphatic.md
+      - topics/bulk.md
+      - topics/charge.md
+      - topics/gravy.md
+      - topics/polar.md
+    - 'Miscellaneous':
+      - topics/translateStrings.md
+      - topics/makeTempDir.md
+      - topics/multiggplot.md
+      - topics/stoufferMeta.md
+    - 'Data and constants':
+      - topics/ABBREV_AA.md
+      - topics/IUPAC_CODES.md
+      - topics/DEFAULT_COLORS.md
+      - topics/IMGT_REGIONS.md
+      - topics/ExampleTrees.md
