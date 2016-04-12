@@ -12,9 +12,9 @@ Description
 `calcDiversity` calculates the clonal diversity index for a vector of diversity 
 orders.
 
+
 Usage
 --------------------
-
 ```
 calcDiversity(p, q)
 ```

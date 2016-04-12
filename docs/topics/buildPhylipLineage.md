@@ -12,9 +12,9 @@ Description
 `buildPhylipLineage` reconstructs an Ig lineage via maximum parsimony using the 
 dnapars application of the PHYLIP package.
 
+
 Usage
 --------------------
-
 ```
 buildPhylipLineage(clone, dnapars_exec, rm_temp = FALSE, verbose = FALSE)
 ```

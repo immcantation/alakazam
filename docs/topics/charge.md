@@ -12,9 +12,9 @@ Description
 `charge` calculates the net charge of amino acid sequences using 
 the method of Moore, 1985, with exclusion of the C-terminus and N-terminus charges.
 
+
 Usage
 --------------------
-
 ```
 charge(seq, pH = 7.4, pK = NULL, normalize = TRUE)
 ```

@@ -12,9 +12,9 @@ Description
 `maskSeqGaps` substitutes gap characters, `c("-", ".")`, with `"N"` 
 in a vector of DNA sequences.
 
+
 Usage
 --------------------
-
 ```
 maskSeqGaps(seq, outer_only = FALSE)
 ```

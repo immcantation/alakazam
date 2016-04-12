@@ -387,7 +387,7 @@ getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1), rcpp=F) {
 #'
 #' @param    seq1    character string containing a DNA sequence.
 #' @param    seq2    character string containing a DNA sequence.
-#' @param    ignore  vector of characters to ignore when testing for equality.\
+#' @param    ignore  vector of characters to ignore when testing for equality.
 #' @param    rcpp    use the Rcpp version of the code
 #' 
 #' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.

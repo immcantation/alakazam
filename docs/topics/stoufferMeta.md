@@ -12,9 +12,9 @@ Description
 `stoufferMeta` combines multiple weighted p-values into a meta-analysis p-value
 using Stouffer's Z-score method.
 
+
 Usage
 --------------------
-
 ```
 stoufferMeta(p, w = NULL)
 ```

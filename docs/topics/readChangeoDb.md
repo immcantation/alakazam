@@ -12,9 +12,9 @@ Description
 `readChangeoDb` reads a tab-delimited database file created by a Change-O tool 
 into a data.frame.
 
+
 Usage
 --------------------
-
 ```
 readChangeoDb(file, select = NULL, drop = NULL, seq_upper = TRUE)
 ```

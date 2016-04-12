@@ -13,9 +13,9 @@ Description
 the method of Ikai. Non-informative positions are excluded, where non-informative 
 is defined as any character in `c("X", "-", ".", "*")`.
 
+
 Usage
 --------------------
-
 ```
 aliphatic(seq, normalize = TRUE)
 ```

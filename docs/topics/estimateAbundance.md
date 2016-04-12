@@ -12,9 +12,9 @@ Description
 `estimateAbundance` estimates the complete clonal relative abundance distribution 
 and confidence intervals on clone sizes using bootstrapping.
 
+
 Usage
 --------------------
-
 ```
 estimateAbundance(data, group, clone = "CLONE", copy = NULL, ci = 0.95,
 nboot = 2000)

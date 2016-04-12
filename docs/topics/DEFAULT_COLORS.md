@@ -11,9 +11,9 @@ Description
 
 Default color palettes for DNA characters, Ig isotypes, and TCR chains.
 
+
 Usage
 --------------------
-
 ```
 DNA_COLORS
 ```

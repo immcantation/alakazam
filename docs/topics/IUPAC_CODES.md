@@ -12,9 +12,9 @@ Description
 A translation list mapping IUPAC ambiguous characters code to corresponding nucleotide
 amino acid characters.
 
+
 Usage
 --------------------
-
 ```
 IUPAC_DNA
 ```

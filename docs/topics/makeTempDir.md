@@ -12,9 +12,9 @@ Description
 `makeTempDir` creates a randomly named temporary folder in the 
 system temp location.
 
+
 Usage
 --------------------
-
 ```
 makeTempDir(prefix)
 ```
@@ -43,7 +43,7 @@ makeTempDir("Clone50")
 
 
 ```
-[1] "/tmp/Rtmp0wLIFK/Clone50-temp-40e62138f5ba"
+[1] "/tmp/RtmplOYXR4/Clone50-temp-371965744949"
 
 ```
 

@@ -11,11 +11,11 @@ Description
 
 `getSeqMatrix` calculates all pairwise distance between a set of sequences.
 
+
 Usage
 --------------------
-
 ```
-getSeqMatrix(seq, dist_mat = getDNAMatrix(gap = -1))
+getSeqMatrix(seq, dist_mat = getDNAMatrix(gap = -1), rcpp = F)
 ```
 
 Arguments
@@ -33,6 +33,9 @@ which are not present in both sequences, will be counted as a
 distance of 1. Meaning, indels of any length will increase
 the sequence distance by 1. Gap values other than -1 will 
 return a distance that does not consider indels as a special case.
+
+rcpp
+:   Use the Rcpp version of the code
 
 
 

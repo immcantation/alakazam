@@ -12,9 +12,9 @@ Description
 `writeChangeoDb` is a simple wrapper around [write.table](http://www.inside-r.org/r-doc/utils/write.table) with defaults 
 appropriate for writing a Change-O tab-delimited database file from a data.frame.
 
+
 Usage
 --------------------
-
 ```
 writeChangeoDb(data, file)
 ```

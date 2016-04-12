@@ -12,9 +12,9 @@ Description
 `countClones` determines the number of sequences and total copy number of 
 clonal groups.
 
+
 Usage
 --------------------
-
 ```
 countClones(data, groups = NULL, copy = NULL, clone = "CLONE")
 ```

@@ -13,9 +13,9 @@ Description
 DNA characters with modifications for gap, `c("-", ".")`, and missing, 
 `c("?")`, character values.
 
+
 Usage
 --------------------
-
 ```
 getDNAMatrix(gap = -1)
 ```

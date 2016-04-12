@@ -12,9 +12,9 @@ Description
 `getAAMatrix` returns a Hamming distance matrix for IUPAC ambiguous
 amino acid characters.
 
+
 Usage
 --------------------
-
 ```
 getAAMatrix()
 ```

@@ -13,9 +13,9 @@ Description
 and replaces the leading and trailing characters with `"N"` characters to create 
 a sequence vector with uniformly masked outer sequence segments.
 
+
 Usage
 --------------------
-
 ```
 maskSeqEnds(seq, max_mask = NULL, trim = FALSE)
 ```

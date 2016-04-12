@@ -11,11 +11,11 @@ Description
 
 `testSeqEqual` checks if two DNA sequences are identical.
 
+
 Usage
 --------------------
-
 ```
-testSeqEqual(seq1, seq2, ignore = c("N", "-", ".", "?"))
+testSeqEqual(seq1, seq2, ignore = c("N", "-", ".", "?"), rcpp = F)
 ```
 
 Arguments
@@ -29,6 +29,9 @@ seq2
 
 ignore
 :   vector of characters to ignore when testing for equality.
+
+rcpp
+:   use the Rcpp version of the code
 
 
 

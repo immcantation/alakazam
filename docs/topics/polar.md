@@ -13,9 +13,9 @@ Description
 Non-informative positions are excluded, where non-informative is defined as any 
 character in `c("X", "-", ".", "*")`.
 
+
 Usage
 --------------------
-
 ```
 polar(seq, polarity = NULL)
 ```

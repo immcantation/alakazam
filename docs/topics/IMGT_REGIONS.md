@@ -13,9 +13,9 @@ A list defining the boundaries of V-segment framework regions (FWRs) and complem
 determining regions (CDRs) for IMGT-gapped immunoglobulin (Ig) nucleotide sequences 
 according to the IMGT numbering scheme.
 
+
 Usage
 --------------------
-
 ```
 IMGT_REGIONS
 ```

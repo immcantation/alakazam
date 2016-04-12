@@ -12,9 +12,9 @@ Description
 `translateStrings` modifies a character vector by substituting one or more 
 strings with a replacement string.
 
+
 Usage
 --------------------
-
 ```
 translateStrings(strings, translation)
 ```

@@ -13,9 +13,9 @@ Description
 length, hydrophobicity, bulkiness, polarity, aliphatic index, net charge, acidic residue
 content, basic residue content, and aromatic residue content.
 
+
 Usage
 --------------------
-
 ```
 aminoAcidProperties(data, property = c("length", "gravy", "bulk", "aliphatic",
 "polarity", "charge", "basic", "acidic", "aromatic"), seq = "JUNCTION",

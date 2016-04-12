@@ -12,9 +12,9 @@ Description
 Determines the count and relative abundance of V(D)J alleles, genes or families within
 groups.
 
+
 Usage
 --------------------
-
 ```
 countGenes(data, gene, groups = NULL, copy = NULL, mode = c("gene",
 "allele", "family"))

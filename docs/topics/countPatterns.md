@@ -12,9 +12,9 @@ Description
 `countPatterns` counts the fraction of times a set of character patterns occur 
 in a set of sequences.
 
+
 Usage
 --------------------
-
 ```
 countPatterns(seq, patterns, nt = FALSE, trim = FALSE, label = "REGION")
 ```

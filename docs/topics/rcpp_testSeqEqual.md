@@ -11,9 +11,9 @@ Description
 
 `rcpp_testSeqEqual` checks if two DNA sequences are identical.
 
+
 Usage
 --------------------
-
 ```
 rcpp_testSeqEqual(seq1, seq2, ignore = character())
 ```

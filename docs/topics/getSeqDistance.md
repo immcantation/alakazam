@@ -11,11 +11,11 @@ Description
 
 `getSeqDistance` calculates the distance between two DNA sequences.
 
+
 Usage
 --------------------
-
 ```
-getSeqDistance(seq1, seq2, dist_mat = getDNAMatrix(gap = -1))
+getSeqDistance(seq1, seq2, dist_mat = getDNAMatrix(gap = -1), rcpp = FALSE)
 ```
 
 Arguments
@@ -36,6 +36,9 @@ which are not present in both sequences, will be counted as a
 distance of 1. Meaning, indels of any length will increase
 the sequence distance by 1. Gap values other than -1 will 
 return a distance that does not consider indels as a special case.
+
+rcpp
+:   Use the Rcpp version of the code
 
 
 

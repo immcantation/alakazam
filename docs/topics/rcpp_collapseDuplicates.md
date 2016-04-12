@@ -12,9 +12,9 @@ Description
 `collapseDuplicates` identifies duplicate DNA sequences, allowing for ambiguous 
 characters, removes the duplicate entries, and combines any associated annotations.
 
+
 Usage
 --------------------
-
 ```
 rcpp_collapseDuplicates(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 text_fields = NULL, num_fields = NULL, seq_fields = NULL,

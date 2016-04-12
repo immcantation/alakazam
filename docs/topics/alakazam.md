@@ -26,9 +26,6 @@ For additional details regarding the use of the `alakazam` package see the
 vignettes:
 `browseVignettes("alakazam")`
 
-Usage
---------------------
-
 
 
 File I/O

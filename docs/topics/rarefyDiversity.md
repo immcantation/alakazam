@@ -13,9 +13,9 @@ Description
 uniformly resamples the sequences from each group, and calculates diversity
 scores (<code class = 'eq'>D</code>) over an interval of diversity orders (<code class = 'eq'>q</code>).
 
+
 Usage
 --------------------
-
 ```
 rarefyDiversity(data, group, clone = "CLONE", copy = NULL, min_q = 0,
 max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,

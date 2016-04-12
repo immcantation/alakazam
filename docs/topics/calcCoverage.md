@@ -13,9 +13,9 @@ Description
 completeness, for varying orders using the method of Chao et al, 2015, falling back 
 to the Chao1 method in the first order case.
 
+
 Usage
 --------------------
-
 ```
 calcCoverage(x, r = 1)
 ```

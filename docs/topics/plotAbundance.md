@@ -13,9 +13,9 @@ Description
 abundance distribution. The distribution is plotted as a log rank abundance 
 distribution.
 
+
 Usage
 --------------------
-
 ```
 plotAbundance(data, colors = NULL, main_title = "Rank Abundance",
 legend_title = NULL, xlim = NULL, ylim = NULL, silent = FALSE, ...)

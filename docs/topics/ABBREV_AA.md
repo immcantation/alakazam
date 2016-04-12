@@ -11,9 +11,9 @@ Description
 
 Mappings of amino acid abbreviations.
 
+
 Usage
 --------------------
-
 ```
 ABBREV_AA
 ```

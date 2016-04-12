@@ -13,9 +13,9 @@ Description
 the V-segment for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the 
 IMGT numbering scheme.
 
+
 Usage
 --------------------
-
 ```
 extractVRegion(sequences, region = c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3"))
 ```

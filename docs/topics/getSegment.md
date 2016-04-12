@@ -14,9 +14,9 @@ expression. [getAllele](getSegment.md), [getGene](getSegment.md) and [getFamily]
 the allele, gene and family names, respectively, from a character vector of immunoglobulin (Ig) 
 or TCR segment allele calls in IMGT format.
 
+
 Usage
 --------------------
-
 ```
 getSegment(segment_call, segment_regex, first = TRUE, collapse = TRUE,
 strip_d = TRUE, sep = ",")

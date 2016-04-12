@@ -12,9 +12,9 @@ Description
 `DiversityCurve` defines diversity (<code class = 'eq'>D</code>) scores over multiple diversity 
 orders (<code class = 'eq'>Q</code>).
 
+
 Usage
 --------------------
-
 ```
 "print"(x)
 ```
@@ -33,7 +33,7 @@ Slots
 
 
 `data`
-data.frame defining the diversity curve with the following columns:
+:   data.frame defining the diversity curve with the following columns:
 
 + `GROUP`:    group label.
 + `Q`:        diversity order.
@@ -49,23 +49,18 @@ divided by `D` at `Q=0`.
 + `E_UPPER`:  eveness upper confidence interval bound.
 
 
-
 `groups`
-character vector of groups retained in the diversity calculation.
-
+:   character vector of groups retained in the diversity calculation.
 
 `n`
-numeric vector indication the number of sequences sampled from each group.
-
+:   numeric vector indication the number of sequences sampled from each group.
 
 `nboot`
-number of bootstrap realizations performed.
-
+:   number of bootstrap realizations performed.
 
 `ci`
-confidence interval defining the upper and lower bounds 
+:   confidence interval defining the upper and lower bounds 
 (a value between 0 and 1).
-
 
 
 

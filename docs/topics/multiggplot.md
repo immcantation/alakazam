@@ -11,9 +11,9 @@ Description
 
 Plots multiple ggplot objects in an equally sized grid.
 
+
 Usage
 --------------------
-
 ```
 multiggplot(..., ncol = 1)
 ```

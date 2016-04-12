@@ -13,9 +13,9 @@ Description
 (<code class = 'eq'>D</code>) at a given diversity order (<code class = 'eq'>q</code>) for a set of annotation groups via
 rarefaction and bootstrapping.
 
+
 Usage
 --------------------
-
 ```
 testDiversity(data, q, group, clone = "CLONE", copy = NULL, min_n = 30,
 max_n = NULL, nboot = 2000)
@@ -139,12 +139,12 @@ testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
           test pvalue delta_mean delta_sd
-1 RL01 != RL02      0      25.68 5.177418
+1 RL01 != RL02      0      25.46 5.468773
 
 Slot "summary":
      group  mean       sd
-RL01  RL01 88.69 3.080388
-RL02  RL02 63.01 4.608939
+RL01  RL01 88.94 3.021205
+RL02  RL02 63.48 4.749226
 
 Slot "groups":
 [1] "RL01" "RL02"

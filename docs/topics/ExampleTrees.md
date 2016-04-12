@@ -11,9 +11,9 @@ Description
 
 A set of Ig lineage trees generated from the `extdata/ExampleDb.gz` file.
 
+
 Usage
 --------------------
-
 ```
 ExampleTrees
 ```

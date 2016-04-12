@@ -11,9 +11,9 @@ Description
 
 `plotDiversityCurve` plots a `DiversityCurve` object.
 
+
 Usage
 --------------------
-
 ```
 plotDiversityCurve(data, colors = NULL, main_title = "Diversity",
 legend_title = NULL, log_q = TRUE, log_d = TRUE, xlim = NULL,

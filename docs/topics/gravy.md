@@ -14,9 +14,9 @@ of amino acid sequences using the method of Kyte & Doolittle. Non-informative
 positions are excluded, where non-informative is defined as any character in 
 `c("X", "-", ".", "*")`.
 
+
 Usage
 --------------------
-
 ```
 gravy(seq, hydropathy = NULL)
 ```

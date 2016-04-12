@@ -11,9 +11,9 @@ Description
 
 `translateDNA` translates nucleotide sequences to amino acid sequences.
 
+
 Usage
 --------------------
-
 ```
 translateDNA(seq, trim = FALSE)
 ```

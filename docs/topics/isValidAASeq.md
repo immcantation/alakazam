@@ -14,9 +14,9 @@ amino acid sequences. A sequence is considered valid if it contains only
 characters in the the non-ambiguous IUPAC character set or any characters in 
 `c("X", ".", "-", "*")`.
 
+
 Usage
 --------------------
-
 ```
 isValidAASeq(seq)
 ```

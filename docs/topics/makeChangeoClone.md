@@ -14,9 +14,9 @@ masks gap positions, masks ragged ends, removes duplicates sequences, and merges
 annotations associated with duplicate sequences. It returns a `ChangeoClone` 
 object which serves as input for lineage reconstruction.
 
+
 Usage
 --------------------
-
 ```
 makeChangeoClone(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 germ = "GERMLINE_IMGT_D_MASK", vcall = "V_CALL", jcall = "J_CALL",
