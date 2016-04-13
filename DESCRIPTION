@@ -19,7 +19,7 @@ Description: Provides immunoglobulin (Ig) sequence lineage reconstruction,
     diversity profiling, and amino acid property analysis. Also provides
     core functionality for other tools in the Change-O suite.
 License: CC BY-NC-SA 4.0
-URL: http://clip.med.yale.edu/changeo
+URL: http://alakazam.readthedocs.org
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
 LazyData: true
 BuildVignettes: true

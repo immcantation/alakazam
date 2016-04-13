@@ -25,7 +25,7 @@ NULL
 #'            in proteins by statistical methods. J Theor Biol 21, 170-201 (1968).
 #' }
 #' @seealso 
-#' For additional size related indices see \code{\link[seqinr]{aaindex}}.
+#' For additional size related indices see \link[seqinr]{aaindex}.
 #'
 #' @examples
 #' # Default bulkiness scale

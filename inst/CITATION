@@ -9,12 +9,10 @@ bibentry(bibtype = "Article",
                      person("Daniel", "Gadala-Maria"),
                      person("Gur", "Yaari"),
                      person("Steven H.", "Kleinstein")),
-         
          year    = 2015,
          journal = "Bioinformatics",
          pages   = "1-3",
-         doi     = "10.1093/bioinformatics/btv359",
-         url     = "http://clip.med.yale.edu/changeo")
+         doi     = "10.1093/bioinformatics/btv359")
 
 bibentry(bibtype = "Article",
          style   = "citation",

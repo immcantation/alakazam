@@ -1,4 +1,4 @@
-Alakazam - Immunoglobulin clonal lineage and diversity analysis
+Alakazam
 -------------------------------------------------------------------------------
 
 The alakazam R package provides a set of tool to investigate lymphocyte receptor 
@@ -17,23 +17,14 @@ Alakazam serves five main purposes:
 4. Performing clonal abundance and diversity analysis on lymphocyte repertoires.
 5. Performing physicochemical property analyses of lymphocyte receptor sequences.
 
-Build Instructions
+Related Projects
 -------------------------------------------------------------------------------
-Install build dependencies:
-```R
-install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))
-```
 
-Building from the R console:
-
-```R
-devtools::install_deps()
-devtools::document()
-devtools::build()
-devtools::install()
-```
-
-Optionally, you can skip the vignettes:
-```R
-devtools::build(vignettes=FALSE)
-```
+* [pRESTO](http://presto.readthedocs.org) - 
+  Raw read assembly, quality control and UMI processing 
+* [Change-O](http://changeo.readthedocs.org) - 
+  V(D)J alignment standardization and clonal clustering
+* [SHazaM](http://shazam.readthedocs.org) - 
+  Mutation profiling and selection strength quantification
+* [TIgGER](http://clip.med.yale.edu/tigger) - 
+  Polymorphism detection and genotyping
