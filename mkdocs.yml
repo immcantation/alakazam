@@ -1,4 +1,5 @@
 site_name: alakazam
+repo_url: https://bitbucket.org/kleinstein/alakazam
 theme: readthedocs
 markdown_extensions:
   - def_list
