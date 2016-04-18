@@ -42,17 +42,17 @@ pages:
       - topics/plotDiversityCurve.md
       - topics/DiversityCurve-class.md
       - topics/DiversityTest-class.md
-    - 'Ig and TCR sequence annotation':
+    - 'Ig and TCR Sequence Annotation':
       - topics/countGenes.md
       - topics/getSegment.md
       - topics/extractVRegion.md
-    - 'Sequence distance calculation':
+    - 'Sequence Distance Calculation':
       - topics/getAAMatrix.md
       - topics/getDNAMatrix.md
       - topics/getSeqDistance.md
       - topics/getSeqMatrix.md
       - topics/testSeqEqual.md
-    - 'Amino acid propertes':
+    - 'Amino Acid Propertes':
       - topics/aminoAcidProperties.md
       - topics/countPatterns.md
       - topics/aliphatic.md
@@ -65,7 +65,7 @@ pages:
       - topics/makeTempDir.md
       - topics/multiggplot.md
       - topics/stoufferMeta.md
-    - 'Data and constants':
+    - 'Data and Constants':
       - topics/ABBREV_AA.md
       - topics/IUPAC_CODES.md
       - topics/DEFAULT_COLORS.md
