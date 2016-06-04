@@ -1,0 +1,9 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.
+~$
+^test
+^data-raw
+^profil
+^doc
+mkdocs.yml
