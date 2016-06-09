@@ -9,15 +9,16 @@ markdown_extensions:
       permalink: True
 docs_dir: 'docs'
 pages:
-  - About:
+  - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
     - 'Package Overview': topics/alakazam.md
-  - Vignettes:
+    - 'Release Notes': news.md
+  - 'Vignettes':
     - 'Analysis of amino acid physicochemical properties': vignettes/AminoAcids-Vignette.md
     - 'Diversity analysis': vignettes/Diversity-Vignette.md
     - 'Ig lineage reconstruction': vignettes/Lineage-Vignette.md
-  - Help Topics:
+  - 'Help Topics':
     - 'File I/O':
       - topics/readChangeoDb.md
       - topics/writeChangeoDb.md

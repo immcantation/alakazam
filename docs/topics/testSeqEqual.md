@@ -15,7 +15,7 @@ Description
 Usage
 --------------------
 ```
-testSeqEqual(seq1, seq2, ignore = c("N", "-", ".", "?"), rcpp = F)
+testSeqEqual(seq1, seq2, ignore = c("N", "-", ".", "?"))
 ```
 
 Arguments
@@ -29,9 +29,6 @@ seq2
 
 ignore
 :   vector of characters to ignore when testing for equality.
-
-rcpp
-:   use the Rcpp version of the code
 
 
 

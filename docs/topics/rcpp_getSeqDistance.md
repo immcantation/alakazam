@@ -4,7 +4,7 @@
 
 
 
-**getSeqDistance** - *Calculate distance between two sequences*
+**rcpp_getSeqDistance** - *Calculate distance between two sequences*
 
 Description
 --------------------
@@ -15,7 +15,7 @@ Description
 Usage
 --------------------
 ```
-getSeqDistance(seq1, seq2, dist_mat = getDNAMatrix(gap = -1))
+rcpp_getSeqDistance(seq1, seq2, dist_mat)
 ```
 
 Arguments

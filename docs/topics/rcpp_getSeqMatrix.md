@@ -4,7 +4,7 @@
 
 
 
-**getSeqMatrix** - *Calculate pairwise distances between sequences*
+**rcpp_getSeqMatrix** - *Calculate pairwise distances between sequences*
 
 Description
 --------------------
@@ -15,14 +15,11 @@ Description
 Usage
 --------------------
 ```
-getSeqMatrix(seq, dist_mat = getDNAMatrix(gap = -1))
+rcpp_getSeqMatrix(rownames, dist_mat)
 ```
 
 Arguments
 -------------------
-
-seq
-:   character vector containing a DNA sequences.
 
 dist_mat
 :   Character distance matrix. Defaults to a Hamming distance 
@@ -33,6 +30,9 @@ which are not present in both sequences, will be counted as a
 distance of 1. Meaning, indels of any length will increase
 the sequence distance by 1. Gap values other than -1 will 
 return a distance that does not consider indels as a special case.
+
+seq
+:   character vector containing a DNA sequences.
 
 
 
