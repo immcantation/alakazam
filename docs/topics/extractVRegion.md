@@ -47,8 +47,8 @@ References
 -------------------
 
 
-1. Lefranc M-P, et al. IMGT unique numbering for immunoglobulin and T cell receptor 
-variable domains and Ig superfamily V-like domains.
+1. Lefranc M-P, et al. IMGT unique numbering for immunoglobulin and T cell 
+receptor variable domains and Ig superfamily V-like domains.
 Dev Comp Immunol. 2003 27(1):55-77.
 
 

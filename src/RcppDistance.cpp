@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <iostream>
 #include <map>
+
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 

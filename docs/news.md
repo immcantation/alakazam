@@ -1,4 +1,4 @@
-Version 0.2.3.999:  June 9, 2016
+Version 0.2.3.999:  June 10, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -8,8 +8,11 @@ General:
   `utils::read.table()` if the input file is not compressed.
 + Ported `testSeqEqual()`, `getSeqDistance()` and `getSeqMatrix()` to C++ to 
   improve performance of `collapseDuplicates()` and other dependent functions.
-+ Added `getDistanceMatrix()` which creates a logical sequence distance matrix;
++ Renamed `testSeqEqual()`, `getSeqDistance()` and `getSeqMatrix()` to 
+  `seqEqual()`, `seqDist()` and `pairwiseDist()`, respectively.
++ Added `pairwiseEqual()` which creates a logical sequence distance matrix;
   TRUE if sequences are identical, FALSE if not, excluding Ns and gaps.
+
 
 Version 0.2.3:  February 22, 2016
 -------------------------------------------------------------------------------

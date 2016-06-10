@@ -9,10 +9,10 @@
 Description
 --------------------
 
-`getSegment` performs generic matching of delimited segment calls with a custom regular 
-expression. [getAllele](getSegment.md), [getGene](getSegment.md) and [getFamily](getSegment.md) extract 
-the allele, gene and family names, respectively, from a character vector of immunoglobulin (Ig) 
-or TCR segment allele calls in IMGT format.
+`getSegment` performs generic matching of delimited segment calls with a custom 
+regular expression. [getAllele](getSegment.md), [getGene](getSegment.md) and [getFamily](getSegment.md) extract 
+the allele, gene and family names, respectively, from a character vector of 
+immunoglobulin (Ig) or TCR segment allele calls in IMGT format.
 
 
 Usage
@@ -44,13 +44,14 @@ segment_regex
 :   string defining the segment match regular expression.
 
 first
-:   if `TRUE` return only the first call in `segment_call`;
-if `FALSE` return all calls delimited by commas.
+:   if `TRUE` return only the first call in 
+`segment_call`; if `FALSE` return all calls 
+delimited by commas.
 
 collapse
-:   if `TRUE` check for duplicates and return only unique segment
-assignments; if `FALSE` return all assignments (faster). 
-Has no effect if `first=TRUE`.
+:   if `TRUE` check for duplicates and return only unique 
+segment assignments; if `FALSE` return all assignments 
+(faster). Has no effect if `first=TRUE`.
 
 strip_d
 :   if `TRUE` remove the "D" from the end of gene annotations 
@@ -58,7 +59,8 @@ strip_d
 if `FALSE` do not alter gene names.
 
 sep
-:   character defining both the input and output segment call delimiter.
+:   character defining both the input and output segment call 
+delimiter.
 
 
 

@@ -29,8 +29,8 @@ using `rarefyDiversity`.
 `testDiversity`.
 
 
-Load Change-O data
---------------------------------------------------------------------------------
+# Load Change-O data
+
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. Diversity calculation requires the `CLONE` field 
 (column) to be present in the Change-O file, as well as an additional grouping 
@@ -45,8 +45,7 @@ file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(file)
 ```
 
-Generate a clonal abundance curve
---------------------------------------------------------------------------------
+# Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
 generated using the `countClones` function either without copy numbers, where
@@ -120,13 +119,13 @@ head(clones, 5)
 ```
 ## Source: local data frame [5 x 6]
 ## 
-##   GROUP CLONE          P       LOWER      UPPER  RANK
-##   (chr) (chr)      (dbl)       (dbl)      (dbl) (int)
-## 1  RL01    53 0.03808654 0.002703519 0.07346957     1
-## 2  RL01    91 0.03808654 0.000000000 0.07681567     2
-## 3  RL01     2 0.01293068 0.000000000 0.03618592     3
-## 4  RL01    21 0.01293068 0.000000000 0.03665211     4
-## 5  RL01    33 0.01293068 0.000000000 0.03790692     5
+##   GROUP CLONE          P        LOWER      UPPER  RANK
+##   (chr) (chr)      (dbl)        (dbl)      (dbl) (int)
+## 1  RL01    53 0.03808654 0.0000000000 0.07745180     1
+## 2  RL01    91 0.03808654 0.0006139145 0.07555917     2
+## 3  RL01     2 0.01293068 0.0000000000 0.03567563     3
+## 4  RL01    21 0.01293068 0.0000000000 0.03566714     4
+## 5  RL01    33 0.01293068 0.0000000000 0.03435939     5
 ```
 
 ```r
@@ -137,8 +136,8 @@ p1 <- plotAbundance(clones, legend_title="Sample")
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
 
 
-Generate a diversity curve
---------------------------------------------------------------------------------
+# Generate a diversity curve
+
 The function `rarefyDiversity` performs uniform resampling of the input 
 sequences and recalculates the clone size distribution, and diversity, with each 
 resampling realization. Diversity (D) is calculated over a range of diversity 
@@ -185,8 +184,8 @@ p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main,
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
 
-Test diversity at a fixed diversity order
---------------------------------------------------------------------------------
+# Test diversity at a fixed diversity order
+
 The function `testDiversity` performs resampling and diversity calculation in 
 the same manner as `rarefyDiversity`, but only for a single diversity order. 
 Significance testing across groups is performed using the delta of the bootstrap
@@ -207,12 +206,12 @@ sample_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##           test pvalue delta_mean delta_sd
-## 1 RL01 != RL02      0     23.655  5.26637
+## 1 RL01 != RL02      0      24.16 5.586632
 ## 
 ## Slot "summary":
 ##      group   mean       sd
-## RL01  RL01 87.650 3.662591
-## RL02  RL02 63.995 4.250330
+## RL01  RL01 87.935 3.032616
+## RL02  RL02 63.775 4.905578
 ## 
 ## Slot "groups":
 ## [1] "RL01" "RL02"
@@ -248,15 +247,15 @@ isotype_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean delta_sd
-## 1 IgA != IgG      0   10.40087 3.115011
-## 2 IgA != IgM      0   32.62206 3.999630
-## 3 IgG != IgM      0   43.02293 2.669961
+## 1 IgA != IgG      0   10.54663 3.725439
+## 2 IgA != IgM      0   32.45057 4.100262
+## 3 IgG != IgM      0   42.99720 2.478109
 ## 
 ## Slot "summary":
-##     group      mean       sd
-## IgA   IgA 14.654361 3.098831
-## IgG   IgG  4.253494 1.070278
-## IgM   IgM 47.276426 2.352652
+##     group      mean        sd
+## IgA   IgA 14.721720 3.4803412
+## IgG   IgG  4.175094 0.9030446
+## IgM   IgM 47.172291 2.2943523
 ## 
 ## Slot "groups":
 ## [1] "IgA" "IgG" "IgM"

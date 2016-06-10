@@ -108,7 +108,7 @@ N 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
 See also
 -------------------
 
-Creates DNA distance matrix for [getSeqDistance](getSeqDistance.md).
+Creates DNA distance matrix for [seqDist](seqDist.md).
 See [getAAMatrix](getAAMatrix.md) for amino acid distances.
 
 

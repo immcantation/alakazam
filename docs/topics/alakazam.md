@@ -88,10 +88,12 @@ Sequence distance calculation
 
 
 
-+ [getSeqDistance](getSeqDistance.md):       Calculate Hamming distance between sequences.
-+ [getSeqMatrix](getSeqMatrix.md):         Calculate a matrix of pairwise Hamming distances 
-for a sequence set.
-+ [testSeqEqual](testSeqEqual.md):         Test sequences for equality.
++ [seqDist](seqDist.md):        Calculate Hamming distance between two sequences.
++ [seqEqual](seqEqual.md):       Test two sequences for equivalence.
++ [pairwiseDist](pairwiseDist.md):   Calculate a matrix of pairwise Hamming distances for a 
+set of sequences.
++ [pairwiseEqual](pairwiseEqual.md):  Calculate a logical matrix of pairwise equivalence for a 
+set of sequences.
 
 
 Amino acid propertes

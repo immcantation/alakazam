@@ -48,10 +48,10 @@ of duplicate sequences will be summed.
 
 seq_fields
 :   vector of nucletoide sequence columns to collapse. The sequence 
-with the fewest numer of non-informative characters will be retained. 
-Where a non-informative character is one of `c("N", "-", ".", "?")`. 
-Note, this is distinct from the `seq` parameter which is used to 
-determine duplicates.
+with the fewest numer of non-informative characters will be 
+retained. Where a non-informative character is one of 
+`c("N", "-", ".", "?")`. Note, this is distinct from the 
+`seq` parameter which is used to determine duplicates.
 
 add_count
 :   if `TRUE` add the column `COLLAPSE_COUNT` that 
@@ -261,7 +261,7 @@ DISCARDED> 0
 See also
 -------------------
 
-Equality is tested with [testSeqEqual](testSeqEqual.md).  For IUPAC ambiguous 
+Equality is tested with [seqEqual](seqEqual.md).  For IUPAC ambiguous 
 character codes see [IUPAC_DNA](IUPAC_CODES.md).
 
 

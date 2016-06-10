@@ -393,7 +393,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
         seq <- substr(seq, left_mask + 1, seq_lengths - right_mask)
     } else {
         substr(seq, 0, left_mask) <- paste(rep('N', left_mask), collapse='')
-        substr(seq, seq_lengths - right_mask + 1, seq_lengths + 1) <- paste(rep('N', right_mask), collapse='')
+        substr(seq, seq_lengths - right_mask + 1, seq_lengths + 1) <- 
+            paste(rep('N', right_mask), collapse='')
     }
     
     return(seq)
@@ -417,10 +418,10 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' @param    num_fields   vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
 #' @param    seq_fields   vector of nucletoide sequence columns to collapse. The sequence 
-#'                        with the fewest numer of non-informative characters will be retained. 
-#'                        Where a non-informative character is one of \code{c("N", "-", ".", "?")}. 
-#'                        Note, this is distinct from the \code{seq} parameter which is used to 
-#'                        determine duplicates.
+#'                        with the fewest numer of non-informative characters will be 
+#'                        retained. Where a non-informative character is one of 
+#'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
+#'                        \code{seq} parameter which is used to determine duplicates.
 #' @param    add_count    if \code{TRUE} add the column \code{COLLAPSE_COUNT} that 
 #'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
@@ -684,8 +685,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' 
 #' @references
 #' \enumerate{
-#'   \item  Lefranc M-P, et al. IMGT unique numbering for immunoglobulin and T cell receptor 
-#'            variable domains and Ig superfamily V-like domains.
+#'   \item  Lefranc M-P, et al. IMGT unique numbering for immunoglobulin and T cell 
+#'            receptor variable domains and Ig superfamily V-like domains.
 #'            Dev Comp Immunol. 2003 27(1):55-77.
 #' }
 #' 
@@ -713,9 +714,13 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
     region <- match.arg(region, several.ok=TRUE)
     
     if (length(region) == 1) {
-        sub_sequences <- substr(sequences, IMGT_REGIONS[[region]][1], IMGT_REGIONS[[region]][2])
+        sub_sequences <- substr(sequences, 
+                                IMGT_REGIONS[[region]][1], 
+                                IMGT_REGIONS[[region]][2])
     } else {
-        sub_sequences <- sapply(region, function(x) substr(sequences, IMGT_REGIONS[[x]][1], IMGT_REGIONS[[x]][2]))
+        sub_sequences <- sapply(region, function(x) substr(sequences, 
+                                                           IMGT_REGIONS[[x]][1], 
+                                                           IMGT_REGIONS[[x]][2]))
     }
     
     return(sub_sequences)
@@ -723,22 +728,24 @@ extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"
 
 #' Get Ig segment allele, gene and family names
 #' 
-#' \code{getSegment} performs generic matching of delimited segment calls with a custom regular 
-#' expression. \link{getAllele}, \link{getGene} and \link{getFamily} extract 
-#' the allele, gene and family names, respectively, from a character vector of immunoglobulin (Ig) 
-#' or TCR segment allele calls in IMGT format.
+#' \code{getSegment} performs generic matching of delimited segment calls with a custom 
+#' regular expression. \link{getAllele}, \link{getGene} and \link{getFamily} extract 
+#' the allele, gene and family names, respectively, from a character vector of 
+#' immunoglobulin (Ig) or TCR segment allele calls in IMGT format.
 #'
 #' @param     segment_call    character vector containing segment calls delimited by commas.
 #' @param     segment_regex   string defining the segment match regular expression.
-#' @param     first           if \code{TRUE} return only the first call in \code{segment_call};
-#'                            if \code{FALSE} return all calls delimited by commas.
-#' @param     collapse        if \code{TRUE} check for duplicates and return only unique segment
-#'                            assignments; if \code{FALSE} return all assignments (faster). 
-#'                            Has no effect if \code{first=TRUE}.
+#' @param     first           if \code{TRUE} return only the first call in 
+#'                            \code{segment_call}; if \code{FALSE} return all calls 
+#'                            delimited by commas.
+#' @param     collapse        if \code{TRUE} check for duplicates and return only unique 
+#'                            segment assignments; if \code{FALSE} return all assignments 
+#'                            (faster). Has no effect if \code{first=TRUE}.
 #' @param     strip_d         if \code{TRUE} remove the "D" from the end of gene annotations 
 #'                            (denoting a duplicate gene in the locus); 
 #'                            if \code{FALSE} do not alter gene names.
-#' @param     sep             character defining both the input and output segment call delimiter.
+#' @param     sep             character defining both the input and output segment call 
+#'                            delimiter.
 #' 
 #' @return    A character vector containing allele, gene or family names.
 #' 

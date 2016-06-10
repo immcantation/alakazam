@@ -15,14 +15,15 @@ can be applied to other regions simply by altering the sequence data column used
         Front Immunol 2, 1-12 (2011).
 
 
-Load Change-O data
---------------------------------------------------------------------------------
+# Load Change-O data
+
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. 
 
 
 ```r
 library(alakazam)
+library(dplyr)
 
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
@@ -30,8 +31,8 @@ db <- readChangeoDb(file)
 db <- db[db$SAMPLE == "RL01", ]
 ```
 
-Calculate the properties of amino acid sequences
---------------------------------------------------------------------------------
+# Calculate the properties of amino acid sequences
+
 Multiple amino acid physicochemical properties can be obtained with the function 
 `aminoAcidProperties`. The available properties are:
 
@@ -109,7 +110,7 @@ multiggplot(g1, g2, g3, g4, ncol=2)
 
 ![plot of chunk AminoAcids-Vignette-2](figure/AminoAcids-Vignette-2-1.png)
 
-## Obtaining properties individually ##
+## Obtaining properties individually
 
 A subset of the properties may be calculated using the `property` argument of
 `aminoAcidProperties`.  For example, calculations may be restricted to only the 
@@ -130,7 +131,7 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ## 3         0.275    -0.05026748
 ```
 
-## Using user defined scales ##
+## Using user defined scales
 
 Each property has a default scale setting, but users may specify alternate scales 
 if they wish. The following example shows how to import and use the
@@ -161,7 +162,7 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ## 3       -0.2340    -0.05030493
 ```
 
-## Getting vectors of individual properties ##
+## Getting vectors of individual properties
 
 The `aminoAcidProperties` function provides a convenient wrapper for calculating
 multiple properties at once from a data.frame. If a vector of a specific property is
@@ -256,8 +257,7 @@ countPatterns(cdr3, c(ACIDIC="[DE]"), label="CDR3")
 ## 3        0.10
 ```
 
-Default scales
---------------------------------------------------------------------------------
+# Default scales
 
 The following references were used for the default physicochemical scales:
 

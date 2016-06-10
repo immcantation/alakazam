@@ -70,7 +70,7 @@ Z 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 0 1 0
 See also
 -------------------
 
-Creates an amino acid distance matrix for [getSeqDistance](getSeqDistance.md).
+Creates an amino acid distance matrix for [seqDist](seqDist.md).
 See [getDNAMatrix](getDNAMatrix.md) for nucleotide distances.
 
 
