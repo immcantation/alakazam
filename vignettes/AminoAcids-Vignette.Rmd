@@ -48,6 +48,7 @@ A small example Change-O tab-delimited database file is included in the
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
+library(dplyr)
 
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
