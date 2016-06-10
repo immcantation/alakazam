@@ -5,9 +5,47 @@ using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 
 
+// Checks for valid character positions
+//
+// @param    seq1  sequence one
+// @param    seq2  sequence two
+//
+// @return   Vector of valid positions.
+// @examples
+// x <- validChars("ATC-C.T", "AT--.TT")
+// all.equal(x, c(0,1,2,4,5,6))
+//
+// [[Rcpp::export]]
+IntegerVector validChars (std::string seq1, std::string seq2) {
+    
+    int len_seq1 = seq1.length();
+    int len_seq2 = seq2.length();
+    
+    if (len_seq1 != len_seq2) {
+        throw std::range_error("Sequences of different length.");  
+    }
+    
+    IntegerVector valid_idx=IntegerVector();
+    
+    for (int i = 0; i < len_seq1; i++)
+    {
+        char seq1_char = (char)seq1[i];
+        char seq2_char = (char)seq2[i];
+        
+        bool valid_seq1 = ( seq1_char != '.') & (seq1_char != '-');
+        bool valid_seq2 = ( seq2_char != '.') & (seq2_char != '-');
+        
+        if (valid_seq1 | valid_seq2) {
+            valid_idx.push_back(i);
+        }
+    } 
+    return valid_idx;
+}
+
+
 //' Test DNA sequences for equality.
 //' 
-//' \code{rcpp_testSeqEqual} checks if two DNA sequences are identical.
+//' \code{seqEqual} checks if two DNA sequences are identical.
 //'
 //' @param    seq1    character string containing a DNA sequence.
 //' @param    seq2    character string containing a DNA sequence.
@@ -21,19 +59,19 @@ using namespace Rcpp;
 //' 
 //' @examples
 //' # Ignore gaps
-//' rcpp_testSeqEqual("ATG-C", "AT--C")
-//' rcpp_testSeqEqual("ATGGC", "ATGGN")
-//' rcpp_testSeqEqual("AT--T", "ATGGC")
+//' seqEqual("ATG-C", "AT--C")
+//' seqEqual("ATGGC", "ATGGN")
+//' seqEqual("AT--T", "ATGGC")
 //' 
 //' # Ignore only Ns
-//' rcpp_testSeqEqual("ATG-C", "AT--C", ignore="N")
-//' rcpp_testSeqEqual("ATGGC", "ATGGN", ignore="N")
-//' rcpp_testSeqEqual("AT--T", "ATGGC", ignore="N")
+//' seqEqual("ATG-C", "AT--C", ignore="N")
+//' seqEqual("ATGGC", "ATGGN", ignore="N")
+//' seqEqual("AT--T", "ATGGC", ignore="N")
 //' 
 //' @export
 // [[Rcpp::export]]
-bool rcpp_testSeqEqual(std::string seq1, std::string seq2, 
-                       CharacterVector ignore=CharacterVector()) {
+bool seqEqual(std::string seq1, std::string seq2, 
+              CharacterVector ignore=CharacterVector()) {
     
     int ig_len = ignore.length();
     
@@ -87,7 +125,7 @@ bool rcpp_testSeqEqual(std::string seq1, std::string seq2,
 
 //' Calculate pairwise equivalence between sequences
 //' 
-//' \code{getDistanceMatrix} determined pairwise equivalence between a pairs in a 
+//' \code{pairwiseEqual} determined pairwise equivalence between a pairs in a 
 //' set of sequences, excluding ambiguous positions (Ns and gaps).
 //'
 //' @param    seq  character vector containing a DNA sequences.
@@ -96,18 +134,18 @@ bool rcpp_testSeqEqual(std::string seq1, std::string seq2,
 //'           Values are \code{TRUE} when sequences are equivalent and \code{FALSE}
 //'           when they are not.
 //' 
-//' @seealso  Uses \link{testSeqEqual} for testing equivalence between pairs.
+//' @seealso  Uses \link{seqEqual} for testing equivalence between pairs.
 //'           
 //' @examples
 //' # Gaps and Ns will match any character
 //' seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
-//' d <- getDistanceMatrix(seq)
+//' d <- pairwiseEqual(seq)
 //' rownames(d) <- colnames(d) <- seq
 //' d
 //' 
 //' @export
 // [[Rcpp::export]]
-LogicalMatrix getDistanceMatrix (StringVector seq) {
+LogicalMatrix pairwiseEqual (StringVector seq) {
     
     // allocate the matrix we will return
     LogicalMatrix rmat(seq.length(), seq.length());
@@ -119,7 +157,7 @@ LogicalMatrix getDistanceMatrix (StringVector seq) {
             std::string row_seq = as<std::string>(seq[i]);
             std::string col_seq = as<std::string>(seq[j]);
             
-            bool is_equal = rcpp_testSeqEqual(row_seq, col_seq);
+            bool is_equal = seqEqual(row_seq, col_seq);
             
             // write to output matrix
             rmat(i,j) = is_equal;
@@ -136,98 +174,14 @@ LogicalMatrix getDistanceMatrix (StringVector seq) {
 }
 
 
-// Checks for valid character positions
-//
-// @param    seq1  sequence one
-// @param    seq2  sequence two
-//
-// @return   Vector of valid positions.
-// @examples
-// x <- validChars("ATC-C.T", "AT--.TT")
-// all.equal(x, c(0,1,2,4,5,6))
-//
+// seqDist
 // [[Rcpp::export]]
-IntegerVector validChars (std::string seq1, std::string seq2) {
-    
-    int len_seq1 = seq1.length();
-    int len_seq2 = seq2.length();
-    
-    if (len_seq1 != len_seq2) {
-        throw std::range_error("Sequences of different length.");  
-    }
-    
-    IntegerVector valid_idx=IntegerVector();
-    
-    for (int i = 0; i < len_seq1; i++)
-    {
-        char seq1_char = (char)seq1[i];
-        char seq2_char = (char)seq2[i];
-        
-        bool valid_seq1 = ( seq1_char != '.') & (seq1_char != '-');
-        bool valid_seq2 = ( seq2_char != '.') & (seq2_char != '-');
-        
-        if (valid_seq1 | valid_seq2) {
-            valid_idx.push_back(i);
-        }
-    } 
-    return valid_idx;
-}
-
-
-//' Calculate distance between two sequences
-//' 
-//' \code{getSeqDistance} calculates the distance between two DNA sequences.
-//'
-//' @param    seq1      character string containing a DNA sequence.
-//' @param    seq2      character string containing a DNA sequence.
-//' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-//'                     matrix returned by \link{getDNAMatrix}. If gap 
-//'                     characters, \code{c("-", ".")}, are assigned a value of -1 
-//'                     in \code{dist_mat} then contiguous gaps of any run length,
-//'                     which are not present in both sequences, will be counted as a 
-//'                     distance of 1. Meaning, indels of any length will increase
-//'                     the sequence distance by 1. Gap values other than -1 will 
-//'                     return a distance that does not consider indels as a special case.
-//'
-//' @return   Numerical distance between \code{seq1} and \code{seq2}.
-//' 
-//' @seealso  Nucleotide distance matrix may be built with 
-//'           \link{getDNAMatrix}. Amino acid distance matrix may be built
-//'           with \link{getAAMatrix}.
-//'           
-//' @examples
-//' # Ungapped examples
-//' getSeqDistance("ATGGC", "ATGGG")
-//' getSeqDistance("ATGGC", "ATG??")
-//' 
-//' # Gaps will be treated as Ns with a gap=0 distance matrix
-//' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0))
-//' 
-//' # Gaps will be treated as universally non-matching characters with gap=1
-//' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1))
-//' 
-//' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-//' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-//' 
-//' # Gaps of equivalent run lengths are not counted as gaps
-//' getSeqDistance("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1))
-//'
-//' # Overlapping runs of gap characters are counted as a single gap
-//' getSeqDistance("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-//' getSeqDistance("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-//' getSeqDistance("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-//' 
-//' # Discontiguous runs of gap characters each count as separate gaps
-//' getSeqDistance("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-//' 
-//' @export
-// [[Rcpp::export]]
-double rcpp_getSeqDistance(std::string seq1, std::string seq2, 
-                           NumericMatrix dist_mat) {
-    
+double seqDistRcpp(std::string seq1, std::string seq2, 
+                   NumericMatrix dist_mat) {
+    // Get valid positions
     IntegerVector valid_seq1 = validChars(seq1, seq2);
     
-    // seq1 and seq2 have same length
+    // Check that seq1 and seq2 have same length
     int len_seqs = valid_seq1.length();
     
     List dist_mat_dims = dist_mat.attr("dimnames");
@@ -310,45 +264,9 @@ double rcpp_getSeqDistance(std::string seq1, std::string seq2,
 }
 
 
-//' Calculate pairwise distances between sequences
-//' 
-//' \code{getSeqMatrix} calculates all pairwise distance between a set of sequences.
-//'
-//' @param    seq       character vector containing a DNA sequences.
-//' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-//'                     matrix returned by \link{getDNAMatrix}. If gap 
-//'                     characters, \code{c("-", ".")}, are assigned a value of -1 
-//'                     in \code{dist_mat} then contiguous gaps of any run length,
-//'                     which are not present in both sequences, will be counted as a 
-//'                     distance of 1. Meaning, indels of any length will increase
-//'                     the sequence distance by 1. Gap values other than -1 will 
-//'                     return a distance that does not consider indels as a special case.
-//'
-//' @return   A matrix of numerical distance between each entry in \code{seq}. 
-//'           If \code{seq} is a named vector, row and columns names will be added 
-//'           accordingly.
-//' 
-//' @seealso  Uses \link{getSeqDistance} for calculating distances between pairs.
-//'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
-//'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
-//'           
-//' @examples
-//' # Gaps will be treated as Ns with a gap=0 distance matrix
-//' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-//'              dist_mat=getDNAMatrix(gap=0))
-//' 
-//' # Gaps will be treated as universally non-matching characters with gap=1
-//' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-//'              dist_mat=getDNAMatrix(gap=1))
-//' 
-//' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-//' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-//'              dist_mat=getDNAMatrix(gap=-1))
-//' 
-//' @export
+// pairwiseDist
 // [[Rcpp::export]]
-NumericMatrix rcpp_getSeqMatrix (StringVector seq, NumericMatrix dist_mat) {
-    
+NumericMatrix pairwiseDistRcpp (StringVector seq, NumericMatrix dist_mat) {
     // allocate the matrix we will return
     NumericMatrix rmat(seq.length(), seq.length());
     
@@ -359,7 +277,7 @@ NumericMatrix rcpp_getSeqMatrix (StringVector seq, NumericMatrix dist_mat) {
             std::string row_seq = as<std::string>(seq[i]);
             std::string col_seq = as<std::string>(seq[j]);
             
-            double distance = rcpp_getSeqDistance(row_seq, col_seq, dist_mat);
+            double distance = seqDistRcpp(row_seq, col_seq, dist_mat);
             
             // write to output matrix
             rmat(i,j) = distance;

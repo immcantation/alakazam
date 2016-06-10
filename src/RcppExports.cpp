@@ -5,30 +5,6 @@
 
 using namespace Rcpp;
 
-// rcpp_testSeqEqual
-bool rcpp_testSeqEqual(std::string seq1, std::string seq2, CharacterVector ignore);
-RcppExport SEXP alakazam_rcpp_testSeqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
-    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
-    __result = Rcpp::wrap(rcpp_testSeqEqual(seq1, seq2, ignore));
-    return __result;
-END_RCPP
-}
-// getDistanceMatrix
-LogicalMatrix getDistanceMatrix(StringVector seq);
-RcppExport SEXP alakazam_getDistanceMatrix(SEXP seqSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< StringVector >::type seq(seqSEXP);
-    __result = Rcpp::wrap(getDistanceMatrix(seq));
-    return __result;
-END_RCPP
-}
 // validChars
 IntegerVector validChars(std::string seq1, std::string seq2);
 RcppExport SEXP alakazam_validChars(SEXP seq1SEXP, SEXP seq2SEXP) {
@@ -41,28 +17,52 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// rcpp_getSeqDistance
-double rcpp_getSeqDistance(std::string seq1, std::string seq2, NumericMatrix dist_mat);
-RcppExport SEXP alakazam_rcpp_getSeqDistance(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
+// seqEqual
+bool seqEqual(std::string seq1, std::string seq2, CharacterVector ignore);
+RcppExport SEXP alakazam_seqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
+    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    __result = Rcpp::wrap(seqEqual(seq1, seq2, ignore));
+    return __result;
+END_RCPP
+}
+// pairwiseEqual
+LogicalMatrix pairwiseEqual(StringVector seq);
+RcppExport SEXP alakazam_pairwiseEqual(SEXP seqSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< StringVector >::type seq(seqSEXP);
+    __result = Rcpp::wrap(pairwiseEqual(seq));
+    return __result;
+END_RCPP
+}
+// seqDistRcpp
+double seqDistRcpp(std::string seq1, std::string seq2, NumericMatrix dist_mat);
+RcppExport SEXP alakazam_seqDistRcpp(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
     Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
-    __result = Rcpp::wrap(rcpp_getSeqDistance(seq1, seq2, dist_mat));
+    __result = Rcpp::wrap(seqDistRcpp(seq1, seq2, dist_mat));
     return __result;
 END_RCPP
 }
-// rcpp_getSeqMatrix
-NumericMatrix rcpp_getSeqMatrix(StringVector seq, NumericMatrix dist_mat);
-RcppExport SEXP alakazam_rcpp_getSeqMatrix(SEXP seqSEXP, SEXP dist_matSEXP) {
+// pairwiseDistRcpp
+NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat);
+RcppExport SEXP alakazam_pairwiseDistRcpp(SEXP seqSEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< StringVector >::type seq(seqSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
-    __result = Rcpp::wrap(rcpp_getSeqMatrix(seq, dist_mat));
+    __result = Rcpp::wrap(pairwiseDistRcpp(seq, dist_mat));
     return __result;
 END_RCPP
 }

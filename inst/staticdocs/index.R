@@ -26,7 +26,7 @@ sd_section("Ig and TCR sequence annotation",
 
 sd_section("Sequence distance calculation",
            "",
-           c("getSeqDistance", "getSeqMatrix", "testSeqEqual", 
+           c("seqEqual", "seqDist", "pairwiseEqual", "pairwiseDist",  
              "getAAMatrix", "getDNAMatrix"))
 
 sd_section("Amino acid propertes",

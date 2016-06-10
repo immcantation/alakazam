@@ -352,7 +352,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
             seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
         }
         seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
-        edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)        
+        edges$weight[i] <- seqDist(seq1, seq2, dist_mat)        
     }
     
     # Find rows zero weight edges with inferred parent nodes
@@ -376,7 +376,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
                 seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
             }
             seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
-            edges$weight[i] <- getSeqDistance(seq1, seq2, dist_mat)      
+            edges$weight[i] <- seqDist(seq1, seq2, dist_mat)      
         }
         
         # Remove row
@@ -519,7 +519,7 @@ phylipToGraph <- function(edges, clone) {
 #'   
 #' @seealso  Takes as input a \link{ChangeoClone}. 
 #'           Temporary directories are created with \link{makeTempDir}.
-#'           Distance is calculated using \link{getSeqDistance}. 
+#'           Distance is calculated using \link{seqDist}. 
 #'           See \link{igraph} and \link{igraph.plotting} for working 
 #'           with igraph \code{graph} objects. 
 #'
