@@ -8,7 +8,7 @@ Reconstruction of an Ig lineage requires the following steps:
 2. Preprocess the clone to remove gap characters and duplicate sequences
 3. Run PHYLIP, parse the output, and modify the tree topology
 
-# Load Change-O data
+## Load Change-O data
 
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. Lineage reconstruction requires the following fields 
@@ -36,7 +36,7 @@ df <- readChangeoDb(file)
 sub_df <- subset(df, CLONE == 164)
 ```
 
-# Preprocess a clone
+## Preprocess a clone
 
 Before a lineage can be contructed the sequences must first be cleaned of gap
 (-, .) characters added by IMGT, duplicate sequences must be removed, and
@@ -72,7 +72,7 @@ clone@data[, c("SAMPLE", "ISOTYPE", "DUPCOUNT")]
 ## 4   RL02 IgA,IgG,IgM       61
 ```
 
-# Run PHYLIP
+## Run PHYLIP
 
 Lineage construction uses the `dnapars` (maximum parsimony) application of the
 PHYLIP package. The function `buildPhylipLineage` performs a number of steps to
@@ -127,7 +127,7 @@ data.frame(SEQUENCE_ID=V(graph)$name,
 ## 5 GN5SHBT07IBCBZ         IgA        1
 ```
 
-# Plotting of the lineage tree
+## Plotting of the lineage tree
 
 Plotting of a lineage tree may be done using the built-in functions of the 
 igraph package. The default edge and vertex labels are edge weights and sequence 
@@ -172,7 +172,7 @@ legend("topleft", c("Germline", "Inferred", "Sample"),
 
 Which is much better.
 
-# Batch processing lineage trees
+## Batch processing lineage trees
 
 Multiple lineage trees may be generated at once, by splitting the Change-O 
 data.frame on the clone column.

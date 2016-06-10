@@ -55,7 +55,7 @@ using `rarefyDiversity`.
 `testDiversity`.
 
 
-# Load Change-O data
+## Load Change-O data
 
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. Diversity calculation requires the `CLONE` field 
@@ -70,7 +70,7 @@ file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(file)
 ```
 
-# Generate a clonal abundance curve
+## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
 generated using the `countClones` function either without copy numbers, where
@@ -115,7 +115,7 @@ p1 <- plotAbundance(clones, legend_title="Sample")
 ```
 
 
-# Generate a diversity curve
+## Generate a diversity curve
 
 The function `rarefyDiversity` performs uniform resampling of the input 
 sequences and recalculates the clone size distribution, and diversity, with each 
@@ -150,7 +150,7 @@ p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main,
                          legend_title="Isotype", log_q=TRUE, log_d=TRUE)
 ```
 
-# Test diversity at a fixed diversity order
+## Test diversity at a fixed diversity order
 
 The function `testDiversity` performs resampling and diversity calculation in 
 the same manner as `rarefyDiversity`, but only for a single diversity order. 

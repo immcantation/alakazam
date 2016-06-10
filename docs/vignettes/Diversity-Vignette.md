@@ -29,7 +29,7 @@ using `rarefyDiversity`.
 `testDiversity`.
 
 
-# Load Change-O data
+## Load Change-O data
 
 A small example Change-O tab-delimited database file is included in the 
 `alakazam` package. Diversity calculation requires the `CLONE` field 
@@ -45,7 +45,7 @@ file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(file)
 ```
 
-# Generate a clonal abundance curve
+## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
 generated using the `countClones` function either without copy numbers, where
@@ -121,11 +121,11 @@ head(clones, 5)
 ## 
 ##   GROUP CLONE          P        LOWER      UPPER  RANK
 ##   (chr) (chr)      (dbl)        (dbl)      (dbl) (int)
-## 1  RL01    53 0.03808654 0.0000000000 0.07745180     1
-## 2  RL01    91 0.03808654 0.0006139145 0.07555917     2
-## 3  RL01     2 0.01293068 0.0000000000 0.03567563     3
-## 4  RL01    21 0.01293068 0.0000000000 0.03566714     4
-## 5  RL01    33 0.01293068 0.0000000000 0.03435939     5
+## 1  RL01    53 0.03808654 0.0027854492 0.07338764     1
+## 2  RL01    91 0.03808654 0.0002422777 0.07593081     2
+## 3  RL01     2 0.01293068 0.0000000000 0.03313652     3
+## 4  RL01    21 0.01293068 0.0000000000 0.03425305     4
+## 5  RL01    33 0.01293068 0.0000000000 0.03707236     5
 ```
 
 ```r
@@ -136,7 +136,7 @@ p1 <- plotAbundance(clones, legend_title="Sample")
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
 
 
-# Generate a diversity curve
+## Generate a diversity curve
 
 The function `rarefyDiversity` performs uniform resampling of the input 
 sequences and recalculates the clone size distribution, and diversity, with each 
@@ -184,7 +184,7 @@ p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main,
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
 
-# Test diversity at a fixed diversity order
+## Test diversity at a fixed diversity order
 
 The function `testDiversity` performs resampling and diversity calculation in 
 the same manner as `rarefyDiversity`, but only for a single diversity order. 
@@ -206,12 +206,12 @@ sample_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##           test pvalue delta_mean delta_sd
-## 1 RL01 != RL02      0      24.16 5.586632
+## 1 RL01 != RL02      0      24.58 5.420378
 ## 
 ## Slot "summary":
 ##      group   mean       sd
-## RL01  RL01 87.935 3.032616
-## RL02  RL02 63.775 4.905578
+## RL01  RL01 87.995 3.299912
+## RL02  RL02 63.415 4.142290
 ## 
 ## Slot "groups":
 ## [1] "RL01" "RL02"
@@ -247,15 +247,15 @@ isotype_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean delta_sd
-## 1 IgA != IgG      0   10.54663 3.725439
-## 2 IgA != IgM      0   32.45057 4.100262
-## 3 IgG != IgM      0   42.99720 2.478109
+## 1 IgA != IgG      0   10.49917 3.269200
+## 2 IgA != IgM      0   32.61438 3.833150
+## 3 IgG != IgM      0   43.11355 2.343652
 ## 
 ## Slot "summary":
-##     group      mean        sd
-## IgA   IgA 14.721720 3.4803412
-## IgG   IgG  4.175094 0.9030446
-## IgM   IgM 47.172291 2.2943523
+##     group      mean       sd
+## IgA   IgA 14.738569 3.103691
+## IgG   IgG  4.239398 1.070730
+## IgM   IgM 47.352946 2.325714
 ## 
 ## Slot "groups":
 ## [1] "IgA" "IgG" "IgM"
