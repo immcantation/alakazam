@@ -4,6 +4,7 @@
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
 
+
 //' Test DNA sequences for equality.
 //' 
 //' \code{rcpp_testSeqEqual} checks if two DNA sequences are identical.
@@ -28,12 +29,11 @@ using namespace Rcpp;
 //' rcpp_testSeqEqual("ATG-C", "AT--C", ignore="N")
 //' rcpp_testSeqEqual("ATGGC", "ATGGN", ignore="N")
 //' rcpp_testSeqEqual("AT--T", "ATGGC", ignore="N")
+//' 
 //' @export
 // [[Rcpp::export]]
-bool rcpp_testSeqEqual(
-        std::string seq1, 
-        std::string seq2, 
-        CharacterVector ignore=CharacterVector() ) {
+bool rcpp_testSeqEqual(std::string seq1, std::string seq2, 
+                       CharacterVector ignore=CharacterVector()) {
     
     int ig_len = ignore.length();
     
@@ -84,19 +84,40 @@ bool rcpp_testSeqEqual(
     }  
 }
 
+
+//' Calculate pairwise equivalence between sequences
+//' 
+//' \code{getDistanceMatrix} determined pairwise equivalence between a pairs in a 
+//' set of sequences, excluding ambiguous positions (Ns and gaps).
+//'
+//' @param    seq  character vector containing a DNA sequences.
+//'
+//' @return   A logical matrix of equivalence between each entry in \code{seq}. 
+//'           Values are \code{TRUE} when sequences are equivalent and \code{FALSE}
+//'           when they are not.
+//' 
+//' @seealso  Uses \link{testSeqEqual} for testing equivalence between pairs.
+//'           
+//' @examples
+//' # Gaps and Ns will match any character
+//' seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
+//' d <- getDistanceMatrix(seq)
+//' rownames(d) <- colnames(d) <- seq
+//' d
+//' 
 //' @export
 // [[Rcpp::export]]
-LogicalMatrix getDistanceMatrix (StringVector rownames) {
+LogicalMatrix getDistanceMatrix (StringVector seq) {
     
     // allocate the matrix we will return
-    LogicalMatrix rmat(rownames.length(), rownames.length());
+    LogicalMatrix rmat(seq.length(), seq.length());
     
     for (int i = 0; i < rmat.nrow(); i++) {
         for (int j = 0; j <= i; j++) {
             
             // check seq equal
-            std::string row_seq = as<std::string>(rownames[i]);
-            std::string col_seq = as<std::string>(rownames[j]);
+            std::string row_seq = as<std::string>(seq[i]);
+            std::string col_seq = as<std::string>(seq[j]);
             
             bool is_equal = rcpp_testSeqEqual(row_seq, col_seq);
             
@@ -106,10 +127,25 @@ LogicalMatrix getDistanceMatrix (StringVector rownames) {
         }
     }
     
+    // Add row and column names
+    Rcpp::List dimnames = Rcpp::List::create(seq.attr("names"), 
+                                             seq.attr("names"));
+    rmat.attr("dimnames") = dimnames;
+    
     return rmat;
 }
 
-//' @export
+
+// Checks for valid character positions
+//
+// @param    seq1  sequence one
+// @param    seq2  sequence two
+//
+// @return   Vector of valid positions.
+// @examples
+// x <- validChars("ATC-C.T", "AT--.TT")
+// all.equal(x, c(0,1,2,4,5,6))
+//
 // [[Rcpp::export]]
 IntegerVector validChars (std::string seq1, std::string seq2) {
     
@@ -137,9 +173,6 @@ IntegerVector validChars (std::string seq1, std::string seq2) {
     return valid_idx;
 }
 
-/*** R
-all.equal(validChars("ATC-C.T", "AT--.TT"), c(0,1,2,4,5,6))
-*/
 
 //' Calculate distance between two sequences
 //' 
@@ -189,9 +222,8 @@ all.equal(validChars("ATC-C.T", "AT--.TT"), c(0,1,2,4,5,6))
 //' 
 //' @export
 // [[Rcpp::export]]
-double rcpp_getSeqDistance(std::string seq1, 
-                        std::string seq2, 
-                        NumericMatrix dist_mat) {
+double rcpp_getSeqDistance(std::string seq1, std::string seq2, 
+                           NumericMatrix dist_mat) {
     
     IntegerVector valid_seq1 = validChars(seq1, seq2);
     
@@ -277,6 +309,7 @@ double rcpp_getSeqDistance(std::string seq1,
     return (distance);
 }
 
+
 //' Calculate pairwise distances between sequences
 //' 
 //' \code{getSeqMatrix} calculates all pairwise distance between a set of sequences.
@@ -314,17 +347,17 @@ double rcpp_getSeqDistance(std::string seq1,
 //' 
 //' @export
 // [[Rcpp::export]]
-NumericMatrix rcpp_getSeqMatrix (StringVector rownames, NumericMatrix dist_mat) {
+NumericMatrix rcpp_getSeqMatrix (StringVector seq, NumericMatrix dist_mat) {
     
     // allocate the matrix we will return
-    NumericMatrix rmat(rownames.length(), rownames.length());
+    NumericMatrix rmat(seq.length(), seq.length());
     
     for (int i = 0; i < rmat.nrow(); i++) {
         for (int j = 0; j < i; j++) {
             
             // check seq equal
-            std::string row_seq = as<std::string>(rownames[i]);
-            std::string col_seq = as<std::string>(rownames[j]);
+            std::string row_seq = as<std::string>(seq[i]);
+            std::string col_seq = as<std::string>(seq[j]);
             
             double distance = rcpp_getSeqDistance(row_seq, col_seq, dist_mat);
             
@@ -334,8 +367,9 @@ NumericMatrix rcpp_getSeqMatrix (StringVector rownames, NumericMatrix dist_mat) 
         }
     }
     
-    Rcpp::List dimnames = Rcpp::List::create(rownames.attr("names"), 
-                                             rownames.attr("names"));
+    // Add row and column names
+    Rcpp::List dimnames = Rcpp::List::create(seq.attr("names"), 
+                                             seq.attr("names"));
     rmat.attr("dimnames") = dimnames;
     return rmat;
 }

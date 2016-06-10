@@ -25,17 +25,37 @@
 #' rcpp_testSeqEqual("ATG-C", "AT--C", ignore="N")
 #' rcpp_testSeqEqual("ATGGC", "ATGGN", ignore="N")
 #' rcpp_testSeqEqual("AT--T", "ATGGC", ignore="N")
+#' 
 #' @export
 rcpp_testSeqEqual <- function(seq1, seq2, ignore = character()) {
     .Call('alakazam_rcpp_testSeqEqual', PACKAGE = 'alakazam', seq1, seq2, ignore)
 }
 
+#' Calculate pairwise equivalence between sequences
+#' 
+#' \code{getDistanceMatrix} determined pairwise equivalence between a pairs in a 
+#' set of sequences, excluding ambiguous positions (Ns and gaps).
+#'
+#' @param    seq  character vector containing a DNA sequences.
+#'
+#' @return   A logical matrix of equivalence between each entry in \code{seq}. 
+#'           Values are \code{TRUE} when sequences are equivalent and \code{FALSE}
+#'           when they are not.
+#' 
+#' @seealso  Uses \link{testSeqEqual} for testing equivalence between pairs.
+#'           
+#' @examples
+#' # Gaps and Ns will match any character
+#' seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
+#' d <- getDistanceMatrix(seq)
+#' rownames(d) <- colnames(d) <- seq
+#' d
+#' 
 #' @export
-getDistanceMatrix <- function(rownames) {
-    .Call('alakazam_getDistanceMatrix', PACKAGE = 'alakazam', rownames)
+getDistanceMatrix <- function(seq) {
+    .Call('alakazam_getDistanceMatrix', PACKAGE = 'alakazam', seq)
 }
 
-#' @export
 validChars <- function(seq1, seq2) {
     .Call('alakazam_validChars', PACKAGE = 'alakazam', seq1, seq2)
 }
@@ -127,7 +147,7 @@ rcpp_getSeqDistance <- function(seq1, seq2, dist_mat) {
 #'              dist_mat=getDNAMatrix(gap=-1))
 #' 
 #' @export
-rcpp_getSeqMatrix <- function(rownames, dist_mat) {
-    .Call('alakazam_rcpp_getSeqMatrix', PACKAGE = 'alakazam', rownames, dist_mat)
+rcpp_getSeqMatrix <- function(seq, dist_mat) {
+    .Call('alakazam_rcpp_getSeqMatrix', PACKAGE = 'alakazam', seq, dist_mat)
 }
 

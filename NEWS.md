@@ -1,4 +1,4 @@
-Version 0.2.3.999:  June 9, 2016
+Version 0.2.3.999:  June 10, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -6,9 +6,10 @@ General:
 + Added Rcpp and data.table dependencies.
 + Modified `readChangeoDb()` to wrap `data.table::fread()` instead of 
   `utils::read.table()` if the input file is not compressed.
-+ Ported `testSeqEqual()`, `getSeqDistance()`, `getDistanceMatrix()`, and
-  `getSeqMatrix()` to C++ to improve performance of `collapseDuplicates()` and
-  other dependent functions.
++ Ported `testSeqEqual()`, `getSeqDistance()` and `getSeqMatrix()` to C++ to 
+  improve performance of `collapseDuplicates()` and other dependent functions.
++ Added `getDistanceMatrix()` which creates a logical sequence distance matrix;
+  TRUE if sequences are identical, FALSE if not, excluding Ns and gaps.
 
 Version 0.2.3:  February 22, 2016
 -------------------------------------------------------------------------------
