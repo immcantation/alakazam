@@ -196,7 +196,7 @@ IMGT_REGIONS <- list("FWR1"=c(1, 78),
 #'           indicating the character pair. By default, distances will be either 0 
 #'           (equivalent), 1 (non-equivalent or missing), or -1 (gap). 
 #' 
-#' @seealso  Creates DNA distance matrix for \link{getSeqDistance}.
+#' @seealso  Creates DNA distance matrix for \link{seqDist}.
 #'           See \link{getAAMatrix} for amino acid distances.
 #' 
 #' @examples
@@ -235,7 +235,7 @@ getDNAMatrix <- function(gap=-1) {
 #' @return   A \code{matrix} of amino acid character distances with row and column names 
 #'           indicating the character pair.
 #' 
-#' @seealso  Creates an amino acid distance matrix for \link{getSeqDistance}.
+#' @seealso  Creates an amino acid distance matrix for \link{seqDist}.
 #'           See \link{getDNAMatrix} for nucleotide distances.
 #' 
 #' @examples
@@ -253,130 +253,6 @@ getAAMatrix <- function() {
   }
   
   return(1 - sub_mat)
-}
-
-
-#' Calculate distance between two sequences
-#' 
-#' \code{getSeqDistance} calculates the distance between two DNA sequences.
-#'
-#' @param    seq1      character string containing a DNA sequence.
-#' @param    seq2      character string containing a DNA sequence.
-#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-#'                     matrix returned by \link{getDNAMatrix}. If gap 
-#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
-#'                     in \code{dist_mat} then contiguous gaps of any run length,
-#'                     which are not present in both sequences, will be counted as a 
-#'                     distance of 1. Meaning, indels of any length will increase
-#'                     the sequence distance by 1. Gap values other than -1 will 
-#'                     return a distance that does not consider indels as a special case.
-#'
-#' @return   Numerical distance between \code{seq1} and \code{seq2}.
-#' 
-#' @seealso  Nucleotide distance matrix may be built with 
-#'           \link{getDNAMatrix}. Amino acid distance matrix may be built
-#'           with \link{getAAMatrix}.
-#'           
-#' @examples
-#' # Ungapped examples
-#' getSeqDistance("ATGGC", "ATGGG")
-#' getSeqDistance("ATGGC", "ATG??")
-#' 
-#' # Gaps will be treated as Ns with a gap=0 distance matrix
-#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0))
-#' 
-#' # Gaps will be treated as universally non-matching characters with gap=1
-#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1))
-#' 
-#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-#' getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-#' 
-#' # Gaps of equivalent run lengths are not counted as gaps
-#' getSeqDistance("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1))
-#'
-#' # Overlapping runs of gap characters are counted as a single gap
-#' getSeqDistance("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-#' getSeqDistance("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-#' getSeqDistance("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-#' 
-#' # Discontiguous runs of gap characters each count as separate gaps
-#' getSeqDistance("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
-#' 
-#' @export
-getSeqDistance <- function(seq1, seq2, dist_mat=getDNAMatrix(gap=-1)) {
-    return(rcpp_getSeqDistance(seq1, seq2, dist_mat))
-}
-
-
-#' Calculate pairwise distances between sequences
-#' 
-#' \code{getSeqMatrix} calculates all pairwise distance between a set of sequences.
-#'
-#' @param    seq       character vector containing a DNA sequences.
-#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
-#'                     matrix returned by \link{getDNAMatrix}. If gap 
-#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
-#'                     in \code{dist_mat} then contiguous gaps of any run length,
-#'                     which are not present in both sequences, will be counted as a 
-#'                     distance of 1. Meaning, indels of any length will increase
-#'                     the sequence distance by 1. Gap values other than -1 will 
-#'                     return a distance that does not consider indels as a special case.
-#'
-#' @return   A matrix of numerical distance between each entry in \code{seq}. 
-#'           If \code{seq} is a named vector, row and columns names will be added 
-#'           accordingly.
-#' 
-#' @seealso  Uses \link{getSeqDistance} for calculating distances between pairs.
-#'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
-#'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
-#'           
-#' @examples
-#' # Gaps will be treated as Ns with a gap=0 distance matrix
-#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-#'              dist_mat=getDNAMatrix(gap=0))
-#' 
-#' # Gaps will be treated as universally non-matching characters with gap=1
-#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-#'              dist_mat=getDNAMatrix(gap=1))
-#' 
-#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-#' getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
-#'              dist_mat=getDNAMatrix(gap=-1))
-#' 
-#' @export
-getSeqMatrix <- function(seq, dist_mat=getDNAMatrix(gap=-1)) {
-    return(rcpp_getSeqMatrix(seq,dist_mat))
-}
-
-
-#' Test DNA sequences for equality.
-#' 
-#' \code{testSeqEqual} checks if two DNA sequences are identical.
-#'
-#' @param    seq1    character string containing a DNA sequence.
-#' @param    seq2    character string containing a DNA sequence.
-#' @param    ignore  vector of characters to ignore when testing for equality.
-#' 
-#' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
-#'           Sequences of unequal length will always return \code{FALSE} regardless of
-#'           their character values.
-#' 
-#' @seealso  Used by \link{collapseDuplicates}.
-#' 
-#' @examples
-#' # Ignore gaps
-#' testSeqEqual("ATG-C", "AT--C")
-#' testSeqEqual("ATGGC", "ATGGN")
-#' testSeqEqual("AT--T", "ATGGC")
-#' 
-#' # Ignore only Ns
-#' testSeqEqual("ATG-C", "AT--C", ignore="N")
-#' testSeqEqual("ATGGC", "ATGGN", ignore="N")
-#' testSeqEqual("AT--T", "ATGGC", ignore="N")
-#' 
-#' @export
-testSeqEqual <- function(seq1, seq2, ignore=c("N", "-", ".", "?")) {
-    return(rcpp_testSeqEqual(seq1,seq2,ignore))
 }
 
 
@@ -582,7 +458,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
 #' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
 #' 
-#' @seealso  Equality is tested with \link{testSeqEqual}.  For IUPAC ambiguous 
+#' @seealso  Equality is tested with \link{seqEqual}.  For IUPAC ambiguous 
 #'           character codes see \link{IUPAC_DNA}.
 #'
 #' @examples
@@ -666,7 +542,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     
     # Build distance matrix
-    d_mat <- getDistanceMatrix(data[[seq]])
+    d_mat <- pairwiseEqual(data[[seq]])
     colnames(d_mat) <- rownames(d_mat) <- data[[id]]
     
     # Return input if no sequences are equal
@@ -953,4 +829,99 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep
                     strip_d=strip_d, sep=sep)
     
     return(r)
+}
+
+
+#### Rcpp distance wrappers ####
+
+#' Calculate distance between two sequences
+#' 
+#' \code{seqDist} calculates the distance between two DNA sequences.
+#'
+#' @param    seq1      character string containing a DNA sequence.
+#' @param    seq2      character string containing a DNA sequence.
+#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
+#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
+#'                     in \code{dist_mat} then contiguous gaps of any run length,
+#'                     which are not present in both sequences, will be counted as a 
+#'                     distance of 1. Meaning, indels of any length will increase
+#'                     the sequence distance by 1. Gap values other than -1 will 
+#'                     return a distance that does not consider indels as a special case.
+#'
+#' @return   Numerical distance between \code{seq1} and \code{seq2}.
+#' 
+#' @seealso  Nucleotide distance matrix may be built with 
+#'           \link{getDNAMatrix}. Amino acid distance matrix may be built
+#'           with \link{getAAMatrix}.
+#'           
+#' @examples
+#' # Ungapped examples
+#' seqDist("ATGGC", "ATGGG")
+#' seqDist("ATGGC", "ATG??")
+#' 
+#' # Gaps will be treated as Ns with a gap=0 distance matrix
+#' seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0))
+#' 
+#' # Gaps will be treated as universally non-matching characters with gap=1
+#' seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1))
+#' 
+#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
+#' seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' # Gaps of equivalent run lengths are not counted as gaps
+#' seqDist("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1))
+#'
+#' # Overlapping runs of gap characters are counted as a single gap
+#' seqDist("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' seqDist("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' seqDist("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' # Discontiguous runs of gap characters each count as separate gaps
+#' seqDist("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' @export
+seqDist <- function(seq1, seq2, dist_mat=getDNAMatrix()) {
+    seqDistRcpp(seq1, seq2, dist_mat)
+}
+
+
+#' Calculate pairwise distances between sequences
+#' 
+#' \code{pairwiseDist} calculates all pairwise distance between a set of sequences.
+#'
+#' @param    seq       character vector containing a DNA sequences.
+#' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
+#'                     matrix returned by \link{getDNAMatrix}. If gap 
+#'                     characters, \code{c("-", ".")}, are assigned a value of -1 
+#'                     in \code{dist_mat} then contiguous gaps of any run length,
+#'                     which are not present in both sequences, will be counted as a 
+#'                     distance of 1. Meaning, indels of any length will increase
+#'                     the sequence distance by 1. Gap values other than -1 will 
+#'                     return a distance that does not consider indels as a special case.
+#'
+#' @return   A matrix of numerical distance between each entry in \code{seq}. 
+#'           If \code{seq} is a named vector, row and columns names will be added 
+#'           accordingly.
+#' 
+#' @seealso  Uses \link{seqDist} for calculating distances between pairs.
+#'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
+#'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
+#'           
+#' @examples
+#' # Gaps will be treated as Ns with a gap=0 distance matrix
+#' pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=0))
+#' 
+#' # Gaps will be treated as universally non-matching characters with gap=1
+#' pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=1))
+#' 
+#' # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
+#' pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+#'              dist_mat=getDNAMatrix(gap=-1))
+#' 
+#' @export
+pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
+    pairwiseDistRcpp(seq, dist_mat)
 }

@@ -1,82 +1,82 @@
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(file)
 
-test_that("getSeqDistance",{
+test_that("seqDist",{
     # Ungapped examples
-    expect_equal(getSeqDistance("ATGGC", "ATGGG"), 1)
-    expect_equal(getSeqDistance("ATGGC", "ATG??"), 2)
+    expect_equal(seqDist("ATGGC", "ATGGG"), 1)
+    expect_equal(seqDist("ATGGC", "ATG??"), 2)
     
     # Gaps will be treated as Ns with a gap=0 distance matrix
     expect_equal(
-        getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0)),
+        seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=0)),
         0)
     
     # Gaps will be treated as universally non-matching characters with gap=1
     expect_equal(
-        getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1)),
+        seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=1)),
         2)
     
     # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
     expect_equal(
-        getSeqDistance("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("ATGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         1)
     
     # Gaps of equivalent run lengths are not counted as gaps
     expect_equal(
-        getSeqDistance("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("ATG-C", "ATG-C", dist_mat=getDNAMatrix(gap=-1)),
         0)
     
     # Overlapping runs of gap characters are counted as a single gap
     expect_equal(
-        getSeqDistance("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("ATG-C", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         1) 
     
     expect_equal(
-        getSeqDistance("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("A-GGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         1)
     
     expect_equal(
-        getSeqDistance("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         0)
     
     # Discontiguous runs of gap characters each count as separate gaps
     expect_equal(
-        getSeqDistance("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
+        seqDist("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         2)
 })
 
-test_that("getSeqMatrix", {
+test_that("pairwiseDist", {
     # Gaps will be treated as Ns with a gap=0 distance matrix
-    obs <- getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
                  dist_mat=getDNAMatrix(gap=0))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0),ncol=4),
                  check.attributes=F)
     # Gaps will be treated as universally non-matching characters with gap=1
-    obs <- getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
                  dist_mat=getDNAMatrix(gap=1))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 2, 1, 0, 0, 3, 1, 0, 0, 3, 2, 3, 3, 0),ncol=4),
                  check.attributes=F)
     
     # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-    obs <- getSeqMatrix(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
                  dist_mat=getDNAMatrix(gap=-1))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 1, 1, 0, 0, 2, 1, 0, 0, 2, 1, 2, 2, 0),ncol=4),
                  check.attributes=F)
 })
 
-test_that("testSeqEqual", {
+test_that("seqEqual", {
     # Ignore gaps
-    expect_true(testSeqEqual("ATG-C", "AT--C"))
-    expect_true(testSeqEqual("ATGGC", "ATGGN"))
-    expect_false(testSeqEqual("AT--T", "ATGGC"))
+    expect_true(seqEqual("ATG-C", "AT--C"))
+    expect_true(seqEqual("ATGGC", "ATGGN"))
+    expect_false(seqEqual("AT--T", "ATGGC"))
     
     # Ignore only Ns
-    expect_false(testSeqEqual("ATG-C", "AT--C", ignore="N"))
-    expect_true(testSeqEqual("ATGGC", "ATGGN", ignore="N"))
-    expect_false(testSeqEqual("AT--T", "ATGGC", ignore="N"))
+    expect_false(seqEqual("ATG-C", "AT--C", ignore="N"))
+    expect_true(seqEqual("ATGGC", "ATGGN", ignore="N"))
+    expect_false(seqEqual("AT--T", "ATGGC", ignore="N"))
 })
 
 test_that("translateDNA", {

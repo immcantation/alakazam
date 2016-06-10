@@ -61,10 +61,12 @@
 #' 
 #' @section  Sequence distance calculation:
 #' \itemize{
-#'   \item  \link{getSeqDistance}:       Calculate Hamming distance between sequences.
-#'   \item  \link{getSeqMatrix}:         Calculate a matrix of pairwise Hamming distances 
-#'                                       for a sequence set.
-#'   \item  \link{testSeqEqual}:         Test sequences for equality.
+#'   \item  \link{seqDist}:        Calculate Hamming distance between two sequences.
+#'   \item  \link{seqEqual}:       Test two sequences for equivalence.
+#'   \item  \link{pairwiseDist}:   Calculate a matrix of pairwise Hamming distances for a 
+#'                                 set of sequences.
+#'   \item  \link{pairwiseEqual}:  Calculate a logical matrix of pairwise equivalence for a 
+#'                                 set of sequences.
 #' }
 #' 
 #' @section  Amino acid propertes:
