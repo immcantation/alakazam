@@ -139,12 +139,12 @@ testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
           test pvalue delta_mean delta_sd
-1 RL01 != RL02      0      25.27 6.154337
+1 RL01 != RL02      0      24.53   4.6763
 
 Slot "summary":
      group  mean       sd
-RL01  RL01 88.63 3.463095
-RL02  RL02 63.36 4.495834
+RL01  RL01 88.21 3.179146
+RL02  RL02 63.68 3.784284
 
 Slot "groups":
 [1] "RL01" "RL02"

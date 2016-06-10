@@ -119,13 +119,13 @@ head(clones, 5)
 ```
 ## Source: local data frame [5 x 6]
 ## 
-##   GROUP CLONE          P        LOWER      UPPER  RANK
-##   (chr) (chr)      (dbl)        (dbl)      (dbl) (int)
-## 1  RL01    53 0.03808654 0.0027854492 0.07338764     1
-## 2  RL01    91 0.03808654 0.0002422777 0.07593081     2
-## 3  RL01     2 0.01293068 0.0000000000 0.03313652     3
-## 4  RL01    21 0.01293068 0.0000000000 0.03425305     4
-## 5  RL01    33 0.01293068 0.0000000000 0.03707236     5
+##   GROUP CLONE          P LOWER      UPPER  RANK
+##   (chr) (chr)      (dbl) (dbl)      (dbl) (int)
+## 1  RL01    53 0.03808654     0 0.07669023     1
+## 2  RL01    91 0.03808654     0 0.07730441     2
+## 3  RL01     2 0.01293068     0 0.03742777     3
+## 4  RL01    21 0.01293068     0 0.03550525     4
+## 5  RL01    33 0.01293068     0 0.03543502     5
 ```
 
 ```r
@@ -206,12 +206,12 @@ sample_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##           test pvalue delta_mean delta_sd
-## 1 RL01 != RL02      0      24.58 5.420378
+## 1 RL01 != RL02      0      24.48 5.398641
 ## 
 ## Slot "summary":
 ##      group   mean       sd
-## RL01  RL01 87.995 3.299912
-## RL02  RL02 63.415 4.142290
+## RL01  RL01 87.995 3.409265
+## RL02  RL02 63.515 4.287387
 ## 
 ## Slot "groups":
 ## [1] "RL01" "RL02"
@@ -247,15 +247,15 @@ isotype_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean delta_sd
-## 1 IgA != IgG      0   10.49917 3.269200
-## 2 IgA != IgM      0   32.61438 3.833150
-## 3 IgG != IgM      0   43.11355 2.343652
+## 1 IgA != IgG      0   9.627693 3.283755
+## 2 IgA != IgM      0  33.646852 3.516436
+## 3 IgG != IgM      0  43.274544 2.172349
 ## 
 ## Slot "summary":
-##     group      mean       sd
-## IgA   IgA 14.738569 3.103691
-## IgG   IgG  4.239398 1.070730
-## IgM   IgM 47.352946 2.325714
+##     group      mean        sd
+## IgA   IgA 13.894135 3.0926226
+## IgG   IgG  4.266443 0.9905737
+## IgM   IgM 47.540987 1.9835305
 ## 
 ## Slot "groups":
 ## [1] "IgA" "IgG" "IgM"

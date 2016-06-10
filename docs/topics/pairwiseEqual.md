@@ -64,6 +64,7 @@ See also
 -------------------
 
 Uses [seqEqual](seqEqual.md) for testing equivalence between pairs.
+See [pairwiseDist](pairwiseDist.md) for generating a sequence distance matrix.
 
 
 

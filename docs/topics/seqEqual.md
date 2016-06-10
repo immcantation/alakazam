@@ -122,7 +122,8 @@ seqEqual("AT--T", "ATGGC", ignore="N")
 See also
 -------------------
 
-Used by [collapseDuplicates](collapseDuplicates.md).
+Used by [pairwiseEqual](pairwiseEqual.md) within [collapseDuplicates](collapseDuplicates.md).
+See [seqDist](seqDist.md) for calculation Hamming distances between sequences.
 
 
 

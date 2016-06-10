@@ -187,7 +187,8 @@ See also
 
 Nucleotide distance matrix may be built with 
 [getDNAMatrix](getDNAMatrix.md). Amino acid distance matrix may be built
-with [getAAMatrix](getAAMatrix.md).
+with [getAAMatrix](getAAMatrix.md). Used by [pairwiseDist](pairwiseDist.md) for generating
+distance matrices. See [seqEqual](seqEqual.md) for testing sequence equivalence.
 
 
 

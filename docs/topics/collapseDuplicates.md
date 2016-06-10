@@ -261,8 +261,8 @@ DISCARDED> 0
 See also
 -------------------
 
-Equality is tested with [seqEqual](seqEqual.md).  For IUPAC ambiguous 
-character codes see [IUPAC_DNA](IUPAC_CODES.md).
+Equality is tested with [seqEqual](seqEqual.md) and [pairwiseEqual](pairwiseEqual.md). 
+For IUPAC ambiguous character codes see [IUPAC_DNA](IUPAC_CODES.md).
 
 
 

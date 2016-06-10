@@ -459,8 +459,8 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
 #' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
 #' 
-#' @seealso  Equality is tested with \link{seqEqual}.  For IUPAC ambiguous 
-#'           character codes see \link{IUPAC_DNA}.
+#' @seealso  Equality is tested with \link{seqEqual} and \link{pairwiseEqual}. 
+#'           For IUPAC ambiguous character codes see \link{IUPAC_DNA}.
 #'
 #' @examples
 #' # Example Change-O data.frame
@@ -860,7 +860,8 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep
 #' 
 #' @seealso  Nucleotide distance matrix may be built with 
 #'           \link{getDNAMatrix}. Amino acid distance matrix may be built
-#'           with \link{getAAMatrix}.
+#'           with \link{getAAMatrix}. Used by \link{pairwiseDist} for generating
+#'           distance matrices. See \link{seqEqual} for testing sequence equivalence.
 #'           
 #' @examples
 #' # Ungapped examples
@@ -911,9 +912,10 @@ seqDist <- function(seq1, seq2, dist_mat=getDNAMatrix()) {
 #'           If \code{seq} is a named vector, row and columns names will be added 
 #'           accordingly.
 #' 
-#' @seealso  Uses \link{seqDist} for calculating distances between pairs.
-#'           Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
+#' @seealso  Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
 #'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
+#'           Uses \link{seqDist} for calculating distances between pairs.
+#'           See \link{pairwiseEqual} for generating an equivalence matrix.
 #'           
 #' @examples
 #' # Gaps will be treated as Ns with a gap=0 distance matrix

@@ -10,12 +10,10 @@ using namespace Rcpp;
 //
 // @param    seq1  sequence one
 // @param    seq2  sequence two
-//
 // @return   Vector of valid positions.
 // @examples
 // x <- validChars("ATC-C.T", "AT--.TT")
 // all.equal(x, c(0,1,2,4,5,6))
-//
 // [[Rcpp::export]]
 IntegerVector validChars (std::string seq1, std::string seq2) {
     
@@ -56,7 +54,8 @@ IntegerVector validChars (std::string seq1, std::string seq2) {
 //'           Sequences of unequal length will always return \code{FALSE} regardless of
 //'           their character values.
 //' 
-//' @seealso  Used by \link{collapseDuplicates}.
+//' @seealso  Used by \link{pairwiseEqual} within \link{collapseDuplicates}.
+//'           See \link{seqDist} for calculation Hamming distances between sequences.
 //' 
 //' @examples
 //' # Ignore gaps
@@ -136,6 +135,7 @@ bool seqEqual(std::string seq1, std::string seq2,
 //'           when they are not.
 //' 
 //' @seealso  Uses \link{seqEqual} for testing equivalence between pairs.
+//'           See \link{pairwiseDist} for generating a sequence distance matrix.
 //'           
 //' @examples
 //' # Gaps and Ns will match any character

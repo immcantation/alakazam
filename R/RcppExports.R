@@ -17,7 +17,8 @@ validChars <- function(seq1, seq2) {
 #'           Sequences of unequal length will always return \code{FALSE} regardless of
 #'           their character values.
 #' 
-#' @seealso  Used by \link{collapseDuplicates}.
+#' @seealso  Used by \link{pairwiseEqual} within \link{collapseDuplicates}.
+#'           See \link{seqDist} for calculation Hamming distances between sequences.
 #' 
 #' @examples
 #' # Ignore gaps
@@ -47,6 +48,7 @@ seqEqual <- function(seq1, seq2, ignore = character()) {
 #'           when they are not.
 #' 
 #' @seealso  Uses \link{seqEqual} for testing equivalence between pairs.
+#'           See \link{pairwiseDist} for generating a sequence distance matrix.
 #'           
 #' @examples
 #' # Gaps and Ns will match any character

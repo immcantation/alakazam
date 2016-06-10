@@ -107,9 +107,10 @@ D 1 2 2 0
 See also
 -------------------
 
-Uses [seqDist](seqDist.md) for calculating distances between pairs.
 Nucleotide distance matrix may be built with [getDNAMatrix](getDNAMatrix.md). 
-Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md).
+Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md). 
+Uses [seqDist](seqDist.md) for calculating distances between pairs.
+See [pairwiseEqual](pairwiseEqual.md) for generating an equivalence matrix.
 
 
 
