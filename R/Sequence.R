@@ -285,7 +285,8 @@ translateDNA <- function (seq, trim=FALSE) {
     # Function to translate a single string
     .translate <- function(x) {
         if (stri_length(x) >= 3) {
-            paste(seqinr::translate(unlist(strsplit(x, ""))), collapse="")
+            stri_join(seqinr::translate(unlist(strsplit(x, "")), ambiguous=TRUE), 
+                      collapse="")
         } else {
             NA
         }
@@ -294,6 +295,9 @@ translateDNA <- function (seq, trim=FALSE) {
     # Remove 3 nucleotides from each end
     # Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
     if (trim) { seq <- substr(seq, 4, stri_length(seq) - 3) }
+    
+    # Replace gaps with N
+    seq <- gsub("[-.]", "N", seq)
     
     # Apply translation
     aa <- sapply(seq, .translate, USE.NAMES=FALSE)

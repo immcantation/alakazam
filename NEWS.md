@@ -1,4 +1,4 @@
-Version 0.2.3.999:  June 10, 2016
+Version 0.2.3.999:  June 12, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -12,6 +12,8 @@ General:
   `seqEqual()`, `seqDist()` and `pairwiseDist()`, respectively.
 + Added `pairwiseEqual()` which creates a logical sequence distance matrix;
   TRUE if sequences are identical, FALSE if not, excluding Ns and gaps.
++ Added translation of ambiguous and gap characters to `X` in 
+  `translateDNA()`.
 
 
 Version 0.2.3:  February 22, 2016
