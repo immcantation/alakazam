@@ -107,14 +107,16 @@
 #' @import      utils
 #' @importFrom  data.table  fread
 #' @importFrom  dplyr       do n desc %>%
-#'                          as_data_frame data_frame data_frame_
+#'                          data_frame data_frame_
 #'                          bind_cols bind_rows combine
 #'                          filter filter_ select select_ arrange arrange_
 #'                          group_by group_by_ ungroup
 #'                          mutate mutate_ transmute transmute_
 #'                          rename rename_ summarize summarize_
-#' @importFrom  igraph      V E graph_from_data_frame
-#'                          vertex_attr set_vertex_attr
+#' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
+#'                          make_graph make_directed_graph make_undirected_graph
+#'                          vertex_attr set_vertex_attr 
+#'                          degree shortest_paths all_shortest_paths distances
 #' @importFrom  lazyeval    interp
 #' @importFrom  scales      log2_trans log10_trans trans_breaks trans_format
 #'                          math_format percent scientific
