@@ -57,3 +57,4 @@ Collate:
     'Lineage.R'
     'RcppExports.R'
     'Sequence.R'
+    'Topology.R'
