@@ -47,20 +47,20 @@ test_that("polar", {
 
 test_that("aliphatic", {
     seq <- c("CARDRSTPWRRGIASTTVRTSW", NA, "XXTQMYVRT")
-    obs <- aliphatic(seq)
+    obs <- aliphatic(seq, normalize=TRUE)
     expect_equal(obs, c(0.4000000, NA, 0.4142857),tolerance=0.001)
     
 })
 
 test_that("charge", {
     seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT")
-    # Normalized charge
-    obs_norm <- charge(seq)
-    expect_equal(obs_norm, c(0.1784859, 0.1425715),tolerance=0.001)
-    
     # Unnormalized charge
     obs <- charge(seq, normalize=FALSE)
     expect_equal(obs, c(3.9266889, 0.9980008),tolerance=0.001)
+
+    # Normalized charge
+    obs_norm <- charge(seq, normalize=TRUE)
+    expect_equal(obs_norm, c(0.1784859, 0.1425715),tolerance=0.001)
     
     # Use the Murray et al, 2006 scores from the seqinr package
     data(pK, package="seqinr")
@@ -81,11 +81,11 @@ test_that("aminoAcidProperties", {
     
     junction_properties <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
                                             trim=FALSE, label="JUNCTION")
-    expect_equal(junction_gravy,junction_properties$JUNCTION_AA_GRAVY, tolerance = .001)
-    expect_equal(junction_bulk,junction_properties$JUNCTION_AA_BULK, tolerance = .001)
-    expect_equal(junction_polar,junction_properties$JUNCTION_AA_POLAR, tolerance = .001)
-    expect_equal(junction_aliphatic,junction_properties$JUNCTION_AA_ALIPHATIC, tolerance = .001)
-    expect_equal(junction_charge,junction_properties$JUNCTION_AA_CHARGE, tolerance = .001)
+    expect_equal(junction_gravy, junction_properties$JUNCTION_AA_GRAVY, tolerance = .001)
+    expect_equal(junction_bulk, junction_properties$JUNCTION_AA_BULK, tolerance = .001)
+    expect_equal(junction_polar, junction_properties$JUNCTION_AA_POLAR, tolerance = .001)
+    expect_equal(junction_aliphatic, junction_properties$JUNCTION_AA_ALIPHATIC, tolerance = .001)
+    expect_equal(junction_charge, junction_properties$JUNCTION_AA_CHARGE, tolerance = .001)
     
     
     data(aaindex, package="seqinr")
@@ -97,7 +97,7 @@ test_that("aminoAcidProperties", {
     junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
                                             trim=FALSE, label="JUNCTION",
                                             hydropathy = h)
-    expect_equal(junction_gravy_h,junction_properties_h$JUNCTION_AA_GRAVY, tolerance = .001)
+    expect_equal(junction_gravy_h, junction_properties_h$JUNCTION_AA_GRAVY, tolerance = .001)
     
     junction_gravy_na <- gravy(c(NA,"NA","NULL"), hydropathy =  h)
     expect_equal(junction_gravy_na,c(NA,0.27,NA), tolerance = .001)

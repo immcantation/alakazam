@@ -15,7 +15,12 @@ General:
 + Added translation of ambiguous and gap characters to `X` in 
   `translateDNA()`.
 
-Topology:
+Amino Acid Analysis:
+
++ Set default to `normalize=FALSE` for charge calculations to be more consistent
+  with previously published repertoire sequencing results.
+  
+Topology Analysis:
 
 + Added a set of functions for lineage tree topology analysis.
 
