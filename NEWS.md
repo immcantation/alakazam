@@ -1,4 +1,4 @@
-Version 0.2.3.999:  June 12, 2016
+Version 0.2.3.999:  June 16, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -14,6 +14,10 @@ General:
   TRUE if sequences are identical, FALSE if not, excluding Ns and gaps.
 + Added translation of ambiguous and gap characters to `X` in 
   `translateDNA()`.
+
+Topology:
+
++ Added a set of functions for lineage tree topology analysis.
 
 
 Version 0.2.3:  February 22, 2016
