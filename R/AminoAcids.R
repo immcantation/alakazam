@@ -413,7 +413,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #'            \item  \code{*_AA_BULK}:       average bulkiness of amino acids.
 #'            \item  \code{*_AA_ALIPHATIC}:  aliphatic index.
 #'            \item  \code{*_AA_POLARITY}:   average polarity of amino acids.
-#'            \item  \code{*_AA_CHARGE}:     normalized net charge.
+#'            \item  \code{*_AA_CHARGE}:     net charge.
 #'            \item  \code{*_AA_BASIC}:      fraction of informative positions that are 
 #'                                           Arg, His or Lys.
 #'            \item  \code{*_AA_ACIDIC}:     fraction of informative positions that are 
