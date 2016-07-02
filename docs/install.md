@@ -27,7 +27,7 @@ To build from the [source code](http://bitbucket.org/kleinstein/alakazam),
 first install the build dependencies:
 
 ```R
-install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))
+install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown", "Rcpp"))
 ```
 
 To install the latest development code via devtools:
