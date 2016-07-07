@@ -22,7 +22,8 @@
 #'           }
 #' 
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
-#'           See \link{getPathLengths} and \link{plotSubtrees} for...
+#'           See \link{getPathLengths} for calculating path length to nodes.
+#'           See \link{plotSubtrees} for...
 #' 
 #' @examples
 #' # Define simple graph
@@ -96,7 +97,6 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
 #'           }
 #' 
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
-#'           \link{getFounder}.
 #' 
 #' @examples
 #' # Define simple graph
@@ -120,12 +120,11 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
 #' 
 #' @export
 getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
-    # TODO:  should steps be level?
     # Define path length data.frame
-    path_df <- data.frame(name=V(graph)$name, stringsAsFactors=FALSE)
+    path_df <- data.frame(NAME=V(graph)$name, stringsAsFactors=FALSE)
 
     # Get indices of excluded vertices
-    skip_idx <- which(path_df$name == root)
+    skip_idx <- which(path_df$NAME == root)
     if (!is.null(field)) {
         g <- vertex_attr(graph, name=field)
         skip_idx <- union(skip_idx, which(g %in% exclude))
@@ -138,8 +137,8 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
     # Get path lengths
     for (i in 1:length(step_list)) {
         v <- step_list[[i]]
-        path_df[i, "steps"] <- sum(!(v %in% skip_idx)) 
-        path_df[i, "distance"] <- sum(E(graph, path=v)$weight)
+        path_df[i, "STEPS"] <- sum(!(v %in% skip_idx)) 
+        path_df[i, "DISTANCE"] <- sum(E(graph, path=v)$weight)
     }
     
     return(path_df)
@@ -148,25 +147,30 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 
 #' Retrieve the first non-root node of a lineage tree
 #' 
-#' \code{getFounder} returns the set of founding node(s) for an igraph object. The founding 
-#' node(s) are defined as the set of nodes within the minimum weighted or unweighted path length
-#' from the root (germline) of the lineage tree, allowing for exclusion of specific groups of
-#' nodes.
+#' \code{getMRCA} returns the set of lineage tree nodes with the minimum weighted or 
+#' unweighted path length from the root (germline) of the lineage tree, allowing for 
+#' exclusion of specific groups of nodes.
 #'
-#' @param    graph    igraph object with vertex annotations.
+#' @param    graph    igraph object containing an annotated lineage tree.
 #' @param    path     string defining whether to use unweighted (steps) or weighted (distance) 
-#'                    measures for determining the founder node set. Must be one of 
-#'                    \code{c("steps", "distance")}. 
+#'                    measures for determining the founder node set.. 
 #' @param    root     name of the root (germline) node.
 #' @param    field    annotation field to use for both unweighted path length exclusion and
-#'                    consideration as a founder node. if \code{NULL} do not exclude any nodes.
-#' @param    exclude  vector of annotation values in the given field to exclude from potential 
-#'                    founder set. If \code{NULL} do not exclude any nodes. Has no effect if 
+#'                    consideration as an MRCA node. If \code{NULL} do not exclude any nodes.
+#' @param    exclude  vector of annotation values in \code{field} to exclude from the potential 
+#'                    MRCA set. If \code{NULL} do not exclude any nodes. Has no effect if 
 #'                    \code{field=NULL}.
 #'                    
-#' @return   A data.frame of the founder node(s).
-#' 
-#' @seealso  \link{getPathLengths}.
+#' @return   A data.frame of the MRCA node(s) containing the columns:
+#'           \itemize{
+#'             \item  \code{NAME}:      node name
+#'             \item  \code{STEPS}:     path length as the number of nodes traversed
+#'             \item  \code{DISTANCE}:  path length as the sum of edge weights
+#'           }
+#'           Along with additional columns (in uppercase) corresponding to the 
+#'           annotations of the input graph.
+#'           
+#' @seealso  Path lengths are determined with \link{getPathLengths}.
 #' 
 #' @examples
 #' # Define simple graph
@@ -183,18 +187,22 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' plot(graph, layout=ly)
 #' 
 #' # Use unweighted path length and do not exclude any nodes
-#' getFounder(graph, path="steps", root="Germline")
+#' getMRCA(graph, path="steps", root="Germline")
 #'
 #' # Exclude nodes without an isotype annotation and use weighted path length
-#' getFounder(graph, path="distance", root="Germline", field="isotype", exclude=NA)
+#' getMRCA(graph, path="distance", root="Germline", field="isotype", exclude=NA)
 #' 
 #' @export
-getFounder <- function(graph, path="distance", root="Germline", field=NULL, exclude=NULL) {
+getMRCA <- function(graph, path=c("distance", "steps"), root="Germline", 
+                    field=NULL, exclude=NULL) {
+    # Check arguments
+    path <- match.arg(path)
+    
     # Get distance from root
     path_df <- getPathLengths(graph, root=root, field=field, exclude=exclude)
     
     # Get indices of excluded vertices
-    skip_idx <- which(path_df$name == root)
+    skip_idx <- which(path_df$NAME == root)
     if (!is.null(field)) {
         g <- vertex_attr(graph, name=field)
         skip_idx <- union(skip_idx, which(g %in% exclude))
@@ -202,28 +210,32 @@ getFounder <- function(graph, path="distance", root="Germline", field=NULL, excl
     
     # Get founder nodes
     if (path == "distance") { 
-        path_len <- setNames(path_df$distance, 1:nrow(path_df))
+        path_len <- setNames(path_df$DISTANCE, 1:nrow(path_df))
     } else if (path == "steps") {
-        path_len <- setNames(path_df$steps, 1:nrow(path_df))
+        path_len <- setNames(path_df$STEPS, 1:nrow(path_df))
     } else {
         stop("Invalid value for 'path' parameter. Must be one of c('distance', 'steps').\n")
     }
+    
     path_len <- path_len[-skip_idx]
     root_idx <- as.numeric(names(path_len)[which(path_len == min(path_len))])
     root_df <- igraph::as_data_frame(graph, what="vertices")[root_idx, ]
-    root_df$steps <- path_df$steps[root_idx]
-    root_df$distance <- path_df$distance[root_idx]
+    root_df$STEPS <- path_df$STEPS[root_idx]
+    root_df$DISTANCE <- path_df$DISTANCE[root_idx]
+    
+    # Switch to uppercase
+    names(root_df) <- toupper(names(root_df))
     
     return(root_df)
 }
 
 
-#' Tabulate the number of edges between annotations within a tree
+#' Tabulate the number of edges between annotations within a lineage tree
 #'
 #' \code{tableEdges} creates a table of the total number of connections (edges) for each 
-#' unique pair of annotations within the tree over all vertices.
+#' unique pair of annotations within a tree over all nodes.
 #' 
-#' @param    graph     igraph object with vertex annotations.
+#' @param    graph     igraph object containing an annotated lineage tree.
 #' @param    field     string defining the annotation field to count.
 #' @param    indirect  if \code{FALSE} count direct connections (edges) only. If 
 #'                     \code{TRUE} walk through any nodes with annotations specified in 
@@ -236,7 +248,7 @@ getFounder <- function(graph, path="distance", root="Germline", field=NULL, excl
 #' @return   A data.frame with columns (parent, child, count) defining total
 #'           annotation connections in the tree.
 #' 
-#' @seealso  link{\code{testEdges}}.
+#' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
 #' 
 #' @examples
 #' # Define simple graph
