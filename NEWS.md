@@ -14,6 +14,8 @@ General:
   TRUE if sequences are identical, FALSE if not, excluding Ns and gaps.
 + Added translation of ambiguous and gap characters to `X` in 
   `translateDNA()`.
++ Fixed bug in `collapseDuplicates()` wherein the input data type sanity check
+  would cause the vignette to fail to build under R 3.3.
 
 Amino Acid Analysis:
 

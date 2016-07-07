@@ -504,14 +504,20 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
                                sep=",", verbose=FALSE) {
     # Verify column classes and exit if they are incorrect
-    if (!all(sapply(subset(data, select=text_fields), is.character))) {
-        stop("All text_fields columns must be of type 'character'")
+    if (!is.null(text_fields)) {
+        if (!all(sapply(subset(data, select=text_fields), is.character))) {
+            stop("All text_fields columns must be of type 'character'")
+        }
     }
-    if (!all(sapply(subset(data, select=num_fields), is.numeric))) {
-        stop("All num_fields columns must be of type 'numeric'")
+    if (!is.null(num_fields)) {
+        if (!all(sapply(subset(data, select=num_fields), is.numeric))) {
+            stop("All num_fields columns must be of type 'numeric'")
+        }
     }
-    if (!all(sapply(subset(data, select=seq_fields), is.character))) {
-        stop("All seq_fields columns must be of type 'character'")
+    if (!is.null(seq_fields)) {
+        if (!all(sapply(subset(data, select=seq_fields), is.character))) {
+            stop("All seq_fields columns must be of type 'character'")
+        }
     }
     seq_len <- stri_length(data[[seq]])
     if (any(seq_len != seq_len[1])) {

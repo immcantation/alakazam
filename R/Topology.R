@@ -7,21 +7,22 @@
 #' \code{summarizeSubtrees} calculates summary statistics for each node of a tree. Includes
 #' both node properties and subtree properties.
 #'
-#' @param    graph   igraph object with node annotations.
+#' @param    graph   igraph object containing an annotated lineage tree.
 #' @param    root    name of the root (germline) node.
 #' @param    fields  vector of vertex annotation names to retain in the return data.frame.
 #' 
 #' @return   A data.frame with columns: 
 #'           \itemize{
-#'             \item  \code{name}:                node name
-#'             \item  \code{parent}:              name of the parent node
-#'             \item  \code{outdegree}:           number of edges leading from the node
-#'             \item  \code{subtree_size}:        total number of nodes within the subtree rooted at the node
-#'             \item  \code{subtree_depth}:       the depth of the subtree that is rooted at the node
-#'             \item  \code{subtree_pathlength}:  the maximum pathlength beneath the node
+#'             \item  \code{NAME}:                node name
+#'             \item  \code{PARENT}:              name of the parent node
+#'             \item  \code{OUTDEGREE}:           number of edges leading from the node
+#'             \item  \code{SUBTREE_SIZE}:        total number of nodes within the subtree rooted at the node
+#'             \item  \code{SUBTREE_DEPTH}:       the depth of the subtree that is rooted at the node
+#'             \item  \code{SUBTREE_PATHLENGTH}:  the maximum pathlength beneath the node
 #'           }
 #' 
-#' @seealso  \link{getPathLengths} and \link{plotSubtrees}.
+#' @seealso  See \link{buildPhylipLineage} for generating input trees. 
+#'           See \link{getPathLengths} and \link{plotSubtrees} for...
 #' 
 #' @examples
 #' # Define simple graph
@@ -45,9 +46,9 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
     # TODO:  should probably include a means to exclude inferred from substree size
     
     # Define node attribute data.frame    
-    node_df <- data.frame(name=V(graph)$name, stringsAsFactors=F)
+    node_df <- data.frame(NAME=V(graph)$name, stringsAsFactors=F)
     for (f in fields) {
-        node_df[, f] <- vertex_attr(graph, name=f)
+        node_df[[f]] <- vertex_attr(graph, name=f)
     }
     
     # Get edges
@@ -60,41 +61,42 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
     paths_length[!is.finite(paths_length)] <- NA
     
     # Define each node's parent
-    node_df$parent <- edges[, 1][match(node_df$name, edges[, 2])]
+    node_df$PARENT <- edges[, 1][match(node_df$NAME, edges[, 2])]
     # Define each node's outdegree
-    node_df$outdegree <- igraph::degree(graph, mode="out")
+    node_df$OUTDEGREE <- igraph::degree(graph, mode="out")
 
-    # Define each node's level (steps from root + 1)
-    #node_df$level <- paths[rownames(paths_step) == root, ] + 1
-    # Define each node's path length (genetic distance) from the root (germline)
-    #node_df$pathlength <- paths_length[rownames(paths_length) == root, ]
-    
     # Define the number of nodes in each subtree (child count + 1)
-    node_df$subtree_size <- apply(paths_step, 1, function(x) length(na.omit(x)))
+    node_df$SUBTREE_SIZE <- apply(paths_step, 1, function(x) length(na.omit(x)))
     # Define number of levels below each node
-    node_df$subtree_depth <- apply(paths_step, 1, max, na.rm=TRUE) + 1
+    node_df$SUBTREE_DEPTH <- apply(paths_step, 1, max, na.rm=TRUE) + 1
     # Define the maximum shortest path length (genetic distance) to a leaf from each node
-    node_df$subtree_pathlength <- apply(paths_length, 1, max, na.rm=TRUE)
+    node_df$SUBTREE_PATHLENGTH <- apply(paths_length, 1, max, na.rm=TRUE)
     
     return(node_df)
 }
 
 
-#' Calculate path lengths from a lineage tree root
+#' Calculate path lengths from the tree root
 #'
 #' \code{getPathLengths} calculates the unweighted (number of steps) and weighted (distance) 
-#' path lengths from the root of a lineage tree in an igraph object.
+#' path lengths from the root of a lineage tree.
 #'
-#' @param    graph     igraph object with node annotations.
+#' @param    graph     igraph object containing an annotated lineage tree.
 #' @param    root      name of the root (germline) node.
 #' @param    field     annotation field to use for exclusion of nodes from step count.
 #' @param    exclude   annotation values specifying which nodes to exclude from step count. 
 #'                     if \code{NULL} consider all nodes. This does not affect the weighted
 #'                     (distance) path length calculation.
 #'                     
-#' @return   A data.frame with columns: name, steps, and distance.
+#' @return   A data.frame with columns:
+#'           \itemize{
+#'             \item  \code{NAME}:      node name
+#'             \item  \code{STEPS}:     path length as the number of nodes traversed
+#'             \item  \code{DISTANCE}:  path length as the sum of edge weights
+#'           }
 #' 
-#' @seealso  \link{getFounder}.
+#' @seealso  See \link{buildPhylipLineage} for generating input trees. 
+#'           \link{getFounder}.
 #' 
 #' @examples
 #' # Define simple graph
