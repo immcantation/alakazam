@@ -167,7 +167,7 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #'             \item  \code{STEPS}:     path length as the number of nodes traversed
 #'             \item  \code{DISTANCE}:  path length as the sum of edge weights
 #'           }
-#'           Along with additional columns (in uppercase) corresponding to the 
+#'           Along with additional columns corresponding to the 
 #'           annotations of the input graph.
 #'           
 #' @seealso  Path lengths are determined with \link{getPathLengths}.
@@ -223,8 +223,8 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
     root_df$STEPS <- path_df$STEPS[root_idx]
     root_df$DISTANCE <- path_df$DISTANCE[root_idx]
     
-    # Switch to uppercase
-    names(root_df) <- toupper(names(root_df))
+    # Switch name column to uppercase
+    names(root_df)[names(root_df) == "name"] <- "NAME"
     
     return(root_df)
 }
@@ -245,11 +245,15 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #'                     Edges that either start or end with the specified annotations will not
 #'                     be counted. If \code{NULL} count all edges.
 #'                     
-#' @return   A data.frame with columns (parent, child, count) defining total
-#'           annotation connections in the tree.
-#' 
+#' @return   A data.frame defining total annotation connections in the tree with columns:
+#'           \itemize{
+#'             \item  \code{PARENT}:  parent annotation
+#'             \item  \code{CHILD}:   child annotation
+#'             \item  \code{COUNT}:   count of edges for the parent-child relationship
+#'           }
+#'           
 #' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
-#' 
+#'           
 #' @examples
 #' # Define simple graph
 #' library(igraph)
@@ -309,27 +313,30 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
                 
             # Define data.frame of connections
             if (length(children) > 0) {
-                edge_list[[i]] <- data.frame("parent"=parent, "child"=children)
+                edge_list[[i]] <- data.frame("PARENT"=parent, "CHILD"=children, 
+                                             stringsAsFactors=FALSE)
             }
         }
         
         # Merge edge list into data.frame
-        edge_df <- plyr::rbind.fill(edge_list)        
+        edge_df <- bind_rows(edge_list)        
     }
     else {
         # Get adjacency list
         edge_mat <- as_edgelist(graph, names=FALSE)
         edge_mat <- vertex_attr(graph, name=field, index=edge_mat)
-        edge_mat <- matrix(edge_mat, ncol=2, dimnames=list(NULL, c("parent", "child")))
+        edge_mat <- matrix(edge_mat, ncol=2, dimnames=list(NULL, c("PARENT", "CHILD")))
 
         # Build and subset edge data.frame
         edge_df <- as.data.frame(edge_mat, stringsAsFactors=FALSE)
-        edge_df <- subset(edge_df, !(parent %in% exclude) & !(child %in% exclude))
+        edge_df <- edge_df[!(edge_df$PARENT %in% exclude) & !(edge_df$CHILD %in% exclude), ]
     }
     
     # Count edges
-    edge_tab <- plyr::ddply(edge_df, c("parent", "child"), summarize, count=length(parent))
-    
+    edge_tab <- edge_df %>%
+        group_by_("PARENT", "CHILD") %>%
+        dplyr::summarize(COUNT=n())
+
     return(edge_tab)
 }
 
@@ -338,9 +345,10 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
 #' 
 #' \code{permuteLabels} permutes the node annotations of a lineage tree.
 #'
-#' @param    graph    igraph object with vertex annotations.
+#' @param    graph    igraph object containing an annotated lineage tree.
 #' @param    field    string defining the annotation field to permute.
-#' @param    exclude  vector of strings defining \code{field} values to exclude from permutation.
+#' @param    exclude  vector of strings defining \code{field} values to exclude 
+#'                    from permutation.
 #' 
 #' @return   A modified igraph object with vertex annotations permuted.
 #' 
@@ -383,20 +391,24 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #### Test functions ####
 
 
-#' Infers the founding node annotation of a list of trees
-#'
-#' @param    graphs   list of igraph objects with vertex annotations.
+#' Tests for MRCA annotation enrichment in lineage trees
+#' 
+#' \code{testMRCA} performs a permutation test on a set of lineage trees to determine
+#' the significance of an annotation's association with the MRCA position of the lineage
+#' trees.
+#' 
+#' @param    graphs   list of igraph object containing annotated lineage trees.
 #' @param    field    string defining the annotation field to test.
 #' @param    root     name of the root (germline) node.
 #' @param    exclude  vector of strings defining \code{field} values to exclude from the
 #'                    set of potential founder annotations.
 #' @param    nperm    number of permutations to perform.
 #' 
-#' @return   A named list containing two data.frames summarizing the founder test (obs)
-#'           and the null distribution of potential founders (perm).
+#' @return   A named list containing two data.frames summarizing the MRCA test (obs)
+#'           and the null distribution of potential MRCAs (perm).
 #'           
-#' @seealso  Uses \link{getFounder} and \link{getPathLengths}. Return object
-#'           can be plotted with \link{plotFounderTest}.
+#' @seealso  Uses \link{getMRCA} and \link{getPathLengths}. Return object
+#'           can be plotted with \link{plotMRCATest}.
 #'           
 #' @examples
 #' # Define simple set of graphs
@@ -414,72 +426,87 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' 
 #' # Count edges between isotypes
 #' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
-#' testFounders(graphs, "isotype", nperm=100)
+#' testMRCA(graphs, "isotype", nperm=100)
 #' 
 #' @export
-testFounders <- function(graphs, field, root="Germline", exclude=c("Germline", NA), 
-                         nperm=2000) {
+testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA), 
+                     nperm=200) {
+    # TODO: should probably return a class instead of a list
+    
     # Function to resolve ambiguous founders
-    resolveFounders <- function(df) {
-        # Remove duplicate labels
-        df <- plyr::ddply(df, c("graph"), subset, !duplicated(label))
-        # Discard unresolved ties
-        df <- plyr::ddply(df, c("graph"), subset, length(label) == 1)
+    # @param  x      data.frame from getMRCA
+    # @param  field  annotation field
+    .resolveMRCA <- function(x, field) {
+        x %>% filter_(interp(~!duplicated(x), x=as.name(field))) %>%
+            filter_(interp(~length(x) == 1, x=as.name(field)))
+    }
+    
+    # Function to count MRCAs
+    # @param  x        list of graphs
+    # @param  field    annotation field
+    # @param  exclude  vector of annotation values to exclude
+    .countMRCA <- function(x, field, exclude) {
+        # Get MRCAs
+        mrca_list <- lapply(x, getMRCA, path="distance", field=field, 
+                            exclude=exclude)
+        # Resolve ambiguous MRCAs
+        mrca_list <- lapply(mrca_list, .resolveMRCA, field=field)
+        # Summarize MRCA counts
+        mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
+            select_("GRAPH", field) %>%
+            rename_("ANNOTATION"=field) %>%
+            group_by_("ANNOTATION") %>%
+            dplyr::summarize(COUNT=n()) %>%
+            ungroup() %>%
+            dplyr::mutate_(FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COUNT")))
         
-        return(df)
+        return(mrca_sum)
     }
     
     # Assign numeric names if graphs is an unnamed list
     if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
-        
-    # Get founders
-    obs_df <- plyr::ldply(graphs, getFounder, path="distance", field=field, 
-                    exclude=exclude, .id="graph")
-    obs_df <- obs_df[, c("graph", field)]
-    names(obs_df) <- c("graph", "label")
-    obs_df <- resolveFounders(obs_df)
-    # Summarize founder counts  
-    obs_sum <- plyr::ddply(obs_df, c("label"), plyr::summarize, count=length(label))
-    obs_sum <- transform(obs_sum, freq=count/sum(count, na.rm=TRUE))
     
+    # Summarize observed MRCA counts
+    obs_sum <- .countMRCA(graphs, field=field, exclude=exclude)
+
     # Generate edge null distribution via permutation
     cat("-> PERMUTING TREES\n")
     pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3)
     perm_list <- list()
     for (i in 1:nperm) {
-        tmp_list <- plyr::llply(graphs, permuteLabels, field=field, exclude=exclude)
-        tmp_df <- plyr::ldply(tmp_list, getFounder, path="distance", field=field, 
-                        exclude=exclude, .id="graph")
-        tmp_df <- tmp_df[, c("graph", field)]
-        names(tmp_df) <- c("graph", "label")
-        tmp_df <- resolveFounders(tmp_df)
-        tmp_sum <- plyr::ddply(tmp_df, c("label"), plyr::summarize, count=length(label))
-        tmp_sum$perm <- i
+        # Permute labels
+        tmp_list <- lapply(graphs, permuteLabels, field=field, exclude=exclude)
+        # Summarize MRCA counts
+        tmp_sum <- .countMRCA(tmp_list, field=field, exclude=exclude)
+        # Update permutation set
+        tmp_sum$PERM <- i
         perm_list[[i]] <- tmp_sum
+        
         setTxtProgressBar(pb, i)
     }
     cat("\n")
-    perm_sum <- plyr::rbind.fill(perm_list)
+    perm_sum <- bind_rows(perm_list)
     
     # Test observed against permutation distribution
     for (i in 1:nrow(obs_sum)) {
-        x <- obs_sum$label[i]
-        f <- ecdf(perm_sum$count[perm_sum$label == x])
-        obs_sum[i, "pvalue"] <- 1 - f(obs_sum$count[i])
+        x <- obs_sum$ANNOTATION[i]
+        f <- ecdf(perm_sum$COUNT[perm_sum$ANNOTATION == x])
+        obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
     }
  
     return(list(obs=obs_sum, perm=perm_sum))
 }
 
 
-#' Tests for edge enrichment via permutation
+#' Tests for parent-child annotation enchrichment in lineage trees
 #' 
-#' \code{testEdges} tests the significance of edge abundance between vertext annotation pairs 
-#' within a list of trees via permutation of the graph labels.
+#' \code{testEdges} performs a permutation test on a set of lineage trees to determine
+#' the significance of an annotation's association with parent-child relationships.
 #'
 #' @param    graphs   list of igraph objects with vertex annotations.
 #' @param    field    string defining the annotation field to permute.
-#' @param    exclude  vector of strings defining \code{field} values to exclude from permutation.
+#' @param    exclude  vector of strings defining \code{field} values to exclude from 
+#'                    permutation.
 #' @param    nperm    number of permutations to perform.
 #' 
 #' @return   A named list containing two data.frames summarizing the observed edge counts (obs)
@@ -503,36 +530,49 @@ testFounders <- function(graphs, field, root="Germline", exclude=c("Germline", N
 #' testEdges(graphs, "isotype", nperm=100)
 #' 
 #' @export
-testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=2000) {
+testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
     # Assign numeric names if graphs is an unnamed list
-    #if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
+    if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
     
-    # Count edges of unpermuted data
-    obs_df <- plyr::ldply(graphs, tableEdges, field=field, exclude=exclude)
-    obs_sum <- plyr::ddply(obs_df, c("parent", "child"), plyr::summarize, count=sum(count, na.rm=TRUE))
+    # Function to count edge annotations
+    # @param  x        list of graphs
+    # @param  field    annotation field
+    # @param  exclude  vector of annotation values to exclude
+    .countEdges <- function(x, field, exclude) {
+        edge_list <- lapply(x, tableEdges, field=field, exclude=exclude)
+        edge_sum <- bind_rows(edge_list) %>%
+            group_by_("PARENT", "CHILD") %>%
+            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
+        return(edge_sum)
+    }
+    
+    # Count edges of observed data
+    obs_sum <- .countEdges(graphs, field, exclude)
 
     # Generate edge null distribution via permutation
     cat("-> PERMUTING TREES\n")
     pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3)
     perm_list <- list()
     for (i in 1:nperm) {
-        tmp_list <- plyr::llply(graphs, permuteLabels, field=field, exclude=exclude)
-        tmp_df <- plyr::ldply(tmp_list, tableEdges, field=field, exclude=exclude)
-        tmp_sum <- plyr::ddply(tmp_df, c("parent", "child"), 
-                               plyr::summarize, count=sum(count, na.rm=TRUE))
-        tmp_sum$perm <- i
+        # Permute annotations
+        tmp_list <- lapply(graphs, permuteLabels, field=field, exclude=exclude)
+        # Count edges
+        tmp_sum <- .countEdges(tmp_list, field, exclude)
+        # Update permutation set
+        tmp_sum$PERM <- i
         perm_list[[i]] <- tmp_sum
+        
         setTxtProgressBar(pb, i)
     }
     cat("\n")
-    perm_sum <- plyr::rbind.fill(perm_list)
+    perm_sum <- bind_rows(perm_list)
     
     # Test observed against permutation distribution
     for (i in 1:nrow(obs_sum)) {
-        x <- obs_sum$parent[i]
-        y <- obs_sum$child[i]
-        f <- ecdf(perm_sum$count[perm_sum$parent == x & perm_sum$child == y])
-        obs_sum[i, "pvalue"] <- 1 - f(obs_sum$count[i])
+        x <- obs_sum$PARENT[i]
+        y <- obs_sum$CHILD[i]
+        f <- ecdf(perm_sum$COUNT[perm_sum$PARENT == x & perm_sum$CHILD == y])
+        obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
     }
     
     return(list(obs=obs_sum, perm=perm_sum))

@@ -42,7 +42,7 @@ orderGenes <- function(genes) {
 #' Determines the count and relative abundance of V(D)J alleles, genes or families within
 #' groups.
 #'
-#' @param    data    data.frame with Change-O style columns containing clonal assignments.
+#' @param    data    data.frame with Change-O style columns.
 #' @param    gene    column containing allele assignments. Only the first allele in the
 #'                   column will be considered.
 #' @param    groups  columns containing grouping variables. If \code{NULL} do not group.
