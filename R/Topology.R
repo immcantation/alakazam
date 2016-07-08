@@ -640,14 +640,14 @@ plotEdgeTest <- function(edge_test) {
 
 #' Plot the results of a founder permutation test
 #' 
-#' \code{plotFounderTest} plots the results of a founder permutation test performed with 
-#' \code{testFounders}.
+#' \code{plotMRCATest} plots the results of a founder permutation test performed with 
+#' \code{testMRCA}.
 #'
-#' @param    founder_test  named list returned by \code{testFounders}.
+#' @param    founder_test  named list returned by \code{testMRCA}.
 #' 
 #' @return   NULL
 #' 
-#' @seealso  \link{testFounders}.
+#' @seealso  \link{testMRCA}.
 #' 
 #' @examples
 #' # Define simple graph
@@ -665,13 +665,13 @@ plotEdgeTest <- function(edge_test) {
 #' graph3 <- graph2
 #' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
 #' graphs <- list(A=graph, B=graph2, C=graph3)
-#' founder_test <- testFounders(graphs, "isotype", nperm=100)
+#' founder_test <- testMRCA(graphs, "isotype", nperm=100)
 #' 
 #' # Plot
 #' plotFounderTest(founder_test)
 #' 
 #' @export
-plotFounderTest <- function(founder_test) {
+plotMRCATest <- function(founder_test) {
     obs_sum <- founder_test[["obs"]]
     perm_sum <- founder_test[["perm"]]
     
