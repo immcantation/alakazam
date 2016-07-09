@@ -93,13 +93,13 @@ DiversityTest <- setClass("DiversityTest",
 #' @param    x  DiversityCurve object
 #' 
 #' @rdname   DiversityCurve-class
-#' @aliases  print,DiversityCurve-method
+#' @aliases  print, DiversityCurve-method
 setMethod("print", "DiversityCurve", function(x) { print(x@data) })
 
 #' @param    x  DiversityTest object
 #' 
 #' @rdname   DiversityTest-class
-#' @aliases  print,DiversityTest-method
+#' @aliases  print, DiversityTest-method
 setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 
 # @rdname DiversityCurve

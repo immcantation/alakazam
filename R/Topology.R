@@ -1,5 +1,55 @@
 # Ig lineage topology analysis
 
+#' @include Alakazam.R
+NULL
+
+#### Classes ####
+
+#' S4 class defining edge significance
+#'
+#' \code{EdgeTest} defines the significance of parent-child annotation enrichment.
+#' 
+#' @slot  tests         data.frame describing the significance test results with columns:
+#'                      \itemize{
+#'                        \item  \code{PARENT}:    parent node annotation.
+#'                        \item  \code{CHILD}:     child node annotation
+#'                        \item  \code{COUNT}:     count of observed edges with the given 
+#'                                                 parent-child annotation set.
+#'                        \item  \code{EXPECTED}:  mean count of expected edges for the 
+#'                                                 given parent-child relationship.
+#'                        \item  \code{PVALUE}:    one-sided p-value for the hypothesis that 
+#'                                                  the observed edge abundance is greater 
+#'                                                  than expected.
+#'                      }
+#' @slot  permutations  data.frame containing the raw permutation test data with columns:
+#'                      \itemize{
+#'                        \item  \code{PARENT}:  parent node annotation.
+#'                        \item  \code{CHILD}:   child node annotation
+#'                        \item  \code{COUNT}:   count of edges with the given parent-child 
+#'                                               annotation set.
+#'                        \item  \code{ITER}:    numerical index define which permutation
+#'                                               realization each observation corresponds 
+#'                                               to.
+#'                      }
+#' @slot  nperm         number of permutation realizations.
+#' 
+#' @name         EdgeTest-class
+#' @rdname       EdgeTest-class
+#' @aliases      EdgeTest
+#' @exportClass  EdgeTest
+EdgeTest <- setClass("EdgeTest", 
+                     slots=c(tests="data.frame",
+                             permutations="data.frame",
+                             nperm="numeric"))
+
+#### Methods ####
+
+#' @param    x  EdgeTest object.
+#' 
+#' @rdname   EdgeTest-class
+#' @aliases  print, EdgeTest-method
+setMethod("print", "EdgeTest", function(x) { print(x@tests) })
+
 #### Graph analysis functions ####
 
 #' Generate subtree summary statistics for a tree
@@ -527,10 +577,14 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' 
 #' # Count edges between isotypes
 #' graphs <- list(A=graph, B=graph, C=graph)
-#' testEdges(graphs, "isotype", nperm=100)
+#' x <- testEdges(graphs, "isotype", nperm=100)
+#' print(x)
 #' 
 #' @export
 testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
+    ## DEBUG
+    # field="isotype"; exclude=c("Germline", NA); nperm=200
+    
     # Assign numeric names if graphs is an unnamed list
     if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
     
@@ -559,7 +613,7 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
         # Count edges
         tmp_sum <- .countEdges(tmp_list, field, exclude)
         # Update permutation set
-        tmp_sum$PERM <- i
+        tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
         setTxtProgressBar(pb, i)
@@ -571,11 +625,22 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
     for (i in 1:nrow(obs_sum)) {
         x <- obs_sum$PARENT[i]
         y <- obs_sum$CHILD[i]
-        f <- ecdf(perm_sum$COUNT[perm_sum$PARENT == x & perm_sum$CHILD == y])
+        # Edge count distribution
+        d <- perm_sum$COUNT[perm_sum$PARENT == x & perm_sum$CHILD == y]
+        # Expected mean
+        obs_sum[i, "EXPECTED"] <- mean(d)
+        # P-value for observed > expected
+        f <- ecdf(d)
         obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
     }
     
-    return(list(obs=obs_sum, perm=perm_sum))
+    # Generate return object
+    edge_test <- new("EdgeTest", 
+                 tests=as.data.frame(obs_sum), 
+                 permutations=as.data.frame(perm_sum),
+                 nperm=nperm)
+    
+    return(edge_test)
 }
 
 
@@ -584,13 +649,29 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
 #' Plot the results of an edge permutation test
 #' 
 #' \code{plotEdgeTest} plots the results of an edge permutation test performed with 
-#' \code{testEdges}.
+#' \code{testEdges} as either a histogram or cumulative distribution function.
 #'
-#' @param    edge_test  named list returned by \code{testEdges}.
+#' @param    data        \link{EdgeTest} object returned by \link{testEdges}.
+#' @param    color       color of the histogram or lines.
+#' @param    main_title  string specifying the plot title.
+#' @param    style       type of plot to draw. One of:
+#'                       \itemize{
+#'                         \item \code{"histogram"}:  histogram of the edge count 
+#'                                                    distribution with a red dotted line
+#'                                                    denoting the observed value.
+#'                         \item \code{"cdf"}:        cumulative distribution function 
+#'                                                    of edge counts with a red dotted 
+#'                                                    line denoting the observed value and
+#'                                                    a blue dotted line indicating the 
+#'                                                    p-value.
+#'                       }
+#' @param    silent      if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                       object; if \code{FALSE} draw the plot.
+#' @param    ...         additional arguments to pass to ggplot2::theme.
+#'
+#' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @return   NULL
-#' 
-#' @seealso  \link{testEdges}.
+#' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
 #' # Define simple graph
@@ -604,37 +685,54 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
 #' 
 #' # Count edges between isotypes
 #' graphs <- list(A=graph, B=graph, C=graph)
-#' edge_test <- testEdges(graphs, "isotype", nperm=100)
-#' plotEdgeTest(edge_test)
+#' x <- testEdges(graphs, "isotype", nperm=100)
+#' plotEdgeTest(x, color="steelblue", style="h")
+#' plotEdgeTest(x, style="c")
 #' 
 #' @export
-plotEdgeTest <- function(edge_test) {
-    obs_sum <- edge_test[["obs"]]
-    perm_sum <- edge_test[["perm"]]
+plotEdgeTest <- function(data, color="black", main_title="Edge Test", 
+                         style=c("histogram", "cdf"), silent=FALSE, ...) {
+    # Check arguments
+    style <- match.arg(style)
     
-    # Plot edge null distribution
-    p1 <- ggplot(perm_sum, aes(x=count)) +
-        ggtitle("Edge Null Distribution") +
-        getBaseTheme() + 
-        xlab("Number of edges") +
-        ylab("Number of realizations") + 
-        geom_histogram(fill="steelblue", color="black", binwidth=1) +
-        #geom_density(adjust=3.0, color="dimgrey", size=1.0, linetype=1) + 
-        geom_vline(data=obs_sum, aes(xintercept=count), color="firebrick", linetype=3, size=1.25) + 
-        facet_grid(child ~ parent, labeller=label_both, scales="free")
-    plot(p1)
+    # Extract plot data
+    obs_sum <- rename_(data@tests, "Parent"="PARENT", "Child"="CHILD")
+    perm_sum <- rename_(data@permutations, "Parent"="PARENT", "Child"="CHILD")
+
+    if (style == "histogram") {
+        # Plot edge null distribution
+        p1 <- ggplot(perm_sum) +
+            getBaseTheme() + 
+            ggtitle(main_title) +
+            xlab("Number of edges") +
+            ylab("Number of realizations") + 
+            geom_histogram(aes_string(x="COUNT"), binwidth=1,
+                           fill=color, color=NA) +
+            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+                       color="firebrick", linetype=3, size=1.25) + 
+            facet_grid("Child ~ Parent", labeller=label_both, scales="free")
+    } else if (style == "cdf") {    
+        # Plot ECDF of edge null distribution
+        p1 <- ggplot(perm_sum) +
+            getBaseTheme() + 
+            ggtitle(main_title) +
+            xlab("Number of edges") +
+            ylab("P-value") +
+            stat_ecdf(aes_string(x="COUNT"), color=color, size=1) +
+            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), color="firebrick", 
+                       linetype=3, size=1.25) + 
+            geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), color="steelblue", 
+                       linetype=3, size=1.25) + 
+            facet_grid("Child ~ Parent", labeller=label_both, scales="free")
+    }
     
-    # Plot ECDF of edge null distribution
-    p2 <- ggplot(perm_sum, aes(x=count)) +
-        ggtitle("Edge ECDF") +
-        getBaseTheme() + 
-        xlab("Number of edges") +
-        ylab("P-Value") +
-        stat_ecdf(color="black", size=1) +
-        geom_vline(data=obs_sum, aes(xintercept=count), color="firebrick", linetype=3, size=1.25) + 
-        geom_hline(data=obs_sum, aes(yintercept=pvalue), color="steelblue", linetype=3, size=1.25) + 
-        facet_grid(child ~ parent, labeller=label_both, scales="free")
-    plot(p2)
+    # Add additional theme elements
+    p1 <- p1 + do.call(theme, list(...))
+    
+    # Plot
+    if (!silent) { plot(p1) }
+    
+    invisible(p1)
 }
 
 
