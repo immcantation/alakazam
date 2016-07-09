@@ -7,6 +7,43 @@ NULL
 
 #' S4 class defining edge significance
 #'
+#' \code{MRCATest} defines the significance of enrichment for annotations appearing at
+#' the MRCA of the tree.
+#' 
+#' @slot  tests         data.frame describing the significance test results with columns:
+#'                      \itemize{
+#'                        \item  \code{ANNOTATION}:  annotation value.
+#'                        \item  \code{COUNT}:       observed count of MRCA positions 
+#'                                                   with the given annotation.
+#'                        \item  \code{EXPECTED}:    expected mean count of MRCA occurance
+#'                                                   for the annotation.
+#'                        \item  \code{PVALUE}:      one-sided p-value for the hypothesis that 
+#'                                                   the observed annotation abundance is greater 
+#'                                                   than expected.
+#'                      }
+#' @slot  permutations  data.frame containing the raw permutation test data with columns:
+#'                      \itemize{
+#'                        \item  \code{ANNOTATION}:  annotation value.
+#'                        \item  \code{COUNT}:       count of MRCA positions with the 
+#'                                                   given annotation.
+#'                        \item  \code{ITER}:        numerical index define which 
+#'                                                   permutation realization each 
+#'                                                   observation corresponds to.
+#'                      }
+#' @slot  nperm         number of permutation realizations.
+#' 
+#' @name         MRCATest-class
+#' @rdname       MRCATest-class
+#' @aliases      MRCATest
+#' @exportClass  MRCATest
+MRCATest <- setClass("MRCATest", 
+                     slots=c(tests="data.frame",
+                             permutations="data.frame",
+                             nperm="numeric"))
+
+
+#' S4 class defining edge significance
+#'
 #' \code{EdgeTest} defines the significance of parent-child annotation enrichment.
 #' 
 #' @slot  tests         data.frame describing the significance test results with columns:
@@ -43,6 +80,12 @@ EdgeTest <- setClass("EdgeTest",
                              nperm="numeric"))
 
 #### Methods ####
+
+#' @param    x  MRCATest object.
+#' 
+#' @rdname   MRCATest-class
+#' @aliases  print, MRCATest-method
+setMethod("print", "MRCATest", function(x) { print(x@tests) })
 
 #' @param    x  EdgeTest object.
 #' 
@@ -454,11 +497,11 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #'                    set of potential founder annotations.
 #' @param    nperm    number of permutations to perform.
 #' 
-#' @return   A named list containing two data.frames summarizing the MRCA test (obs)
-#'           and the null distribution of potential MRCAs (perm).
+#' @return   An \link{MRCATest} object containing the test results and permutation
+#'           realizations.
 #'           
-#' @seealso  Uses \link{getMRCA} and \link{getPathLengths}. Return object
-#'           can be plotted with \link{plotMRCATest}.
+#' @seealso  Uses \link{getMRCA} and \link{getPathLengths}. 
+#'           See \link{plotMRCATest} for plotting the permutation distributions.
 #'           
 #' @examples
 #' # Define simple set of graphs
@@ -474,15 +517,14 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' graph3 <- graph2
 #' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
 #' 
-#' # Count edges between isotypes
+#' # Perform MRCA test on isotypes
 #' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
-#' testMRCA(graphs, "isotype", nperm=100)
+#' x <- testMRCA(graphs, "isotype", nperm=100)
+#' print(x)
 #' 
 #' @export
 testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA), 
                      nperm=200) {
-    # TODO: should probably return a class instead of a list
-    
     # Function to resolve ambiguous founders
     # @param  x      data.frame from getMRCA
     # @param  field  annotation field
@@ -506,9 +548,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
             select_("GRAPH", field) %>%
             rename_("ANNOTATION"=field) %>%
             group_by_("ANNOTATION") %>%
-            dplyr::summarize(COUNT=n()) %>%
-            ungroup() %>%
-            dplyr::mutate_(FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COUNT")))
+            dplyr::summarize(COUNT=n())
         
         return(mrca_sum)
     }
@@ -529,7 +569,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         # Summarize MRCA counts
         tmp_sum <- .countMRCA(tmp_list, field=field, exclude=exclude)
         # Update permutation set
-        tmp_sum$PERM <- i
+        tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
         setTxtProgressBar(pb, i)
@@ -540,11 +580,22 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
     # Test observed against permutation distribution
     for (i in 1:nrow(obs_sum)) {
         x <- obs_sum$ANNOTATION[i]
-        f <- ecdf(perm_sum$COUNT[perm_sum$ANNOTATION == x])
+        # Annotation count distribution
+        d <- perm_sum$COUNT[perm_sum$ANNOTATION == x]
+        # Expected mean
+        obs_sum[i, "EXPECTED"] <- mean(d)
+        # P-value for observed > expected
+        f <- ecdf(d)
         obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
     }
  
-    return(list(obs=obs_sum, perm=perm_sum))
+    # Generate return object
+    mrca_test <- new("MRCATest", 
+                     tests=as.data.frame(obs_sum), 
+                     permutations=as.data.frame(perm_sum),
+                     nperm=nperm)
+    
+    return(mrca_test)
 }
 
 
@@ -559,11 +610,11 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'                    permutation.
 #' @param    nperm    number of permutations to perform.
 #' 
-#' @return   A named list containing two data.frames summarizing the observed edge counts (obs)
-#'           and the null distribution of edge counts (perm).
+#' @return   An \link{EdgeTest} object containing the test results and permutation
+#'           realizations.
 #' 
-#' @seealso  Uses \link{tableEdges} and \link{permuteLabels}. Return object
-#'           can be plotted with \link{plotEdgeTest}.
+#' @seealso  Uses \link{tableEdges} and \link{permuteLabels}. 
+#'           See \link{plotEdgeTest} for plotting the permutation distributions.
 #'           
 #' @examples
 #' # Define simple graph
@@ -575,7 +626,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' E(graph)$label <- E(graph)$weight
 #' V(graph)$label <- V(graph)$name
 #' 
-#' # Count edges between isotypes
+#' # Perform edge test on isotypes
 #' graphs <- list(A=graph, B=graph, C=graph)
 #' x <- testEdges(graphs, "isotype", nperm=100)
 #' print(x)
@@ -683,9 +734,11 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
 #' E(graph)$label <- E(graph)$weight
 #' V(graph)$label <- V(graph)$name
 #' 
-#' # Count edges between isotypes
+#' # Perform edge test on isotypes
 #' graphs <- list(A=graph, B=graph, C=graph)
 #' x <- testEdges(graphs, "isotype", nperm=100)
+#' 
+#' # Plot
 #' plotEdgeTest(x, color="steelblue", style="h")
 #' plotEdgeTest(x, style="c")
 #' 
@@ -701,24 +754,24 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 
     if (style == "histogram") {
         # Plot edge null distribution
-        p1 <- ggplot(perm_sum) +
+        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
             getBaseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("Number of realizations") + 
-            geom_histogram(aes_string(x="COUNT"), binwidth=1,
+            geom_histogram(binwidth=1,
                            fill=color, color=NA) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
                        color="firebrick", linetype=3, size=1.25) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
-        p1 <- ggplot(perm_sum) +
+        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
             getBaseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("P-value") +
-            stat_ecdf(aes_string(x="COUNT"), color=color, size=1) +
+            stat_ecdf(color=color, size=1) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), color="firebrick", 
                        linetype=3, size=1.25) + 
             geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), color="steelblue", 
@@ -741,14 +794,30 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' \code{plotMRCATest} plots the results of a founder permutation test performed with 
 #' \code{testMRCA}.
 #'
-#' @param    founder_test  named list returned by \code{testMRCA}.
+#' @param    data        \link{MRCATest} object returned by \link{testMRCA}.
+#' @param    color       color of the histogram or lines.
+#' @param    main_title  string specifying the plot title.
+#' @param    style       type of plot to draw. One of:
+#'                       \itemize{
+#'                         \item \code{"histogram"}:  histogram of the annotation count 
+#'                                                    distribution with a red dotted line
+#'                                                    denoting the observed value.
+#'                         \item \code{"cdf"}:        cumulative distribution function 
+#'                                                    of annotation counts with a red dotted 
+#'                                                    line denoting the observed value and
+#'                                                    a blue dotted line indicating the 
+#'                                                    p-value.
+#'                       }
+#' @param    silent      if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                       object; if \code{FALSE} draw the plot.
+#' @param    ...         additional arguments to pass to ggplot2::theme.
+#'
+#' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @return   NULL
-#' 
-#' @seealso  \link{testMRCA}.
+#' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
-#' # Define simple graph
+#' # Define simple graphs
 #' library(igraph)
 #' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
 #' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
@@ -756,46 +825,62 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' V(graph)$label <- V(graph)$name
 #' E(graph)$weight <- c(10, 3, 6, 4, 1)
 #' E(graph)$label <- E(graph)$weight
-#' 
-#' # Count edges between isotypes
 #' graph2 <- graph
 #' E(graph2)$weight <- c(10, 3, 3, 4, 1)
 #' graph3 <- graph2
 #' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
+#'
+#' # Perform MRCA test on isotypes
 #' graphs <- list(A=graph, B=graph2, C=graph3)
-#' founder_test <- testMRCA(graphs, "isotype", nperm=100)
+#' x <- testMRCA(graphs, "isotype", nperm=100)
 #' 
 #' # Plot
-#' plotFounderTest(founder_test)
+#' plotMRCATest(x, color="steelblue", style="h")
+#' plotMRCATest(x, style="c")
 #' 
 #' @export
-plotMRCATest <- function(founder_test) {
-    obs_sum <- founder_test[["obs"]]
-    perm_sum <- founder_test[["perm"]]
+plotMRCATest <- function(data, color="black", main_title="MRCA Test", 
+                         style=c("histogram", "cdf"), silent=FALSE, ...) {
+    # Check arguments
+    style <- match.arg(style)
     
-    # Plot founder null distribution
-    p1 <- ggplot(perm_sum, aes(x=count)) +
-        ggtitle("Founder Null Distribution") +
-        getBaseTheme() + 
-        xlab("Number of founders") +
-        ylab("Number of realizations") + 
-        geom_histogram(fill="steelblue", color="black", binwidth=1) +
-        #geom_density(adjust=3.0, color="dimgrey", size=1.0, linetype=1) + 
-        geom_vline(data=obs_sum, aes(xintercept=count), color="firebrick", linetype=3, size=1.25) + 
-        facet_wrap(~ label, ncol=1, scales="free_y")
-    plot(p1)
+    # Extract plot data
+    obs_sum <- rename_(data@tests, "Annotation"="ANNOTATION")
+    perm_sum <- rename_(data@permutations, "Annotation"="ANNOTATION")
     
-    # Plot ECDF of founder null distribution
-    p2 <- ggplot(perm_sum, aes(x=count)) +
-        ggtitle("Founder ECDF") +
-        getBaseTheme() + 
-        xlab("Number of founders") +
-        ylab("P-Value") +
-        stat_ecdf(color="black", size=1) +
-        geom_vline(data=obs_sum, aes(xintercept=count), color="firebrick", linetype=3, size=1.25) + 
-        geom_hline(data=obs_sum, aes(yintercept=pvalue), color="steelblue", linetype=3, size=1.25) + 
-        facet_wrap(~ label, nrow=1, scales="free_y")
-    plot(p2)
+    if (style == "histogram") {
+        # Plot MRCA null distribution
+        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+            getBaseTheme() + 
+            ggtitle(main_title) +
+            xlab("Number of MRCAs") +
+            ylab("Number of realizations") + 
+            geom_histogram(fill=color, color=NA, binwidth=1) +
+            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+                       color="firebrick", linetype=3, size=1.25) + 
+            facet_wrap("Annotation", ncol=1, scales="free_y")
+    } else if (style == "cdf") {
+        # Plot ECDF of MRCA null distribution
+        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+            getBaseTheme() + 
+            ggtitle(main_title) +
+            xlab("Number of MRCAs") +
+            ylab("P-value") +
+            stat_ecdf(color=color, size=1) +
+            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+                       color="firebrick", linetype=3, size=1.25) + 
+            geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), 
+                       color="steelblue", linetype=3, size=1.25) + 
+            facet_wrap("Annotation", nrow=1, scales="free_y")
+    }
+    
+    # Add additional theme elements
+    p1 <- p1 + do.call(theme, list(...))
+    
+    # Plot
+    if (!silent) { plot(p1) }
+    
+    invisible(p1)
 }
 
 
