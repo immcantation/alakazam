@@ -101,22 +101,33 @@ setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 #' both node properties and subtree properties.
 #'
 #' @param    graph   igraph object containing an annotated lineage tree.
+#' @param    fields  annotation fields to add to the output.
 #' @param    root    name of the root (germline) node.
-#' @param    fields  vector of vertex annotation names to retain in the return data.frame.
 #' 
 #' @return   A data.frame with columns: 
 #'           \itemize{
-#'             \item  \code{NAME}:                node name
-#'             \item  \code{PARENT}:              name of the parent node
-#'             \item  \code{OUTDEGREE}:           number of edges leading from the node
-#'             \item  \code{SUBTREE_SIZE}:        total number of nodes within the subtree rooted at the node
-#'             \item  \code{SUBTREE_DEPTH}:       the depth of the subtree that is rooted at the node
-#'             \item  \code{SUBTREE_PATHLENGTH}:  the maximum pathlength beneath the node
+#'             \item  \code{NAME}:             node name.
+#'             \item  \code{PARENT}:           name of the parent node.
+#'             \item  \code{OUTDEGREE}:        number of edges leading from the node.
+#'             \item  \code{SIZE}:             total number of nodes within the subtree rooted 
+#'                                             at the node.
+#'             \item  \code{DEPTH}:            the depth of the subtree that is rooted at 
+#'                                             the node.
+#'             \item  \code{PATHLENGTH}:       the maximum pathlength beneath the node.
+#'             \item  \code{OUTDEGREE_NORM}:   \code{OUTDEGREE} normalized by the total 
+#'                                             number of edges.
+#'             \item  \code{SIZE_NORM}:        \code{SIZE} normalized by the largest
+#'                                             subtree size (the germline).
+#'             \item  \code{DEPTH_NORM}:       \code{DEPTH} normalized by the largest
+#'                                             subtree depth (the germline).
+#'             \item  \code{PATHLENGTH_NORM}:  \code{PATHLEGNTH} normalized by the largest
+#'                                             subtree pathlength (the germline).
 #'           }
+#'           An additional column corresponding to the value of \code{field} is added when
+#'           specified.
 #' 
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
 #'           See \link{getPathLengths} for calculating path length to nodes.
-#'           See \link{plotSubtrees} for...
 #' 
 #' @examples
 #' # Define simple graph
@@ -133,18 +144,20 @@ setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 #' plot(graph, layout=ly)
 #' 
 #' # Summarize
-#' summarizeSubtrees(graph, root="Germline")
+#' summarizeSubtrees(graph, fields="isotype", root="Germline")
 #' 
 #' @export
-summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
+summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
+    ## DEBUG
+    # root="Germline"; fields=NULL
     # TODO:  should probably include a means to exclude inferred from substree size
     
     # Define node attribute data.frame    
     node_df <- data.frame(NAME=V(graph)$name, stringsAsFactors=F)
-    for (f in fields) {
-        node_df[[f]] <- vertex_attr(graph, name=f)
+    for (f in fields) { 
+        node_df[[f]] <- vertex_attr(graph, name=f) 
     }
-    
+
     # Get edges
     edges <- igraph::as_edgelist(graph)
     # Get unweighted paths
@@ -158,14 +171,20 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
     node_df$PARENT <- edges[, 1][match(node_df$NAME, edges[, 2])]
     # Define each node's outdegree
     node_df$OUTDEGREE <- igraph::degree(graph, mode="out")
-
     # Define the number of nodes in each subtree (child count + 1)
-    node_df$SUBTREE_SIZE <- apply(paths_step, 1, function(x) length(na.omit(x)))
+    node_df$SIZE <- apply(paths_step, 1, function(x) length(na.omit(x)))
     # Define number of levels below each node
-    node_df$SUBTREE_DEPTH <- apply(paths_step, 1, max, na.rm=TRUE) + 1
+    node_df$DEPTH <- apply(paths_step, 1, max, na.rm=TRUE) + 1
     # Define the maximum shortest path length (genetic distance) to a leaf from each node
-    node_df$SUBTREE_PATHLENGTH <- apply(paths_length, 1, max, na.rm=TRUE)
+    node_df$PATHLENGTH <- apply(paths_length, 1, max, na.rm=TRUE)
     
+    # Normalize
+    node_df <- node_df %>%
+        dplyr::mutate_(OUTDEGREE_NORM=interp(~x/sum(x, na.rm=TRUE), x=as.name("OUTDEGREE")),
+                       SIZE_NORM=interp(~x/max(x, na.rm=TRUE), x=as.name("SIZE")),
+                       DEPTH_NORM=interp(~x/max(x, na.rm=TRUE), x=as.name("DEPTH")),
+                       PATHLENGTH_NORM=interp(~x/max(x, na.rm=TRUE), x=as.name("PATHLENGTH")))
+
     return(node_df)
 }
 
@@ -179,7 +198,7 @@ summarizeSubtrees <- function(graph, root="Germline", fields=NULL) {
 #' @param    root      name of the root (germline) node.
 #' @param    field     annotation field to use for exclusion of nodes from step count.
 #' @param    exclude   annotation values specifying which nodes to exclude from step count. 
-#'                     if \code{NULL} consider all nodes. This does not affect the weighted
+#'                     If \code{NULL} consider all nodes. This does not affect the weighted
 #'                     (distance) path length calculation.
 #'                     
 #' @return   A data.frame with columns:
@@ -886,7 +905,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 
 #' Plots subtree properties distributions for multiple trees
 #' 
-#' \code{plotsSubtrees} summarizes the subtree sizes, depths and pathlengths by vertex
+#' \code{plotSubtrees} summarizes the subtree sizes, depths and pathlengths by vertex
 #' annotation values and plots them.
 #'
 #' @param    graphs   list of igraph objects with vertex annotations.
@@ -927,7 +946,7 @@ plotSubtrees <- function(graphs, field, root="Germline", exclude=c("Germline", N
     if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
     
     # Get subtree summarizes
-    sum_df <- plyr::ldply(graphs, summarizeSubtrees, root=root, fields=field, .id="tree_identifier")
+    sum_df <- plyr::ldply(graphs, summarizeSubtrees, fields=field, root=root, .id="tree_identifier")
     sum_df <- sum_df[!(sum_df[, field] %in% exclude), ] 
     
     # Normalize subtree properties within tree
