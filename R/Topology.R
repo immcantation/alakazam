@@ -548,8 +548,8 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
     # @param  x      data.frame from getMRCA
     # @param  field  annotation field
     .resolveMRCA <- function(x, field) {
-        x %>% filter_(interp(~!duplicated(x), x=as.name(field))) %>%
-            filter_(interp(~length(x) == 1, x=as.name(field)))
+        x %>% filter_(interp(~!duplicated(y), y=as.name(field))) %>%
+            filter_(interp(~length(y) == 1, y=as.name(field)))
     }
     
     # Function to count MRCAs
@@ -1025,4 +1025,102 @@ plotSubtrees <- function(graphs, field, root="Germline", exclude=c("Germline", N
     plot(p4)
     
     return(sum_df)
+}
+
+#' Plots the outdegree distribution for multiple trees
+#' 
+#' \code{plotOutdegree} summarizes and plots normalized outdegree distributions for a 
+#' set of lineage trees, broken down by annotation value.
+#'
+#' @param    graphs      list of igraph objects containing annotated lineage trees.
+#' @param    field       string defining the annotation field.
+#' @param    root        name of the root (germline) node.
+#' @param    exclude     vector of strings defining \code{field} values to exclude from
+#'                       plotting.
+#' @param    colors      named vector of colors for values in \code{field}, with 
+#'                       names defining annotation names \code{field} column and values
+#'                       being colors. Also controls the order in which values appear on the
+#'                       plot. If \code{NULL} alphabetical ordering and a default color palette 
+#'                       will be used.
+#' @param    main_title  string specifying the plot title.
+#' @param    style       string specifying the style of plot to draw. One of:
+#'                       \itemize{
+#'                         \item \code{"histogram"}:  histogram of the annotation count 
+#'                                                    distribution with a red dotted line
+#'                                                    denoting the observed value.
+#'                         \item \code{"cdf"}:        cumulative distribution function 
+#'                                                    of annotation counts with a red 
+#'                                                    dotted line denoting the observed 
+#'                                                    value and a blue dotted line 
+#'                                                    indicating the p-value.
+#'                       }
+#' @param    silent      if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                       object; if \code{FALSE} draw the plot.
+#' @param    ...         additional arguments to pass to ggplot2::theme.
+#'
+#' @return   A \code{ggplot} object defining the plot.
+#' 
+#' @seealso  \link{summarizeSubtrees}.
+#' 
+#' @examples
+#' # Define simple set of graphs
+#' library(igraph)
+#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
+#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
+#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
+#' V(graph)$label <- V(graph)$name
+#' E(graph)$weight <- c(10, 3, 6, 4, 1)
+#' E(graph)$label <- E(graph)$weight
+#' graph2 <- graph
+#' E(graph2)$weight <- c(10, 3, 3, 4, 1)
+#' graph3 <- graph2
+#' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
+#' 
+#' # Plot subtrees
+#' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
+#' df <- plotOutdegree(graphs, "isotype")
+#' 
+#' @export
+plotOutdegree <- function(graphs, field, colors=NULL, main_title="Outdegree", 
+                          root="Germline", exclude=c("Germline", NA), 
+                          style=c("box", "violin"), silent=FALSE, ...) {
+    ## DEBUG
+    # field="isotype"; colors=NULL; main_title="Outdegree"; root="Germline"; exclude=c("Germline", NA); style="box"
+    # Check arguments
+    style <- match.arg(style)
+
+    # Assign numeric names if graphs is an unnamed list
+    if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
+    
+    # Get subtree summarizes and filter excluded annotations
+    sum_list <- lapply(graphs, summarizeSubtrees, fields=field, root=root)
+    sum_df <- bind_rows(sum_list, .id="GRAPH") %>%
+        filter_(interp(~!(x %in% exclude), x=as.name(field)),
+                interp(~is.finite(x), x=as.name("OUTDEGREE_NORM")))
+
+    # Make plot object
+    p1 <- ggplot(sum_df, aes_string(x=field, y="OUTDEGREE_NORM")) + 
+        getBaseTheme() + 
+        theme(legend.position="none") +
+        ggtitle(main_title) + 
+        xlab("") +
+        ylab("Outdegree (percent of tree size)") +
+        scale_y_continuous(labels=percent) +
+        expand_limits(y=0)
+    if (style == "box") {
+        p1 <- p1 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
+    } else if (style == "violin") {
+        p1 <- p1 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, 
+                               width=0.7, alpha=0.8) +
+            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
+                          width=0.8, size=2.5, color="black")
+    }
+
+    # Add additional theme elements
+    p1 <- p1 + do.call(theme, list(...))
+    
+    # Plot
+    if (!silent) { plot(p1) }
+    
+    invisible(p1)
 }
