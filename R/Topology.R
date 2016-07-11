@@ -903,192 +903,94 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 }
 
 
-#' Plots subtree properties distributions for multiple trees
+#' Plots subtree statistics for multiple trees
 #' 
-#' \code{plotSubtrees} summarizes the subtree sizes, depths and pathlengths by vertex
-#' annotation values and plots them.
-#'
-#' @param    graphs   list of igraph objects with vertex annotations.
-#' @param    field    string defining the annotation field.
-#' @param    root     name of the root (germline) node.
-#' @param    exclude  vector of strings defining \code{field} values to exclude from the results.
-#' @param    style    string specifying the style of plot to draw. One of c("box", "violin")
-#' 
-#' @return   A data.frame of the subtree properties for all trees.
-#' 
-#' @seealso  \link{summarizeSubtrees}.
-#' 
-#' @examples
-#' # Define simple set of graphs
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' V(graph)$label <- V(graph)$name
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' graph2 <- graph
-#' E(graph2)$weight <- c(10, 3, 3, 4, 1)
-#' graph3 <- graph2
-#' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
-#' 
-#' # Plot subtrees
-#' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
-#' df <- plotSubtrees(graphs, "isotype")
-#' 
-#' @export
-plotSubtrees <- function(graphs, field, root="Germline", exclude=c("Germline", NA), style="box") {
-    if (!(style %in% c("box", "violin"))) {
-        stop("The style argument must be one of c('box', 'violin')")
-    }
-    
-    # Assign numeric names if graphs is an unnamed list
-    if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
-    
-    # Get subtree summarizes
-    sum_df <- plyr::ldply(graphs, summarizeSubtrees, fields=field, root=root, .id="tree_identifier")
-    sum_df <- sum_df[!(sum_df[, field] %in% exclude), ] 
-    
-    # Normalize subtree properties within tree
-    sum_df <- plyr::ddply(sum_df, c("tree_identifier"), plyr::mutate, 
-                          outdegree_norm=outdegree/length(name),
-                          size_norm=subtree_size/max(subtree_size, na.rm=TRUE),
-                          depth_norm=subtree_depth/max(subtree_depth, na.rm=TRUE),
-                          pathlength_norm=subtree_pathlength/max(subtree_pathlength, na.rm=TRUE))
-        
-    # Plot outdegree
-    p1 <- ggplot(subset(sum_df, is.finite(outdegree_norm)), aes_string(x=field, y="outdegree_norm")) + 
-        ggtitle("Outdegree") + 
-        getBaseTheme() + theme(legend.position="none") +
-        xlab("") +
-        ylab("Outdegree (percent of tree size)") +
-        scale_y_continuous(labels=percent) +
-        expand_limits(y=0)
-    if (style == "box") {
-        p1 <- p1 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
-    } else if (style == "violin") {
-        p1 <- p1 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, width=0.7, alpha=0.8) +
-            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
-                          width=0.8, size=2.5, color="black")
-    }
-    plot(p1)
-
-    # Plot subtree size
-    p2 <- ggplot(subset(sum_df, is.finite(size_norm)), aes_string(x=field, y="size_norm")) + 
-        ggtitle("Subtree size") + 
-        getBaseTheme() + theme(legend.position="none") +
-        xlab("") +
-        ylab("Size (percent of tree size)") +
-        scale_y_continuous(labels=percent) +
-        expand_limits(y=0)
-    if (style == "box") {
-        p2 <- p2 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
-    } else if (style == "violin") {
-        p2 <- p2 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, width=0.7, alpha=0.8) +
-            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
-                          width=0.8, size=2.5, color="black")
-    }
-    plot(p2)
-    
-    # Plot normalized depth of subtree under node
-    p3 <- ggplot(subset(sum_df, is.finite(depth_norm)), aes_string(x=field, y="depth_norm")) + 
-        ggtitle("Subtree depth") + 
-        getBaseTheme() + theme(legend.position="none") +
-        xlab("") +
-        ylab("Depth (percent of tree depth)") +
-        scale_y_continuous(labels=percent) +
-        expand_limits(y=0)
-    if (style == "box") {
-        p3 <- p3 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
-    } else if (style == "violin") {
-        p3 <- p3 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, width=0.7, alpha=0.8) +
-            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
-                          width=0.8, size=2.5, color="black")
-    }
-    plot(p3)
- 
-    # Plot normalized pathlength of subtree under node
-    p4 <- ggplot(subset(sum_df, is.finite(pathlength_norm)), aes_string(x=field, y="pathlength_norm")) + 
-        ggtitle("Subtree maximum pathlength to leaf") + 
-        getBaseTheme() + theme(legend.position="none") +
-        xlab("") +
-        ylab("Maximum pathlength (percent of tree pathlength)") +
-        scale_y_continuous(labels=percent) +
-        expand_limits(y=0)
-    if (style == "box") {
-        p4 <- p4 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
-    } else if (style == "violin") {
-        p4 <- p4 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, width=0.7, alpha=0.8) +
-            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
-                          width=0.8, size=2.5, color="black")
-    }
-    plot(p4)
-    
-    return(sum_df)
-}
-
-#' Plots the outdegree distribution for multiple trees
-#' 
-#' \code{plotOutdegree} summarizes and plots normalized outdegree distributions for a 
+#' \code{plotSubtree} plots distributions of normalized subtree statistics for a 
 #' set of lineage trees, broken down by annotation value.
 #'
-#' @param    graphs      list of igraph objects containing annotated lineage trees.
-#' @param    field       string defining the annotation field.
-#' @param    root        name of the root (germline) node.
-#' @param    exclude     vector of strings defining \code{field} values to exclude from
-#'                       plotting.
-#' @param    colors      named vector of colors for values in \code{field}, with 
-#'                       names defining annotation names \code{field} column and values
-#'                       being colors. Also controls the order in which values appear on the
-#'                       plot. If \code{NULL} alphabetical ordering and a default color palette 
-#'                       will be used.
-#' @param    main_title  string specifying the plot title.
-#' @param    style       string specifying the style of plot to draw. One of:
-#'                       \itemize{
-#'                         \item \code{"histogram"}:  histogram of the annotation count 
-#'                                                    distribution with a red dotted line
-#'                                                    denoting the observed value.
-#'                         \item \code{"cdf"}:        cumulative distribution function 
-#'                                                    of annotation counts with a red 
-#'                                                    dotted line denoting the observed 
-#'                                                    value and a blue dotted line 
-#'                                                    indicating the p-value.
-#'                       }
-#' @param    silent      if \code{TRUE} do not draw the plot and just return the ggplot2 
-#'                       object; if \code{FALSE} draw the plot.
-#' @param    ...         additional arguments to pass to ggplot2::theme.
+#' @param    graphs        list of igraph objects containing annotated lineage trees.
+#' @param    field         string defining the annotation field.
+#' @param    stat          string defining the subtree statistic to plot. One of:
+#'                         \itemize{
+#'                           \item  \code{outdegree}:   distribution of normalized node 
+#'                                                      outdegrees.
+#'                           \item  \code{size}:        distribution of normalized subtree sizes.
+#'                           \item  \code{depth}:       distribution of subtree depths.
+#'                           \item  \code{pathlength}:  distribution of maximum pathlength 
+#'                                                      beneath nodes.
+#'                         }
+#' @param    root          name of the root (germline) node.
+#' @param    exclude       vector of strings defining \code{field} values to exclude from
+#'                         plotting.
+#' @param    colors        named vector of colors for values in \code{field}, with 
+#'                         names defining annotation names \code{field} column and values
+#'                         being colors. Also controls the order in which values appear on the
+#'                         plot. If \code{NULL} alphabetical ordering and a default color palette 
+#'                         will be used.
+#' @param    main_title    string specifying the plot title.
+#' @param    legend_title  string specifying the legend title.
+#' @param    style         string specifying the style of plot to draw. One of:
+#'                         \itemize{
+#'                           \item \code{"histogram"}:  histogram of the annotation count 
+#'                                                      distribution with a red dotted line
+#'                                                      denoting the observed value.
+#'                           \item \code{"cdf"}:        cumulative distribution function 
+#'                                                      of annotation counts with a red 
+#'                                                      dotted line denoting the observed 
+#'                                                      value and a blue dotted line 
+#'                                                      indicating the p-value.
+#'                         }
+#' @param    silent        if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                         object; if \code{FALSE} draw the plot.
+#' @param    ...           additional arguments to pass to ggplot2::theme.
 #'
 #' @return   A \code{ggplot} object defining the plot.
 #' 
-#' @seealso  \link{summarizeSubtrees}.
+#' @seealso  Subtree statistics are calculated with \link{summarizeSubtrees}.
 #' 
 #' @examples
-#' # Define simple set of graphs
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' V(graph)$label <- V(graph)$name
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' graph2 <- graph
-#' E(graph2)$weight <- c(10, 3, 3, 4, 1)
-#' graph3 <- graph2
-#' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
+#' # Plot boxplot of outdegree by sample
+#' plotOutdegree(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
+#'               style="b")
+#'
+#' # Plot boxplot of subtree by sample
+#' plotOutdegree(ExampleTrees, "SAMPLE", "size", style="b")
 #' 
-#' # Plot subtrees
-#' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
-#' df <- plotOutdegree(graphs, "isotype")
+#' # Plot violins of pathlength by isotype
+#' plotOutdegree(ExampleTrees,  "ISOTYPE", "path", colors=IG_COLORS, 
+#'               legend_title="Isotype", style="v")
+#' 
+#' # Plot violins of depth by isotype
+#' plotOutdegree(ExampleTrees,  "ISOTYPE", "depth", style="v")
 #' 
 #' @export
-plotOutdegree <- function(graphs, field, colors=NULL, main_title="Outdegree", 
-                          root="Germline", exclude=c("Germline", NA), 
-                          style=c("box", "violin"), silent=FALSE, ...) {
+plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germline", NA), 
+                         colors=NULL, main_title="Subtrees", legend_title="Annotation", 
+                         style=c("box", "violin"), silent=FALSE, ...) {
     ## DEBUG
-    # field="isotype"; colors=NULL; main_title="Outdegree"; root="Germline"; exclude=c("Germline", NA); style="box"
+    # graphs=ExampleTrees; field="ISOTYPE"; colors=IG_COLORS; main_title="Outdegree"; root="Germline"; exclude=c("Germline", NA); style="box"
     # Check arguments
-    style <- match.arg(style)
+    style <- match.arg(style, several.ok=FALSE)
+    stat <- match.arg(stat, choices=c("outdegree", "size", "depth", "pathlength"), 
+                      several.ok=FALSE)
 
+    # Set stat column and axis labels
+    if (stat == "outdegree") {
+        stat_col <- "OUTDEGREE_NORM"
+        y_lab <- "Node outdegree (percent of tree edges)"
+    } else if (stat == "size") {
+        stat_col <- "SIZE_NORM"
+        y_lab <- "Substree size (percent of tree size)"
+    } else if (stat == "depth") {
+        stat_col <- "DEPTH_NORM"
+        y_lab <- "Depth under node (percent of tree depth)"
+    } else if (stat == "pathlength") {
+        stat_col <- "PATHLENGTH_NORM"
+        y_lab <- "Path length under node (percent of longest path)"
+    } else {
+        error("Invalid value for 'stat'. How did you get here?")
+    }
+    
     # Assign numeric names if graphs is an unnamed list
     if (is.null(names(graphs))) { names(graphs) <- 1:length(graphs) }
     
@@ -1096,26 +998,51 @@ plotOutdegree <- function(graphs, field, colors=NULL, main_title="Outdegree",
     sum_list <- lapply(graphs, summarizeSubtrees, fields=field, root=root)
     sum_df <- bind_rows(sum_list, .id="GRAPH") %>%
         filter_(interp(~!(x %in% exclude), x=as.name(field)),
-                interp(~is.finite(x), x=as.name("OUTDEGREE_NORM")))
-
+                interp(~is.finite(x), x=as.name(stat_col)))
+    
+    # Set ordering based on color names
+    if (!is.null(colors)) {
+        # Assign missing levels to grey
+        x <- unique(sum_df[[field]])
+        x <- sort(x[!(x %in% names(colors))])
+        if (length(x) > 0) {
+            warning("The following annotations are missing from the 'colors' argument and will be assigned to grey: ", 
+                    paste(x, collapse=" "))
+            x <- setNames(rep("grey", length(x)), x)
+            colors <- c(colors, x)
+        }
+        # Cast to factor
+        sum_df[[field]] <- factor(sum_df[[field]], levels=names(colors))
+    } else {
+        sum_df[[field]] <- factor(sum_df[[field]])
+    }
+    
     # Make plot object
-    p1 <- ggplot(sum_df, aes_string(x=field, y="OUTDEGREE_NORM")) + 
+    p1 <- ggplot(sum_df, aes_string(x=field, y=stat_col)) + 
         getBaseTheme() + 
-        theme(legend.position="none") +
         ggtitle(main_title) + 
         xlab("") +
-        ylab("Outdegree (percent of tree size)") +
+        ylab(y_lab) +
         scale_y_continuous(labels=percent) +
         expand_limits(y=0)
+    
+    # Add distributions style
     if (style == "box") {
         p1 <- p1 + geom_boxplot(aes_string(fill=field), width=0.7, alpha=0.8)
     } else if (style == "violin") {
         p1 <- p1 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, 
                                width=0.7, alpha=0.8) +
-            geom_errorbar(stat="hline", yintercept="mean", aes(ymin=..y.., ymax=..y..),
-                          width=0.8, size=2.5, color="black")
+            geom_errorbarh(aes(xmin=(..x..) - 0.4, xmax=(..x..) + 0.4), color="black", 
+                           stat="summary", fun.y="mean", size=1.25, height=0, alpha=0.9)
     }
 
+    # Set colors and legend
+    if (!is.null(colors)) {
+        p1 <- p1 + scale_fill_manual(name=legend_title, values=colors)
+    } else {
+        p1 <- p1 + scale_fill_discrete(name=legend_title)
+    }
+    
     # Add additional theme elements
     p1 <- p1 + do.call(theme, list(...))
     
