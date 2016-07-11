@@ -53,7 +53,7 @@ Collate:
     'AminoAcids.R'
     'Core.R'
     'Diversity.R'
-    'GeneUsage.R'
+    'Gene.R'
     'Lineage.R'
     'RcppExports.R'
     'Sequence.R'

@@ -16,6 +16,7 @@ General:
   `translateDNA()`.
 + Fixed bug in `collapseDuplicates()` wherein the input data type sanity check
   would cause the vignette to fail to build under R 3.3.
++ Added `sortGenes()` function to sort V(D)J genes by name or locus position.
 
 Amino Acid Analysis:
 
