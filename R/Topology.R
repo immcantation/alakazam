@@ -130,21 +130,12 @@ setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 #'           See \link{getPathLengths} for calculating path length to nodes.
 #' 
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$name
-#'
-#' # Plot graph with a tree layout
-#' ly <- layout_as_tree(graph, root="Germline")
-#' plot(graph, layout=ly)
+#' # Define and plot example graph
+#' graph <- ExampleTrees[[5]]
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
-#' # Summarize
-#' summarizeSubtrees(graph, fields="isotype", root="Germline")
+#' # Summarize tree
+#' summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
 #' 
 #' @export
 summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
@@ -211,24 +202,15 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
 #' 
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$name
-#'
-#' # Plot graph with a tree layout
-#' ly <- layout_as_tree(graph, root="Germline")
-#' plot(graph, layout=ly)
+#' # Define and plot example graph
+#' graph <- ExampleTrees[[5]]
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Consider all nodes
 #' getPathLengths(graph, root="Germline")
 #' 
 #' # Exclude nodes without an isotype annotation from step count
-#' getPathLengths(graph, root="Germline", field="isotype", exclude=NA)
+#' getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
 #' 
 #' @export
 getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
@@ -285,24 +267,15 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' @seealso  Path lengths are determined with \link{getPathLengths}.
 #' 
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' V(graph)$label <- c("Germline", "Inferred", "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#'
-#' # Plot graph with a tree layout
-#' ly <- layout_as_tree(graph, root="Germline")
-#' plot(graph, layout=ly)
+#' # Define and plot example graph
+#' graph <- ExampleTrees[[5]]
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Use unweighted path length and do not exclude any nodes
 #' getMRCA(graph, path="steps", root="Germline")
 #'
 #' # Exclude nodes without an isotype annotation and use weighted path length
-#' getMRCA(graph, path="distance", root="Germline", field="isotype", exclude=NA)
+#' getMRCA(graph, path="distance", root="Germline", field="ISOTYPE", exclude=NA)
 #' 
 #' @export
 getMRCA <- function(graph, path=c("distance", "steps"), root="Germline", 
@@ -367,28 +340,18 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
 #'           
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6, 6, 7, 7, 8, 7, 9))
-#' V(graph)$name <- c("Germline", "Inferred1", "Seq1", "Seq2", "Seq3", 
-#'                    "Seq4", "Inferred2", "Seq5", "Seq6")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA", NA, "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1, 1, 1, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$isotype
-#' 
-#' # Plot graph with a tree layout
-#' ly <- layout_as_tree(graph, root="Germline")
-#' plot(graph, layout=ly)
+#' # Define and plot example graph
+#' graph <- ExampleTrees[[5]]
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Count direct edges between isotypes including inferred nodes
-#' tableEdges(graph, "isotype", exclude=NULL)
+#' tableEdges(graph, "ISOTYPE", exclude=NULL)
 #' 
 #' # Count direct edges excluding edges to and from inferred nodes
-#' tableEdges(graph, "isotype", exclude=NA)
+#' tableEdges(graph, "ISOTYPE", exclude=NA)
 #' 
 #' # Count indirect edges walking through inferred nodes
-#' tableEdges(graph, "isotype", indirect=TRUE, exclude=NA)
+#' tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=NA)
 #' 
 #' @export
 tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) {
@@ -467,17 +430,13 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
 #' @seealso  \link{testEdges}.
 #' 
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$name
+#' # Define and plot example graph
+#' graph <- ExampleTrees[[5]]
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
-#' # Count edges between isotypes
-#' permuteLabels(graph, "isotype")
+#' # Permute annotations and plot new tree
+#' g <- permuteLabels(graph, "ISOTYPE")
+#' plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE)
 #' 
 #' @export
 permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
@@ -523,22 +482,8 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #'           See \link{plotMRCATest} for plotting the permutation distributions.
 #'           
 #' @examples
-#' # Define simple set of graphs
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' V(graph)$label <- V(graph)$name
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' graph2 <- graph
-#' E(graph2)$weight <- c(10, 3, 3, 4, 1)
-#' graph3 <- graph2
-#' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
-#' 
 #' # Perform MRCA test on isotypes
-#' graphs <- list(A=graph, B=graph, C=graph2, D=graph3)
-#' x <- testMRCA(graphs, "isotype", nperm=100)
+#' x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
 #' print(x)
 #' 
 #' @export
@@ -636,18 +581,8 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'           See \link{plotEdgeTest} for plotting the permutation distributions.
 #'           
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$name
-#' 
 #' # Perform edge test on isotypes
-#' graphs <- list(A=graph, B=graph, C=graph)
-#' x <- testEdges(graphs, "isotype", nperm=100)
+#' x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
 #' print(x)
 #' 
 #' @export
@@ -744,22 +679,12 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
-#' # Define simple graph
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' V(graph)$label <- V(graph)$name
-#' 
 #' # Perform edge test on isotypes
-#' graphs <- list(A=graph, B=graph, C=graph)
-#' x <- testEdges(graphs, "isotype", nperm=100)
+#' x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
 #' 
 #' # Plot
-#' plotEdgeTest(x, color="steelblue", style="h")
-#' plotEdgeTest(x, style="c")
+#' plotEdgeTest(x, color="steelblue", style="hist")
+#' plotEdgeTest(x, style="cdf")
 #' 
 #' @export
 plotEdgeTest <- function(data, color="black", main_title="Edge Test", 
@@ -836,26 +761,12 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
-#' # Define simple graphs
-#' library(igraph)
-#' graph <- make_directed_graph(c(1, 2, 2, 3, 2, 4, 3, 5, 3, 6))
-#' V(graph)$name <- c("Germline", "Inferred", "Seq1", "Seq2", "Seq3", "Seq4")
-#' V(graph)$isotype <- c(NA, NA, "IgM", "IgG", "IgA", "IgA")
-#' V(graph)$label <- V(graph)$name
-#' E(graph)$weight <- c(10, 3, 6, 4, 1)
-#' E(graph)$label <- E(graph)$weight
-#' graph2 <- graph
-#' E(graph2)$weight <- c(10, 3, 3, 4, 1)
-#' graph3 <- graph2
-#' V(graph3)$isotype <- c(NA, NA, "IgM", "IgM", "IgA", "IgA")
-#'
 #' # Perform MRCA test on isotypes
-#' graphs <- list(A=graph, B=graph2, C=graph3)
-#' x <- testMRCA(graphs, "isotype", nperm=100)
+#' x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
 #' 
 #' # Plot
-#' plotMRCATest(x, color="steelblue", style="h")
-#' plotMRCATest(x, style="c")
+#' plotMRCATest(x, color="steelblue", style="hist")
+#' plotMRCATest(x, style="cdf")
 #' 
 #' @export
 plotMRCATest <- function(data, color="black", main_title="MRCA Test", 
