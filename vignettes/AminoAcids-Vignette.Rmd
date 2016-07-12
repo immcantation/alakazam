@@ -22,8 +22,10 @@ output:
     toc: yes
 geometry: margin=1in
 fontsize: 11pt
-vignette: |
-  %\VignetteEngine{knitr::rmarkdown} %\VignetteIndexEntry{Analysis of amino acid physicochemical properties} %\usepackage[utf8]{inputenc}
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties}
+  %\usepackage[utf8]{inputenc}
 ---
 
 The `alakazam` package includes a set of function to analyze the physicochemical 
