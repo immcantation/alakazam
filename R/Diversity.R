@@ -155,7 +155,7 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' # Calculate clone sizes
 #' clones <- countClones(df, groups="SAMPLE")
 #' # Calculate 1st order coverage for a single sample
-#' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
+#' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
 #'
 #' @export
 calcCoverage <- function(x, r=1) {

@@ -55,10 +55,10 @@ library(dplyr)
 
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Select clone
-sub_df <- subset(df, CLONE == 164)
+sub_db <- subset(db, CLONE == 3138)
 ```
 
 ## Preprocess a clone
@@ -81,7 +81,7 @@ following duplicate removal. Unique values appearing within columns given by the
 ```{r, eval=TRUE}
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- makeChangeoClone(sub_df, text_fields=c("SAMPLE", "ISOTYPE"), 
+clone <- makeChangeoClone(sub_db, text_fields=c("SAMPLE", "ISOTYPE"), 
                           num_fields="DUPCOUNT")
 
 # Show combined annotations
@@ -112,8 +112,8 @@ graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load data insted of running phylip
-# Clone 164 is at index 5
-graph <- ExampleTrees[[5]]
+# Clone 3138 is at index 23
+graph <- ExampleTrees[[23]]
 ```
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
@@ -148,7 +148,7 @@ germline sequence, which is named "Germline" in the object returned by
 
 ```{r, eval=TRUE}
 # Modify graph and plot attributes
-V(graph)$color <- "lightgrey"
+V(graph)$color <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
 V(graph)$label <- V(graph)$ISOTYPE
@@ -156,14 +156,12 @@ E(graph)$label <- ""
 
 # Remove large default margins
 par(mar=c(0, 0, 0, 0) + 0.1)
-# Define a tree layout with the Germline at the top
-ly <- layout_as_tree(graph, root="Germline", circular=F, flip.y=T)
 # Plot graph
-plot(graph, layout=ly, edge.arrow.mode=0, vertex.frame.color="black",
-     vertex.label.color="black", vertex.size=50)
+plot(graph, layout=layout_as_tree, edge.arrow.mode=0, vertex.frame.color="black",
+     vertex.label.color="black", vertex.size=38)
 # Add legend
 legend("topleft", c("Germline", "Inferred", "Sample"), 
-       fill=c("black", "white", "grey80"), cex=0.75)
+       fill=c("black", "white", "steelblue"), cex=0.75)
 ```
 
 Which is much better.
@@ -175,7 +173,7 @@ data.frame on the clone column.
 
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
 # Preprocess clones
-clones <- df %>%
+clones <- db %>%
     group_by(CLONE) %>%
     do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
                                 num_fields="DUPCOUNT"))
@@ -201,5 +199,5 @@ graphs[sapply(graphs, is.null)] <- NULL
 
 # The set of tree may then be subset by node count for further 
 # analysis, if desired.
-graphs[sapply(graphs, vcount) >= 5]
+graphs <- graphs[sapply(graphs, vcount) >= 5]
 ```

@@ -9,18 +9,21 @@ library(igraph)
 
 # Load and filter data
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Preprocess clones
-clones <- df %>%
+clones <- db %>%
     group_by(CLONE) %>%
     do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"),
                                 num_fields="DUPCOUNT"))
 # Build lineages
 dnapars_exec <- "~/apps/phylip-3.69/dnapars"
-ExampleTrees <- lapply(clones$CHANGEO, buildPhylipLineage,
-                      dnapars_exec=dnapars_exec, rm_temp=TRUE)
-ExampleTrees[sapply(ExampleTrees, is.null)] <- NULL
+graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
+                 dnapars_exec=dnapars_exec, rm_temp=TRUE)
+
+# Subset to trees with at least 5 nodes
+graphs[sapply(graphs, is.null)] <- NULL
+ExampleTrees <- graphs[sapply(graphs, vcount) >= 4]
 
 #### Save to data location ####
 

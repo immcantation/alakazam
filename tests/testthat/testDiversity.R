@@ -5,7 +5,7 @@ test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(df, groups="SAMPLE")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
+    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 

@@ -704,7 +704,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 #' df <- readChangeoDb(file)
-#' clone <- subset(df, CLONE == 164)
+#' clone <- subset(df, CLONE == 3138)
 #'
 #' # Get all regions
 #' extractVRegion(clone$SEQUENCE_IMGT)

@@ -1,4 +1,4 @@
-Version 0.2.3.999:  June 16, 2016
+Version 0.2.3.999:  July 12, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -17,6 +17,8 @@ General:
 + Fixed bug in `collapseDuplicates()` wherein the input data type sanity check
   would cause the vignette to fail to build under R 3.3.
 + Added `sortGenes()` function to sort V(D)J genes by name or locus position.
++ Replaced the `ExampleDb.gz` file with a larger, more clonal, data set.
++ Replaced `ExampleTrees` with a larger set of trees.
 
 Amino Acid Analysis:
 

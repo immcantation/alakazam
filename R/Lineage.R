@@ -527,10 +527,10 @@ phylipToGraph <- function(edges, clone) {
 #' \dontrun{
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Preprocess clone
-#' clone <- subset(df, CLONE == 164)
+#' clone <- subset(db, CLONE == 3138)
 #' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
@@ -539,8 +539,7 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' ly <- layout_as_tree(graph, root="Germline", circular=F, flip.y=T)
-#' plot(graph, layout=ly)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' }
 #' 
 #' @export

@@ -51,7 +51,7 @@ library(dplyr)
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 db <- readChangeoDb(file)
-db <- db[db$SAMPLE == "RL01", ]
+db <- db[db$SAMPLE == "+7d", ]
 ```
 
 ## Calculate the properties of amino acid sequences
