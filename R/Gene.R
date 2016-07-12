@@ -37,9 +37,9 @@ NULL
 #'           with columns:
 #'           \itemize{
 #'             \item \code{GENE}:        name of the family, gene or allele
-#'             \item \code{SEQ_COUNT}:   total number of sequences for the gene.
+#'             \item \code{SEQ_COUNT}:   total number of sequences, or clones, for the gene.
 #'             \item \code{SEQ_FREQ}:    frequency of the gene as a fraction of the total
-#'                                       number of sequences within each grouping.
+#'                                       number of sequences, or clones, within each grouping.
 #'             \item \code{COPY_COUNT}:  sum of the copy counts in the \code{copy} column.
 #'                                       for each gene. Only present if the \code{copy} 
 #'                                       argument is specified.
@@ -62,18 +62,10 @@ NULL
 #' # With copy numbers and multiple groups
 #' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     copy="DUPCOUNT", mode="family")
-#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-#'                     copy="DUPCOUNT", mode="gene")
-#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-#'                     copy="DUPCOUNT", mode="allele")
 #' 
 #' # Count by clone
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
-#'                     mode="family")
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
-#'                     mode="gene")
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
-#'                     mode="allele")
+#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#'                     clone="CLONE", mode="family")
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
@@ -98,10 +90,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
             group_by_(.dots=c(groups, clone)) %>%
             slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
             select_(interp(~-x, x=as.name("CLONE_GENE_COUNT")))
-        
     } else if (!is.null(clone) & !is.null(copy)) {
         warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
-                "The 'copy' argument will be ignored.")
+                "The 'clone' argument will be ignored.")
     }
     # Extract gene, allele or family assignments
     gene_func <- switch(mode,
