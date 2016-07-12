@@ -1,9 +1,13 @@
-load("../data-tests/ExampleTrees.rda")
+ExampleTrees <- file.path("..","data-tests", "ExampleTrees.rda")
+load(ExampleTrees)
+
 graph <- ExampleTrees[[5]]
+graph_2 <- graph
 
 test_that("Test summarizeSubtrees",{
     obs_graph_sum_sub <- summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
-    load("../data-tests/exp_graph_sum_sub.rda")
+    expected <- file.path("..","data-tests", "exp_graph_sum_sub.rda")
+    load(expected)
     expect_equal(obs_graph_sum_sub, exp_graph_sum_sub, tolerance=1)
 })
 
@@ -15,7 +19,6 @@ test_that("Test getPathLengths",{
     expect_equal(pl$DISTANCE, c(28,0,32,34))
     
     # Exclude nodes without an isotype annotation from step count
-    graph_2 <- graph
     pl_exclude <- getPathLengths(graph_2, root="Germline", field="ISOTYPE", 
                                  exclude=NA)
     expect_equal(pl_exclude$STEPS, c(0,0,1,1))
