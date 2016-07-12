@@ -1,5 +1,5 @@
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
+ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
+db <- readChangeoDb(ExampleDb)
 
 test_that("translateDNA", {
     expect_equal(translateDNA("ACTGACTCGA",trim=F),"TDS")

@@ -1,5 +1,5 @@
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
+df <- readChangeoDb(ExampleDb)
 
 test_that("seqDist",{
     # Ungapped examples

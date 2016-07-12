@@ -1,11 +1,11 @@
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
+df <- readChangeoDb(ExampleDb)
 
 test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(df, groups="SAMPLE")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
+    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 
