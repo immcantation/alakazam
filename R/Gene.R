@@ -26,8 +26,8 @@ NULL
 #'                   This argument is ignored if \code{clone} is specified.
 #' @param    clone   name of the \code{data} column containing clone identifiers for each 
 #'                   sequence. If this value is specified, then genes will be counted only
-#'                   once for each clone. Note, this is accomplished by using only the 
-#'                   first row of each set with the same value in \code{clone}. As such,
+#'                   once for each clone. Note, this is accomplished by using the most 
+#'                   common gene within each \code{clone} identifier. As such,
 #'                   ambiguous alleles within a clone will not be accurately represented.
 #' @param    mode    one of \code{c("gene", "family", "allele")} defining
 #'                   the degree of specificity regarding allele calls. Determines whether 
@@ -72,13 +72,16 @@ NULL
 #'                     mode="family")
 #' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
 #'                     mode="gene")
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
+#'                     mode="allele")
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
                        mode=c("gene", "allele", "family")) {
     ## DEBUG
     # data=db; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
-
+    # data=subset(db, CLONE == 3138)
+    
     # Check input
     mode <- match.arg(mode)
     check <- checkColumns(data, c(gene, groups, copy))
@@ -86,10 +89,16 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
     
     # Subset to one sequence per clone if required
     if (!is.null(clone) & is.null(copy)) {
-        # Keep only first row of each clone
+        # Find count of genes within each clone
         data <- data %>%
-            group_by_(clone) %>%
-            slice_(1)
+            group_by_(.dots=c(groups, clone, gene)) %>%
+            dplyr::mutate(CLONE_GENE_COUNT=n())
+        # Keep first row that corresponds to the most common gene
+        data <- data %>%
+            group_by_(.dots=c(groups, clone)) %>%
+            slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
+            select_(interp(~-x, x=as.name("CLONE_GENE_COUNT")))
+        
     } else if (!is.null(clone) & !is.null(copy)) {
         warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
                 "The 'copy' argument will be ignored.")
@@ -240,6 +249,8 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep
     return(r)
 }
 
+
+#### Utility functions ####
 
 #' Sort V(D)J genes
 #'
