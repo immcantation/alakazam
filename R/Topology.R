@@ -84,13 +84,13 @@ EdgeTest <- setClass("EdgeTest",
 #' @param    x  MRCATest object.
 #' 
 #' @rdname   MRCATest-class
-#' @aliases  print, MRCATest-method
+#' @aliases  MRCATest-method
 setMethod("print", "MRCATest", function(x) { print(x@tests) })
 
 #' @param    x  EdgeTest object.
 #' 
 #' @rdname   EdgeTest-class
-#' @aliases  print, EdgeTest-method
+#' @aliases  EdgeTest-method
 setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 
 #### Graph analysis functions ####
@@ -131,7 +131,8 @@ setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 #' 
 #' @examples
 #' # Define and plot example graph
-#' graph <- ExampleTrees[[5]]
+#' library(igraph)
+#' graph <- ExampleTrees[[23]]
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Summarize tree
@@ -203,7 +204,8 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' 
 #' @examples
 #' # Define and plot example graph
-#' graph <- ExampleTrees[[5]]
+#' library(igraph)
+#' graph <- ExampleTrees[[23]]
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Consider all nodes
@@ -268,7 +270,8 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' 
 #' @examples
 #' # Define and plot example graph
-#' graph <- ExampleTrees[[5]]
+#' library(igraph)
+#' graph <- ExampleTrees[[23]]
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Use unweighted path length and do not exclude any nodes
@@ -341,7 +344,8 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #'           
 #' @examples
 #' # Define and plot example graph
-#' graph <- ExampleTrees[[5]]
+#' library(igraph)
+#' graph <- ExampleTrees[[23]]
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Count direct edges between isotypes including inferred nodes
@@ -431,7 +435,8 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
 #' 
 #' @examples
 #' # Define and plot example graph
-#' graph <- ExampleTrees[[5]]
+#' library(igraph)
+#' graph <- ExampleTrees[[23]]
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
 #' 
 #' # Permute annotations and plot new tree
@@ -861,23 +866,26 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 #' 
 #' @examples
 #' # Plot boxplot of outdegree by sample
-#' plotOutdegree(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
-#'               style="b")
+#' plotSubtrees(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
+#'              style="b")
 #'
 #' # Plot boxplot of subtree by sample
-#' plotOutdegree(ExampleTrees, "SAMPLE", "size", style="b")
+#' plotSubtrees(ExampleTrees, "SAMPLE", "size", style="b")
 #' 
 #' # Plot violins of pathlength by isotype
-#' plotOutdegree(ExampleTrees,  "ISOTYPE", "path", colors=IG_COLORS, 
-#'               legend_title="Isotype", style="v")
+#' plotSubtrees(ExampleTrees,  "ISOTYPE", "path", colors=IG_COLORS, 
+#'              legend_title="Isotype", style="v")
 #' 
 #' # Plot violins of depth by isotype
-#' plotOutdegree(ExampleTrees,  "ISOTYPE", "depth", style="v")
+#' plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="v")
 #' 
 #' @export
 plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germline", NA), 
                          colors=NULL, main_title="Subtrees", legend_title="Annotation", 
                          style=c("box", "violin"), silent=FALSE, ...) {
+    # Hack for visibility of special ggplot variables
+    ..x.. <- ..y.. <- NULL
+    
     ## DEBUG
     # graphs=ExampleTrees; field="ISOTYPE"; colors=IG_COLORS; main_title="Outdegree"; root="Germline"; exclude=c("Germline", NA); style="box"
     # Check arguments
@@ -899,7 +907,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
         stat_col <- "PATHLENGTH_NORM"
         y_lab <- "Path length under node (percent of longest path)"
     } else {
-        error("Invalid value for 'stat'. How did you get here?")
+        stop("Invalid value for 'stat'. How did you get here?")
     }
     
     # Assign numeric names if graphs is an unnamed list
@@ -943,7 +951,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
     } else if (style == "violin") {
         p1 <- p1 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, 
                                width=0.7, alpha=0.8) +
-            geom_errorbarh(aes(xmin=(..x..) - 0.4, xmax=(..x..) + 0.4), color="black", 
+            geom_errorbarh(aes(xmin=..x.. - 0.4, xmax=..x.. + 0.4), color="black", 
                            stat="summary", fun.y="mean", size=1.25, height=0, alpha=0.9)
     }
 
