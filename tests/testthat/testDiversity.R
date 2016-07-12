@@ -1,9 +1,9 @@
 ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
-df <- readChangeoDb(ExampleDb)
+db <- readChangeoDb(ExampleDb)
 
 test_that("calcCoverage", {
     # Calculate clone sizes
-    clones <- countClones(df, groups="SAMPLE")
+    clones <- countClones(db, groups="SAMPLE")
     # Calculate 1st order coverage for a single sample
     obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
@@ -11,10 +11,10 @@ test_that("calcCoverage", {
 
 test_that("countClones", {
     # Without copy numbers
-    clones <- countClones(df, groups="SAMPLE")
+    clones <- countClones(db, groups="SAMPLE")
     
     # With copy numbers and multiple groups
-    clones <- countClones(df, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+    clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
     
     expect_equal(clones$SEQ_COUNT[1:6], c(1, 2, 1, 1, 2, 1))
     expect_equal(clones$COPY_COUNT[1:6], c(10, 2, 1, 1, 2, 1))
@@ -24,7 +24,7 @@ test_that("countClones", {
 
 test_that("estimateAbundance", {
     set.seed(90)
-    abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+    abund <- estimateAbundance(db, "SAMPLE", nboot=100)
     expect_equal(abund$P[1:6], 
                  c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
                  tolerance=0.001)
@@ -54,7 +54,7 @@ test_that("calcDiversity", {
 test_that("rarefyDiversity", {
     set.seed(5)
     # Group by sample identifier
-    div <- rarefyDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100)
+    div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
     obs <- div@data[c(1,3,9,20),]
     exp <- data.frame(
         "GROUP" = c("RL01", "RL01", "RL01", "RL02"),
@@ -75,7 +75,7 @@ test_that("rarefyDiversity", {
     set.seed <- 25
     # Grouping by isotype rather than sample identifier
     expect_warning(
-        div <- rarefyDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+        div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
                                nboot=100),
         "Not all groups passed threshold")
 
@@ -98,12 +98,12 @@ test_that("rarefyDiversity", {
 test_that("testDiversity", {
     set.seed(3)
     # Groups under the size threshold are excluded and a warning message is issued.
-    div <- testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
+    div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
     expect_equal(div@tests$pvalue, 0)
     expect_equal(div@summary$mean, c(88.10, 63.11), tolerance=0.001)
     
     set.seed(3)
-    div <- testDiversity(rbind(df,df), "SAMPLE", q=0, min_n=30, nboot=100)
+    div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=100)
     expect_equal(div@tests$pvalue, 0.88)
     expect_equal(div@summary$mean, c(78.63, 79.58), tolerance=0.001)
 })

@@ -121,7 +121,7 @@ setClass("ChangeoClone",
 #' 
 #' @examples
 #' # Example Change-O data.frame
-#' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+#' db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
 #'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 #'                  V_CALL="Homsap IGKV1-39*01 F",
 #'                  J_CALL="Homsap IGKJ5*01 F",
@@ -133,10 +133,10 @@ setClass("ChangeoClone",
 #'                  stringsAsFactors=FALSE)
 #' 
 #' # Without end masking
-#' makeChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+#' makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
 #'
 #' # With end masking
-#' makeChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+#' makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
 #'
 #' @export
 makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 

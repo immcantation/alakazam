@@ -23,6 +23,12 @@ NULL
 #' @param    copy    name of the \code{data} column containing copy numbers for each 
 #'                   sequence. If this value is specified, then total copy abundance
 #'                   is determined by the sum of copy numbers within each gene.
+#'                   This argument is ignored if \code{clone} is specified.
+#' @param    clone   name of the \code{data} column containing clone identifiers for each 
+#'                   sequence. If this value is specified, then genes will be counted only
+#'                   once for each clone. Note, this is accomplished by using only the 
+#'                   first row of each set with the same value in \code{clone}. As such,
+#'                   ambiguous alleles within a clone will not be accurately represented.
 #' @param    mode    one of \code{c("gene", "family", "allele")} defining
 #'                   the degree of specificity regarding allele calls. Determines whether 
 #'                   to return counts for genes, families or alleles.
@@ -46,34 +52,48 @@ NULL
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Without copy numbers
-#' genes <- countGenes(df, gene="V_CALL", groups="SAMPLE", mode="family")
-#' genes <- countGenes(df, gene="V_CALL", groups="SAMPLE", mode="gene")
-#' genes <- countGenes(df, gene="V_CALL", groups="SAMPLE", mode="allele")
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene")
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     copy="DUPCOUNT", mode="family")
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     copy="DUPCOUNT", mode="gene")
-#' genes <- countGenes(df, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     copy="DUPCOUNT", mode="allele")
 #' 
+#' # Count by clone
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
+#'                     mode="family")
+#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", clone="CLONE", 
+#'                     mode="gene")
+#'
 #'@export
-countGenes <- function(data, gene, groups=NULL, copy=NULL, 
+countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
                        mode=c("gene", "allele", "family")) {
-    #groups=NULL
-    #groups="PRCONS"
-    #gene="V_CALL"
-    #mode="gene"
-    
+    ## DEBUG
+    # data=db; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
+
     # Check input
     mode <- match.arg(mode)
     check <- checkColumns(data, c(gene, groups, copy))
     if (check != TRUE) { stop(check) }
     
+    # Subset to one sequence per clone if required
+    if (!is.null(clone) & is.null(copy)) {
+        # Keep only first row of each clone
+        data <- data %>%
+            group_by_(clone) %>%
+            slice_(1)
+    } else if (!is.null(clone) & !is.null(copy)) {
+        warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
+                "The 'copy' argument will be ignored.")
+    }
     # Extract gene, allele or family assignments
     gene_func <- switch(mode,
                         allele=getAllele,

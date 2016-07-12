@@ -1,9 +1,9 @@
 ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
-df <- readChangeoDb(ExampleDb)
+db <- readChangeoDb(ExampleDb)
 
 test_that("makeChangeoClone",{
     # Example Change-O data.frame
-    df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+    db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
                      SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
                      V_CALL="Homsap IGKV1-39*01 F",
                      J_CALL="Homsap IGKJ5*01 F",
@@ -23,7 +23,7 @@ test_that("makeChangeoClone",{
     )
     
     # Without end masking
-    clone <- makeChangeoClone(df, text_fields="TYPE", num_fields="COUNT")
+    clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
     
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")
@@ -35,7 +35,7 @@ test_that("makeChangeoClone",{
     
     
     # With end masking
-    clone <- makeChangeoClone(df, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+    clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
     exp <- data.frame(
         "SEQUENCE_ID" = "A",
         "SEQUENCE" = c("NNNCTGNN"),
@@ -57,7 +57,7 @@ test_that("makeChangeoClone",{
 
 test_that("buildPhylipLineage", {
     # Preprocess clone
-    clone <- subset(df, CLONE == 164)
+    clone <- subset(db, CLONE == 164)
     clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), 
                               num_fields="DUPCOUNT")
     

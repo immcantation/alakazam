@@ -16,7 +16,6 @@ General:
   `translateDNA()`.
 + Fixed bug in `collapseDuplicates()` wherein the input data type sanity check
   would cause the vignette to fail to build under R 3.3.
-+ Added `sortGenes()` function to sort V(D)J genes by name or locus position.
 + Replaced the `ExampleDb.gz` file with a larger, more clonal, data set.
 + Replaced `ExampleTrees` with a larger set of trees.
 
@@ -28,6 +27,12 @@ Amino Acid Analysis:
 Topology Analysis:
 
 + Added a set of functions for lineage tree topology analysis.
+
+Gene Usage:
+
++ Added `sortGenes()` function to sort V(D)J genes by name or locus position.
++ Added `clone` argument to `countGenes()` to allow restriction of gene 
+  abundance to one gene per clone.
 
 
 Version 0.2.3:  February 22, 2016
