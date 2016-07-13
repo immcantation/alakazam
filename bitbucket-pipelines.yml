@@ -5,4 +5,5 @@ pipelines:
   default:
     - step:
         script:
-          - echo "Everything is awesome!"
+          - R CMD build .
+          - R CMD check *.tar.gz
