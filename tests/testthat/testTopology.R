@@ -1,4 +1,4 @@
-ExampleTrees <- file.path("..","data-tests", "ExampleTrees.rda")
+ExampleTrees <- system.file("tests/data-tests", "ExampleTrees.rda", package="alakazam")
 load(ExampleTrees)
 
 graph <- ExampleTrees[[5]]

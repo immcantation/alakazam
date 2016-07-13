@@ -1,4 +1,4 @@
-ExampleDb <- file.path("..","data-tests","ExampleDb.gz")
+ExampleDb <- system.file("tests/data-tests", "ExampleDb.gz", package="alakazam")
 df <- readChangeoDb(ExampleDb)
 
 test_that("makeChangeoClone",{
