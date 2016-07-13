@@ -150,10 +150,10 @@ setMethod("print", "DiversityTest", function(x) { print(x@tests) })
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Calculate clone sizes
-#' clones <- countClones(df, groups="SAMPLE")
+#' clones <- countClones(db, groups="SAMPLE")
 #' # Calculate 1st order coverage for a single sample
 #' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
 #'
@@ -333,13 +333,13 @@ adjustObservedAbundance <- function(x) {
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Without copy numbers
-#' clones <- countClones(df, groups="SAMPLE")
+#' clones <- countClones(db, groups="SAMPLE")
 #'
 #' # With copy numbers and multiple groups
-#' clones <- countClones(df, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 #' 
 #' @export
 countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
@@ -424,9 +424,9 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
-#' abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+#' abund <- estimateAbundance(db, "SAMPLE", nboot=100)
 #'
 #' @export
 estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nboot=2000) {
@@ -873,10 +873,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @examples  
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
+#' testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
@@ -1024,10 +1024,10 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
 #' # Plot
-#' abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+#' abund <- estimateAbundance(db, "SAMPLE", nboot=100)
 #' plotAbundance(abund)
 #' 
 #' @export

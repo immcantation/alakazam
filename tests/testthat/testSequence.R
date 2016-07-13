@@ -1,5 +1,5 @@
 ExampleDb <- system.file("tests/data-tests", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(ExampleDb)
+db <- readChangeoDb(ExampleDb)
 
 test_that("seqDist",{
     # Ungapped examples
@@ -81,11 +81,11 @@ test_that("seqEqual", {
 
 test_that("translateDNA", {
     expect_equal(
-        translateDNA(df$JUNCTION[1:3]),
+        translateDNA(db$JUNCTION[1:3]),
         c("CARDRSTPWRRGIASTTVRTSW", "CARDLLWSVLLTGYYSYGMDAW", "CARDLLWSVLLTGYYSYGMDAW"))
     
     expect_equal(
-        translateDNA(df$JUNCTION[1:3], trim=TRUE),
+        translateDNA(db$JUNCTION[1:3], trim=TRUE),
         c("ARDRSTPWRRGIASTTVRTS", "ARDLLWSVLLTGYYSYGMDA", "ARDLLWSVLLTGYYSYGMDA"))
     expect_equal(translateDNA("ACTGACTCGA"), "TDS")
 })
@@ -117,7 +117,7 @@ test_that("maskSeqEnds", {
 
 test_that("collapseDuplicates", {
     # Example Change-O data.frame
-    df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+    db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
                      SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
                      TYPE=c("IgM", "IgG", "IgG", "IgA"),
                      SAMPLE=c("S1", "S1", "S2", "S2"),
@@ -126,7 +126,7 @@ test_that("collapseDuplicates", {
     
     # Annotations are not parsed if neither text_fields nor num_fields is specified
     # The retained sequence annotations will be random
-    obs <- collapseDuplicates(df, verbose=F)
+    obs <- collapseDuplicates(db, verbose=F)
     exp <- data.frame(
         "SEQUENCE_ID" = c("C", "A"),
         "SEQUENCE_IMGT" = c("NAACTGGN", "CCCCTGGG"),
@@ -140,7 +140,7 @@ test_that("collapseDuplicates", {
     # Unique text_fields annotations are combined into a single string with ","
     # num_fields annotations are summed
     # Ambiguous duplicates are discarded
-    obs <- collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        verbose=F)
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COUNT <- c(3,3)
@@ -148,21 +148,21 @@ test_that("collapseDuplicates", {
     
     
     # Use alternate delimiter for collapsing textual annotations
-    obs <- collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        sep="/", verbose=F)
     exp$TYPE <- c("IgG","IgG/IgM")
     expect_equal(obs, exp)
     
     # Add count of duplicates
-    obs <- collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        add_count=TRUE, verbose=F)
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COLLAPSE_COUNT <- c(1,2)
     expect_equal(obs, exp)
     
     # Masking ragged ends may impact duplicate removal
-    df$SEQUENCE_IMGT <- maskSeqEnds(df$SEQUENCE_IMGT)
-    obs <- collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
+    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        add_count=TRUE, verbose=F)    
     exp <- data.frame(
         "SEQUENCE_ID" = "A",
@@ -178,7 +178,7 @@ test_that("collapseDuplicates", {
 })
 
 test_that("extractVRegion", {
-    clone <- subset(df, CLONE == 164)
+    clone <- subset(db, CLONE == 164)
     
     # Get all regions
     obs <- extractVRegion(clone$SEQUENCE_IMGT)

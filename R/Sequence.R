@@ -22,8 +22,8 @@ NULL
 #' @examples 
 #' # IG_COLORS as an isotype color set for ggplot
 #' isotype <- c("IgG", "IgM", "IgM", "IgA")
-#' df <- data.frame(x=1:4, y=1:4, iso=isotype)
-#' g1 <- ggplot(df, aes(x=x, y=y, color=iso)) + 
+#' db <- data.frame(x=1:4, y=1:4, iso=isotype)
+#' g1 <- ggplot(db, aes(x=x, y=y, color=iso)) + 
 #'     scale_color_manual(name="Isotype", values=IG_COLORS) +
 #'     geom_point(size=10)
 #' plot(g1)
@@ -274,10 +274,10 @@ getAAMatrix <- function() {
 #' library(alakazam)
 #' # Load Change-O file
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
+#' db <- readChangeoDb(file)
 #' 
-#' translateDNA(df$JUNCTION[1:3])
-#' translateDNA(df$JUNCTION[1:3], trim=TRUE)
+#' translateDNA(db$JUNCTION[1:3])
+#' translateDNA(db$JUNCTION[1:3], trim=TRUE)
 #' translateDNA("ACTGACTCGA")
 #' 
 #' @export
@@ -468,7 +468,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'
 #' @examples
 #' # Example Change-O data.frame
-#' df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+#' db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
 #'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 #'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
 #'                  SAMPLE=c("S1", "S1", "S2", "S2"),
@@ -477,25 +477,25 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #' 
 #' # Annotations are not parsed if neither text_fields nor num_fields is specified
 #' # The retained sequence annotations will be random
-#' collapseDuplicates(df, verbose=TRUE)
+#' collapseDuplicates(db, verbose=TRUE)
 #' 
 #' # Unique text_fields annotations are combined into a single string with ","
 #' # num_fields annotations are summed
 #' # Ambiguous duplicates are discarded
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 #'                    verbose=TRUE)
 #'
 #' # Use alternate delimiter for collapsing textual annotations
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 #'                    sep="/", verbose=TRUE)
 #' 
 #' # Add count of duplicates
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 #'                    add_count=TRUE, verbose=TRUE)
 #' 
 #' # Masking ragged ends may impact duplicate removal
-#' df$SEQUENCE_IMGT <- maskSeqEnds(df$SEQUENCE_IMGT)
-#' collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
+#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 #'                    add_count=TRUE, verbose=TRUE)
 #'
 #' @export
@@ -703,8 +703,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' @examples
 #' # Load example data
 #' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' df <- readChangeoDb(file)
-#' clone <- subset(df, CLONE == 3138)
+#' db <- readChangeoDb(file)
+#' clone <- subset(db, CLONE == 3138)
 #'
 #' # Get all regions
 #' extractVRegion(clone$SEQUENCE_IMGT)

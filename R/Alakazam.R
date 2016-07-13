@@ -108,9 +108,9 @@
 #' @importFrom  data.table  fread
 #' @importFrom  dplyr       do n desc %>%
 #'                          data_frame data_frame_
-#'                          bind_cols bind_rows combine
-#'                          filter filter_ select select_ arrange arrange_
+#'                          bind_cols bind_rows combine arrange arrange_ 
 #'                          group_by group_by_ ungroup
+#'                          filter filter_ slice slice_ select select_ 
 #'                          mutate mutate_ transmute transmute_
 #'                          rename rename_ summarize summarize_
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
