@@ -89,6 +89,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
         data <- data %>%
             group_by_(.dots=c(groups, clone)) %>%
             slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
+            upgroup() %>%
             select_(interp(~-x, x=as.name("CLONE_GENE_COUNT")))
     } else if (!is.null(clone) & !is.null(copy)) {
         warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
