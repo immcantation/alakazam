@@ -1,0 +1,8 @@
+# You can build any language by using Docker images from Docker Hub.
+image: docker-image:tag
+
+pipelines:
+  default:
+    - step:
+        script:
+          - echo "Everything is awesome!"
