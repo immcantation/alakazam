@@ -60,7 +60,7 @@ Examples
 # Define and plot example graph
 library(igraph)
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=30)
 
 ```
 

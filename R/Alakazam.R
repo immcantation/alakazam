@@ -38,6 +38,16 @@
 #'   \item  \link{buildPhylipLineage}:   Perform lineage reconstruction of Ig sequences.
 #' }
 #' 
+#' @section  Lineage topology analysis:
+#' \itemize{
+#'   \item  \link{tableEdges}:           Tabulate annotation relationships over edges.
+#'   \item  \link{testEdges}:            Significance testing of annotation edges.
+#'   \item  \link{testMRCA}:             Significance testing of MRCA annotations.
+#'   \item  \link{summarizeSubtrees}:    Various summary statistics for subtrees.
+#'   \item  \link{plotSubtrees}:         Plot distributions of summary statistics 
+#'                                       for a population of trees.
+#' }
+#' 
 #' @section  Diversity analysis:
 #' \itemize{
 #'   \item  \link{countClones}:          Calculate clonal abundance.

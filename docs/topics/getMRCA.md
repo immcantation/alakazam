@@ -65,25 +65,12 @@ Examples
 ```R
 # Define and plot example graph
 library(igraph)
-
-```
-
-*
-Attaching package: ‘igraph’
-**The following objects are masked from ‘package:stats’:
-
-    decompose, spectrum
-**The following object is masked from ‘package:base’:
-
-    union
-*
-```R
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=30)
 
 ```
 
-![6](getMRCA-6.png)
+![2](getMRCA-2.png)
 
 ```R
 

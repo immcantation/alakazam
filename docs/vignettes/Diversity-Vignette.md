@@ -210,12 +210,12 @@ sample_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean delta_sd
-## 1 -1h != +7d      0    477.745 16.39678
+## 1 -1h != +7d      0    480.425 16.77083
 ## 
 ## Slot "summary":
 ##     group    mean       sd
-## -1h   -1h 816.600 11.30971
-## +7d   +7d 338.855 12.16073
+## -1h   -1h 818.965 12.02776
+## +7d   +7d 338.540 12.77161
 ## 
 ## Slot "groups":
 ## [1] "-1h" "+7d"
@@ -246,19 +246,19 @@ isotype_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean  delta_sd
-## 1 IgA != IgD      0  190.12410 11.255614
-## 2 IgA != IgG      0   26.25834  4.765638
-## 3 IgA != IgM      0  228.66913  7.046630
-## 4 IgD != IgG      0  163.86576 12.045100
-## 5 IgD != IgM      0   38.54503 12.513694
-## 6 IgG != IgM      0  202.41079  7.776748
+## 1 IgA != IgD      0  191.98212 10.895729
+## 2 IgA != IgG      0   26.82262  4.349422
+## 3 IgA != IgM      0  228.85129  6.535732
+## 4 IgD != IgG      0  165.15950 11.621868
+## 5 IgD != IgM      0   36.86917 12.121182
+## 6 IgG != IgM      0  202.02868  7.257912
 ## 
 ## Slot "summary":
 ##     group      mean        sd
-## IgA   IgA  13.03562  2.064575
-## IgD   IgD 203.15972 11.036208
-## IgG   IgG  39.29395  4.312907
-## IgM   IgM 241.70474  6.552779
+## IgA   IgA  12.79637  1.990933
+## IgD   IgD 204.77848 10.583917
+## IgG   IgG  39.61898  4.200877
+## IgM   IgM 241.64766  6.493150
 ## 
 ## Slot "groups":
 ## [1] "IgA" "IgD" "IgG" "IgM"

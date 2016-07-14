@@ -56,6 +56,19 @@ Lineage reconstruction
 + [buildPhylipLineage](buildPhylipLineage.md):   Perform lineage reconstruction of Ig sequences.
 
 
+Lineage topology analysis
+-------------------
+
+
+
++ [tableEdges](tableEdges.md):           Tabulate annotation relationships over edges.
++ [testEdges](testEdges.md):            Significance testing of annotation edges.
++ [testMRCA](testMRCA.md):             Significance testing of MRCA annotations.
++ [summarizeSubtrees](summarizeSubtrees.md):    Various summary statistics for subtrees.
++ [plotSubtrees](plotSubtrees.md):         Plot distributions of summary statistics 
+for a population of trees.
+
+
 Diversity analysis
 -------------------
 

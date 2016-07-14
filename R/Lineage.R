@@ -510,7 +510,7 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' }
 #' 
 #' @export

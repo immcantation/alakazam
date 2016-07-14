@@ -95,9 +95,9 @@ Examples
 -------------------
 
 ```R
-# Plot boxplot of outdegree by sample
+# Plot violins of outdegree by sample
 plotSubtrees(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
-style="b")
+style="v")
 
 ```
 
@@ -105,8 +105,8 @@ style="b")
 
 ```R
 
-# Plot boxplot of subtree by sample
-plotSubtrees(ExampleTrees, "SAMPLE", "size", style="b")
+# Plot violins of subtree by sample
+plotSubtrees(ExampleTrees, "SAMPLE", "size", style="v")
 
 ```
 
@@ -114,18 +114,18 @@ plotSubtrees(ExampleTrees, "SAMPLE", "size", style="b")
 
 ```R
 
-# Plot violins of pathlength by isotype
-plotSubtrees(ExampleTrees,  "ISOTYPE", "path", colors=IG_COLORS, 
-legend_title="Isotype", style="v")
+# Plot boxplot of pathlength by isotype
+plotSubtrees(ExampleTrees, "ISOTYPE", "path", colors=IG_COLORS, 
+legend_title="Isotype", style="b")
 
 ```
 
-*Warning*:The following annotations are missing from the 'colors' argument and will be assigned to grey: IgA,IgG IgD,IgG![7](plotSubtrees-7.png)
+*Warning*:The following are missing from the 'colors' argument and will be colored grey: IgA,IgG IgD,IgG![7](plotSubtrees-7.png)
 
 ```R
 
-# Plot violins of depth by isotype
-plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="v")
+# Plot boxplot of depth by isotype
+plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="b")
 ```
 
 ![9](plotSubtrees-9.png)

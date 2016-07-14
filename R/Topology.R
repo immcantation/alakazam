@@ -44,7 +44,7 @@ NULL
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' 
 #' # Summarize tree
 #' summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
@@ -117,7 +117,7 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' 
 #' # Consider all nodes
 #' getPathLengths(graph, root="Germline")
@@ -183,7 +183,7 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' 
 #' # Use unweighted path length and do not exclude any nodes
 #' getMRCA(graph, path="steps", root="Germline")
@@ -257,7 +257,7 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' 
 #' # Count direct edges between isotypes including inferred nodes
 #' tableEdges(graph, "ISOTYPE", exclude=NULL)
@@ -348,7 +348,7 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
 #' 
 #' # Permute annotations and plot new tree
 #' g <- permuteLabels(graph, "ISOTYPE")
@@ -783,19 +783,19 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 #' @seealso  Subtree statistics are calculated with \link{summarizeSubtrees}.
 #' 
 #' @examples
-#' # Plot boxplot of outdegree by sample
+#' # Plot violins of outdegree by sample
 #' plotSubtrees(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
-#'              style="b")
+#'              style="v")
 #'
-#' # Plot boxplot of subtree by sample
-#' plotSubtrees(ExampleTrees, "SAMPLE", "size", style="b")
+#' # Plot violins of subtree by sample
+#' plotSubtrees(ExampleTrees, "SAMPLE", "size", style="v")
 #' 
-#' # Plot violins of pathlength by isotype
-#' plotSubtrees(ExampleTrees,  "ISOTYPE", "path", colors=IG_COLORS, 
-#'              legend_title="Isotype", style="v")
+#' # Plot boxplot of pathlength by isotype
+#' plotSubtrees(ExampleTrees, "ISOTYPE", "path", colors=IG_COLORS, 
+#'              legend_title="Isotype", style="b")
 #' 
-#' # Plot violins of depth by isotype
-#' plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="v")
+#' # Plot boxplot of depth by isotype
+#' plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="b")
 #' 
 #' @export
 plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germline", NA), 
@@ -843,7 +843,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
         x <- unique(sum_df[[field]])
         x <- sort(x[!(x %in% names(colors))])
         if (length(x) > 0) {
-            warning("The following annotations are missing from the 'colors' argument and will be assigned to grey: ", 
+            warning("The following are missing from the 'colors' argument and will be colored grey: ", 
                     paste(x, collapse=" "))
             x <- setNames(rep("grey", length(x)), x)
             colors <- c(colors, x)
