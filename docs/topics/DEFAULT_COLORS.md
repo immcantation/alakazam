@@ -44,8 +44,8 @@ Examples
 ```R
 # IG_COLORS as an isotype color set for ggplot
 isotype <- c("IgG", "IgM", "IgM", "IgA")
-df <- data.frame(x=1:4, y=1:4, iso=isotype)
-g1 <- ggplot(df, aes(x=x, y=y, color=iso)) + 
+db <- data.frame(x=1:4, y=1:4, iso=isotype)
+g1 <- ggplot(db, aes(x=x, y=y, color=iso)) + 
 scale_color_manual(name="Isotype", values=IG_COLORS) +
 geom_point(size=10)
 plot(g1)

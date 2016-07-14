@@ -44,27 +44,27 @@ Examples
 library(alakazam)
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
-translateDNA(df$JUNCTION[1:3])
-
-```
-
+translateDNA(db$JUNCTION[1:3])
 
 ```
-[1] "CARDRSTPWRRGIASTTVRTSW" "CARDLLWSVLLTGYYSYGMDAW" "CARDLLWSVLLTGYYSYGMDAW"
+
+
+```
+[1] "CARVKRRGWRRNSLWFGESTPSDAHRWFDPW" "CARMVILGSCYSRGCGTPGPGDGETQYW"    "CARVGIDVVVPAAIPGFDYYYGMDVW"     
 
 ```
 
 
 ```R
-translateDNA(df$JUNCTION[1:3], trim=TRUE)
+translateDNA(db$JUNCTION[1:3], trim=TRUE)
 
 ```
 
 
 ```
-[1] "ARDRSTPWRRGIASTTVRTS" "ARDLLWSVLLTGYYSYGMDA" "ARDLLWSVLLTGYYSYGMDA"
+[1] "ARVKRRGWRRNSLWFGESTPSDAHRWFDP" "ARMVILGSCYSRGCGTPGPGDGETQY"    "ARVGIDVVVPAAIPGFDYYYGMDV"     
 
 ```
 

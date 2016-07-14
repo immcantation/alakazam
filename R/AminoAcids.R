@@ -1,8 +1,5 @@
 # Amino acid sequence properties
 
-#' @include Alakazam.R
-NULL
-
 #### Chemical property functions ####
 
 #' Calculates the average bulkiness of amino acid sequences

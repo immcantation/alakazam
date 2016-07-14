@@ -16,7 +16,7 @@ the method of Moore, 1985, with exclusion of the C-terminus and N-terminus charg
 Usage
 --------------------
 ```
-charge(seq, pH = 7.4, pK = NULL, normalize = TRUE)
+charge(seq, pH = 7.4, pK = NULL, normalize = FALSE)
 ```
 
 Arguments
@@ -64,21 +64,8 @@ Examples
 
 ```R
 seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVRT") 
-# Normalized charge
-charge(seq)
-
-```
-
-
-```
-[1] 0.1784859 0.1425715
-
-```
-
-
-```R
 # Unnormalized charge
-charge(seq, normalize=FALSE)
+charge(seq)
 
 ```
 
@@ -90,13 +77,26 @@ charge(seq, normalize=FALSE)
 
 
 ```R
+# Normalized charge
+charge(seq, normalize=TRUE)
+
+```
+
+
+```
+[1] 0.1784859 0.1425715
+
+```
+
+
+```R
 
 # Use the Murray et al, 2006 scores from the seqinr package
 library(seqinr)
 data(pK)
 x <- setNames(pK[["Murray"]], rownames(pK))
 # Calculate charge
-charge(seq, pK=x, normalize=FALSE)
+charge(seq, pK=x)
 ```
 
 

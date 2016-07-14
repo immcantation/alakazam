@@ -14,6 +14,7 @@ pages:
     - 'Download & Installation': install.md
     - 'Package Overview': topics/alakazam.md
     - 'Release Notes': news.md
+    - 'Related Projects': projects.md
   - 'Vignettes':
     - 'Analysis of amino acid physicochemical properties': vignettes/AminoAcids-Vignette.md
     - 'Diversity analysis': vignettes/Diversity-Vignette.md
@@ -32,6 +33,19 @@ pages:
       - topics/buildPhylipLineage.md
       - topics/makeChangeoClone.md
       - topics/ChangeoClone-class.md
+    - 'Lineage Topology Analysis':
+      - topics/getMRCA.md
+      - topics/getPathLengths.md
+      - topics/permuteLabels.md
+      - topics/summarizeSubtrees.md
+      - topics/tableEdges.md
+      - topics/testEdges.md
+      - topics/testMRCA.md
+      - topics/plotEdgeTest.md
+      - topics/plotMRCATest.md
+      - topics/plotSubtrees.md
+      - topics/EdgeTest-class.md
+      - topics/MRCATest-class.md
     - 'Diversity Analysis':
       - topics/calcCoverage.md
       - topics/calcDiversity.md
@@ -45,6 +59,7 @@ pages:
       - topics/DiversityTest-class.md
     - 'Ig and TCR Sequence Annotation':
       - topics/countGenes.md
+      - topics/sortGenes.md
       - topics/getSegment.md
       - topics/extractVRegion.md
     - 'Sequence Distance Calculation':

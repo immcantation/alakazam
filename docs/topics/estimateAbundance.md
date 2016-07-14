@@ -93,19 +93,12 @@ Examples
 ```R
 # Load example data
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
-abund <- estimateAbundance(df, "SAMPLE", nboot=100)
+abund <- estimateAbundance(db, "SAMPLE", nboot=100)
 ```
 
-
-```
--> ESTIMATING ABUNDANCE
-  |                                                |                                        |   0%  |                                                |====================                    |  50%  |                                                |========================================| 100%
-
-```
-
-
+**Error in estimateAbundance(db, "SAMPLE", nboot = 100)**: object 'progress' not found
 
 See also
 -------------------

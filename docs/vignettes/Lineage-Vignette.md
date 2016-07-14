@@ -30,10 +30,10 @@ library(dplyr)
 
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Select clone
-sub_df <- subset(df, CLONE == 164)
+sub_db <- subset(db, CLONE == 3138)
 ```
 
 ## Preprocess a clone
@@ -57,7 +57,7 @@ following duplicate removal. Unique values appearing within columns given by the
 ```r
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- makeChangeoClone(sub_df, text_fields=c("SAMPLE", "ISOTYPE"), 
+clone <- makeChangeoClone(sub_db, text_fields=c("SAMPLE", "ISOTYPE"), 
                           num_fields="DUPCOUNT")
 
 # Show combined annotations
@@ -65,11 +65,13 @@ clone@data[, c("SAMPLE", "ISOTYPE", "DUPCOUNT")]
 ```
 
 ```
-##   SAMPLE     ISOTYPE DUPCOUNT
-## 1   RL02         IgA        1
-## 2   RL02         IgG        1
-## 3   RL02         IgG        1
-## 4   RL02 IgA,IgG,IgM       61
+##   SAMPLE ISOTYPE DUPCOUNT
+## 1    +7d     IgA        1
+## 2    +7d     IgG        1
+## 3    +7d IgA,IgG       10
+## 4    +7d     IgG       36
+## 5    +7d     IgA       10
+## 6    +7d     IgG       13
 ```
 
 ## Run PHYLIP
@@ -108,7 +110,7 @@ data.frame(CLONE=graph$clone,
 
 ```
 ##   CLONE JUNCTION_LENGTH   V_GENE J_GENE
-## 1   164              66 IGHV3-48  IGHJ2
+## 1  3138              60 IGHV3-49  IGHJ5
 ```
 
 ```r
@@ -119,12 +121,14 @@ data.frame(SEQUENCE_ID=V(graph)$name,
 ```
 
 ```
-##      SEQUENCE_ID     ISOTYPE DUPCOUNT
-## 1 GN5SHBT08J0DZP IgA,IgG,IgM       61
-## 2 GN5SHBT07FM4BU         IgG        1
-## 3       Germline        <NA>       NA
-## 4 GN5SHBT07IAWQ9         IgG        1
-## 5 GN5SHBT07IBCBZ         IgA        1
+##      SEQUENCE_ID ISOTYPE DUPCOUNT
+## 1 GN5SHBT06HH3QD     IgA       10
+## 2 GN5SHBT08F45HV IgA,IgG       10
+## 3       Germline    <NA>       NA
+## 4 GN5SHBT06IFV0R     IgG       13
+## 5 GN5SHBT08I3P11     IgG       36
+## 6 GN5SHBT01BXJY7     IgG        1
+## 7 GN5SHBT01EGEU6     IgA        1
 ```
 
 ## Plotting of the lineage tree
@@ -150,7 +154,7 @@ germline sequence, which is named "Germline" in the object returned by
 
 ```r
 # Modify graph and plot attributes
-V(graph)$color <- "lightgrey"
+V(graph)$color <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
 V(graph)$label <- V(graph)$ISOTYPE
@@ -158,14 +162,12 @@ E(graph)$label <- ""
 
 # Remove large default margins
 par(mar=c(0, 0, 0, 0) + 0.1)
-# Define a tree layout with the Germline at the top
-ly <- layout_as_tree(graph, root="Germline", circular=F, flip.y=T)
 # Plot graph
-plot(graph, layout=ly, edge.arrow.mode=0, vertex.frame.color="black",
-     vertex.label.color="black", vertex.size=50)
+plot(graph, layout=layout_as_tree, edge.arrow.mode=0, vertex.frame.color="black",
+     vertex.label.color="black", vertex.size=38)
 # Add legend
 legend("topleft", c("Germline", "Inferred", "Sample"), 
-       fill=c("black", "white", "grey80"), cex=0.75)
+       fill=c("black", "white", "steelblue"), cex=0.75)
 ```
 
 ![plot of chunk Lineage-Vignette-7](figure/Lineage-Vignette-7-1.png)
@@ -180,7 +182,7 @@ data.frame on the clone column.
 
 ```r
 # Preprocess clones
-clones <- df %>%
+clones <- db %>%
     group_by(CLONE) %>%
     do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
                                 num_fields="DUPCOUNT"))
@@ -205,28 +207,5 @@ graphs[sapply(graphs, is.null)] <- NULL
 
 # The set of tree may then be subset by node count for further 
 # analysis, if desired.
-graphs[sapply(graphs, vcount) >= 5]
-```
-
-```
-## [[1]]
-## IGRAPH DNW- 5 4 -- 
-## + attr: clone (g/c), v_gene (g/c), j_gene (g/c), junc_len (g/n),
-## | name (v/c), sequence (v/c), SAMPLE (v/c), ISOTYPE (v/c),
-## | DUPCOUNT (v/n), COLLAPSE_COUNT (v/n), label (v/c), weight (e/n),
-## | label (e/n)
-## + edges (vertex names):
-## [1] GN5SHBT08J0DZP->GN5SHBT07FM4BU GN5SHBT07FM4BU->GN5SHBT07IAWQ9
-## [3] GN5SHBT08J0DZP->GN5SHBT07IBCBZ Germline      ->GN5SHBT08J0DZP
-## 
-## [[2]]
-## IGRAPH DNW- 7 6 -- 
-## + attr: clone (g/c), v_gene (g/c), j_gene (g/c), junc_len (g/n),
-## | name (v/c), sequence (v/c), SAMPLE (v/c), ISOTYPE (v/c),
-## | DUPCOUNT (v/n), COLLAPSE_COUNT (v/n), label (v/c), weight (e/n),
-## | label (e/n)
-## + edges (vertex names):
-## [1] Inferred1     ->GNDG01207IOOW7 Inferred1     ->GNDG01205GFPQH
-## [3] GNDG01205GFPQH->GNDG01201D1OBR GNDG01205GFPQH->GNDG01207GJ4SW
-## [5] GNDG01205GFPQH->GNDG01201EV1DM Germline      ->Inferred1
+graphs <- graphs[sapply(graphs, vcount) >= 5]
 ```

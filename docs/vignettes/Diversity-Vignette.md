@@ -42,7 +42,7 @@ library(alakazam)
 
 # Load Change-O file
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 ```
 
 ## Generate a clonal abundance curve
@@ -54,7 +54,7 @@ the size of each clone is determined by the number of sequence members:
 
 ```r
 # Partitions the data based on the SAMPLE column
-clones <- countClones(df, groups="SAMPLE")
+clones <- countClones(db, groups="SAMPLE")
 head(clones, 5)
 ```
 
@@ -63,12 +63,12 @@ head(clones, 5)
 ## Groups: SAMPLE [1]
 ## 
 ##   SAMPLE CLONE SEQ_COUNT SEQ_FREQ
-##    (chr) (chr)     (int)    (dbl)
-## 1   RL01    53         4     0.04
-## 2   RL01    91         4     0.04
-## 3   RL01     2         2     0.02
-## 4   RL01    21         2     0.02
-## 5   RL01    33         2     0.02
+##    <chr> <chr>     <int>    <dbl>
+## 1    +7d  3128       100    0.100
+## 2    +7d  3100        50    0.050
+## 3    +7d  3141        44    0.044
+## 4    +7d  3177        30    0.030
+## 5    +7d  3170        28    0.028
 ```
 
 You may also specify a column containing the abundance count of each sequence 
@@ -82,7 +82,7 @@ normalized to within multiple group data partitions.
 ```r
 # Partitions the data based on both the SAMPLE and ISOTYPE columns
 # Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(df, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 head(clones, 5)
 ```
 
@@ -90,13 +90,13 @@ head(clones, 5)
 ## Source: local data frame [5 x 7]
 ## Groups: SAMPLE, ISOTYPE [2]
 ## 
-##   SAMPLE ISOTYPE CLONE SEQ_COUNT COPY_COUNT SEQ_FREQ  COPY_FREQ
-##    (chr)   (chr) (chr)     (int)      (int)    (dbl)      (dbl)
-## 1   RL01     IgA    90         1         10      0.2 0.71428571
-## 2   RL01     IgA     2         2          2      0.4 0.14285714
-## 3   RL01     IgA     1         1          1      0.2 0.07142857
-## 4   RL01     IgA    24         1          1      0.2 0.07142857
-## 5   RL01     IgD    33         2          2      0.2 0.20000000
+##   SAMPLE ISOTYPE CLONE SEQ_COUNT COPY_COUNT   SEQ_FREQ  COPY_FREQ
+##    <chr>   <chr> <chr>     <int>      <int>      <dbl>      <dbl>
+## 1    +7d     IgA  3128        88        651 0.33082707 0.49732620
+## 2    +7d     IgG  3100        49        279 0.09280303 0.17296962
+## 3    +7d     IgA  3141        44        240 0.16541353 0.18334607
+## 4    +7d     IgG  3192        19        141 0.03598485 0.08741476
+## 5    +7d     IgG  3177        29        130 0.05492424 0.08059516
 ```
 
 While `countClones` will report observed abundances, it will not correct the
@@ -109,7 +109,11 @@ using the `plotAbundance` function.
 ```r
 # Partitions the data on the SAMPLE column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-clones <- estimateAbundance(df, group="SAMPLE", ci=0.95, nboot=200)
+clones <- estimateAbundance(db, group="SAMPLE", ci=0.95, nboot=200)
+```
+
+```
+## Error in estimateAbundance(db, group = "SAMPLE", ci = 0.95, nboot = 200): object 'progress' not found
 ```
 
 ```r
@@ -117,20 +121,25 @@ head(clones, 5)
 ```
 
 ```
-## Source: local data frame [5 x 6]
+## Source: local data frame [5 x 7]
+## Groups: SAMPLE, ISOTYPE [2]
 ## 
-##   GROUP CLONE          P LOWER      UPPER  RANK
-##   (chr) (chr)      (dbl) (dbl)      (dbl) (int)
-## 1  RL01    53 0.03808654     0 0.07669023     1
-## 2  RL01    91 0.03808654     0 0.07730441     2
-## 3  RL01     2 0.01293068     0 0.03742777     3
-## 4  RL01    21 0.01293068     0 0.03550525     4
-## 5  RL01    33 0.01293068     0 0.03543502     5
+##   SAMPLE ISOTYPE CLONE SEQ_COUNT COPY_COUNT   SEQ_FREQ  COPY_FREQ
+##    <chr>   <chr> <chr>     <int>      <int>      <dbl>      <dbl>
+## 1    +7d     IgA  3128        88        651 0.33082707 0.49732620
+## 2    +7d     IgG  3100        49        279 0.09280303 0.17296962
+## 3    +7d     IgA  3141        44        240 0.16541353 0.18334607
+## 4    +7d     IgG  3192        19        141 0.03598485 0.08741476
+## 5    +7d     IgG  3177        29        130 0.05492424 0.08059516
 ```
 
 ```r
 # Plots a rank abundance curve of the relative clonal abundances
 p1 <- plotAbundance(clones, legend_title="Sample")
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'LOWER' not found
 ```
 
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
@@ -149,19 +158,14 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 2000 resampling realizations are performed (nboot=200)
-sample_div <- rarefyDiversity(df, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
+sample_div <- rarefyDiversity(db, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
                                  ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_div <- rarefyDiversity(df, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
+isotype_div <- rarefyDiversity(db, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
                                   step_q=0.05, ci=0.95, nboot=200)
-```
-
-```
-## Warning in rarefyDiversity(df, "ISOTYPE", min_n = 30, min_q = 0, max_q =
-## 32, : Not all groups passed threshold min_n=30.Excluded: IgD
 ```
 
 
@@ -195,7 +199,7 @@ distributions between groups.
 ```r
 # Test diversity at q=0 (species richness) across values in the "SAMPLE" column
 # 2000 bootstrap realizations are performed (nboot=200)
-sample_test <- testDiversity(df, 0, "SAMPLE", nboot=200)
+sample_test <- testDiversity(db, 0, "SAMPLE", nboot=200)
 ```
 
 ```r
@@ -205,23 +209,23 @@ sample_test
 ```
 ## An object of class "DiversityTest"
 ## Slot "tests":
-##           test pvalue delta_mean delta_sd
-## 1 RL01 != RL02      0      24.48 5.398641
+##         test pvalue delta_mean delta_sd
+## 1 -1h != +7d      0    477.745 16.39678
 ## 
 ## Slot "summary":
-##      group   mean       sd
-## RL01  RL01 87.995 3.409265
-## RL02  RL02 63.515 4.287387
+##     group    mean       sd
+## -1h   -1h 816.600 11.30971
+## +7d   +7d 338.855 12.16073
 ## 
 ## Slot "groups":
-## [1] "RL01" "RL02"
+## [1] "-1h" "+7d"
 ## 
 ## Slot "q":
 ## [1] 0
 ## 
 ## Slot "n":
-## RL01 RL02 
-##  100  100 
+##  -1h  +7d 
+## 1000 1000 
 ## 
 ## Slot "nboot":
 ## [1] 200
@@ -231,12 +235,7 @@ sample_test
 # Test diversity across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_test <- testDiversity(df, 2, "ISOTYPE", min_n=30, nboot=200)
-```
-
-```
-## Warning in testDiversity(df, 2, "ISOTYPE", min_n = 30, nboot = 200): Not
-## all groups passed threshold min_n=30. Excluded: IgD
+isotype_test <- testDiversity(db, 2, "ISOTYPE", min_n=30, nboot=200)
 ```
 
 ```r
@@ -246,26 +245,30 @@ isotype_test
 ```
 ## An object of class "DiversityTest"
 ## Slot "tests":
-##         test pvalue delta_mean delta_sd
-## 1 IgA != IgG      0   9.627693 3.283755
-## 2 IgA != IgM      0  33.646852 3.516436
-## 3 IgG != IgM      0  43.274544 2.172349
+##         test pvalue delta_mean  delta_sd
+## 1 IgA != IgD      0  190.12410 11.255614
+## 2 IgA != IgG      0   26.25834  4.765638
+## 3 IgA != IgM      0  228.66913  7.046630
+## 4 IgD != IgG      0  163.86576 12.045100
+## 5 IgD != IgM      0   38.54503 12.513694
+## 6 IgG != IgM      0  202.41079  7.776748
 ## 
 ## Slot "summary":
 ##     group      mean        sd
-## IgA   IgA 13.894135 3.0926226
-## IgG   IgG  4.266443 0.9905737
-## IgM   IgM 47.540987 1.9835305
+## IgA   IgA  13.03562  2.064575
+## IgD   IgD 203.15972 11.036208
+## IgG   IgG  39.29395  4.312907
+## IgM   IgM 241.70474  6.552779
 ## 
 ## Slot "groups":
-## [1] "IgA" "IgG" "IgM"
+## [1] "IgA" "IgD" "IgG" "IgM"
 ## 
 ## Slot "q":
 ## [1] 2
 ## 
 ## Slot "n":
-## IgA IgG IgM 
-##  50  50  50 
+## IgA IgD IgG IgM 
+## 259 259 259 259 
 ## 
 ## Slot "nboot":
 ## [1] 200

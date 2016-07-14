@@ -70,13 +70,13 @@ Examples
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
 
 # Read all columns in and convert sequence fields to upper case
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Subset columns and convert sequence fields to upper case
-df <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"))
+db <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"))
 
 # Drop columns and do not alter sequence field case
-df <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
+db <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
 ```
 
 

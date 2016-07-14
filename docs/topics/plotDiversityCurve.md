@@ -16,7 +16,7 @@ Usage
 --------------------
 ```
 plotDiversityCurve(data, colors = NULL, main_title = "Diversity",
-legend_title = NULL, log_q = TRUE, log_d = TRUE, xlim = NULL,
+legend_title = "Group", log_q = TRUE, log_d = TRUE, xlim = NULL,
 ylim = NULL, annotate = c("none", "depth"), silent = FALSE, ...)
 ```
 
@@ -82,17 +82,16 @@ Examples
 ```R
 # Load example data
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # All groups pass default minimum sampling threshold of 10 sequences
-div <- rarefyDiversity(df, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+div <- rarefyDiversity(db, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 
 ```
 
 
 ```
--> CALCULATING DIVERSITY
-  |                                                |                                        |   0%  |                                                |====================                    |  50%  |                                                |========================================| 100%
+
 
 ```
 

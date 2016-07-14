@@ -18,7 +18,7 @@ Usage
 --------------------
 ```
 testDiversity(data, q, group, clone = "CLONE", copy = NULL, min_n = 30,
-max_n = NULL, nboot = 2000)
+max_n = NULL, nboot = 2000, progress = FALSE)
 ```
 
 Arguments
@@ -53,6 +53,9 @@ if automatically determined from the size of the largest group.
 
 nboot
 :   number of bootstrap realizations to perform.
+
+progress
+:   if `TRUE` show a progress bar.
 
 
 
@@ -121,16 +124,15 @@ Examples
 ```R
 # Load example data
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Groups under the size threshold are excluded and a warning message is issued.
-testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
+testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
 ```
 
 
 ```
--> CALCULATING DIVERSITY
-  |                                                |                                        |   0%  |                                                |====================                    |  50%  |                                                |========================================| 100%
+
 
 ```
 
@@ -138,23 +140,23 @@ testDiversity(df, "SAMPLE", q=0, min_n=30, nboot=100)
 ```
 An object of class "DiversityTest"
 Slot "tests":
-          test pvalue delta_mean delta_sd
-1 RL01 != RL02      0      24.53   4.6763
+        test pvalue delta_mean delta_sd
+1 -1h != +7d      0     479.31  18.8056
 
 Slot "summary":
-     group  mean       sd
-RL01  RL01 88.21 3.179146
-RL02  RL02 63.68 3.784284
+    group   mean       sd
+-1h   -1h 818.15 11.24599
++7d   +7d 338.84 14.57251
 
 Slot "groups":
-[1] "RL01" "RL02"
+[1] "-1h" "+7d"
 
 Slot "q":
 [1] 0
 
 Slot "n":
-RL01 RL02 
- 100  100 
+ -1h  +7d 
+1000 1000 
 
 Slot "nboot":
 [1] 100

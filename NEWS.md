@@ -1,4 +1,4 @@
-Version 0.2.3.999:  July 12, 2016
+Version 0.2.3.999:  July 14, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -24,15 +24,20 @@ Amino Acid Analysis:
 + Set default to `normalize=FALSE` for charge calculations to be more consistent
   with previously published repertoire sequencing results.
   
-Topology Analysis:
+Diversity Analysis:
 
-+ Added a set of functions for lineage tree topology analysis.
-
++ Added a `progress` argument to `rarefyDiversity()` and `testDiversity()` to
+  enable the (previously default) progress bar.
+  
 Gene Usage:
 
 + Added `sortGenes()` function to sort V(D)J genes by name or locus position.
 + Added `clone` argument to `countGenes()` to allow restriction of gene 
   abundance to one gene per clone.
+
+Topology Analysis:
+
++ Added a set of functions for lineage tree topology analysis.
 
 
 Version 0.2.3:  February 22, 2016

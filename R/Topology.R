@@ -1,97 +1,8 @@
 # Ig lineage topology analysis
 
-#' @include Alakazam.R
+#' @include Classes.R
 NULL
 
-#### Classes ####
-
-#' S4 class defining edge significance
-#'
-#' \code{MRCATest} defines the significance of enrichment for annotations appearing at
-#' the MRCA of the tree.
-#' 
-#' @slot  tests         data.frame describing the significance test results with columns:
-#'                      \itemize{
-#'                        \item  \code{ANNOTATION}:  annotation value.
-#'                        \item  \code{COUNT}:       observed count of MRCA positions 
-#'                                                   with the given annotation.
-#'                        \item  \code{EXPECTED}:    expected mean count of MRCA occurance
-#'                                                   for the annotation.
-#'                        \item  \code{PVALUE}:      one-sided p-value for the hypothesis that 
-#'                                                   the observed annotation abundance is greater 
-#'                                                   than expected.
-#'                      }
-#' @slot  permutations  data.frame containing the raw permutation test data with columns:
-#'                      \itemize{
-#'                        \item  \code{ANNOTATION}:  annotation value.
-#'                        \item  \code{COUNT}:       count of MRCA positions with the 
-#'                                                   given annotation.
-#'                        \item  \code{ITER}:        numerical index define which 
-#'                                                   permutation realization each 
-#'                                                   observation corresponds to.
-#'                      }
-#' @slot  nperm         number of permutation realizations.
-#' 
-#' @name         MRCATest-class
-#' @rdname       MRCATest-class
-#' @aliases      MRCATest
-#' @exportClass  MRCATest
-MRCATest <- setClass("MRCATest", 
-                     slots=c(tests="data.frame",
-                             permutations="data.frame",
-                             nperm="numeric"))
-
-
-#' S4 class defining edge significance
-#'
-#' \code{EdgeTest} defines the significance of parent-child annotation enrichment.
-#' 
-#' @slot  tests         data.frame describing the significance test results with columns:
-#'                      \itemize{
-#'                        \item  \code{PARENT}:    parent node annotation.
-#'                        \item  \code{CHILD}:     child node annotation
-#'                        \item  \code{COUNT}:     count of observed edges with the given 
-#'                                                 parent-child annotation set.
-#'                        \item  \code{EXPECTED}:  mean count of expected edges for the 
-#'                                                 given parent-child relationship.
-#'                        \item  \code{PVALUE}:    one-sided p-value for the hypothesis that 
-#'                                                  the observed edge abundance is greater 
-#'                                                  than expected.
-#'                      }
-#' @slot  permutations  data.frame containing the raw permutation test data with columns:
-#'                      \itemize{
-#'                        \item  \code{PARENT}:  parent node annotation.
-#'                        \item  \code{CHILD}:   child node annotation
-#'                        \item  \code{COUNT}:   count of edges with the given parent-child 
-#'                                               annotation set.
-#'                        \item  \code{ITER}:    numerical index define which permutation
-#'                                               realization each observation corresponds 
-#'                                               to.
-#'                      }
-#' @slot  nperm         number of permutation realizations.
-#' 
-#' @name         EdgeTest-class
-#' @rdname       EdgeTest-class
-#' @aliases      EdgeTest
-#' @exportClass  EdgeTest
-EdgeTest <- setClass("EdgeTest", 
-                     slots=c(tests="data.frame",
-                             permutations="data.frame",
-                             nperm="numeric"))
-
-#### Methods ####
-
-#' @param    x  MRCATest object.
-#' 
-#' @rdname   MRCATest-class
-#' @aliases  MRCATest-method
-setMethod("print", "MRCATest", function(x) { print(x@tests) })
-
-#' @param    x  EdgeTest object.
-#' 
-#' @rdname   EdgeTest-class
-#' @aliases  EdgeTest-method
-setMethod("print", "EdgeTest", function(x) { print(x@tests) })
 
 #### Graph analysis functions ####
 
@@ -473,12 +384,13 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' the significance of an annotation's association with the MRCA position of the lineage
 #' trees.
 #' 
-#' @param    graphs   list of igraph object containing annotated lineage trees.
-#' @param    field    string defining the annotation field to test.
-#' @param    root     name of the root (germline) node.
-#' @param    exclude  vector of strings defining \code{field} values to exclude from the
-#'                    set of potential founder annotations.
-#' @param    nperm    number of permutations to perform.
+#' @param    graphs    list of igraph object containing annotated lineage trees.
+#' @param    field     string defining the annotation field to test.
+#' @param    root      name of the root (germline) node.
+#' @param    exclude   vector of strings defining \code{field} values to exclude from the
+#'                     set of potential founder annotations.
+#' @param    nperm     number of permutations to perform.
+#' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   An \link{MRCATest} object containing the test results and permutation
 #'           realizations.
@@ -493,7 +405,7 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' 
 #' @export
 testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA), 
-                     nperm=200) {
+                     nperm=200, progress=FALSE) {
     # Function to resolve ambiguous founders
     # @param  x      data.frame from getMRCA
     # @param  field  annotation field
@@ -529,8 +441,10 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
     obs_sum <- .countMRCA(graphs, field=field, exclude=exclude)
 
     # Generate edge null distribution via permutation
-    cat("-> PERMUTING TREES\n")
-    pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3)
+    if (progress) { 
+        cat("-> PERMUTING TREES\n")
+        pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3) 
+    }
     perm_list <- list()
     for (i in 1:nperm) {
         # Permute labels
@@ -541,7 +455,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
-        setTxtProgressBar(pb, i)
+        if (progress) { setTxtProgressBar(pb, i) }
     }
     cat("\n")
     perm_sum <- bind_rows(perm_list)
@@ -573,11 +487,12 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' \code{testEdges} performs a permutation test on a set of lineage trees to determine
 #' the significance of an annotation's association with parent-child relationships.
 #'
-#' @param    graphs   list of igraph objects with vertex annotations.
-#' @param    field    string defining the annotation field to permute.
-#' @param    exclude  vector of strings defining \code{field} values to exclude from 
-#'                    permutation.
-#' @param    nperm    number of permutations to perform.
+#' @param    graphs    list of igraph objects with vertex annotations.
+#' @param    field     string defining the annotation field to permute.
+#' @param    exclude   vector of strings defining \code{field} values to exclude from 
+#'                     permutation.
+#' @param    nperm     number of permutations to perform.
+#' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   An \link{EdgeTest} object containing the test results and permutation
 #'           realizations.
@@ -591,7 +506,8 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' print(x)
 #' 
 #' @export
-testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
+testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200, 
+                      progress=FALSE) {
     ## DEBUG
     # field="isotype"; exclude=c("Germline", NA); nperm=200
     
@@ -614,8 +530,10 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
     obs_sum <- .countEdges(graphs, field, exclude)
 
     # Generate edge null distribution via permutation
-    cat("-> PERMUTING TREES\n")
-    pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3)
+    if (progress) { 
+        cat("-> PERMUTING TREES\n")
+        pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3) 
+    }
     perm_list <- list()
     for (i in 1:nperm) {
         # Permute annotations
@@ -626,7 +544,7 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200) {
         tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
-        setTxtProgressBar(pb, i)
+        if (progress) { setTxtProgressBar(pb, i) }
     }
     cat("\n")
     perm_sum <- bind_rows(perm_list)

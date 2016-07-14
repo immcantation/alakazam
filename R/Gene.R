@@ -1,14 +1,5 @@
 # Gene usage analysis
 
-#' @include Alakazam.R
-NULL
-
-#### Classes ####
-
-
-#### Methods ####
-
-
 #### Calculation functions ####
 
 #' Tabulates V(D)J allele, gene or family usage.

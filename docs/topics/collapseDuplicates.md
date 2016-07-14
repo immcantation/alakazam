@@ -111,7 +111,7 @@ Examples
 
 ```R
 # Example Change-O data.frame
-df <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
 SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 TYPE=c("IgM", "IgG", "IgG", "IgA"),
 SAMPLE=c("S1", "S1", "S2", "S2"),
@@ -120,7 +120,7 @@ stringsAsFactors=FALSE)
 
 # Annotations are not parsed if neither text_fields nor num_fields is specified
 # The retained sequence annotations will be random
-collapseDuplicates(df, verbose=TRUE)
+collapseDuplicates(db, verbose=TRUE)
 
 ```
 
@@ -149,7 +149,7 @@ DISCARDED> 1
 # Unique text_fields annotations are combined into a single string with ","
 # num_fields annotations are summed
 # Ambiguous duplicates are discarded
-collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 verbose=TRUE)
 
 ```
@@ -177,7 +177,7 @@ DISCARDED> 1
 ```R
 
 # Use alternate delimiter for collapsing textual annotations
-collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 sep="/", verbose=TRUE)
 
 ```
@@ -205,7 +205,7 @@ DISCARDED> 1
 ```R
 
 # Add count of duplicates
-collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 add_count=TRUE, verbose=TRUE)
 
 ```
@@ -233,8 +233,8 @@ DISCARDED> 1
 ```R
 
 # Masking ragged ends may impact duplicate removal
-df$SEQUENCE_IMGT <- maskSeqEnds(df$SEQUENCE_IMGT)
-collapseDuplicates(df, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
+collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 add_count=TRUE, verbose=TRUE)
 ```
 

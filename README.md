@@ -1,9 +1,10 @@
 Alakazam
 -------------------------------------------------------------------------------
 
-The alakazam R package provides a set of tool to investigate lymphocyte receptor 
-clonal lineages, diversity and other repertoire level properties, with a focus on 
-high-throughput immunoglobulin (Ig) sequencing.
+Alakazam is part of the [Immcantation](http://immcantation.readthedocs.io) tool
+suite and provides a set of tools to investigate lymphocyte receptor 
+clonal lineages, diversity and other repertoire level properties, with a focus 
+on high-throughput immunoglobulin (Ig) sequencing.
 
 Alakazam serves five main purposes:
 
@@ -16,15 +17,3 @@ Alakazam serves five main purposes:
    (Ig) sequences. 
 4. Performing clonal abundance and diversity analysis on lymphocyte repertoires.
 5. Performing physicochemical property analyses of lymphocyte receptor sequences.
-
-Related Projects
--------------------------------------------------------------------------------
-
-* [pRESTO](http://presto.readthedocs.io) - 
-  Raw read assembly, quality control and UMI processing 
-* [Change-O](http://changeo.readthedocs.io) - 
-  V(D)J alignment standardization and clonal clustering
-* [SHazaM](http://shazam.readthedocs.io) - 
-  Mutation profiling and selection strength quantification
-* [TIgGER](http://tigger.readthedocs.io) - 
-  Polymorphism detection and genotyping

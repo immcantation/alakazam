@@ -19,7 +19,7 @@ Usage
 ```
 rarefyDiversity(data, group, clone = "CLONE", copy = NULL, min_q = 0,
 max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,
-nboot = 2000)
+nboot = 2000, progress = FALSE)
 ```
 
 Arguments
@@ -63,6 +63,9 @@ ci
 
 nboot
 :   number of bootstrap realizations to generate.
+
+progress
+:   if `TRUE` show a progress bar.
 
 
 
@@ -116,17 +119,16 @@ Examples
 ```R
 # Load example data
 file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-df <- readChangeoDb(file)
+db <- readChangeoDb(file)
 
 # Group by sample identifier
-div <- rarefyDiversity(df, "SAMPLE", step_q=1, max_q=10, nboot=100)
+div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
 
 ```
 
 
 ```
--> CALCULATING DIVERSITY
-  |                                                |                                        |   0%  |                                                |====================                    |  50%  |                                                |========================================| 100%
+
 
 ```
 
@@ -141,14 +143,13 @@ plotDiversityCurve(div, legend_title="Sample")
 ```R
 
 # Grouping by isotype rather than sample identifier
-div <- rarefyDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
+div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
 
 ```
 
-*Warning*:Not all groups passed threshold min_n=40.Excluded: IgD
+
 ```
--> CALCULATING DIVERSITY
-  |                                                |                                        |   0%  |                                                |=============                           |  33%  |                                                |===========================             |  67%  |                                                |========================================| 100%
+
 
 ```
 
@@ -157,7 +158,7 @@ div <- rarefyDiversity(df, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
 plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-![9](rarefyDiversity-9.png)
+![8](rarefyDiversity-8.png)
 
 
 See also

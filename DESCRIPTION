@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.3.999
-Date: 2016-04-13
+Date: 2016-07-14
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -51,6 +51,7 @@ RoxygenNote: 5.0.1
 Collate:
     'Alakazam.R'
     'AminoAcids.R'
+    'Classes.R'
     'Core.R'
     'Diversity.R'
     'Gene.R'

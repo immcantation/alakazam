@@ -1,125 +1,7 @@
 # Clonal diversity analysis
 
-#' @include Alakazam.R
+#' @include Classes.R
 NULL
-
-
-#### Classes ####
-
-#' S4 class defining diversity curve 
-#'
-#' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
-#' orders (\eqn{Q}).
-#' 
-#' @slot  data      data.frame defining the diversity curve with the following columns:
-#'                  \itemize{
-#'                    \item  \code{GROUP}:    group label.
-#'                    \item  \code{Q}:        diversity order.
-#'                    \item  \code{D}:        mean diversity index over all bootstrap 
-#'                                            realizations.
-#'                    \item  \code{D_SD}:     standard deviation of the diversity index 
-#'                                            over all bootstrap realizations.
-#'                    \item  \code{D_LOWER}:  diversity lower confidence inverval bound.
-#'                    \item  \code{D_UPPER}:  diversity upper confidence interval bound.
-#'                    \item  \code{E}:        evenness index calculated as \code{D} 
-#'                                            divided by \code{D} at \code{Q=0}.
-#'                    \item  \code{E_LOWER}:  evenness lower confidence inverval bound.
-#'                    \item  \code{E_UPPER}:  eveness upper confidence interval bound.
-#'                  }
-#' @slot  groups    character vector of groups retained in the diversity calculation.
-#' @slot  n         numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot     number of bootstrap realizations performed.
-#' @slot  ci        confidence interval defining the upper and lower bounds 
-#'                  (a value between 0 and 1).
-#' 
-#' @name         DiversityCurve-class
-#' @rdname       DiversityCurve-class
-#' @aliases      DiversityCurve
-#' @exportClass  DiversityCurve
-setClass("DiversityCurve", 
-         slots=c(data="data.frame", 
-                 groups="character", 
-                 n="numeric", 
-                 nboot="numeric", 
-                 ci="numeric"))
-
-#' S4 class defining diversity significance
-#'
-#' \code{DiversityTest} defines the signifance of diversity (\eqn{D}) differences at a 
-#' fixed diversity order (\eqn{q}).
-#' 
-#' @slot  tests    data.frame describing the significance test results with columns:
-#'                 \itemize{
-#'                   \item  \code{test}:          string listing the two groups tested.
-#'                   \item  \code{pvalue}:        p-value for the test.
-#'                   \item  \code{delta_mean}:    mean of the \eqn{D} bootstrap delta 
-#'                                                distribution for the test.
-#'                   \item  \code{delta_sd}:      standard deviation of the \eqn{D} 
-#'                                                bootstrap delta distribution for the test.
-#'                 }
-#' @slot  summary  data.frame containing summary statistics for the diversity index 
-#'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
-#'                 \itemize{
-#'                   \item  \code{group}:   the name of the group.
-#'                   \item  \code{mean}:    mean of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{sd}:      standard deviation of the \eqn{D} bootstrap 
-#'                                          distribution.
-#'                 }
-#' @slot  groups   character vector of groups retained in diversity calculation.
-#' @slot  q        diversity order tested (\eqn{q}).
-#' @slot  n        numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot    number of bootstrap realizations.
-#' 
-#' @name         DiversityTest-class
-#' @rdname       DiversityTest-class
-#' @aliases      DiversityTest
-#' @exportClass  DiversityTest
-DiversityTest <- setClass("DiversityTest", 
-         slots=c(tests="data.frame",
-                 summary="data.frame",
-                 groups="character", 
-                 q="numeric",
-                 n="numeric", 
-                 nboot="numeric"))
-
-
-#### Methods ####
-
-# TODO:  plot method for DiversityCurve pointing to plotDiversityCurve
-# TODO:  plot method for DiversityTest
-# TODO:  summary method for DiversityTest
-# TODO:  summary method for DiversityCurve
-
-#' @param    x  DiversityCurve object
-#' 
-#' @rdname   DiversityCurve-class
-#' @aliases  DiversityCurve-method
-setMethod("print", "DiversityCurve", function(x) { print(x@data) })
-
-#' @param    x  DiversityTest object
-#' 
-#' @rdname   DiversityTest-class
-#' @aliases  DiversityTest-method
-setMethod("print", "DiversityTest", function(x) { print(x@tests) })
-
-# @rdname DiversityCurve
-# @export
-# setMethod("plot", 
-#           signature("DiversityCurve", 
-#                     colors="character", 
-#                     main_title="character", 
-#                     legend_title="character", 
-#                     log_q="logical", 
-#                     log_d="logical",
-#                     xlim="numeric", 
-#                     ylim="numeric", 
-#                     silent="logical"),
-#           function(data, colors=NULL, main_title="Diversity", 
-#                    legend_title=NULL, log_q=TRUE, log_d=TRUE,
-#                    xlim=NULL, ylim=NULL, silent=FALSE) {
-#             plotDiversityCurve(data, colors=colors, main_title=main_title, 
-#                                legend_title=legend_title, log_q=log_q, log_d=log_d,
-#                                xlim=xlim, ylim=ylim, silent=silent) })
 
 
 #### Coverage functions ####
@@ -460,8 +342,10 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
     ci_z <- ci + (1 - ci) / 2
     
     # Generate diversity index and confidence intervals via resampling
-    cat("-> ESTIMATING ABUNDANCE\n")
-    pb <- txtProgressBar(min=0, max=length(group_set), initial=0, width=40, style=3)
+    if (progress) { 
+        cat("-> ESTIMATING ABUNDANCE\n")
+        pb <- txtProgressBar(min=0, max=length(group_set), initial=0, width=40, style=3) 
+    }
     abund_list <- list()
     i <- 0
     for (g in group_set) {
@@ -492,7 +376,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nb
         abund_df$RANK <- 1:nrow(abund_df)
         abund_list[[g]] <- abund_df
         
-        setTxtProgressBar(pb, i)
+        if (progress) { setTxtProgressBar(pb, i) }
     }
     cat("\n")
     
@@ -614,6 +498,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'                     if automatically determined from the size of the largest group.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
+#' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
 #' 
@@ -671,7 +556,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
-                            ci=0.95, nboot=2000) {
+                            ci=0.95, nboot=2000, progress=FALSE) {
     #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
     # Check input
@@ -725,8 +610,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     }
     
     # Generate diversity index and confidence intervals via resampling
-    cat("-> CALCULATING DIVERSITY\n")
-    pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3)
+    if (progress) { 
+        pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3) 
+        cat("-> CALCULATING DIVERSITY\n")
+    }
     div_list <- list()
     #coverage <- setNames(numeric(length(group_keep)), group_keep)
     i <- 0
@@ -778,7 +665,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
         # Update list with results
         div_list[[g]] <- as.data.frame(result_mat)
         
-        setTxtProgressBar(pb, i <- i + 1)
+        if (progress) { setTxtProgressBar(pb, i <- i + 1) }
     }
     cat("\n")
     
@@ -815,6 +702,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
 #' @param    nboot     number of bootstrap realizations to perform.
+#' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityTest} object containing p-values and summary statistics.
 #' 
@@ -880,7 +768,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
-                          min_n=30, max_n=NULL, nboot=2000) {
+                          min_n=30, max_n=NULL, nboot=2000, progress=FALSE) {
     #group="SAMPLE"; clone="CLONE"; copy=NULL; q=1; min_n=30; max_n=NULL; nboot=200
     # TODO:  write plotDiversityTest function
 
@@ -925,8 +813,10 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     }
 
     # Generate diversity index and confidence intervals via resampling
-    cat("-> CALCULATING DIVERSITY\n")
-    pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3)
+    if (progress) { 
+        cat("-> CALCULATING DIVERSITY\n")
+        pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3) 
+    }
     ngroup <- length(group_keep)
     div_mat <- matrix(NA, nboot, ngroup, dimnames=list(NULL, group_keep))
     for (i in 1:ngroup) {
@@ -946,7 +836,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
         # Calculate diversity
         div_mat[, i] <- apply(sample_mat, 2, calcDiversity, q=q)
 
-        setTxtProgressBar(pb, i)
+        if (progress) { setTxtProgressBar(pb, i) }
     }
     cat("\n")
         
