@@ -1,6 +1,6 @@
 # You can build any language by using Docker images from Docker Hub.
 image: 
-  name: immcantation
+  name: ssnn/immcantation
   username: $USERNAME
   password: $PASSWORD
   email: $EMAIL
