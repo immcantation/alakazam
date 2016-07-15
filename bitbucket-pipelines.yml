@@ -1,5 +1,9 @@
 # You can build any language by using Docker images from Docker Hub.
-image: r-base
+image: 
+  name: immcantation
+  username: $USERNAME
+  password: $PASSWORD
+  email: $EMAIL
 
 pipelines:
   default:
