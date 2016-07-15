@@ -257,16 +257,17 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' \code{estimateAbundance} estimates the complete clonal relative abundance distribution 
 #' and confidence intervals on clone sizes using bootstrapping.
 #' 
-#' @param    data   data.frame with Change-O style columns containing clonal assignments.
-#' @param    group  name of the \code{data} column containing group identifiers.
-#' @param    clone  name of the \code{data} column containing clone identifiers.
-#' @param    copy   name of the \code{data} column containing copy numbers for each 
-#'                  sequence. If \code{copy=NULL} (the default), then clone abundance
-#'                  is determined by the number of sequences. If a \code{copy} column
-#'                  is specified, then clone abundances is determined by the sum of 
-#'                  copy numbers within each clonal group.
-#' @param    ci     confidence interval to calculate; the value must be between 0 and 1.
-#' @param    nboot  number of bootstrap realizations to generate.
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
+#' @param    progress  if \code{TRUE} show a progress bar. 
 #' 
 #' @return   A data.frame with relative clonal abundance data and confidence intervals,
 #'           containing the following columns:
@@ -311,7 +312,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' abund <- estimateAbundance(db, "SAMPLE", nboot=100)
 #'
 #' @export
-estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, nboot=2000) {
+estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, 
+                              nboot=2000, progress=FALSE) {
     #group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
     
     # Check input

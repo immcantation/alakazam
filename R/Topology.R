@@ -399,8 +399,11 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #'           See \link{plotMRCATest} for plotting the permutation distributions.
 #'           
 #' @examples
+#' # Subset example trees for example purposes
+#' graphs <- ExampleTrees[1-10]
+#' 
 #' # Perform MRCA test on isotypes
-#' x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
+#' x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 #' print(x)
 #' 
 #' @export
@@ -501,8 +504,11 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'           See \link{plotEdgeTest} for plotting the permutation distributions.
 #'           
 #' @examples
+#' # Subset example trees for example purposes
+#' graphs <- ExampleTrees[1-10]
+#' 
 #' # Perform edge test on isotypes
-#' x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
+#' x <- testEdges(graphs, "ISOTYPE", nperm=10)
 #' print(x)
 #' 
 #' @export
@@ -602,8 +608,11 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200,
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
+#' # Subset example trees for example purposes
+#' graphs <- ExampleTrees[1-10]
+#' 
 #' # Perform edge test on isotypes
-#' x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
+#' x <- testEdges(graphs, "ISOTYPE", nperm=10)
 #' 
 #' # Plot
 #' plotEdgeTest(x, color="steelblue", style="hist")
@@ -684,8 +693,11 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
+#' # Subset example trees for example purposes
+#' graphs <- ExampleTrees[1-10]
+#' 
 #' # Perform MRCA test on isotypes
-#' x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
+#' x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 #' 
 #' # Plot
 #' plotMRCATest(x, color="steelblue", style="hist")
