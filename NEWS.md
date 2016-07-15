@@ -16,7 +16,8 @@ General:
   `translateDNA()`.
 + Fixed bug in `collapseDuplicates()` wherein the input data type sanity check
   would cause the vignette to fail to build under R 3.3.
-+ Replaced the `ExampleDb.gz` file with a larger, more clonal, data set.
++ Replaced the `ExampleDb.gz` file with a larger, more clonal, `ExampleDb` 
+  data object.
 + Replaced `ExampleTrees` with a larger set of trees.
 
 Amino Acid Analysis:

@@ -65,8 +65,11 @@ Examples
 -------------------
 
 ```R
+# Define example tree set
+graphs <- ExampleTrees[1-10]
+
 # Perform MRCA test on isotypes
-x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
+x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 
 ```
 

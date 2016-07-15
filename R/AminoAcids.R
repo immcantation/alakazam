@@ -472,10 +472,8 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' that calculate the included properties individually.
 #' 
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' db <- db[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
+#' # Subset example data
+#' db <- ExampleDb[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
 #' 
 #' # Calculate default amino acid properties from amino acid sequences
 #' # Use a custom output column prefix

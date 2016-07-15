@@ -80,12 +80,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
 # All groups pass default minimum sampling threshold of 10 sequences
-div <- rarefyDiversity(db, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 
 ```
 

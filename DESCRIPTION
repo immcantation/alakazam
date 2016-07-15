@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.3.999
-Date: 2016-07-14
+Date: 2016-07-15
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -53,6 +53,7 @@ Collate:
     'AminoAcids.R'
     'Classes.R'
     'Core.R'
+    'Data.R'
     'Diversity.R'
     'Gene.R'
     'Lineage.R'

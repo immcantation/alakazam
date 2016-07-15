@@ -17,7 +17,7 @@ Usage
 --------------------
 ```
 estimateAbundance(data, group, clone = "CLONE", copy = NULL, ci = 0.95,
-nboot = 2000)
+nboot = 2000, progress = FALSE)
 ```
 
 Arguments
@@ -44,6 +44,9 @@ ci
 
 nboot
 :   number of bootstrap realizations to generate.
+
+progress
+:   if `TRUE` show a progress bar.
 
 
 
@@ -91,14 +94,16 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
-abund <- estimateAbundance(db, "SAMPLE", nboot=100)
+abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 ```
 
-**Error in estimateAbundance(db, "SAMPLE", nboot = 100)**: object 'progress' not found
+
+```
+
+
+```
+
+
 
 See also
 -------------------

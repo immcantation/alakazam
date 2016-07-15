@@ -41,21 +41,17 @@
 #'           Additional columns defined by the \code{groups} argument will also be present.
 #'
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Without copy numbers
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene")
-#' genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele")
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="family")
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="gene")
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     copy="DUPCOUNT", mode="family")
 #' 
 #' # Count by clone
-#' genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     clone="CLONE", mode="family")
 #'
 #'@export

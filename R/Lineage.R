@@ -4,16 +4,6 @@
 NULL
 
 
-#### Data ####
-
-#' Example Ig lineage trees
-#'
-#' A set of Ig lineage trees generated from the \code{extdata/ExampleDb.gz} file.
-#'
-#' @format   A list of igraph objects output by \link{buildPhylipLineage}.
-"ExampleTrees"
-
-
 #### Preprocessing functions ####
 
 #' Generate a ChangeoClone object for lineage construction
@@ -496,12 +486,8 @@ phylipToGraph <- function(edges, clone) {
 #'
 #' @examples
 #' \dontrun{
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Preprocess clone
-#' clone <- subset(db, CLONE == 3138)
+#' clone <- subset(ExampleDb, CLONE == 3138)
 #' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
@@ -510,7 +496,8 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' }
 #' 
 #' @export

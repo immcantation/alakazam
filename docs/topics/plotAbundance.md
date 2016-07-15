@@ -66,21 +66,24 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
-# Plot
-abund <- estimateAbundance(db, "SAMPLE", nboot=100)
+# Estimate abundance by sample and plot
+abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 
 ```
 
-**Error in estimateAbundance(db, "SAMPLE", nboot = 100)**: object 'progress' not found
+
+```
+
+
+```
+
+
 ```R
 plotAbundance(abund)
 ```
 
-**Error in ggplot(data, aes_string(x = "RANK", y = "P", group = "GROUP"))**: object 'abund' not found
+![4](plotAbundance-4.png)
+
 
 See also
 -------------------

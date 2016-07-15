@@ -66,7 +66,8 @@ Examples
 # Define and plot example graph
 library(igraph)
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=30)
+plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
@@ -85,8 +86,8 @@ getMRCA(graph, path="steps", root="Germline")
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               SAMPLE ISOTYPE DUPCOUNT COLLAPSE_COUNT          label STEPS DISTANCE
-GN5SHBT06HH3QD    +7d     IgA       10              3 GN5SHBT06HH3QD     1       20
+               SAMPLE ISOTYPE DUPCOUNT          label STEPS DISTANCE
+GN5SHBT06HH3QD    +7d     IgA       10 GN5SHBT06HH3QD     1       20
 
 ```
 
@@ -103,8 +104,8 @@ getMRCA(graph, path="distance", root="Germline", field="ISOTYPE", exclude=NA)
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               SAMPLE ISOTYPE DUPCOUNT COLLAPSE_COUNT          label STEPS DISTANCE
-GN5SHBT06HH3QD    +7d     IgA       10              3 GN5SHBT06HH3QD     1       20
+               SAMPLE ISOTYPE DUPCOUNT          label STEPS DISTANCE
+GN5SHBT06HH3QD    +7d     IgA       10 GN5SHBT06HH3QD     1       20
 
 ```
 

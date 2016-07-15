@@ -124,12 +124,8 @@ Examples
 
 ```R
 ### Not run:
-# Load example data
-# file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-# db <- readChangeoDb(file)
-# 
-# # Preprocess clone
-# clone <- subset(db, CLONE == 3138)
+# Preprocess clone
+# clone <- subset(ExampleDb, CLONE == 3138)
 # clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
 # 
 # # Run PHYLIP and process output
@@ -138,7 +134,8 @@ Examples
 # 
 # # Plot graph with a tree layout
 # library(igraph)
-# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=30)
+# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+# vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
 

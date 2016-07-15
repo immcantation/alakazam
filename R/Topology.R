@@ -44,7 +44,8 @@ NULL
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Summarize tree
 #' summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
@@ -117,7 +118,8 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Consider all nodes
 #' getPathLengths(graph, root="Germline")
@@ -183,7 +185,8 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Use unweighted path length and do not exclude any nodes
 #' getMRCA(graph, path="steps", root="Germline")
@@ -257,7 +260,8 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Count direct edges between isotypes including inferred nodes
 #' tableEdges(graph, "ISOTYPE", exclude=NULL)
@@ -348,11 +352,13 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) 
 #' # Define and plot example graph
 #' library(igraph)
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, vertex.size=38)
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Permute annotations and plot new tree
 #' g <- permuteLabels(graph, "ISOTYPE")
-#' plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE)
+#' plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE,
+#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' @export
 permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
@@ -399,7 +405,7 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #'           See \link{plotMRCATest} for plotting the permutation distributions.
 #'           
 #' @examples
-#' # Subset example trees for example purposes
+#' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform MRCA test on isotypes
@@ -504,7 +510,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'           See \link{plotEdgeTest} for plotting the permutation distributions.
 #'           
 #' @examples
-#' # Subset example trees for example purposes
+#' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform edge test on isotypes
@@ -608,7 +614,7 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200,
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
-#' # Subset example trees for example purposes
+#' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform edge test on isotypes
@@ -693,7 +699,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
-#' # Subset example trees for example purposes
+#' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform MRCA test on isotypes
@@ -795,19 +801,22 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 #' @seealso  Subtree statistics are calculated with \link{summarizeSubtrees}.
 #' 
 #' @examples
+#' # Define example tree set
+#' graphs <- ExampleTrees[1-10]
+#' 
 #' # Plot violins of outdegree by sample
-#' plotSubtrees(ExampleTrees, "SAMPLE", "out", main_title="Node outdegree", 
+#' plotSubtrees(graphs, "SAMPLE", "out", main_title="Node outdegree", 
 #'              style="v")
 #'
 #' # Plot violins of subtree by sample
-#' plotSubtrees(ExampleTrees, "SAMPLE", "size", style="v")
+#' plotSubtrees(graphs, "SAMPLE", "size", style="v")
 #' 
 #' # Plot boxplot of pathlength by isotype
-#' plotSubtrees(ExampleTrees, "ISOTYPE", "path", colors=IG_COLORS, 
+#' plotSubtrees(graphs, "ISOTYPE", "path", colors=IG_COLORS, 
 #'              legend_title="Isotype", style="b")
 #' 
 #' # Plot boxplot of depth by isotype
-#' plotSubtrees(ExampleTrees,  "ISOTYPE", "depth", style="b")
+#' plotSubtrees(graphs,  "ISOTYPE", "depth", style="b")
 #' 
 #' @export
 plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germline", NA), 

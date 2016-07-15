@@ -122,12 +122,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
 # Groups under the size threshold are excluded and a warning message is issued.
-testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
+testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 ```
 
 
@@ -141,12 +137,12 @@ testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test pvalue delta_mean delta_sd
-1 -1h != +7d      0      476.7 17.15143
+1 -1h != +7d      0     478.62 16.57659
 
 Slot "summary":
     group   mean       sd
--1h   -1h 816.53 12.27089
-+7d   +7d 339.83 12.29934
+-1h   -1h 819.05 12.06328
++7d   +7d 340.43 12.17238
 
 Slot "groups":
 [1] "-1h" "+7d"

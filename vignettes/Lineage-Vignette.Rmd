@@ -34,11 +34,11 @@ Reconstruction of an Ig lineage requires the following steps:
 2. Preprocess the clone to remove gap characters and duplicate sequences
 3. Run PHYLIP, parse the output, and modify the tree topology
 
-## Load Change-O data
+## Example data
 
-A small example Change-O tab-delimited database file is included in the 
-`alakazam` package. Lineage reconstruction requires the following fields 
-(columns) to be present in the Change-O file: 
+A small example Change-O database file is included in the `alakazam` package. 
+Lineage reconstruction requires the following fields (columns) to be present 
+in the Change-O file: 
 
 * `SEQUENCE_ID`
 * `SEQUENCE_IMGT` 
@@ -53,12 +53,9 @@ library(alakazam)
 library(igraph)
 library(dplyr)
 
-# Load Change-O file
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
-# Select clone
-sub_db <- subset(db, CLONE == 3138)
+# Select clone from example database
+data(ExampleDb)
+sub_db <- subset(ExampleDb, CLONE == 3138)
 ```
 
 ## Preprocess a clone
@@ -158,7 +155,7 @@ E(graph)$label <- ""
 par(mar=c(0, 0, 0, 0) + 0.1)
 # Plot graph
 plot(graph, layout=layout_as_tree, edge.arrow.mode=0, vertex.frame.color="black",
-     vertex.label.color="black", vertex.size=38)
+     vertex.label.color="black", vertex.size=40)
 # Add legend
 legend("topleft", c("Germline", "Inferred", "Sample"), 
        fill=c("black", "white", "steelblue"), cex=0.75)
@@ -173,7 +170,7 @@ data.frame on the clone column.
 
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
 # Preprocess clones
-clones <- db %>%
+clones <- ExampleDb %>%
     group_by(CLONE) %>%
     do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
                                 num_fields="DUPCOUNT"))

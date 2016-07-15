@@ -53,8 +53,11 @@ Examples
 -------------------
 
 ```R
+# Define example tree set
+graphs <- ExampleTrees[1-10]
+
 # Perform edge test on isotypes
-x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
+x <- testEdges(graphs, "ISOTYPE", nperm=10)
 
 ```
 
@@ -71,17 +74,17 @@ print(x)
 
 
 ```
-    PARENT   CHILD COUNT   EXPECTED    PVALUE
-1      IgA     IgA    39  63.020000 0.9700000
-2      IgA IgA,IgG     3   3.494949 0.5454545
-3      IgA     IgG     2   5.020202 0.7777778
-4  IgA,IgG     IgA    29   5.886792 0.0000000
-5  IgA,IgG IgA,IgG     1   2.000000 0.6153846
-6  IgA,IgG     IgG    24   3.100000 0.0000000
-7  IgD,IgG     IgG     8   1.815789 0.0000000
-8      IgG     IgA     1   4.380000 0.9500000
-9      IgG IgD,IgG     1   1.000000 0.0000000
-10     IgG     IgG   115 138.310000 1.0000000
+    PARENT   CHILD COUNT   EXPECTED PVALUE
+1      IgA     IgA    39  58.000000    1.0
+2      IgA IgA,IgG     3   3.200000    0.5
+3      IgA     IgG     2   5.300000    0.9
+4  IgA,IgG     IgA    29   9.444444    0.0
+5  IgA,IgG IgA,IgG     1   2.666667    1.0
+6  IgA,IgG     IgG    24   6.250000    0.0
+7  IgD,IgG     IgG     8   1.000000    0.0
+8      IgG     IgA     1   4.000000    0.9
+9      IgG IgD,IgG     1   1.000000    0.0
+10     IgG     IgG   112 134.200000    1.0
 
 ```
 

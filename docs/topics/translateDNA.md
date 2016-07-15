@@ -41,12 +41,22 @@ Examples
 -------------------
 
 ```R
-library(alakazam)
-# Load Change-O file
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
+# Translate a single sequence
+translateDNA("ACTGACTCGA")
 
-translateDNA(db$JUNCTION[1:3])
+```
+
+
+```
+[1] "TDS"
+
+```
+
+
+```R
+
+# Translate a vector of sequences
+translateDNA(ExampleDb$JUNCTION[1:3])
 
 ```
 
@@ -58,24 +68,14 @@ translateDNA(db$JUNCTION[1:3])
 
 
 ```R
-translateDNA(db$JUNCTION[1:3], trim=TRUE)
 
+# Remove the first and last codon from the translation
+translateDNA(ExampleDb$JUNCTION[1:3], trim=TRUE)
 ```
 
 
 ```
 [1] "ARVKRRGWRRNSLWFGESTPSDAHRWFDP" "ARMVILGSCYSRGCGTPGPGDGETQY"    "ARVGIDVVVPAAIPGFDYYYGMDV"     
-
-```
-
-
-```R
-translateDNA("ACTGACTCGA")
-```
-
-
-```
-[1] "TDS"
 
 ```
 

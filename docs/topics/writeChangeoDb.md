@@ -38,7 +38,7 @@ Examples
 ```R
 ### Not run:
 # Write a database
-# writeChangeoDb(data, "changeo_output.tab")
+# writeChangeoDb(data, "changeo.tsv")
 ```
 
 

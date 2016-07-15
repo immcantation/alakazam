@@ -15,20 +15,18 @@ can be applied to other regions simply by altering the sequence data column used
         Front Immunol 2, 1-12 (2011).
 
 
-## Load Change-O data
+## Example data
 
-A small example Change-O tab-delimited database file is included in the 
-`alakazam` package. 
+A small example Change-O database file is included in the `alakazam` package. 
 
 
 ```r
 library(alakazam)
 library(dplyr)
 
-# Load Change-O file
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-db <- db[db$SAMPLE == "+7d", ]
+# Subset example data
+data(ExampleDb)
+db <- ExampleDb[ExampleDb$SAMPLE == "+7d", ]
 ```
 
 ## Calculate the properties of amino acid sequences

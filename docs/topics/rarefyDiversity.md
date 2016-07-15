@@ -117,12 +117,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
 # Group by sample identifier
-div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
+div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
 
 ```
 
@@ -143,7 +139,8 @@ plotDiversityCurve(div, legend_title="Sample")
 ```R
 
 # Grouping by isotype rather than sample identifier
-div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
+div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+nboot=100)
 
 ```
 

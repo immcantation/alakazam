@@ -57,8 +57,11 @@ Examples
 -------------------
 
 ```R
+# Define example tree set
+graphs <- ExampleTrees[1-10]
+
 # Perform MRCA test on isotypes
-x <- testMRCA(ExampleTrees, "ISOTYPE", nperm=100)
+x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 
 ```
 
@@ -75,10 +78,10 @@ print(x)
 
 
 ```
-  ANNOTATION COUNT EXPECTED PVALUE
-1        IgA    16 13.30000 0.0000
-2    IgA,IgG     1  1.34375 0.3125
-3        IgG    32 34.77000 1.0000
+  ANNOTATION COUNT  EXPECTED    PVALUE
+1        IgA    16 12.900000 0.0000000
+2    IgA,IgG     1  1.142857 0.1428571
+3        IgG    31 34.200000 1.0000000
 
 ```
 

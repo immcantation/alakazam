@@ -63,15 +63,11 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
 # Without copy numbers
-clones <- countClones(db, groups="SAMPLE")
+clones <- countClones(ExampleDb, groups="SAMPLE")
 
 # With copy numbers and multiple groups
-clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 ```
 
 

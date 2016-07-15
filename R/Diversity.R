@@ -30,13 +30,10 @@ NULL
 #' Used by \link{rarefyDiversity}.
 #'           
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Calculate clone sizes
-#' clones <- countClones(db, groups="SAMPLE")
-#' # Calculate 1st order coverage for a single sample
+#' clones <- countClones(ExampleDb, groups="SAMPLE")
+#' 
+#' # Calculate 1first order coverage for a single sample
 #' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
 #'
 #' @export
@@ -213,15 +210,11 @@ adjustObservedAbundance <- function(x) {
 #'           Also includes additional columns specified in the \code{groups} argument.
 #' 
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Without copy numbers
-#' clones <- countClones(db, groups="SAMPLE")
+#' clones <- countClones(ExampleDb, groups="SAMPLE")
 #'
 #' # With copy numbers and multiple groups
-#' clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 #' 
 #' @export
 countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
@@ -305,11 +298,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' See \link{rarefyDiversity} for a similar application to clonal diversity.
 #'           
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
-#' abund <- estimateAbundance(db, "SAMPLE", nboot=100)
+#' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 #'
 #' @export
 estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, 
@@ -543,16 +532,13 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'           See \link{plotDiversityCurve} for plotting the return object.
 #' 
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Group by sample identifier
-#' div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier
-#' div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+#'                        nboot=100)
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
@@ -761,12 +747,8 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'           distribution function.
 #' 
 #' @examples  
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
+#' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
@@ -914,12 +896,8 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' Plotting is performed with \link{ggplot}.
 #'           
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
-#' # Plot
-#' abund <- estimateAbundance(db, "SAMPLE", nboot=100)
+#' # Estimate abundance by sample and plot
+#' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 #' plotAbundance(abund)
 #' 
 #' @export
@@ -995,12 +973,8 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #'           objects for input. Plotting is performed with \link{ggplot}.
 #' 
 #' @examples
-#' # Load example data
-#' file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-#' db <- readChangeoDb(file)
-#' 
 #' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- rarefyDiversity(db, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #' 
 #' @export

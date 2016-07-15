@@ -83,8 +83,10 @@ pages:
       - topics/multiggplot.md
       - topics/stoufferMeta.md
     - 'Data and Constants':
+      - topics/ExampleDb.md
+      - topics/ExampleTrees.md
       - topics/ABBREV_AA.md
       - topics/IUPAC_CODES.md
       - topics/DEFAULT_COLORS.md
       - topics/IMGT_REGIONS.md
-      - topics/ExampleTrees.md
+      

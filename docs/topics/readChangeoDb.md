@@ -66,17 +66,16 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-
+### Not run:
 # Read all columns in and convert sequence fields to upper case
-db <- readChangeoDb(file)
-
-# Subset columns and convert sequence fields to upper case
-db <- readChangeoDb(file, select=c("SEQUENCE_ID", "SEQUENCE_IMGT"))
-
-# Drop columns and do not alter sequence field case
-db <- readChangeoDb(file, drop=c("D_CALL", "DUPCOUNT"), seq_upper=FALSE)
+# db <- readChangeoDb("changeo.tsv")
+# 
+# # Subset columns and convert sequence fields to upper case
+# db <- readChangeoDb("changeo.tsv", select=c("SEQUENCE_ID", "SEQUENCE_IMGT"))
+# 
+# # Drop columns and do not alter sequence field case
+# db <- readChangeoDb("changeo.tsv", drop=c("D_CALL", "DUPCOUNT"), 
+# seq_upper=FALSE)
 ```
 
 

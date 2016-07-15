@@ -53,13 +53,10 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-
 # Calculate clone sizes
-clones <- countClones(db, groups="SAMPLE")
-# Calculate 1st order coverage for a single sample
+clones <- countClones(ExampleDb, groups="SAMPLE")
+
+# Calculate 1first order coverage for a single sample
 calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
 ```
 

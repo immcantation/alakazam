@@ -55,19 +55,16 @@ using `rarefyDiversity`.
 `testDiversity`.
 
 
-## Load Change-O data
+## Example data
 
-A small example Change-O tab-delimited database file is included in the 
-`alakazam` package. Diversity calculation requires the `CLONE` field 
-(column) to be present in the Change-O file, as well as an additional grouping 
-column. In this example we will use the grouping columns `SAMPLE` and `ISOTYPE`.
+A small example Change-O database is included in the `alakazam` package. 
+Diversity calculation requires the `CLONE` field (column) to be present in the 
+Change-O file, as well as an additional grouping column. In this example we 
+will use the grouping columns `SAMPLE` and `ISOTYPE`.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 library(alakazam)
-
-# Load Change-O file
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
+data(ExampleDb)
 ```
 
 ## Generate a clonal abundance curve
@@ -78,7 +75,7 @@ the size of each clone is determined by the number of sequence members:
 
 ```{r, eval=TRUE, warning=FALSE}
 # Partitions the data based on the SAMPLE column
-clones <- countClones(db, groups="SAMPLE")
+clones <- countClones(ExampleDb, groups="SAMPLE")
 head(clones, 5)
 ```
 
@@ -92,7 +89,7 @@ normalized to within multiple group data partitions.
 ```{r, eval=TRUE, warning=FALSE}
 # Partitions the data based on both the SAMPLE and ISOTYPE columns
 # Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 head(clones, 5)
 ```
 
@@ -105,7 +102,7 @@ using the `plotAbundance` function.
 ```{r, eval=TRUE, results='hide', warning=FALSE, fig.width=6, fig.height=4}
 # Partitions the data on the SAMPLE column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-clones <- estimateAbundance(db, group="SAMPLE", ci=0.95, nboot=200)
+clones <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
 ```
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
 head(clones, 5)
@@ -127,13 +124,13 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 2000 resampling realizations are performed (nboot=200)
-sample_div <- rarefyDiversity(db, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
+sample_div <- rarefyDiversity(ExampleDb, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
                                  ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_div <- rarefyDiversity(db, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
+isotype_div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
                                   step_q=0.05, ci=0.95, nboot=200)
 ```
 
@@ -160,7 +157,7 @@ distributions between groups.
 ```{r, eval=TRUE, results='hide'}
 # Test diversity at q=0 (species richness) across values in the "SAMPLE" column
 # 2000 bootstrap realizations are performed (nboot=200)
-sample_test <- testDiversity(db, 0, "SAMPLE", nboot=200)
+sample_test <- testDiversity(ExampleDb, 0, "SAMPLE", nboot=200)
 ```
 ```{r, eval=TRUE}
 sample_test
@@ -169,7 +166,7 @@ sample_test
 # Test diversity across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_test <- testDiversity(db, 2, "ISOTYPE", min_n=30, nboot=200)
+isotype_test <- testDiversity(ExampleDb, 2, "ISOTYPE", min_n=30, nboot=200)
 ```
 ```{r, eval=TRUE}
 isotype_test

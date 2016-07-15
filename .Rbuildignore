@@ -7,3 +7,4 @@
 ^profil
 ^doc
 mkdocs.yml
+bitbucket-pipelines.yml

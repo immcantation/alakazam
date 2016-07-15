@@ -58,10 +58,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
-clone <- subset(db, CLONE == 3138)
+# Assign example clone
+clone <- subset(ExampleDb, CLONE == 3138)
 
 # Get all regions
 extractVRegion(clone$SEQUENCE_IMGT)

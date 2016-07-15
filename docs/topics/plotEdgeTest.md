@@ -65,8 +65,11 @@ Examples
 -------------------
 
 ```R
+# Define example tree set
+graphs <- ExampleTrees[1-10]
+
 # Perform edge test on isotypes
-x <- testEdges(ExampleTrees, "ISOTYPE", nperm=100)
+x <- testEdges(graphs, "ISOTYPE", nperm=10)
 
 ```
 

@@ -29,20 +29,17 @@ using `rarefyDiversity`.
 `testDiversity`.
 
 
-## Load Change-O data
+## Example data
 
-A small example Change-O tab-delimited database file is included in the 
-`alakazam` package. Diversity calculation requires the `CLONE` field 
-(column) to be present in the Change-O file, as well as an additional grouping 
-column. In this example we will use the grouping columns `SAMPLE` and `ISOTYPE`.
+A small example Change-O database is included in the `alakazam` package. 
+Diversity calculation requires the `CLONE` field (column) to be present in the 
+Change-O file, as well as an additional grouping column. In this example we 
+will use the grouping columns `SAMPLE` and `ISOTYPE`.
 
 
 ```r
 library(alakazam)
-
-# Load Change-O file
-file <- system.file("extdata", "ExampleDb.gz", package="alakazam")
-db <- readChangeoDb(file)
+data(ExampleDb)
 ```
 
 ## Generate a clonal abundance curve
@@ -54,7 +51,7 @@ the size of each clone is determined by the number of sequence members:
 
 ```r
 # Partitions the data based on the SAMPLE column
-clones <- countClones(db, groups="SAMPLE")
+clones <- countClones(ExampleDb, groups="SAMPLE")
 head(clones, 5)
 ```
 
@@ -82,7 +79,7 @@ normalized to within multiple group data partitions.
 ```r
 # Partitions the data based on both the SAMPLE and ISOTYPE columns
 # Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 head(clones, 5)
 ```
 
@@ -109,11 +106,7 @@ using the `plotAbundance` function.
 ```r
 # Partitions the data on the SAMPLE column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-clones <- estimateAbundance(db, group="SAMPLE", ci=0.95, nboot=200)
-```
-
-```
-## Error in estimateAbundance(db, group = "SAMPLE", ci = 0.95, nboot = 200): object 'progress' not found
+clones <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
 ```
 
 ```r
@@ -121,25 +114,19 @@ head(clones, 5)
 ```
 
 ```
-## Source: local data frame [5 x 7]
-## Groups: SAMPLE, ISOTYPE [2]
-## 
-##   SAMPLE ISOTYPE CLONE SEQ_COUNT COPY_COUNT   SEQ_FREQ  COPY_FREQ
-##    <chr>   <chr> <chr>     <int>      <int>      <dbl>      <dbl>
-## 1    +7d     IgA  3128        88        651 0.33082707 0.49732620
-## 2    +7d     IgG  3100        49        279 0.09280303 0.17296962
-## 3    +7d     IgA  3141        44        240 0.16541353 0.18334607
-## 4    +7d     IgG  3192        19        141 0.03598485 0.08741476
-## 5    +7d     IgG  3177        29        130 0.05492424 0.08059516
+## # A tibble: 5 x 6
+##   GROUP CLONE           P        LOWER       UPPER  RANK
+##   <chr> <chr>       <dbl>        <dbl>       <dbl> <int>
+## 1   -1h  8365 0.011999814 0.0049337733 0.019065854     1
+## 2   -1h  6465 0.007993219 0.0026877548 0.013298683     2
+## 3   -1h  5060 0.006983872 0.0021809099 0.011786834     3
+## 4   -1h  6985 0.005962422 0.0009414266 0.010983417     4
+## 5   -1h  1574 0.004914877 0.0007375257 0.009092228     5
 ```
 
 ```r
 # Plots a rank abundance curve of the relative clonal abundances
 p1 <- plotAbundance(clones, legend_title="Sample")
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'LOWER' not found
 ```
 
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
@@ -158,13 +145,13 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 32 (max_q=32) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 2000 resampling realizations are performed (nboot=200)
-sample_div <- rarefyDiversity(db, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
+sample_div <- rarefyDiversity(ExampleDb, "SAMPLE", min_q=0, max_q=32, step_q=0.05, 
                                  ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_div <- rarefyDiversity(db, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
+isotype_div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=30, min_q=0, max_q=32, 
                                   step_q=0.05, ci=0.95, nboot=200)
 ```
 
@@ -199,7 +186,7 @@ distributions between groups.
 ```r
 # Test diversity at q=0 (species richness) across values in the "SAMPLE" column
 # 2000 bootstrap realizations are performed (nboot=200)
-sample_test <- testDiversity(db, 0, "SAMPLE", nboot=200)
+sample_test <- testDiversity(ExampleDb, 0, "SAMPLE", nboot=200)
 ```
 
 ```r
@@ -210,12 +197,12 @@ sample_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean delta_sd
-## 1 -1h != +7d      0    480.425 16.77083
+## 1 -1h != +7d      0     477.39 17.28763
 ## 
 ## Slot "summary":
 ##     group    mean       sd
-## -1h   -1h 818.965 12.02776
-## +7d   +7d 338.540 12.77161
+## -1h   -1h 817.295 12.04506
+## +7d   +7d 339.905 12.55724
 ## 
 ## Slot "groups":
 ## [1] "-1h" "+7d"
@@ -235,7 +222,7 @@ sample_test
 # Test diversity across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_test <- testDiversity(db, 2, "ISOTYPE", min_n=30, nboot=200)
+isotype_test <- testDiversity(ExampleDb, 2, "ISOTYPE", min_n=30, nboot=200)
 ```
 
 ```r
@@ -246,19 +233,19 @@ isotype_test
 ## An object of class "DiversityTest"
 ## Slot "tests":
 ##         test pvalue delta_mean  delta_sd
-## 1 IgA != IgD      0  191.98212 10.895729
-## 2 IgA != IgG      0   26.82262  4.349422
-## 3 IgA != IgM      0  228.85129  6.535732
-## 4 IgD != IgG      0  165.15950 11.621868
-## 5 IgD != IgM      0   36.86917 12.121182
-## 6 IgG != IgM      0  202.02868  7.257912
+## 1 IgA != IgD      0  189.63411 11.281797
+## 2 IgA != IgG      0   26.68917  4.660478
+## 3 IgA != IgM      0  228.61108  6.726367
+## 4 IgD != IgG      0  162.94494 11.198856
+## 5 IgD != IgM      0   38.97697 12.533752
+## 6 IgG != IgM      0  201.92192  7.602324
 ## 
 ## Slot "summary":
 ##     group      mean        sd
-## IgA   IgA  12.79637  1.990933
-## IgD   IgD 204.77848 10.583917
-## IgG   IgG  39.61898  4.200877
-## IgM   IgM 241.64766  6.493150
+## IgA   IgA  12.93730  1.932362
+## IgD   IgD 202.57141 10.853966
+## IgG   IgG  39.62646  4.057819
+## IgM   IgM 241.54838  6.408486
 ## 
 ## Slot "groups":
 ## [1] "IgA" "IgD" "IgG" "IgM"
