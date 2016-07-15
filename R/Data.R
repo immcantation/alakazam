@@ -42,6 +42,8 @@
 #'     \item  \code{CLONE}:                 Change-O assignment clonal group identifier.
 #' }
 #' 
+#' @seealso \link{ExampleTrees}
+#' 
 #' @references
 #' \enumerate{
 #'   \item  Laserson U and Vigneault F, et al. High-resolution antibody dynamics of 
@@ -62,7 +64,9 @@
 #'     \item  \code{SAMPLE}:    Sample identifier(s). Time in relation to vaccination.
 #'     \item  \code{ISOTYPE}:   Isotype assignment(s). 
 #'     \item  \code{DUPCOUNT}:  Copy count (number of duplicates) of the sequence.
-#'   }          
+#'   }
+#'   
+#' @seealso \link{ExampleTrees}
 "ExampleTrees"
 
 
