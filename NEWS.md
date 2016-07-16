@@ -29,7 +29,9 @@ Diversity Analysis:
 
 + Added a `progress` argument to `rarefyDiversity()` and `testDiversity()` to
   enable the (previously default) progress bar.
-  
++ Fixed a bug in `estimateAbundance()` were the function would fail if there 
+  was only a single input sequence per group.
+
 Gene Usage:
 
 + Added `sortGenes()` function to sort V(D)J genes by name or locus position.

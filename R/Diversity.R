@@ -303,7 +303,9 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @export
 estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, 
                               nboot=2000, progress=FALSE) {
-    #group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
+    ## DEBUG
+    # group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
+    # data=clones; group="SUBJECT"; clone="CLONE"; copy=NULL; ci=0.95; nboot=200; progress=FALSE
     
     # Check input
     if (!is.data.frame(data)) {
@@ -349,8 +351,8 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
         p1 <- adjustObservedAbundance(abund_obs)
         p2 <- inferUnseenAbundance(abund_obs)
         p <- c(p1, p2)
-        names(p) <- c(clone_tab$CLONE[clone_tab[[group]] == g], 
-                      paste0("U", 1:length(p2)))
+        p2_names <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
+        names(p) <- c(clone_tab$CLONE[clone_tab[[group]] == g], p2_names)
         
         # Bootstrap abundance
         boot_mat <- rmultinom(nboot, nsam, p) / nsam
