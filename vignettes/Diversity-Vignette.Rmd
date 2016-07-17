@@ -57,13 +57,16 @@ using `rarefyDiversity`.
 
 ## Example data
 
-A small example Change-O database is included in the `alakazam` package. 
+A small example Change-O database, `ExampleDb, is included in the `alakazam` package. 
 Diversity calculation requires the `CLONE` field (column) to be present in the 
 Change-O file, as well as an additional grouping column. In this example we 
 will use the grouping columns `SAMPLE` and `ISOTYPE`.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
+# Load required packages
 library(alakazam)
+
+# Load example data
 data(ExampleDb)
 ```
 

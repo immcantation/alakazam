@@ -41,13 +41,8 @@ NULL
 #'           See \link{getPathLengths} for calculating path length to nodes.
 #' 
 #' @examples
-#' # Define and plot example graph
-#' library(igraph)
+#' # Summarize a tree
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
-#' 
-#' # Summarize tree
 #' summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
 #' 
 #' @export
@@ -115,11 +110,8 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
 #' 
 #' @examples
-#' # Define and plot example graph
-#' library(igraph)
-#' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
+#' # Define example graph
+#' graph <- ExampleTrees[[24]]
 #' 
 #' # Consider all nodes
 #' getPathLengths(graph, root="Germline")
@@ -182,11 +174,8 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #' @seealso  Path lengths are determined with \link{getPathLengths}.
 #' 
 #' @examples
-#' # Define and plot example graph
-#' library(igraph)
+#' # Define example graph
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Use unweighted path length and do not exclude any nodes
 #' getMRCA(graph, path="steps", root="Germline")
@@ -257,11 +246,8 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
 #'           
 #' @examples
-#' # Define and plot example graph
-#' library(igraph)
+#' # Define example graph
 #' graph <- ExampleTrees[[23]]
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-#'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Count direct edges between isotypes including inferred nodes
 #' tableEdges(graph, "ISOTYPE", exclude=NULL)

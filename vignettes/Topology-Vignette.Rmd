@@ -1,0 +1,208 @@
+---
+title: 'Alakazam: Ig lineage topology analysis'
+author: "Jason Anthony Vander Heiden"
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
+  html_document:
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
+    toc: yes
+geometry: margin=1in
+fontsize: 11pt
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Ig lineage topology analysis}
+  %\usepackage[utf8]{inputenc}
+---
+
+This vignette covers the basics of analyzing the topologies of Ig lineage 
+trees built using `buildPhylipLineage`, using some built-in alakazam functions
+that focus on quantifying annotation relationships within lineages.
+
+## Example data
+
+A small set of annotated example trees are included in the `alakazam` package.
+The trees are `igraph` objects with the following tree annotations (graph attributes):
+
+* `clone`: An identifier for the clonal group. These entries correspond to the `CLONE`
+           column in the `ExampleDb` data.frame from which the trees were generated.
+* `v_gene`: IGHV gene name. 
+* `j_gene`: IGHJ gene name. 
+* `junc_len`: Length of the junction region (nucleotides).
+
+And the following node annotations (vertex attributes):
+
+* `SAMPLE`: Time point in relation to influenza vaccination.
+* `ISOTYPE`: The isotype(s) assigned to the sequence. Multiple isotypes are 
+             delimited by comma, and reflect identical V(D)J sequences observed
+             with more than one isotype.
+* `DUPCOUNT`: The copy number (duplicate count), which indicates the total number 
+              of reads with the same V(D)J sequence.
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+# Load required packages
+library(alakazam)
+library(igraph)
+library(dplyr)
+
+# Load example trees
+data(ExampleTrees)
+
+# Select one tree for example purposes
+graph <- ExampleTrees[[24]]
+# And add some annotation complexity to the tree
+V(graph)$SAMPLE[c(2, 7)] <- "-1h"
+V(graph)$ISOTYPE[c(2, 7)] <- "IgM"
+
+# Make a list of example trees excluding multi-isotype trees
+graphs <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)$ISOTYPE)))]
+```
+
+## Plotting annotations on a tree
+
+There are many options for configuring how an igrpah object is plotted which
+are helpful for visualing annotation topologies. Below is an extensive example of
+how to plot a tree by configuring the colors, labels, shapes and sizes of
+different visual elements according to annotations embedded in the graph.
+
+```{r, eval=TRUE}
+# Set node colors
+V(graph)$color <- "steelblue"
+V(graph)$color[V(graph)$name == "Germline"] <- "black"
+V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
+
+# Set node labels
+V(graph)$label <- paste(V(graph)$SAMPLE, V(graph)$ISOTYPE, sep=", ")
+V(graph)$label[V(graph)$name == "Germline"] <- ""
+V(graph)$label[grepl("Inferred", V(graph)$name)] <- ""
+
+# Set node shapes
+V(graph)$shape <- "crectangle"
+V(graph)$shape[V(graph)$name == "Germline"] <- "circle"
+V(graph)$shape[grepl("Inferred", V(graph)$name)] <- "circle"
+
+# Set node sizes
+V(graph)$size <- 60
+V(graph)$size[V(graph)$name == "Germline"] <- 30
+V(graph)$size[grepl("Inferred", V(graph)$name)] <- 15 
+
+# Remove large default margins
+par(mar=c(0, 0, 0, 0) + 0.05)
+
+# Plot the example tree
+plot(graph, layout=layout_as_tree, vertex.frame.color="grey", 
+     vertex.label.color="black", edge.label.color="black", 
+     edge.arrow.mode=0)
+
+# Add legend
+legend("topleft", c("Germline", "Inferred", "Sample"), 
+       fill=c("black", "white", "steelblue"), cex=0.75)
+```
+
+## Summarizing node properties
+
+Various annotation dependent node statistics can be calculated using the
+`summarizeSubstrees` and `getPathLengths` functions. `getPathLengths` 
+calculates distances from the root (germline) *to child nodes*, whereas 
+`summarizeSubtrees` calculates paths and subtree statistics 
+*from child nodes*.
+
+### Calculating distance from the germline
+
+To determine the shortest path from the germline sequence to any node, 
+we use `getPathLengths`, which returns the distance both as the number
+of "hops" (`STEPS`) and the number of mutational events (`DISTANCE`).
+
+```{r, eval=TRUE}
+# Consider all nodes
+getPathLengths(graph, root="Germline")
+```
+
+Note, the `STEPS` counted in the above example include traversal of inferred 
+intermediates. If you want to exclude such nodes, and consider only nodes
+associated with observed sequences, you can specify an annotation field and 
+value that will be excluded from the number of steps. In the example below
+we are excluding `NA` values in the `ISOTYPE` annotation 
+(`field="ISOTYPE", exclude=NA`). 
+
+```{r, eval=TRUE}
+# Exclude nodes without an isotype annotation from step count
+getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
+```
+
+Note, `STEPS` has changed with respect to the previous example, but 
+`DISTANCE` remains the same.
+
+### Calculating subtree properties
+
+The `summarizeSubtrees` function returns a table of each node with the 
+following properties for each node:
+
+* `NAME`: The node identifier.
+* `PARENT`: The identifier of the node's parent.
+* `OUTDEGREE`: The number of edges leading from the node.
+* `SIZE`: The total number of nodes within the subtree rooted at the node.
+* `DEPTH`: The depth of the subtree that is rooted at the node.
+* `PATHLENGTH`: The maximum path length beneath the node.
+* `OUTDEGREE_NORM`: The `OUTDEGREE` normalized by the total number of edges.
+* `SIZE_NORM`: The `SIZE` normalized by the total tree size.
+* `DEPTH_NORM`: The `DEPTH` normalized by the total tree depth.
+* `PATHLENGTH_NORM`: The `PATHLENGTH` normalized by the longest path.
+
+The `fields=c("SAMPLE", "ISOTYPE")` argument in the example below simply
+defines which annotations we wish to retain in the output. This argument
+has no effect on the results, in constast to the behavior of `getPathLengths`.
+
+```{r, eval=TRUE}
+# Summarize tree
+df <- summarizeSubtrees(graph, fields=c("SAMPLE", "ISOTYPE"), root="Germline")
+print(df[1:4])
+print(df[c(1, 5:8)])
+print(df[c(1, 9:12)])
+```
+
+Distributions of normalized subtree statistics for a population of trees 
+can be plotted using the `plotSubtrees` function:
+
+```{r, eval=TRUE}
+# Set sample colors
+sample_colors <- c("-1h"="steelblue", "+7d"="firebrick")
+# Box plots of node outdegree by sample
+plotSubtrees(graphs, "SAMPLE", "outdegree", colors=sample_colors, 
+             main_title="Node outdegree", legend_title="Time", style="box")
+# Box plots of subtree size by sample
+plotSubtrees(graphs, "SAMPLE", "size", colors=sample_colors, 
+             main_title="Subtree size", legend_title="Time", style="box")
+# Violin plots of subtree path length by isotype
+plotSubtrees(graphs, "ISOTYPE", "pathlength", colors=IG_COLORS, 
+             main_title="Subtree path length", legend_title="Isotype", style="violin")
+# Violin plots of subtree depth by isotype
+plotSubtrees(graphs,  "ISOTYPE", "depth", colors=IG_COLORS, 
+             main_title="Subtree depth", legend_title="Isotype", style="violin")
+```
+
+## Testing node annotation relationships
+
+tableEdges
+testEdges
+plotEdgeTest
+
+## Testing MRCA annotations
+
+getMRCA
+testMRCA
+plotMRCATest
+
