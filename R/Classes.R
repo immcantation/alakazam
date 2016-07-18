@@ -55,19 +55,19 @@ setClass("DiversityCurve",
 #' 
 #' @slot  tests    data.frame describing the significance test results with columns:
 #'                 \itemize{
-#'                   \item  \code{test}:          string listing the two groups tested.
-#'                   \item  \code{pvalue}:        p-value for the test.
-#'                   \item  \code{delta_mean}:    mean of the \eqn{D} bootstrap delta 
-#'                                                distribution for the test.
-#'                   \item  \code{delta_sd}:      standard deviation of the \eqn{D} 
-#'                                                bootstrap delta distribution for the test.
+#'                   \item  \code{TEST}:        string listing the two groups tested.
+#'                   \item  \code{DELTA_MEAN}:  mean of the \eqn{D} bootstrap delta 
+#'                                              distribution for the test.
+#'                   \item  \code{DELTA_SD}:    standard deviation of the \eqn{D} 
+#'                                              bootstrap delta distribution for the test.
+#'                   \item  \code{PVALUE}:      p-value for the test.
 #'                 }
 #' @slot  summary  data.frame containing summary statistics for the diversity index 
 #'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
 #'                 \itemize{
-#'                   \item  \code{group}:   the name of the group.
-#'                   \item  \code{mean}:    mean of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{sd}:      standard deviation of the \eqn{D} bootstrap 
+#'                   \item  \code{GROUP}:   the name of the group.
+#'                   \item  \code{MEAN}:    mean of the \eqn{D} bootstrap distribution.
+#'                   \item  \code{SD}:      standard deviation of the \eqn{D} bootstrap 
 #'                                          distribution.
 #'                 }
 #' @slot  groups   character vector of groups retained in diversity calculation.

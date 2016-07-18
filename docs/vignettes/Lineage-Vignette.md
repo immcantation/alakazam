@@ -1,4 +1,4 @@
-Ig lineage reconstruction
+Lineage reconstruction
 ====================
 
 
@@ -10,7 +10,7 @@ Reconstruction of an Ig lineage requires the following steps:
 
 ## Example data
 
-A small example Change-O database file is included in the `alakazam` package. 
+A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
 Lineage reconstruction requires the following fields (columns) to be present 
 in the Change-O file: 
 
@@ -24,6 +24,7 @@ in the Change-O file:
 
 
 ```r
+# Load required packages
 library(alakazam)
 library(igraph)
 library(dplyr)

@@ -31,7 +31,9 @@ Diversity Analysis:
   enable the (previously default) progress bar.
 + Fixed a bug in `estimateAbundance()` were the function would fail if there 
   was only a single input sequence per group.
-
++ Change column names in `data` and `summary` slots of `DiversityTest` to 
+  uppercase for consistency with other tools.
+  
 Gene Usage:
 
 + Added `sortGenes()` function to sort V(D)J genes by name or locus position.
@@ -41,6 +43,7 @@ Gene Usage:
 Topology Analysis:
 
 + Added a set of functions for lineage tree topology analysis.
++ Added a vignette showing basic tree topology analysis.
 
 
 Version 0.2.3:  February 22, 2016

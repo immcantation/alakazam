@@ -1,5 +1,5 @@
 ---
-title: 'Alakazam: Ig lineage reconstruction'
+title: 'Alakazam: Reconstruction of Ig lineage trees'
 author: "Jason Anthony Vander Heiden"
 date: '`r Sys.Date()`'
 output:
@@ -24,7 +24,7 @@ geometry: margin=1in
 fontsize: 11pt
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Ig lineage reconstruction}
+  %\VignetteIndexEntry{Lineage reconstruction}
   %\usepackage[utf8]{inputenc}
 ---
 

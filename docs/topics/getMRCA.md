@@ -63,17 +63,8 @@ Examples
 -------------------
 
 ```R
-# Define and plot example graph
-library(igraph)
+# Define example graph
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
-
-```
-
-![2](getMRCA-2.png)
-
-```R
 
 # Use unweighted path length and do not exclude any nodes
 getMRCA(graph, path="steps", root="Germline")

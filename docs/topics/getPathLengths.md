@@ -54,17 +54,8 @@ Examples
 -------------------
 
 ```R
-# Define and plot example graph
-library(igraph)
-graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
-
-```
-
-![2](getPathLengths-2.png)
-
-```R
+# Define example graph
+graph <- ExampleTrees[[24]]
 
 # Consider all nodes
 getPathLengths(graph, root="Germline")
@@ -74,13 +65,15 @@ getPathLengths(graph, root="Germline")
 
 ```
             NAME STEPS DISTANCE
-1 GN5SHBT06HH3QD     1       20
-2 GN5SHBT08F45HV     2       23
-3       Germline     0        0
-4 GN5SHBT06IFV0R     3       25
-5 GN5SHBT08I3P11     3       30
-6 GN5SHBT01BXJY7     3       24
-7 GN5SHBT01EGEU6     3       24
+1      Inferred1     1       20
+2 GN5SHBT04CW57C     2       26
+3      Inferred2     3       28
+4 GN5SHBT08I7RKL     4       29
+5 GN5SHBT04CAVIG     5       30
+6       Germline     0        0
+7 GN5SHBT01D6X0W     2       22
+8 GN5SHBT06H7TQD     6       31
+9 GN5SHBT05HEG2J     4       33
 
 ```
 
@@ -94,13 +87,15 @@ getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
 
 ```
             NAME STEPS DISTANCE
-1 GN5SHBT06HH3QD     1       20
-2 GN5SHBT08F45HV     2       23
-3       Germline     0        0
-4 GN5SHBT06IFV0R     3       25
-5 GN5SHBT08I3P11     3       30
-6 GN5SHBT01BXJY7     3       24
-7 GN5SHBT01EGEU6     3       24
+1      Inferred1     0       20
+2 GN5SHBT04CW57C     1       26
+3      Inferred2     1       28
+4 GN5SHBT08I7RKL     2       29
+5 GN5SHBT04CAVIG     3       30
+6       Germline     0        0
+7 GN5SHBT01D6X0W     1       22
+8 GN5SHBT06H7TQD     4       31
+9 GN5SHBT05HEG2J     2       33
 
 ```
 

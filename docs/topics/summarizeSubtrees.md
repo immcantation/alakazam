@@ -64,19 +64,8 @@ Examples
 -------------------
 
 ```R
-# Define and plot example graph
-library(igraph)
+# Summarize a tree
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
-
-```
-
-![2](summarizeSubtrees-2.png)
-
-```R
-
-# Summarize tree
 summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
 ```
 

@@ -31,14 +31,17 @@ using `rarefyDiversity`.
 
 ## Example data
 
-A small example Change-O database is included in the `alakazam` package. 
+A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
 Diversity calculation requires the `CLONE` field (column) to be present in the 
 Change-O file, as well as an additional grouping column. In this example we 
 will use the grouping columns `SAMPLE` and `ISOTYPE`.
 
 
 ```r
+# Load required packages
 library(alakazam)
+
+# Load example data
 data(ExampleDb)
 ```
 
@@ -117,16 +120,17 @@ head(clones, 5)
 ## # A tibble: 5 x 6
 ##   GROUP CLONE           P        LOWER       UPPER  RANK
 ##   <chr> <chr>       <dbl>        <dbl>       <dbl> <int>
-## 1   -1h  8365 0.011999814 0.0049337733 0.019065854     1
-## 2   -1h  6465 0.007993219 0.0026877548 0.013298683     2
-## 3   -1h  5060 0.006983872 0.0021809099 0.011786834     3
-## 4   -1h  6985 0.005962422 0.0009414266 0.010983417     4
-## 5   -1h  1574 0.004914877 0.0007375257 0.009092228     5
+## 1   -1h  8365 0.011999814 0.0050778480 0.018921779     1
+## 2   -1h  6465 0.007993219 0.0023788880 0.013607550     2
+## 3   -1h  5060 0.006983872 0.0017497925 0.012217951     3
+## 4   -1h  6985 0.005962422 0.0015734821 0.010351362     4
+## 5   -1h  1574 0.004914877 0.0007761166 0.009053637     5
 ```
 
 ```r
 # Plots a rank abundance curve of the relative clonal abundances
-p1 <- plotAbundance(clones, legend_title="Sample")
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotAbundance(clones, colors=sample_colors, legend_title="Sample")
 ```
 
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
@@ -160,8 +164,9 @@ isotype_div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=30, min_q=0, max_q=32
 # Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
 # Indicate number of sequences resampled from each group in the title
 sample_main <- paste0("Sample diversity (n=", sample_div@n, ")")
-p2 <- plotDiversityCurve(sample_div, main_title=sample_main, 
-                         legend_title="Sample", log_q=TRUE, log_d=TRUE)
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotDiversityCurve(sample_div, colors=sample_colors, main_title=sample_main, 
+                  legend_title="Sample", log_q=TRUE, log_d=TRUE)
 ```
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-1.png)
@@ -169,8 +174,8 @@ p2 <- plotDiversityCurve(sample_div, main_title=sample_main,
 ```r
 # Plot isotype diversity using default set of Ig isotype colors
 isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
-p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
-                         legend_title="Isotype", log_q=TRUE, log_d=TRUE)
+plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
+                   legend_title="Isotype", log_q=TRUE, log_d=TRUE)
 ```
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
@@ -190,33 +195,15 @@ sample_test <- testDiversity(ExampleDb, 0, "SAMPLE", nboot=200)
 ```
 
 ```r
-sample_test
+# Print p-value table
+print(sample_test)
 ```
 
 ```
-## An object of class "DiversityTest"
-## Slot "tests":
-##         test pvalue delta_mean delta_sd
-## 1 -1h != +7d      0     477.39 17.28763
-## 
-## Slot "summary":
-##     group    mean       sd
-## -1h   -1h 817.295 12.04506
-## +7d   +7d 339.905 12.55724
-## 
-## Slot "groups":
-## [1] "-1h" "+7d"
-## 
-## Slot "q":
-## [1] 0
-## 
-## Slot "n":
-##  -1h  +7d 
-## 1000 1000 
-## 
-## Slot "nboot":
-## [1] 200
+##         test DELTA_MEAN DELTA_SD PVALUE
+## 1 -1h != +7d     479.45  17.4741      0
 ```
+
 
 ```r
 # Test diversity across values in the "ISOTYPE" column
@@ -226,37 +213,16 @@ isotype_test <- testDiversity(ExampleDb, 2, "ISOTYPE", min_n=30, nboot=200)
 ```
 
 ```r
-isotype_test
+# Print p-value table
+print(isotype_test)
 ```
 
 ```
-## An object of class "DiversityTest"
-## Slot "tests":
-##         test pvalue delta_mean  delta_sd
-## 1 IgA != IgD      0  189.63411 11.281797
-## 2 IgA != IgG      0   26.68917  4.660478
-## 3 IgA != IgM      0  228.61108  6.726367
-## 4 IgD != IgG      0  162.94494 11.198856
-## 5 IgD != IgM      0   38.97697 12.533752
-## 6 IgG != IgM      0  201.92192  7.602324
-## 
-## Slot "summary":
-##     group      mean        sd
-## IgA   IgA  12.93730  1.932362
-## IgD   IgD 202.57141 10.853966
-## IgG   IgG  39.62646  4.057819
-## IgM   IgM 241.54838  6.408486
-## 
-## Slot "groups":
-## [1] "IgA" "IgD" "IgG" "IgM"
-## 
-## Slot "q":
-## [1] 2
-## 
-## Slot "n":
-## IgA IgD IgG IgM 
-## 259 259 259 259 
-## 
-## Slot "nboot":
-## [1] 200
+##         test DELTA_MEAN  DELTA_SD PVALUE
+## 1 IgA != IgD  189.04148  9.895936      0
+## 2 IgA != IgG   26.61738  4.751652      0
+## 3 IgA != IgM  229.34190  6.474893      0
+## 4 IgD != IgG  162.42410 11.107872      0
+## 5 IgD != IgM   40.30042 12.045177      0
+## 6 IgG != IgM  202.72452  7.236566      0
 ```

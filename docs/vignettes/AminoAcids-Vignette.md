@@ -1,4 +1,4 @@
-Analysis of amino acid physicochemical properties
+Amino acid property analysis
 ====================
 
 
@@ -17,10 +17,11 @@ can be applied to other regions simply by altering the sequence data column used
 
 ## Example data
 
-A small example Change-O database file is included in the `alakazam` package. 
+A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
 
 
 ```r
+# Load required packages
 library(alakazam)
 library(dplyr)
 

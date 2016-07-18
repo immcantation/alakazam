@@ -1,5 +1,5 @@
 ---
-title: 'Alakazam: Analysis of clonal diversity'
+title: 'Alakazam: Analysis of clonal abundance and diversity'
 author: "Jason Anthony Vander Heiden"
 date: '`r Sys.Date()`'
 output:
@@ -57,7 +57,7 @@ using `rarefyDiversity`.
 
 ## Example data
 
-A small example Change-O database, `ExampleDb, is included in the `alakazam` package. 
+A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
 Diversity calculation requires the `CLONE` field (column) to be present in the 
 Change-O file, as well as an additional grouping column. In this example we 
 will use the grouping columns `SAMPLE` and `ISOTYPE`.
@@ -111,7 +111,8 @@ clones <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
 head(clones, 5)
 
 # Plots a rank abundance curve of the relative clonal abundances
-p1 <- plotAbundance(clones, legend_title="Sample")
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotAbundance(clones, colors=sample_colors, legend_title="Sample")
 ```
 
 
@@ -141,13 +142,14 @@ isotype_div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=30, min_q=0, max_q=32
 # Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
 # Indicate number of sequences resampled from each group in the title
 sample_main <- paste0("Sample diversity (n=", sample_div@n, ")")
-p2 <- plotDiversityCurve(sample_div, main_title=sample_main, 
-                         legend_title="Sample", log_q=TRUE, log_d=TRUE)
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotDiversityCurve(sample_div, colors=sample_colors, main_title=sample_main, 
+                  legend_title="Sample", log_q=TRUE, log_d=TRUE)
 
 # Plot isotype diversity using default set of Ig isotype colors
 isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
-p3 <- plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
-                         legend_title="Isotype", log_q=TRUE, log_d=TRUE)
+plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
+                   legend_title="Isotype", log_q=TRUE, log_d=TRUE)
 ```
 
 ## Test diversity at a fixed diversity order
@@ -157,20 +159,21 @@ the same manner as `rarefyDiversity`, but only for a single diversity order.
 Significance testing across groups is performed using the delta of the bootstrap
 distributions between groups.
 
-```{r, eval=TRUE, results='hide'}
+```{r, eval=TRUE}
 # Test diversity at q=0 (species richness) across values in the "SAMPLE" column
 # 2000 bootstrap realizations are performed (nboot=200)
 sample_test <- testDiversity(ExampleDb, 0, "SAMPLE", nboot=200)
+
+# Print p-value table
+print(sample_test)
 ```
+
 ```{r, eval=TRUE}
-sample_test
-```
-```{r, eval=TRUE, results='hide'}
 # Test diversity across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
 isotype_test <- testDiversity(ExampleDb, 2, "ISOTYPE", min_n=30, nboot=200)
-```
-```{r, eval=TRUE}
-isotype_test
+
+# Print p-value table
+print(isotype_test)
 ```

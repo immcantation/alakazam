@@ -16,7 +16,7 @@ unique pair of annotations within a tree over all nodes.
 Usage
 --------------------
 ```
-tableEdges(graph, field, indirect = FALSE, exclude = c("Germline", NA))
+tableEdges(graph, field, indirect = FALSE, exclude = NULL)
 ```
 
 Arguments
@@ -57,20 +57,11 @@ Examples
 -------------------
 
 ```R
-# Define and plot example graph
-library(igraph)
+# Define example graph
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
-vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
-
-```
-
-![2](tableEdges-2.png)
-
-```R
 
 # Count direct edges between isotypes including inferred nodes
-tableEdges(graph, "ISOTYPE", exclude=NULL)
+tableEdges(graph, "ISOTYPE")
 
 ```
 
@@ -91,8 +82,8 @@ Groups: PARENT [?]
 
 ```R
 
-# Count direct edges excluding edges to and from inferred nodes
-tableEdges(graph, "ISOTYPE", exclude=NA)
+# Count direct edges excluding edges to and from germline and inferred nodes
+tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 
 ```
 
@@ -112,8 +103,8 @@ Groups: PARENT [?]
 
 ```R
 
-# Count indirect edges walking through inferred nodes
-tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=NA)
+# Count indirect edges walking through germline and inferred nodes
+tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
 

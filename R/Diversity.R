@@ -830,7 +830,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     group_pairs <- combn(group_keep, 2, simplify=F)
     npairs <- length(group_pairs)
     pvalue_mat <- matrix(NA, npairs, 3, 
-                         dimnames=list(NULL, c("pvalue", "delta_mean", "delta_sd")))
+                         dimnames=list(NULL, c("DELTA_MEAN", "DELTA_SD", "PVALUE")))
     test_names <- sapply(group_pairs, paste, collapse=" != ")
     for (i in 1:npairs) {
         g1 <- group_pairs[[i]][1]
@@ -846,15 +846,13 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
         g_cdf <- ecdf(g_delta)
         p <- g_cdf(0)
         p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
-        pvalue_mat[i, ] <- c(p, 
-                             mean(g_delta), 
-                             sd(g_delta))
+        pvalue_mat[i, ] <- c(mean(g_delta), sd(g_delta), p)
     }
     
     tests_df <- cbind(data.frame(test=test_names), as.data.frame(pvalue_mat))
-    summary_df <- data.frame(group=group_keep, 
-                             mean=apply(div_mat, 2, mean),
-                             sd=apply(div_mat, 2, sd))
+    summary_df <- data.frame(GROUP=group_keep, 
+                             MEAN=apply(div_mat, 2, mean),
+                             SD=apply(div_mat, 2, sd))
     
     # Generate return object
     div <- new("DiversityTest", 

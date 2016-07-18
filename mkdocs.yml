@@ -16,9 +16,10 @@ pages:
     - 'Release Notes': news.md
     - 'Related Projects': projects.md
   - 'Vignettes':
-    - 'Analysis of amino acid physicochemical properties': vignettes/AminoAcids-Vignette.md
-    - 'Diversity analysis': vignettes/Diversity-Vignette.md
-    - 'Ig lineage reconstruction': vignettes/Lineage-Vignette.md
+    - 'Amino acid physicochemical property analysis': vignettes/AminoAcids-Vignette.md
+    - 'Analysis of clonal abundance and diversity': vignettes/Diversity-Vignette.md
+    - 'Reconstruction of Ig lineage trees': vignettes/Lineage-Vignette.md
+    - 'Topology analysis of lineage trees': vignettes/Topology-Vignette.md
   - 'Help Topics':
     - 'File I/O':
       - topics/readChangeoDb.md

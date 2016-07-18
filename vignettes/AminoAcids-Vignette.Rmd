@@ -1,5 +1,5 @@
 ---
-title: 'Alakazam: Analysis of amino acid physicochemical properties'
+title: 'Alakazam: Amino acid physicochemical property analysis'
 author: "Susanna Marquez"
 date: '`r Sys.Date()`'
 output:
@@ -24,7 +24,7 @@ geometry: margin=1in
 fontsize: 11pt
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Analysis of amino acid physicochemical properties}
+  %\VignetteIndexEntry{Amino acid property analysis}
   %\usepackage[utf8]{inputenc}
 ---
 

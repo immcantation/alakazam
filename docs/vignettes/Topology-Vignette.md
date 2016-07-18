@@ -1,32 +1,6 @@
----
-title: 'Alakazam: Topology analysis of lineage trees'
-author: "Jason Anthony Vander Heiden"
-date: '`r Sys.Date()`'
-output:
-  pdf_document:
-    dev: pdf
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
-  html_document:
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    theme: readable
-    toc: yes
-  md_document:
-    fig_height: 4
-    fig_width: 7.5
-    preserve_yaml: no
-    toc: yes
-geometry: margin=1in
-fontsize: 11pt
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Topology analysis}
-  %\usepackage[utf8]{inputenc}
----
+Topology analysis
+====================
+
 
 This vignette covers the basics of analyzing the topologies of Ig lineage 
 trees built using `buildPhylipLineage`, using some built-in alakazam functions
@@ -52,7 +26,8 @@ And the following node annotations (vertex attributes):
 * `DUPCOUNT`: The copy number (duplicate count), which indicates the total number 
               of reads with the same V(D)J sequence.
 
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
+
+```r
 # Load required packages
 library(alakazam)
 library(igraph)
@@ -78,7 +53,8 @@ are helpful for visualing annotation topologies. Below is an extensive example o
 how to plot a tree by configuring the colors, labels, shapes and sizes of
 different visual elements according to annotations embedded in the graph.
 
-```{r, eval=TRUE}
+
+```r
 # Set node colors
 V(graph)$color[V(graph)$SAMPLE == "-1h"] <- "seagreen"
 V(graph)$color[V(graph)$SAMPLE == "+7d"] <- "steelblue"
@@ -113,6 +89,8 @@ legend("topleft", c("Germline", "Inferred", "-1h", "+7d"),
        fill=c("black", "white", "seagreen", "steelblue"), cex=0.75)
 ```
 
+![plot of chunk Topology-Vignette-2](figure/Topology-Vignette-2-1.png)
+
 ## Summarizing node properties
 
 Various annotation dependent node statistics can be calculated using the
@@ -127,9 +105,23 @@ To determine the shortest path from the germline sequence to any node,
 we use `getPathLengths`, which returns the distance both as the number
 of "hops" (`STEPS`) and the number of mutational events (`DISTANCE`).
 
-```{r, eval=TRUE}
+
+```r
 # Consider all nodes
 getPathLengths(graph, root="Germline")
+```
+
+```
+##             NAME STEPS DISTANCE
+## 1      Inferred1     1       20
+## 2 GN5SHBT04CW57C     2       26
+## 3      Inferred2     3       28
+## 4 GN5SHBT08I7RKL     4       29
+## 5 GN5SHBT04CAVIG     5       30
+## 6       Germline     0        0
+## 7 GN5SHBT01D6X0W     2       22
+## 8 GN5SHBT06H7TQD     6       31
+## 9 GN5SHBT05HEG2J     4       33
 ```
 
 Note, the `STEPS` counted in the above example include traversal of inferred 
@@ -139,9 +131,23 @@ value that will be excluded from the number of steps. In the example below
 we are excluding `NA` values in the `ISOTYPE` annotation 
 (`field="ISOTYPE", exclude=NA`). 
 
-```{r, eval=TRUE}
+
+```r
 # Exclude nodes without an isotype annotation from step count
 getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
+```
+
+```
+##             NAME STEPS DISTANCE
+## 1      Inferred1     0       20
+## 2 GN5SHBT04CW57C     1       26
+## 3      Inferred2     1       28
+## 4 GN5SHBT08I7RKL     2       29
+## 5 GN5SHBT04CAVIG     3       30
+## 6       Germline     0        0
+## 7 GN5SHBT01D6X0W     1       22
+## 8 GN5SHBT06H7TQD     4       31
+## 9 GN5SHBT05HEG2J     2       33
 ```
 
 Note, `STEPS` has changed with respect to the previous example, but 
@@ -167,33 +173,97 @@ The `fields=c("SAMPLE", "ISOTYPE")` argument in the example below simply
 defines which annotations we wish to retain in the output. This argument
 has no effect on the results, in constast to the behavior of `getPathLengths`.
 
-```{r, eval=TRUE}
+
+```r
 # Summarize tree
 df <- summarizeSubtrees(graph, fields=c("SAMPLE", "ISOTYPE"), root="Germline")
 print(df[1:4])
+```
+
+```
+##             NAME SAMPLE ISOTYPE         PARENT
+## 1      Inferred1   <NA>    <NA>       Germline
+## 2 GN5SHBT04CW57C    -1h     IgM      Inferred1
+## 3      Inferred2   <NA>    <NA> GN5SHBT04CW57C
+## 4 GN5SHBT08I7RKL    +7d     IgG      Inferred2
+## 5 GN5SHBT04CAVIG    +7d     IgG GN5SHBT08I7RKL
+## 6       Germline   <NA>    <NA>           <NA>
+## 7 GN5SHBT01D6X0W    -1h     IgM      Inferred1
+## 8 GN5SHBT06H7TQD    +7d     IgG GN5SHBT04CAVIG
+## 9 GN5SHBT05HEG2J    +7d     IgG      Inferred2
+```
+
+```r
 print(df[c(1, 5:8)])
+```
+
+```
+##             NAME OUTDEGREE SIZE DEPTH PATHLENGTH
+## 1      Inferred1         2    8     6         13
+## 2 GN5SHBT04CW57C         1    6     5          7
+## 3      Inferred2         2    5     4          5
+## 4 GN5SHBT08I7RKL         1    3     3          2
+## 5 GN5SHBT04CAVIG         1    2     2          1
+## 6       Germline         1    9     7         33
+## 7 GN5SHBT01D6X0W         0    1     1          0
+## 8 GN5SHBT06H7TQD         0    1     1          0
+## 9 GN5SHBT05HEG2J         0    1     1          0
+```
+
+```r
 print(df[c(1, 9:12)])
+```
+
+```
+##             NAME OUTDEGREE_NORM SIZE_NORM DEPTH_NORM PATHLENGTH_NORM
+## 1      Inferred1          0.250 0.8888889  0.8571429      0.39393939
+## 2 GN5SHBT04CW57C          0.125 0.6666667  0.7142857      0.21212121
+## 3      Inferred2          0.250 0.5555556  0.5714286      0.15151515
+## 4 GN5SHBT08I7RKL          0.125 0.3333333  0.4285714      0.06060606
+## 5 GN5SHBT04CAVIG          0.125 0.2222222  0.2857143      0.03030303
+## 6       Germline          0.125 1.0000000  1.0000000      1.00000000
+## 7 GN5SHBT01D6X0W          0.000 0.1111111  0.1428571      0.00000000
+## 8 GN5SHBT06H7TQD          0.000 0.1111111  0.1428571      0.00000000
+## 9 GN5SHBT05HEG2J          0.000 0.1111111  0.1428571      0.00000000
 ```
 
 Distributions of normalized subtree statistics for a population of trees 
 can be plotted using the `plotSubtrees` function:
 
-```{r, eval=TRUE}
+
+```r
 # Set sample colors
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
 # Box plots of node outdegree by sample
 plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
              main_title="Node outdegree", legend_title="Time", style="box")
+```
+
+![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-1.png)
+
+```r
 # Box plots of subtree size by sample
 plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
              main_title="Subtree size", legend_title="Time", style="box")
+```
+
+![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-2.png)
+
+```r
 # Violin plots of subtree path length by isotype
 plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
              main_title="Subtree path length", legend_title="Isotype", style="violin")
+```
+
+![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-3.png)
+
+```r
 # Violin plots of subtree depth by isotype
 plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
              main_title="Subtree depth", legend_title="Isotype", style="violin")
 ```
+
+![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-4.png)
 
 ## Counting and testing node annotation relationships
 
@@ -208,18 +278,42 @@ relationship is a decent relationship that travels through another node (or node
 Tabulating all directparent-child annotation relationships in the tree by isotype 
 annotation can be performed like so:
 
-```{r, eval=TRUE}
+
+```r
 # Count direct edges between isotypes
 tableEdges(graph, "ISOTYPE")
+```
+
+```
+## Source: local data frame [5 x 3]
+## Groups: PARENT [?]
+## 
+##   PARENT CHILD COUNT
+##    <chr> <chr> <int>
+## 1    IgG   IgG     2
+## 2    IgM  <NA>     1
+## 3   <NA>   IgG     2
+## 4   <NA>   IgM     2
+## 5   <NA>  <NA>     1
 ```
 
 The above output is cluttered with the `NA` annotations from the germline and 
 inferred nodes. We can perform the same direct tabulation, but exclude any nodes 
 annotated with either `Germline` or `NA` for isotype using the `exclude` argument:
 
-```{r, eval=TRUE}
+
+```r
 # Direct edges excluding germline and inferred nodes
 tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
+```
+
+```
+## Source: local data frame [1 x 3]
+## Groups: PARENT [?]
+## 
+##   PARENT CHILD COUNT
+##    <chr> <chr> <int>
+## 1    IgG   IgG     2
 ```
 
 As there are inferred nodes in the tree, we might want to consider indirect
@@ -227,9 +321,20 @@ parent-child relationships that traverse through inferred nodes. This is accompl
 using the same arguments as above, but with the addition of the `indirect=TRUE` argument
 which will skip over the excluded nodes when tabulating annotation pairs:
 
-```{r, eval=TRUE}
+
+```r
 # Count indirect edges walking through germline and inferred nodes
 tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
+```
+
+```
+## Source: local data frame [2 x 3]
+## Groups: PARENT [?]
+## 
+##   PARENT CHILD COUNT
+##    <chr> <chr> <int>
+## 1    IgG   IgG     2
+## 2    IgM   IgG     2
 ```
 
 ### Significance testing of edges in a population of trees
@@ -243,17 +348,32 @@ of any annotations specified to the `exclude` argument (these annotation remain
 fix in the tree). P-values output by `testEdges` are one-sided tests that the
 annotation pair is observed more often than expected.
 
-```{r, eval=TRUE}
+
+```r
 # Test isotype relationships using 100 permutations
 edge_test <- testEdges(graph_list, "ISOTYPE", nperm=100)
+```
 
+```r
 # Print p-value table
 print(edge_test)
+```
 
+```
+##   PARENT CHILD COUNT  EXPECTED    PVALUE
+## 1    IgA   IgA    36 34.660000 0.0300000
+## 2    IgA   IgG     2  2.926471 0.4852941
+## 3    IgG   IgA     1  2.600000 0.7789474
+## 4    IgG   IgG    99 98.880000 0.4700000
+```
+
+```r
 # Plot null distributions for each annotation pair
 plotEdgeTest(edge_test, color="steelblue", main_title="Isotype Edges", 
              style="hist")
 ```
+
+![plot of chunk Topology-Vignette-10](figure/Topology-Vignette-10-1.png)
 
 ## Counting and testing MRCA annotations
 
@@ -272,7 +392,8 @@ of nodes with specific annotations. To simply extact the annotations for the
 node(s) immediately below the germline, you can use the  `path=steps` argument 
 without any node exclusion:
 
-```{r, eval=TRUE}
+
+```r
 # Use unweighted path length and do not exclude any nodes
 mrca_df <- getMRCA(graph, path="steps", root="Germline")
 
@@ -280,17 +401,28 @@ mrca_df <- getMRCA(graph, path="steps", root="Germline")
 print(mrca_df[c("NAME", "SAMPLE", "ISOTYPE", "STEPS", "DISTANCE")])
 ```
 
+```
+##                NAME SAMPLE ISOTYPE STEPS DISTANCE
+## Inferred1 Inferred1   <NA>    <NA>     1       20
+```
+
 To use mutational distance and consider only observed (ie, non-germline and 
 non-inferred) nodes, we specify the exclusion field (`field="ISOTYPE"`) and
 exclusion value within that field (`exclude=NA`):
 
-```{r, eval=TRUE}
+
+```r
 # Exclude nodes without an isotype annotation and use weighted path length
 mrca_df <- getMRCA(graph, path="distance", root="Germline", 
                    field="ISOTYPE", exclude=NA)
 
 # Print excluding sequence, label, color, shape and size annotations
 print(mrca_df[c("NAME", "SAMPLE", "ISOTYPE", "STEPS", "DISTANCE")])
+```
+
+```
+##                          NAME SAMPLE ISOTYPE STEPS DISTANCE
+## GN5SHBT01D6X0W GN5SHBT01D6X0W    -1h     IgM     1       22
 ```
 
 ### Significance testing of MRCA annotations
@@ -300,14 +432,27 @@ test to determine the significance of an annotation appearing at the MRCA
 over a population of trees. P-values output by `testMRCA` are one-sided tests 
 that the annotation is observed more often than expected in the MRCA position.
 
-```{r, eval=TRUE}
+
+```r
 # Test isotype MRCA annotations using 100 permutations
 mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=100)
+```
 
+```r
 # Print p-value table
 print(mrca_test)
+```
 
+```
+##   ANNOTATION COUNT EXPECTED PVALUE
+## 1        IgA    12    11.27   0.00
+## 2        IgG    31    31.73   0.73
+```
+
+```r
 # Plot null distributions for each annotation
 plotMRCATest(mrca_test, color="steelblue", main_title="Isotype MRCA", 
              style="hist")
 ```
+
+![plot of chunk Topology-Vignette-13](figure/Topology-Vignette-13-1.png)

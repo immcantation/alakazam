@@ -250,16 +250,16 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' graph <- ExampleTrees[[23]]
 #' 
 #' # Count direct edges between isotypes including inferred nodes
-#' tableEdges(graph, "ISOTYPE", exclude=NULL)
+#' tableEdges(graph, "ISOTYPE")
 #' 
-#' # Count direct edges excluding edges to and from inferred nodes
-#' tableEdges(graph, "ISOTYPE", exclude=NA)
+#' # Count direct edges excluding edges to and from germline and inferred nodes
+#' tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 #' 
-#' # Count indirect edges walking through inferred nodes
-#' tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=NA)
+#' # Count indirect edges walking through germline and inferred nodes
+#' tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 #' 
 #' @export
-tableEdges <- function(graph, field, indirect=FALSE, exclude=c("Germline", NA)) {
+tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
     # Function to retrieve the name if x is exactly one vertex index and NULL otherwise
     .getSingleVertex <- function(x) {
         if (length(x) == 1) { 
@@ -484,6 +484,10 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'
 #' @param    graphs    list of igraph objects with vertex annotations.
 #' @param    field     string defining the annotation field to permute.
+#' @param    indirect  if \code{FALSE} count direct connections (edges) only. If 
+#'                     \code{TRUE} walk through any nodes with annotations specified in 
+#'                     the \code{argument} to count indirect connections. Specifying
+#'                     \code{indirect=TRUE} with \code{exclude=NULL} will have no effect.
 #' @param    exclude   vector of strings defining \code{field} values to exclude from 
 #'                     permutation.
 #' @param    nperm     number of permutations to perform.
@@ -504,7 +508,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' print(x)
 #' 
 #' @export
-testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200, 
+testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), nperm=200, 
                       progress=FALSE) {
     ## DEBUG
     # field="isotype"; exclude=c("Germline", NA); nperm=200
@@ -517,7 +521,7 @@ testEdges <- function(graphs, field, exclude=c("Germline", NA), nperm=200,
     # @param  field    annotation field
     # @param  exclude  vector of annotation values to exclude
     .countEdges <- function(x, field, exclude) {
-        edge_list <- lapply(x, tableEdges, field=field, exclude=exclude)
+        edge_list <- lapply(x, tableEdges, field=field, indirect=indirect, exclude=exclude)
         edge_sum <- bind_rows(edge_list) %>%
             group_by_("PARENT", "CHILD") %>%
             dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
@@ -627,10 +631,9 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("Number of realizations") + 
-            geom_histogram(binwidth=1,
-                           fill=color, color=NA) +
+            geom_histogram(bins=50, fill=color, color=NA) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
-                       color="firebrick", linetype=3, size=1.25) + 
+                       color="firebrick", linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
@@ -641,9 +644,9 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), color="firebrick", 
-                       linetype=3, size=1.25) + 
+                       linetype=3, size=0.75) + 
             geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), color="steelblue", 
-                       linetype=3, size=1.25) + 
+                       linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     }
     
@@ -712,9 +715,9 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("Number of realizations") + 
-            geom_histogram(fill=color, color=NA, binwidth=1) +
+            geom_histogram(fill=color, color=NA, bins=50) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
-                       color="firebrick", linetype=3, size=1.25) + 
+                       color="firebrick", linetype=3, size=0.75) + 
             facet_wrap("Annotation", ncol=1, scales="free_y")
     } else if (style == "cdf") {
         # Plot ECDF of MRCA null distribution
@@ -725,9 +728,9 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
             geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
-                       color="firebrick", linetype=3, size=1.25) + 
+                       color="firebrick", linetype=3, size=0.75) + 
             geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), 
-                       color="steelblue", linetype=3, size=1.25) + 
+                       color="steelblue", linetype=3, size=0.75) + 
             facet_wrap("Annotation", nrow=1, scales="free_y")
     }
     
