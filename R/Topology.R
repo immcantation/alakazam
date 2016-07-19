@@ -824,16 +824,16 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
     # Set stat column and axis labels
     if (stat == "outdegree") {
         stat_col <- "OUTDEGREE_NORM"
-        y_lab <- "Node outdegree (percent of tree edges)"
+        y_lab <- "Node outdegree"
     } else if (stat == "size") {
         stat_col <- "SIZE_NORM"
-        y_lab <- "Substree size (percent of tree size)"
+        y_lab <- "Substree size"
     } else if (stat == "depth") {
         stat_col <- "DEPTH_NORM"
-        y_lab <- "Depth under node (percent of tree depth)"
+        y_lab <- "Depth under node"
     } else if (stat == "pathlength") {
         stat_col <- "PATHLENGTH_NORM"
-        y_lab <- "Path length under node (percent of longest path)"
+        y_lab <- "Path length under node"
     } else {
         stop("Invalid value for 'stat'. How did you get here?")
     }

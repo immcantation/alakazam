@@ -80,8 +80,10 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ```
 
 ```r
-# Plot a subset of the properties
+# Define a ggplot theme for all plots
 tmp_theme <- theme_bw() + theme(legend.position="bottom")
+
+# Generate plots for a four of the properties
 g1 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_LENGTH)) + tmp_theme +
     ggtitle("CDR3 length") + 
     xlab("Isotype") + ylab("Amino acids") +
@@ -104,7 +106,9 @@ g4 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_ACIDIC)) + tmp_theme +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
     geom_boxplot(aes(fill=ISOTYPE))
-multiggplot(g1, g2, g3, g4, ncol=2)
+
+# Plot in a 2x2 grid
+gridPlot(g1, g2, g3, g4, ncol=2)
 ```
 
 ![plot of chunk AminoAcids-Vignette-2](figure/AminoAcids-Vignette-2-1.png)

@@ -228,42 +228,39 @@ print(df[c(1, 9:12)])
 ```
 
 Distributions of normalized subtree statistics for a population of trees 
-can be plotted using the `plotSubtrees` function:
+can be plotted using the `plotSubtrees` function. In the example below,
+we have specified `silent=TRUE` which causes `plotSubtrees` to return the 
+ggplot object without rendering the plot. The ggplot object are then
+plotting using the `gridPlot` function which places each individual plot in
+a separate panel of the same figure.
 
 
 ```r
 # Set sample colors
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+
 # Box plots of node outdegree by sample
-plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
-             main_title="Node outdegree", legend_title="Time", style="box")
+p1 <- plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
+                   main_title="Node outdegree", legend_title="Time", 
+                   style="box", silent=TRUE)
+# Box plots of subtree size by sample
+p2 <- plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
+                   main_title="Subtree size", legend_title="Time", 
+                   style="box", silent=TRUE)
+# Violin plots of subtree path length by isotype
+p3 <- plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
+                   main_title="Subtree path length", legend_title="Isotype", 
+                   style="violin", silent=TRUE)
+# Violin plots of subtree depth by isotype
+p4 <- plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
+                   main_title="Subtree depth", legend_title="Isotype", 
+                   style="violin", silent=TRUE)
+
+# Plot in a 2x2 grid
+gridPlot(p1, p2, p3, p4, ncol=2)
 ```
 
 ![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-1.png)
-
-```r
-# Box plots of subtree size by sample
-plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
-             main_title="Subtree size", legend_title="Time", style="box")
-```
-
-![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-2.png)
-
-```r
-# Violin plots of subtree path length by isotype
-plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
-             main_title="Subtree path length", legend_title="Isotype", style="violin")
-```
-
-![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-3.png)
-
-```r
-# Violin plots of subtree depth by isotype
-plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
-             main_title="Subtree depth", legend_title="Isotype", style="violin")
-```
-
-![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-4.png)
 
 ## Counting and testing node annotation relationships
 
@@ -361,10 +358,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.660000 0.0300000
-## 2    IgA   IgG     2  2.926471 0.4852941
-## 3    IgG   IgA     1  2.600000 0.7789474
-## 4    IgG   IgG    99 98.880000 0.4700000
+## 1    IgA   IgA    36 34.790000 0.0300000
+## 2    IgA   IgG     2  3.040541 0.6081081
+## 3    IgG   IgA     1  2.644444 0.8444444
+## 4    IgG   IgG    99 98.580000 0.3300000
 ```
 
 ```r

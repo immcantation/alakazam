@@ -296,7 +296,7 @@ getBaseTheme <- function(sizing=c("figure", "window")) {
 #' http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)
 #' 
 #' @export
-multiggplot <- function(..., ncol=1) {
+gridPlot <- function(..., ncol=1) {
     p <- list(...)
     n <- length(p)
     layout <- matrix(seq(1, ncol*ceiling(n/ncol)), ncol=ncol, nrow=ceiling(n/ncol))

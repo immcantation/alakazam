@@ -4,7 +4,7 @@
 
 
 
-**multiggplot** - *Plot multiple ggplot objects*
+**gridPlot** - *Plot multiple ggplot objects*
 
 Description
 --------------------
@@ -15,7 +15,7 @@ Plots multiple ggplot objects in an equally sized grid.
 Usage
 --------------------
 ```
-multiggplot(..., ncol = 1)
+gridPlot(..., ncol = 1)
 ```
 
 Arguments

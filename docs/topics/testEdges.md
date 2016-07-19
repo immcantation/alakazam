@@ -73,12 +73,28 @@ x <- testEdges(graphs, "ISOTYPE", nperm=10)
 
 ```
 
-**Error in ecdf(d)**: 'x' must have 1 or more non-missing values
+
 ```R
 print(x)
 ```
 
-**Error in print(x)**: object 'x' not found
+
+```
+    PARENT   CHILD COUNT   EXPECTED PVALUE
+1      IgA     IgA    39  63.500000    1.0
+2      IgA IgA,IgG     3   3.500000    0.7
+3      IgA     IgG     2   5.700000    0.8
+4  IgA,IgG     IgA    29   6.200000    0.0
+5  IgA,IgG IgA,IgG     1   2.000000    1.0
+6  IgA,IgG     IgG    24   1.666667    0.0
+7  IgD,IgG     IgG     8   1.000000    0.0
+8      IgG     IgA     1   4.000000    1.0
+9      IgG IgD,IgG     1   1.000000    0.0
+10     IgG     IgG   112 135.900000    1.0
+
+```
+
+
 
 See also
 -------------------

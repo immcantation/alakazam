@@ -81,7 +81,7 @@ pages:
     - 'Miscellaneous':
       - topics/translateStrings.md
       - topics/makeTempDir.md
-      - topics/multiggplot.md
+      - topics/gridPlot.md
       - topics/stoufferMeta.md
     - 'Data and Constants':
       - topics/ExampleDb.md

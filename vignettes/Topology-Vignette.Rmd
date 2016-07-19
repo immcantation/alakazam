@@ -176,23 +176,35 @@ print(df[c(1, 9:12)])
 ```
 
 Distributions of normalized subtree statistics for a population of trees 
-can be plotted using the `plotSubtrees` function:
+can be plotted using the `plotSubtrees` function. In the example below,
+we have specified `silent=TRUE` which causes `plotSubtrees` to return the 
+ggplot object without rendering the plot. The ggplot object are then
+plotting using the `gridPlot` function which places each individual plot in
+a separate panel of the same figure.
 
 ```{r, eval=TRUE}
 # Set sample colors
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+
 # Box plots of node outdegree by sample
-plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
-             main_title="Node outdegree", legend_title="Time", style="box")
+p1 <- plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
+                   main_title="Node outdegree", legend_title="Time", 
+                   style="box", silent=TRUE)
 # Box plots of subtree size by sample
-plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
-             main_title="Subtree size", legend_title="Time", style="box")
+p2 <- plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
+                   main_title="Subtree size", legend_title="Time", 
+                   style="box", silent=TRUE)
 # Violin plots of subtree path length by isotype
-plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
-             main_title="Subtree path length", legend_title="Isotype", style="violin")
+p3 <- plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
+                   main_title="Subtree path length", legend_title="Isotype", 
+                   style="violin", silent=TRUE)
 # Violin plots of subtree depth by isotype
-plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
-             main_title="Subtree depth", legend_title="Isotype", style="violin")
+p4 <- plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
+                   main_title="Subtree depth", legend_title="Isotype", 
+                   style="violin", silent=TRUE)
+
+# Plot in a 2x2 grid
+gridPlot(p1, p2, p3, p4, ncol=2)
 ```
 
 ## Counting and testing node annotation relationships
