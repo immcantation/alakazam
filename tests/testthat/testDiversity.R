@@ -104,11 +104,11 @@ test_that("testDiversity", {
     set.seed(3)
     # Groups under the size threshold are excluded and a warning message is issued.
     div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
-    expect_equal(div@tests$pvalue, 0)
-    expect_equal(div@summary$mean, c(88.10, 63.11), tolerance=0.001)
+    expect_equal(div@tests$PVALUE, 0)
+    expect_equal(div@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
     
     set.seed(3)
     div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=100)
-    expect_equal(div@tests$pvalue, 0.88)
-    expect_equal(div@summary$mean, c(78.63, 79.58), tolerance=0.001)
+    expect_equal(div@tests$PVALUE, 0.88)
+    expect_equal(div@summary$MEAN, c(78.63, 79.58), tolerance=0.001)
 })
