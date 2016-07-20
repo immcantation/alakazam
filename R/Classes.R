@@ -5,8 +5,8 @@
 #' @exportMethod print
 setGeneric("print")
 
-# @exportMethod plot
-#setGeneric("plot")
+#' @exportMethod plot
+setGeneric("plot")
 
 
 #### Diversity classes ####
@@ -95,36 +95,24 @@ setClass("DiversityTest",
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve
 
-#' @param    x  DiversityCurve object
+#' @param    x    DiversityCurve object
 #' 
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
-setMethod("print", "DiversityCurve", function(x) { print(x@data) })
+setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
 
-#' @param    x  DiversityTest object
+#' @param    ...  arguments to pass to \link{plotDiversityCurve}.
+#' 
+#' @rdname DiversityCurve-class
+#' @aliases  DiversityCurve-method
+setMethod("plot", c(x="DiversityCurve"),
+          function(x, ...) { plotDiversityCurve(x, ...) })
+
+#' @param    x    DiversityTest object.
 #' 
 #' @rdname   DiversityTest-class
 #' @aliases  DiversityTest-method
-setMethod("print", "DiversityTest", function(x) { print(x@tests) })
-
-# @rdname DiversityCurve
-# @export
-# setMethod("plot", 
-#           signature("DiversityCurve", 
-#                     colors="character", 
-#                     main_title="character", 
-#                     legend_title="character", 
-#                     log_q="logical", 
-#                     log_d="logical",
-#                     xlim="numeric", 
-#                     ylim="numeric", 
-#                     silent="logical"),
-#           function(data, colors=NULL, main_title="Diversity", 
-#                    legend_title=NULL, log_q=TRUE, log_d=TRUE,
-#                    xlim=NULL, ylim=NULL, silent=FALSE) {
-#             plotDiversityCurve(data, colors=colors, main_title=main_title, 
-#                                legend_title=legend_title, log_q=log_q, log_d=log_d,
-#                                xlim=xlim, ylim=ylim, silent=silent) })
+setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
 
 
 #### Lineage classes ####
@@ -237,14 +225,28 @@ setClass("EdgeTest",
 
 #### Topology methods ####
 
-#' @param    x  MRCATest object.
+#' @param    x    MRCATest object.
 #' 
 #' @rdname   MRCATest-class
 #' @aliases  MRCATest-method
-setMethod("print", "MRCATest", function(x) { print(x@tests) })
+setMethod("print", c(x="MRCATest"), function(x) { print(x@tests) })
 
-#' @param    x  EdgeTest object.
+#' @param    ...  arguments to pass to \link{plotMRCATest}.
+#' 
+#' @rdname   MRCATest-class
+#' @aliases  MRCATest-method
+setMethod("plot", c(x="MRCATest"),
+          function(x, ...) { plotMRCATest(x, ...) })
+
+#' @param    x    EdgeTest object.
 #' 
 #' @rdname   EdgeTest-class
 #' @aliases  EdgeTest-method
-setMethod("print", "EdgeTest", function(x) { print(x@tests) })
+setMethod("print", c(x="EdgeTest"), function(x) { print(x@tests) })
+
+#' @param    ...  arguments to pass to \link{plotEdgeTest}.
+#' 
+#' @rdname   EdgeTest-class
+#' @aliases  EdgeTest-method
+setMethod("plot", c(x="EdgeTest"),
+          function(x, ...) { plotEdgeTest(x, ...) })

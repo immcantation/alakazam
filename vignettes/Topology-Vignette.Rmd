@@ -256,8 +256,8 @@ fix in the tree). P-values output by `testEdges` are one-sided tests that the
 annotation pair is observed more often than expected.
 
 ```{r, eval=TRUE}
-# Test isotype relationships using 100 permutations
-edge_test <- testEdges(graph_list, "ISOTYPE", nperm=100)
+# Test isotype relationships
+edge_test <- testEdges(graph_list, "ISOTYPE", nperm=20)
 
 # Print p-value table
 print(edge_test)
@@ -313,8 +313,8 @@ over a population of trees. P-values output by `testMRCA` are one-sided tests
 that the annotation is observed more often than expected in the MRCA position.
 
 ```{r, eval=TRUE}
-# Test isotype MRCA annotations using 100 permutations
-mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=100)
+# Test isotype MRCA annotations
+mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=20)
 
 # Print p-value table
 print(mrca_test)
