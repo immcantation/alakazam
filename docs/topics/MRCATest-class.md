@@ -18,12 +18,21 @@ Usage
 ```
 "print"(x)
 ```
+```
+"plot"(x, y, ...)
+```
 
 Arguments
 -------------------
 
 x
 :   MRCATest object.
+
+y
+:   ignored.
+
+...
+:   arguments to pass to [plotMRCATest](plotMRCATest.md).
 
 
 

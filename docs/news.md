@@ -1,4 +1,4 @@
-Version 0.2.3.999:  July 14, 2016
+Version 0.2.4:  July 20, 2016
 -------------------------------------------------------------------------------
 
 General:
@@ -19,6 +19,7 @@ General:
 + Replaced the `ExampleDb.gz` file with a larger, more clonal, `ExampleDb` 
   data object.
 + Replaced `ExampleTrees` with a larger set of trees.
++ Renamed `multiggplot()` to `gridPlot()`.
 
 Amino Acid Analysis:
 
@@ -31,8 +32,10 @@ Diversity Analysis:
   enable the (previously default) progress bar.
 + Fixed a bug in `estimateAbundance()` were the function would fail if there 
   was only a single input sequence per group.
-+ Change column names in `data` and `summary` slots of `DiversityTest` to 
++ Changed column names in `data` and `summary` slots of `DiversityTest` to 
   uppercase for consistency with other tools.
++ Added dispatching of `plot` to `plotDiversityCurve` for `DiversityCurve`
+  objects.
   
 Gene Usage:
 

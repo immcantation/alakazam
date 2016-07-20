@@ -17,12 +17,21 @@ Usage
 ```
 "print"(x)
 ```
+```
+"plot"(x, y, ...)
+```
 
 Arguments
 -------------------
 
 x
 :   EdgeTest object.
+
+y
+:   ignored.
+
+...
+:   arguments to pass to [plotEdgeTest](plotEdgeTest.md).
 
 
 
