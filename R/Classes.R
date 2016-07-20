@@ -2,11 +2,11 @@
 
 #### Generics ####
 
-#' @exportMethod print
-setGeneric("print")
+# @exportMethod print
+#setGeneric("print")
 
-#' @exportMethod plot
-setGeneric("plot")
+# @exportMethod plot
+#setGeneric("plot")
 
 
 #### Diversity classes ####
@@ -90,7 +90,6 @@ setClass("DiversityTest",
 
 #### Diversity methods ####
 
-# TODO:  plot method for DiversityCurve pointing to plotDiversityCurve
 # TODO:  plot method for DiversityTest
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve
@@ -99,19 +98,23 @@ setClass("DiversityTest",
 #' 
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
+#' @export
 setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
 
+#' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
 #' 
-#' @rdname DiversityCurve-class
+#' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
-setMethod("plot", c(x="DiversityCurve"),
-          function(x, ...) { plotDiversityCurve(x, ...) })
+#' @export
+setMethod("plot", c(x="DiversityCurve", y="missing"),
+          function(x, y, ...) { plotDiversityCurve(x, ...) })
 
 #' @param    x    DiversityTest object.
 #' 
 #' @rdname   DiversityTest-class
 #' @aliases  DiversityTest-method
+#' @export
 setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
 
 
@@ -229,24 +232,30 @@ setClass("EdgeTest",
 #' 
 #' @rdname   MRCATest-class
 #' @aliases  MRCATest-method
+#' @export
 setMethod("print", c(x="MRCATest"), function(x) { print(x@tests) })
 
+#' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotMRCATest}.
 #' 
 #' @rdname   MRCATest-class
 #' @aliases  MRCATest-method
-setMethod("plot", c(x="MRCATest"),
-          function(x, ...) { plotMRCATest(x, ...) })
+#' @export
+setMethod("plot", c(x="MRCATest", y="missing"),
+          function(x, y, ...) { plotMRCATest(x, ...) })
 
 #' @param    x    EdgeTest object.
 #' 
 #' @rdname   EdgeTest-class
 #' @aliases  EdgeTest-method
+#' @export
 setMethod("print", c(x="EdgeTest"), function(x) { print(x@tests) })
 
+#' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotEdgeTest}.
 #' 
 #' @rdname   EdgeTest-class
 #' @aliases  EdgeTest-method
-setMethod("plot", c(x="EdgeTest"),
-          function(x, ...) { plotEdgeTest(x, ...) })
+#' @export
+setMethod("plot", c(x="EdgeTest", y="missing"),
+          function(x, y, ...) { plotEdgeTest(x, ...) })
