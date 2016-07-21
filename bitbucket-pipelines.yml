@@ -10,4 +10,4 @@ pipelines:
         script:
           - sed -i '/test/ d' .Rbuildignore
           - R CMD build .
-          - R CMD check *.tar.gz
+          - R CMD check *.tar.gz --as-cran --timings

@@ -1,4 +1,4 @@
-ExampleDb <- system.file("tests/data-tests", "ExampleDb.gz", package="alakazam")
+ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
 test_that("seqDist",{
