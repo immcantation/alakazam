@@ -23,7 +23,7 @@ Arguments
 -------------------
 
 x
-:   DiversityTest object
+:   DiversityTest object.
 
 
 

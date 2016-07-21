@@ -18,12 +18,21 @@ Usage
 ```
 "print"(x)
 ```
+```
+"plot"(x, y, ...)
+```
 
 Arguments
 -------------------
 
 x
 :   DiversityCurve object
+
+y
+:   ignored.
+
+...
+:   arguments to pass to [plotDiversityCurve](plotDiversityCurve.md).
 
 
 

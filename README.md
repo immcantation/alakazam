@@ -14,7 +14,7 @@ Alakazam serves five main purposes:
    manipulation, and interacting with V(D)J segment and gene annotations.
 2. Providing an R interface for interacting with the output of the 
    [pRESTO](http://presto.readthedocs.io) and 
-   [Change-O](http://presto.readthedocs.io) tool suites.
+   [Change-O](http://changeo.readthedocs.io) tool suites.
 3. Performing lineage reconstruction on clonal populations of Ig sequences 
    and analyzing the topology of the resultant lineage trees. 
 4. Performing clonal abundance and diversity analysis on lymphocyte 

@@ -347,8 +347,8 @@ annotation pair is observed more often than expected.
 
 
 ```r
-# Test isotype relationships using 100 permutations
-edge_test <- testEdges(graph_list, "ISOTYPE", nperm=100)
+# Test isotype relationships
+edge_test <- testEdges(graph_list, "ISOTYPE", nperm=20)
 ```
 
 ```r
@@ -358,10 +358,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.790000 0.0300000
-## 2    IgA   IgG     2  3.040541 0.6081081
-## 3    IgG   IgA     1  2.644444 0.8444444
-## 4    IgG   IgG    99 98.580000 0.3300000
+## 1    IgA   IgA    36 34.950000 0.0500000
+## 2    IgA   IgG     2  4.000000 0.8461538
+## 3    IgG   IgA     1  2.529412 0.5882353
+## 4    IgG   IgG    99 98.300000 0.3500000
 ```
 
 ```r
@@ -431,8 +431,8 @@ that the annotation is observed more often than expected in the MRCA position.
 
 
 ```r
-# Test isotype MRCA annotations using 100 permutations
-mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=100)
+# Test isotype MRCA annotations
+mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=20)
 ```
 
 ```r
@@ -442,8 +442,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.27   0.00
-## 2        IgG    31    31.73   0.73
+## 1        IgA    12     11.4    0.0
+## 2        IgG    31     31.6    0.6
 ```
 
 ```r
