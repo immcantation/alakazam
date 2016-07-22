@@ -40,6 +40,12 @@ test_that("estimateAbundance", {
                  c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
                  tolerance = 0.001)
     expect_equal(abund$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    
+    set.seed(90)
+    abund <- estimateAbundance(db[c(1,289),],"SAMPLE", nboot=100)
+    expect_equal(abund$LOWER,c(1,1))
+    expect_equal(abund$UPPER,c(1,1))
+    expect_equal(abund$RANK,c(1,1))
 })
 
 test_that("calcDiversity", {
