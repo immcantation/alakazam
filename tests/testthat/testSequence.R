@@ -1,7 +1,14 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
-test_that("seqDist",{
+# Load test database
+e1 <- new.env()
+#load(file.path("tests", "data-tests", "TestDb.rda"), envir=e1)
+load(file.path("..", "data-tests", "TestDb.rda"), envir=e1)
+db2 <- get("TestDb", envir=e1)
+rm(e1)
+
+test_that("seqDist: short toy sequences", {
     # Ungapped examples
     expect_equal(seqDist("ATGGC", "ATGGG"), 1)
     expect_equal(seqDist("ATGGC", "ATG??"), 2)
@@ -43,6 +50,69 @@ test_that("seqDist",{
     expect_equal(
         seqDist("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1)),
         2)
+})
+
+test_that("seqDist: long IMGT-gapped sequences", {
+    # Define test sequence set
+    seq <- substr(db2$SEQUENCE_IMGT[1:4], 1, 312)
+    germ <- substr(db2$GERMLINE_IMGT_D_MASK[1:4], 1, 312)
+    # Replace dots with Ns
+    seq_n <- gsub(".", "N", seq, fixed=TRUE)
+    germ_n <- gsub(".", "N", germ, fixed=TRUE)
+    
+    # Region ranges
+    regions <- list("SEQ"=c(1, 312),
+                    "FWR1"=c(79, 114),
+                    "CDR1"=c(115, 165),
+                    "FWR2"=c(115, 165),
+                    "CDR2"=c(166, 195),
+                    "FWR3"=c(196, 312))
+    
+    # Expected mutations
+    expected <- list("SEQ"=c(13, 19, 19, 55),
+                     "FWR1"=c(2, 6, 6, 4),
+                     "CDR1"=c(1, 5, 5, 3),
+                     "FWR2"=c(2, 1, 1, 3),
+                     "CDR2"=c(3, 3, 3, 6),
+                     "FWR3"=c(5, 4, 4, 39))
+    
+    # Test full V region sequence
+    #cat("Full V-region (", paste(regions[["SEQ"]], collapse=":"), ") distance:\n", sep="")
+    
+    #cat("  With dots:\n")
+    d <- mapply(seqDist, seq, germ, MoreArgs=list(dist_mat=getDNAMatrix(gap=0)), 
+                USE.NAMES=FALSE)
+    #d <- mapply(function(x, y) { sum(seqinr::s2c(x) != seqinr::s2c(y)) }, seq, germ, USE.NAMES=FALSE)
+    expect_equal(d, expected[["SEQ"]], info="Full V-region with dots")
+    
+    #cat("  With Ns:\n")
+    d <- mapply(seqDist, seq_n, germ_n, MoreArgs=list(dist_mat=getDNAMatrix(gap=0)), 
+                USE.NAMES=FALSE)
+    #d <- mapply(function(x, y) { sum(seqinr::s2c(x) != seqinr::s2c(y)) }, seq, germ, USE.NAMES=FALSE)
+    expect_equal(d, expected[["SEQ"]], info="Full V-region with Ns")
+    
+    # Test by region
+    for (n in c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")) {
+        #cat(n, " (", paste(regions[[n]], collapse=":"), ") distance:\n", sep="")
+        
+        # Define substrings
+        seq_sub <- extractVRegion(seq, n)
+        germ_sub <- extractVRegion(germ, n)
+        seq_n_sub <- extractVRegion(seq_n, n)
+        germ_n_sub <- extractVRegion(germ_n, n)
+        
+        #cat("  With dots:\n")
+        d <- mapply(seqDist, seq_sub, germ_sub, MoreArgs=list(dist_mat=getDNAMatrix(gap=0)), 
+                    USE.NAMES=FALSE)
+        #d <- mapply(function(x, y) { sum(seqinr::s2c(x) != seqinr::s2c(y)) }, seq_sub, germ_sub, USE.NAMES=FALSE)
+        expect_equal(d, expected[[n]], info=paste(n, "with dots"))
+        
+        #cat("  With Ns:\n")
+        d <- mapply(seqDist, seq_n_sub, germ_n_sub, MoreArgs=list(dist_mat=getDNAMatrix(gap=0)), 
+                    USE.NAMES=FALSE)
+        #d <- mapply(function(x, y) { sum(seqinr::s2c(x) != seqinr::s2c(y)) }, seq_sub, germ_sub, USE.NAMES=FALSE)
+        expect_equal(d, expected[[n]], info=paste(n, "with Ns"))
+    }
 })
 
 test_that("pairwiseDist", {
