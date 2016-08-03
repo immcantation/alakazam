@@ -9,6 +9,9 @@ db2 <- get("TestDb", envir=e1)
 rm(e1)
 
 test_that("seqDist: short toy sequences", {
+    
+    expect_equal(seqDist("AC-A", "AC-G", getDNAMatrix(gap=0)), 1)
+    
     # Ungapped examples
     expect_equal(seqDist("ATGGC", "ATGGG"), 1)
     expect_equal(seqDist("ATGGC", "ATG??"), 2)

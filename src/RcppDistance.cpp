@@ -180,10 +180,10 @@ LogicalMatrix pairwiseEqual (StringVector seq) {
 double seqDistRcpp(std::string seq1, std::string seq2, 
                    NumericMatrix dist_mat) {
     // Get valid positions
+    // Check that seq1 and seq2 have same length
     IntegerVector valid_seq1 = validChars(seq1, seq2);
     
-    // Check that seq1 and seq2 have same length
-    int len_seqs = valid_seq1.length();
+    int len_seqs = seq1.length();
     
     List dist_mat_dims = dist_mat.attr("dimnames");
     //print (dist_mat_dims);
