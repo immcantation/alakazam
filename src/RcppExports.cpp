@@ -5,18 +5,6 @@
 
 using namespace Rcpp;
 
-// validChars
-IntegerVector validChars(std::string seq1, std::string seq2);
-RcppExport SEXP alakazam_validChars(SEXP seq1SEXP, SEXP seq2SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< std::string >::type seq1(seq1SEXP);
-    Rcpp::traits::input_parameter< std::string >::type seq2(seq2SEXP);
-    __result = Rcpp::wrap(validChars(seq1, seq2));
-    return __result;
-END_RCPP
-}
 // seqEqual
 bool seqEqual(std::string seq1, std::string seq2, CharacterVector ignore);
 RcppExport SEXP alakazam_seqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
