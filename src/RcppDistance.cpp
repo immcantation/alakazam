@@ -49,6 +49,7 @@ IntegerVector validChars (std::string seq1, std::string seq2) {
 //' @param    seq1    character string containing a DNA sequence.
 //' @param    seq2    character string containing a DNA sequence.
 //' @param    ignore  vector of characters to ignore when testing for equality.
+//'                   Default is to ignore c("N",".","-","?")
 //' 
 //' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
 //'           Sequences of unequal length will always return \code{FALSE} regardless of
@@ -71,17 +72,9 @@ IntegerVector validChars (std::string seq1, std::string seq2) {
 //' @export
 // [[Rcpp::export]]
 bool seqEqual(std::string seq1, std::string seq2, 
-              CharacterVector ignore=CharacterVector()) {
+              CharacterVector ignore=CharacterVector::create("N","-",".","?")) {
     
     int ig_len = ignore.length();
-    
-    // Default ignore characters
-    if (ig_len == 0) {
-        ignore.push_back("N");
-        ignore.push_back("-");
-        ignore.push_back(".");
-        ignore.push_back("?");
-    }
     
     ig_len = ignore.length();
     

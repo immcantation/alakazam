@@ -12,6 +12,7 @@ validChars <- function(seq1, seq2) {
 #' @param    seq1    character string containing a DNA sequence.
 #' @param    seq2    character string containing a DNA sequence.
 #' @param    ignore  vector of characters to ignore when testing for equality.
+#'                   Default is to ignore c("N",".","-","?")
 #' 
 #' @return   Returns \code{TRUE} if sequences are equal and \code{FALSE} if they are not.
 #'           Sequences of unequal length will always return \code{FALSE} regardless of
@@ -32,7 +33,7 @@ validChars <- function(seq1, seq2) {
 #' seqEqual("AT--T", "ATGGC", ignore="N")
 #' 
 #' @export
-seqEqual <- function(seq1, seq2, ignore = character()) {
+seqEqual <- function(seq1, seq2, ignore = as.character( c("N","-",".","?"))) {
     .Call('alakazam_seqEqual', PACKAGE = 'alakazam', seq1, seq2, ignore)
 }
 
