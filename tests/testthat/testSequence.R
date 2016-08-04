@@ -11,6 +11,17 @@ rm(e1)
 test_that("seqDist: short toy sequences", {
     
     expect_equal(seqDist("AC-A", "AC-G", getDNAMatrix(gap=0)), 1)
+    expect_equal(seqDist("AC--A", "ACATG", getDNAMatrix(gap=0)), 1)
+    expect_equal(seqDist("AC--A", "ACATG", getDNAMatrix(gap=1)), 3)
+    expect_equal(seqDist("AC--A", "ACATG", getDNAMatrix(gap=-1)), 2)
+    
+    # AC--AAC--A
+    # ACATGACATG
+    # **--.**--.
+    expect_equal(seqDist("AC--AAC--A", "ACATGACATG", getDNAMatrix(gap=0)), 2)
+    expect_equal(seqDist("AC--AAC--A", "ACATGACATG", getDNAMatrix(gap=1)), 6)
+    expect_equal(seqDist("AC--AAC--A", "ACATGACATG", getDNAMatrix(gap=-1)), 4)
+    
     
     # Ungapped examples
     expect_equal(seqDist("ATGGC", "ATGGG"), 1)
