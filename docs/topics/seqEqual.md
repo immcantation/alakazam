@@ -15,7 +15,7 @@ Description
 Usage
 --------------------
 ```
-seqEqual(seq1, seq2, ignore = character())
+seqEqual(seq1, seq2, ignore = as.character(c("N", "-", ".", "?")))
 ```
 
 Arguments
@@ -29,6 +29,7 @@ seq2
 
 ignore
 :   vector of characters to ignore when testing for equality.
+Default is to ignore c("N",".","-","?")
 
 
 

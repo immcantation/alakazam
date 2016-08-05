@@ -1,3 +1,13 @@
+Version 0.2.5:  August 5, 2016
+-------------------------------------------------------------------------------
+
+General:
+
++ Fixed a bug in `seqDist()` wherein distance was not properly calculated in
+  some sequences containing gap characters.
++ Added stop and gap characters to `getAAMatrix()` return matrix.
+
+
 Version 0.2.4:  July 20, 2016
 -------------------------------------------------------------------------------
 

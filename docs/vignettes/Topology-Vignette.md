@@ -358,10 +358,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.900000 0.1000000
-## 2    IgA   IgG     2  2.500000 0.4166667
-## 3    IgG   IgA     1  2.777778 0.7777778
-## 4    IgG   IgG    99 99.100000 0.4500000
+## 1    IgA   IgA    36 34.750000 0.0500000
+## 2    IgA   IgG     2  2.266667 0.4666667
+## 3    IgG   IgA     1  3.111111 0.9444444
+## 4    IgG   IgG    99 98.750000 0.3000000
 ```
 
 ```r
@@ -442,8 +442,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.45   0.00
-## 2        IgG    31    31.55   0.55
+## 1        IgA    12     11.2    0.0
+## 2        IgG    31     31.8    0.8
 ```
 
 ```r

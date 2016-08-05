@@ -391,12 +391,14 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #'           See \link{plotMRCATest} for plotting the permutation distributions.
 #'           
 #' @examples
+#' \donttest{
 #' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform MRCA test on isotypes
 #' x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 #' print(x)
+#' }
 #' 
 #' @export
 testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA), 
@@ -500,12 +502,14 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #'           See \link{plotEdgeTest} for plotting the permutation distributions.
 #'           
 #' @examples
+#' \donttest{
 #' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
 #' # Perform edge test on isotypes
 #' x <- testEdges(graphs, "ISOTYPE", nperm=10)
 #' print(x)
+#' }
 #' 
 #' @export
 testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), nperm=200, 
@@ -604,6 +608,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
+#' \donttest{
 #' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
@@ -613,6 +618,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 #' # Plot
 #' plotEdgeTest(x, color="steelblue", style="hist")
 #' plotEdgeTest(x, style="cdf")
+#' }
 #' 
 #' @export
 plotEdgeTest <- function(data, color="black", main_title="Edge Test", 
@@ -688,6 +694,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @seealso  See \link{testEdges} for performing the test.
 #' 
 #' @examples
+#' \donttest{
 #' # Define example tree set
 #' graphs <- ExampleTrees[1-10]
 #' 
@@ -697,6 +704,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' # Plot
 #' plotMRCATest(x, color="steelblue", style="hist")
 #' plotMRCATest(x, style="cdf")
+#' }
 #' 
 #' @export
 plotMRCATest <- function(data, color="black", main_title="MRCA Test", 
