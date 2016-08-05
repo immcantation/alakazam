@@ -51,6 +51,8 @@ getDNAMatrix <- function(gap=-1) {
 #' \code{getAAMatrix} returns a Hamming distance matrix for IUPAC ambiguous
 #' amino acid characters.
 #' 
+#' @param    gap  value to assign to characters in the set \code{c("-", ".")}.
+#' 
 #' @return   A \code{matrix} of amino acid character distances with row and column names 
 #'           indicating the character pair.
 #' 
@@ -61,15 +63,20 @@ getDNAMatrix <- function(gap=-1) {
 #' getAAMatrix()
 #' 
 #' @export
-getAAMatrix <- function() {
+getAAMatrix <- function(gap=0) {
   # Define Hamming distance matrix
-  sub_mat <- diag(length(IUPAC_AA))
-  colnames(sub_mat) <- rownames(sub_mat) <- names(IUPAC_AA)
+  sub_mat <- diag(27)
+  colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_AA), c("*", "-", "."))
   for (i in 1:length(IUPAC_AA)) {
     for (j in i:length(IUPAC_AA)) {
       sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_AA[[i]] %in% IUPAC_AA[[j]])
     }
   }
+  
+  # Add gap characters
+  sub_mat[c("-", "."), c("-", ".")] <- 1 
+  sub_mat[c("-", "."), c(1:27)] <- 1 - gap 
+  sub_mat[c(1:27), c("-", ".")] <- 1 - gap
   
   return(1 - sub_mat)
 }
