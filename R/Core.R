@@ -191,7 +191,19 @@ translateStrings <- function(strings, translation) {
 # @param   logic    one of "all" or "any" controlling whether all or at least one of
 #                   the columns must be valid
 # @return  TRUE if columns are valid and a string message if not.
+# 
+# @examples
+# df <- data.frame(A=1:3, B=4:6, C=rep(NA, 3))
+# alakazam:::checkColumns(df, c("A", "B"), logic="all")
+# alakazam:::checkColumns(df, c("A", "B"), logic="any")
+# alakazam:::checkColumns(df, c("A", "C"), logic="all")
+# alakazam:::checkColumns(df, c("A", "C"), logic="any")
+# alakazam:::checkColumns(df, c("A", "D"), logic="all")
+# alakazam:::checkColumns(df, c("A", "D"), logic="any")
 checkColumns <- function(data, columns, logic=c("all", "any")) {
+    ## DEBUG
+    # data=df; columns=c("A", "D"); logic="any"
+    
     # Check arguments
     logic <- match.arg(logic)
     
@@ -206,7 +218,7 @@ checkColumns <- function(data, columns, logic=c("all", "any")) {
         }        
         # Check that all values are not NA
         for (f in columns) {
-            if (all(is.na(data[, f]))) { 
+            if (all(is.na(data[[f]]))) { 
                 msg <- paste("The column", f, "contains no data") 
                 return(msg)
             }
@@ -214,13 +226,17 @@ checkColumns <- function(data, columns, logic=c("all", "any")) {
     } else if (logic == "any") {
         # Check that columns exist
         if (!any(columns %in% data_names)) {
-            msg <- paste("Input must contain at least one of the columns:", paste(columns, collapse=", "))
+            msg <- paste("Input must contain at least one of the columns:", 
+                         paste(columns, collapse=", "))
             return(msg)
         }
         # Check that all values are not NA
-        invalid <- sapply(columns, function(f) all(is.na(data_names[, f])))
+        
+        columns_found <- columns[columns %in% data_names]
+        invalid <- sapply(columns_found, function(f) all(is.na(data[[f]])))
         if (all(invalid)) { 
-            msg <- paste("None of the columns", paste(columns, collapse=", "), "contain data") 
+            msg <- paste("None of the columns", paste(columns_found, collapse=", "), 
+                         "contain data") 
             return(msg)
         }
     }
