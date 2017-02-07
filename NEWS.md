@@ -1,3 +1,12 @@
+Version 0.2.5.999:  February 7, 2017
+-------------------------------------------------------------------------------
+
+General:
+
++ License changed to Creative Commons Attribution-ShareAlike 4.0 International
+(CC BY-SA 4.0).
+
+
 Version 0.2.5:  August 5, 2016
 -------------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
-Version: 0.2.5
-Date: 2016-08-05
+Version: 0.2.5.999
+Date: 2017-02-07
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -18,7 +18,7 @@ Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Provides immunoglobulin (Ig) sequence lineage reconstruction,
     diversity profiling, and amino acid property analysis. Also provides
     core functionality for other tools in the Change-O suite.
-License: CC BY-NC-SA 4.0
+License: CC BY-SA 4.0
 URL: http://alakazam.readthedocs.org
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
 LazyData: true
