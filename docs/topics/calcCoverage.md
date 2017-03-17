@@ -31,10 +31,12 @@ r
 
 
 
+
 Value
 -------------------
 
 The sample coverage of the given order `r`.
+
 
 References
 -------------------

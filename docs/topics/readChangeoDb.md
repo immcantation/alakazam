@@ -38,6 +38,7 @@ for a list of which columns are effected.
 
 
 
+
 Value
 -------------------
 
@@ -83,7 +84,7 @@ Examples
 See also
 -------------------
 
-Wraps [read.table](http://www.inside-r.org/r-doc/utils/read.table) and [fread](http://www.inside-r.org/packages/cran/data.table/docs/fread). 
+Wraps [read_delim](http://www.inside-r.org/packages/cran/readr/docs/read_delim). 
 See [writeChangeoDb](writeChangeoDb.md) for writing to Change-O files.
 
 

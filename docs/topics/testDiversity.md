@@ -59,10 +59,12 @@ progress
 
 
 
+
 Value
 -------------------
 
 A [DiversityTest](DiversityTest-class.md) object containing p-values and summary statistics.
+
 
 Details
 -------------------
@@ -89,6 +91,7 @@ for all bootstrap realizations, yeilding a distribution of `nboot` total deltas;
 <code class = 'eq'>Da  !=  Db</code> is the value of <code class = 'eq'>P(0)</code> from the empirical cumulative distribution 
 function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.
 
+
 Note
 -------------------
 
@@ -96,6 +99,7 @@ This method may inflate statistical significance when clone sizes are uniformly 
 such as when most clones sizes are 1, sample size is small, and `max_n` is near
 the total count of the smallest data group. Use caution when interpreting the results 
 in such cases. We are currently investigating this potential problem.
+
 
 References
 -------------------
@@ -137,12 +141,12 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d     479.65 15.91669      0
+1 -1h != +7d     480.26 16.64218      0
 
 Slot "summary":
     GROUP   MEAN       SD
--1h   -1h 818.20 12.01262
-+7d   +7d 338.55 11.29170
+-1h   -1h 819.49 12.27010
++7d   +7d 339.23 12.97461
 
 Slot "groups":
 [1] "-1h" "+7d"

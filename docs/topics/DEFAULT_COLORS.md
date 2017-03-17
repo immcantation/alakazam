@@ -25,6 +25,7 @@ TR_COLORS
 ```
 
 
+
 Format
 -------------------
 Named character vectors with hexcode colors as values.

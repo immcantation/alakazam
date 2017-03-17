@@ -69,6 +69,7 @@ object; if `FALSE` draw the plot.
 
 
 
+
 Value
 -------------------
 
@@ -96,7 +97,7 @@ div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
 plotDiversityCurve(div, legend_title="Sample")
 ```
 
-![4](plotDiversityCurve-4.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![6](plotDiversityCurve-6.png)
 
 
 See also

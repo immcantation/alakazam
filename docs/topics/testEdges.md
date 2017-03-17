@@ -47,6 +47,7 @@ progress
 
 
 
+
 Value
 -------------------
 
@@ -81,16 +82,16 @@ print(x)
 
 ```
     PARENT   CHILD COUNT   EXPECTED PVALUE
-1      IgA     IgA    39  65.500000    1.0
-2      IgA IgA,IgG     3   3.700000    0.6
-3      IgA     IgG     2   5.700000    0.9
-4  IgA,IgG     IgA    29   2.000000    0.0
-5  IgA,IgG IgA,IgG     1   1.000000    0.0
-6  IgA,IgG     IgG    24   6.400000    0.0
-7  IgD,IgG     IgG     8   4.000000    0.0
-8      IgG     IgA     1   3.777778    1.0
+1      IgA     IgA    39  60.400000    1.0
+2      IgA IgA,IgG     3   2.800000    0.3
+3      IgA     IgG     2   4.500000    0.8
+4  IgA,IgG     IgA    29  10.666667    0.0
+5  IgA,IgG IgA,IgG     1   1.500000    0.5
+6  IgA,IgG     IgG    24   2.714286    0.0
+7  IgD,IgG     IgG     8   1.000000    0.0
+8      IgG     IgA     1   3.800000    0.9
 9      IgG IgD,IgG     1   1.000000    0.0
-10     IgG     IgG   112 132.400000    1.0
+10     IgG     IgG   112 136.700000    1.0
 
 ```
 

@@ -34,10 +34,12 @@ scale is used.
 
 
 
+
 Value
 -------------------
 
 A vector of bulkiness scores for the sequence(s).
+
 
 References
 -------------------

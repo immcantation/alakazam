@@ -50,6 +50,7 @@ progress
 
 
 
+
 Value
 -------------------
 
@@ -64,6 +65,7 @@ containing the following columns:
 + `RANK`:   the rank of the clone abundance.
 
 
+
 Details
 -------------------
 
@@ -73,6 +75,7 @@ correction and unseen clone frequencies described in Chao et al, 2015.
 
 Confidence intervals are derived using the standard deviation of the resampling 
 realizations, as described in Chao et al, 2015.
+
 
 References
 -------------------

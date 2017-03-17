@@ -87,10 +87,12 @@ number of sequences that were collapsed.
 
 
 
+
 Value
 -------------------
 
 A [ChangeoClone](ChangeoClone-class.md) object containing the modified clone.
+
 
 Details
 -------------------

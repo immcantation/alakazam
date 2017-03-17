@@ -115,21 +115,22 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
-#' @importFrom  data.table  fread
 #' @importFrom  dplyr       do n desc %>%
 #'                          data_frame data_frame_
 #'                          bind_cols bind_rows combine arrange arrange_ 
 #'                          group_by group_by_ ungroup
 #'                          filter filter_ slice slice_ select select_ 
-#'                          mutate mutate_ transmute transmute_
-#'                          rename rename_ summarize summarize_
+#'                          mutate mutate_ mutate_at
+#'                          summarize summarize_ summarize_at
+#'                          transmute transmute_ rename rename_
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
 #'                          vertex_attr set_vertex_attr 
 #'                          degree shortest_paths all_shortest_paths distances
 #' @importFrom  lazyeval    interp
+#' @importFrom  readr       read_delim read_tsv write_delim write_tsv
 #' @importFrom  scales      log2_trans log10_trans trans_breaks trans_format
-#'                          math_format percent scientific
+#'                          math_format percent scientific pretty_breaks
 #' @importFrom  seqinr      translate
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          dbinom pbinom qbinom rbinom

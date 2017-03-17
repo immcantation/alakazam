@@ -45,6 +45,7 @@ progress
 
 
 
+
 Value
 -------------------
 
@@ -78,10 +79,10 @@ print(x)
 
 
 ```
-  ANNOTATION COUNT  EXPECTED    PVALUE
-1        IgA    16 13.600000 0.0000000
-2    IgA,IgG     1  1.285714 0.2857143
-3        IgG    31 33.300000 1.0000000
+  ANNOTATION COUNT EXPECTED PVALUE
+1        IgA    16     12.9    0.0
+2    IgA,IgG     1      1.6    0.4
+3        IgG    31     34.3    1.0
 
 ```
 

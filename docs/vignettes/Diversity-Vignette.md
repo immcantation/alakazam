@@ -117,14 +117,14 @@ head(clones, 5)
 ```
 
 ```
-## # A tibble: 5 x 6
+## # A tibble: 5 × 6
 ##   GROUP CLONE           P        LOWER       UPPER  RANK
 ##   <chr> <chr>       <dbl>        <dbl>       <dbl> <int>
-## 1   -1h  8365 0.011999814 0.0053357117 0.018663916     1
-## 2   -1h  6465 0.007993219 0.0022311870 0.013755251     2
-## 3   -1h  5060 0.006983872 0.0022420688 0.011725675     3
-## 4   -1h  6985 0.005962422 0.0010158428 0.010909001     4
-## 5   -1h  1574 0.004914877 0.0007562948 0.009073459     5
+## 1   -1h  8365 0.011999814 0.0052118988 0.018787729     1
+## 2   -1h  6465 0.007993219 0.0030849446 0.012901494     2
+## 3   -1h  5060 0.006983872 0.0018621957 0.012105548     3
+## 4   -1h  6985 0.005962422 0.0007441978 0.011180646     4
+## 5   -1h  1574 0.004914877 0.0004536958 0.009376058     5
 ```
 
 ```r
@@ -169,6 +169,12 @@ plotDiversityCurve(sample_div, colors=sample_colors, main_title=sample_main,
                   legend_title="Sample", log_q=TRUE, log_d=TRUE)
 ```
 
+```
+## Warning: Transformation introduced infinite values in continuous x-axis
+
+## Warning: Transformation introduced infinite values in continuous x-axis
+```
+
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-1.png)
 
 ```r
@@ -176,6 +182,12 @@ plotDiversityCurve(sample_div, colors=sample_colors, main_title=sample_main,
 isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
 plotDiversityCurve(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
                    legend_title="Isotype", log_q=TRUE, log_d=TRUE)
+```
+
+```
+## Warning: Transformation introduced infinite values in continuous x-axis
+
+## Warning: Transformation introduced infinite values in continuous x-axis
 ```
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
@@ -201,7 +213,7 @@ print(sample_test)
 
 ```
 ##         test DELTA_MEAN DELTA_SD PVALUE
-## 1 -1h != +7d    478.775 15.95264      0
+## 1 -1h != +7d    477.325 15.90422      0
 ```
 
 
@@ -219,10 +231,10 @@ print(isotype_test)
 
 ```
 ##         test DELTA_MEAN  DELTA_SD PVALUE
-## 1 IgA != IgD  191.32896 10.840779      0
-## 2 IgA != IgG   26.85284  4.590661      0
-## 3 IgA != IgM  228.96134  7.516002      0
-## 4 IgD != IgG  164.47612 11.733460      0
-## 5 IgD != IgM   37.63238 12.988683      0
-## 6 IgG != IgM  202.10850  8.307737      0
+## 1 IgA != IgD  189.87781 11.711944      0
+## 2 IgA != IgG   26.93563  4.502549      0
+## 3 IgA != IgM  228.89640  6.452985      0
+## 4 IgD != IgG  162.94217 11.889159      0
+## 5 IgD != IgM   39.01859 12.873198      0
+## 6 IgG != IgM  201.96076  7.377254      0
 ```

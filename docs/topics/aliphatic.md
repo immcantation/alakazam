@@ -35,10 +35,12 @@ aliphatic index.
 
 
 
+
 Value
 -------------------
 
 A vector of the aliphatic indices for the sequence(s).
+
 
 References
 -------------------

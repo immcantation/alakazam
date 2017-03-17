@@ -39,6 +39,7 @@ the console.
 
 
 
+
 Value
 -------------------
 
@@ -85,6 +86,7 @@ the input `ChangeoClone`.
 `junc_len` slot of the input `ChangeoClone`.
 
 
+
 Details
 -------------------
 
@@ -105,6 +107,7 @@ between them. The germline sequence (outgroup) is moved to the root of the tree 
 excluded from the node replacement processes, which permits the trunk of the tree to be
 the only edge with a distance of zero. Edge weights of the resultant tree are assigned 
 as the distance between each sequence.
+
 
 References
 -------------------

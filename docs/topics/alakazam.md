@@ -28,6 +28,7 @@ vignettes:
 
 
 
+
 File I/O
 -------------------
 
@@ -35,6 +36,7 @@ File I/O
 
 + [readChangeoDb](readChangeoDb.md):        Input Change-O style files.
 + [writeChangeoDb](writeChangeoDb.md):       Output Change-O style files.
+
 
 
 Sequence cleaning
@@ -47,6 +49,7 @@ Sequence cleaning
 + [collapseDuplicates](collapseDuplicates.md):   Remove duplicate sequences.
 
 
+
 Lineage reconstruction
 -------------------
 
@@ -54,6 +57,7 @@ Lineage reconstruction
 
 + [makeChangeoClone](makeChangeoClone.md):     Clean sequences for lineage reconstruction.
 + [buildPhylipLineage](buildPhylipLineage.md):   Perform lineage reconstruction of Ig sequences.
+
 
 
 Lineage topology analysis
@@ -67,6 +71,7 @@ Lineage topology analysis
 + [summarizeSubtrees](summarizeSubtrees.md):    Various summary statistics for subtrees.
 + [plotSubtrees](plotSubtrees.md):         Plot distributions of summary statistics 
 for a population of trees.
+
 
 
 Diversity analysis
@@ -84,6 +89,7 @@ curve.
 + [plotDiversityCurve](plotDiversityCurve.md):   Plot clonal diversity curves.
 
 
+
 Ig and TCR sequence annotation
 -------------------
 
@@ -94,6 +100,7 @@ Ig and TCR sequence annotation
 + [getAllele](getSegment.md):            Get V(D)J allele names.
 + [getGene](getSegment.md):              Get V(D)J gene names.
 + [getFamily](getSegment.md):            Get V(D)J family names.
+
 
 
 Sequence distance calculation
@@ -109,6 +116,7 @@ set of sequences.
 set of sequences.
 
 
+
 Amino acid propertes
 -------------------
 
@@ -121,12 +129,14 @@ sequences.
 
 
 
+
 General data manipulation
 -------------------
 
 
 
 + [translateStrings](translateStrings.md):     Perform multiple string replacement operations.
+
 
 
 References

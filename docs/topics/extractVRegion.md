@@ -34,6 +34,7 @@ regions will be returned.
 
 
 
+
 Value
 -------------------
 
@@ -42,6 +43,7 @@ vector of the extracted sub-sequences will be returned. If multiple regions
 are specified, then a character matrix will be returned with columns 
 corresponding to the specified regions and a row for each entry in 
 `sequences`.
+
 
 References
 -------------------

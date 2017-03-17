@@ -35,10 +35,12 @@ scale is used.
 
 
 
+
 Value
 -------------------
 
 A vector of GRAVY scores for the sequence(s).
+
 
 References
 -------------------

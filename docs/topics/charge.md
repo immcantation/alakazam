@@ -43,10 +43,12 @@ net charge.
 
 
 
+
 Value
 -------------------
 
 A vector of net charges for the sequence(s).
+
 
 References
 -------------------

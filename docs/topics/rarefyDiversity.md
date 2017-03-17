@@ -69,10 +69,12 @@ progress
 
 
 
+
 Value
 -------------------
 
 A [DiversityCurve](DiversityCurve-class.md) object summarizing the diversity scores.
+
 
 Details
 -------------------
@@ -94,6 +96,7 @@ common number of sequences.
 The diversity index (<code class = 'eq'>D</code>) for each group is the mean value of over all resampling 
 realizations. Confidence intervals are derived using the standard deviation of the 
 resampling realizations, as described in Chao et al, 2015.
+
 
 References
 -------------------
@@ -134,7 +137,7 @@ plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-![4](rarefyDiversity-4.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![6](rarefyDiversity-6.png)
 
 ```R
 
@@ -155,7 +158,7 @@ nboot=100)
 plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-![8](rarefyDiversity-8.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![12](rarefyDiversity-12.png)
 
 
 See also

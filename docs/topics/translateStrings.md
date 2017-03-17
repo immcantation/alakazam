@@ -31,10 +31,12 @@ the strings to replace (values) and their replacements (names).
 
 
 
+
 Value
 -------------------
 
 A modified `strings` vector.
+
 
 Details
 -------------------

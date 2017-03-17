@@ -34,7 +34,7 @@
 #'             \item  GERMLINE_IMGT_D_MASK
 #'           }
 #'                   
-#' @seealso  Wraps \link{read.table} and \link[data.table]{fread}. 
+#' @seealso  Wraps \link[readr]{read_delim}. 
 #'           See \link{writeChangeoDb} for writing to Change-O files.
 #' 
 #' @examples
@@ -57,34 +57,25 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
                      "GERMLINE_IMGT", "GERMLINE_IMGT_D_MASK")
     text_columns <- c("SEQUENCE_ID", "CLONE", "SAMPLE")
     
-    db <- tryCatch({ 
-            # Attempt to use fread
-            data.table::fread(file, sep="\t", header=TRUE, stringsAsFactors=FALSE,
-                              na.strings=c("", "NA", "None"), select=select, drop=drop,
-                              data.table=FALSE)
-        }, error=function(e) {
-            # Read file using read.delim if fread fails
-            #message("Failed to read file with fread. Falling back to read.table.")
-            db <- read.delim(file, as.is=TRUE, na.strings=c("", "NA", "None"))
-            
-            # Select columns
-            select_columns <- colnames(db)
-            if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
-            if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
-            
-            subset(db, select=select_columns)
-        })    
+    # Read file    
+    db <- suppressMessages(readr::read_tsv(file, na=c("", "NA", "None")))
 
+    # Select columns
+    select_columns <- colnames(db)
+    if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
+    if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
+    select_(db, .dots=select_columns)
+    
     # Convert sequence fields to upper case
-    if (seq_upper) {
-        for (x in intersect(seq_columns, names(db))) {
-            db[, x] <- toupper(db[, x]) 
-        }
+    upper_cols <- intersect(seq_columns, names(db))
+    if (seq_upper & length(upper_cols) > 0) {
+        db <- mutate_at(db, upper_cols, toupper)
     }
     
     # Convert text fields to character
-    for (x in intersect(text_columns, names(db))) {
-        db[, x] <- as.character(db[, x])
+    char_cols <- intersect(text_columns, names(db))
+    if (length(char_cols) > 0) {
+        db <- mutate_at(db, char_cols, as.character)
     }
     
     return(db)
@@ -93,7 +84,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 
 #' Write a Change-O tab-delimited database file
 #' 
-#' \code{writeChangeoDb} is a simple wrapper around \link{write.table} with defaults 
+#' \code{writeChangeoDb} is a simple wrapper around \link[readr]{write_delim} with defaults 
 #' appropriate for writing a Change-O tab-delimited database file from a data.frame.
 #'
 #' @param    data  data.frame of Change-O data.
@@ -101,7 +92,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' 
 #' @return   NULL
 #' 
-#' @seealso  Wraps \link{write.table}. See \link{readChangeoDb} for reading to Change-O files.
+#' @seealso  Wraps \link[readr]{write_delim}. See \link{readChangeoDb} for reading to Change-O files.
 #' 
 #' @examples
 #' \dontrun{
@@ -111,7 +102,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' 
 #' @export
 writeChangeoDb <- function(data, file) {
-    write.table(data, file=file, quote=FALSE, sep="\t", row.names=FALSE)
+    write_tsv(data, file, na="NA")
 }
 
 

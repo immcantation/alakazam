@@ -64,10 +64,12 @@ delimiter.
 
 
 
+
 Value
 -------------------
 
 A character vector containing allele, gene or family names.
+
 
 References
 -------------------

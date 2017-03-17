@@ -30,10 +30,12 @@ q
 
 
 
+
 Value
 -------------------
 
 A vector of diversity scores <code class = 'eq'>D</code> for each <code class = 'eq'>q</code>.
+
 
 Details
 -------------------
@@ -50,6 +52,7 @@ ones, thus encompassing a range of definitions that can be visualized as a singl
 
 Values of <code class = 'eq'>q < 0</code> are valid, but are generally not meaningful. The value of <code class = 'eq'>D</code> 
 at <code class = 'eq'>q=1</code> is estimated by <code class = 'eq'>D</code> at <code class = 'eq'>q=0.9999</code>.
+
 
 References
 -------------------

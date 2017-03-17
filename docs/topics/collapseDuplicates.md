@@ -72,11 +72,13 @@ sequences; if `FALSE` process sequences silently.
 
 
 
+
 Value
 -------------------
 
 A modified `data` data.frame with duplicate sequences removed and 
 annotation fields collapsed.
+
 
 Details
 -------------------

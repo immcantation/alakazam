@@ -1,3 +1,14 @@
+Version 0.2.6:  March 17, 2017
+-------------------------------------------------------------------------------
+
+General:
+
++ License changed to Creative Commons Attribution-ShareAlike 4.0 International
+  (CC BY-SA 4.0).
++ Removed data.table dependency and added readr dependency.
++ Performance improvements in `readChangeoDb` and `writeChangeoDb`.
+
+
 Version 0.2.5:  August 5, 2016
 -------------------------------------------------------------------------------
 

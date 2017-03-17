@@ -54,6 +54,7 @@ object; if `FALSE` draw the plot.
 
 
 
+
 Value
 -------------------
 
@@ -79,7 +80,7 @@ x <- testEdges(graphs, "ISOTYPE", nperm=10)
 
 ```
 
-
+**Error in ecdf(d)**: 'x' must have 1 or more non-missing values
 ```R
 
 # Plot
@@ -87,14 +88,12 @@ plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-![4](plotEdgeTest-4.png)
-
+**Error in rename_(data@tests, Parent = "PARENT", Child = "CHILD")**: object 'x' not found
 ```R
 plotEdgeTest(x, style="cdf")
 ```
 
-![6](plotEdgeTest-6.png)
-
+**Error in rename_(data@tests, Parent = "PARENT", Child = "CHILD")**: object 'x' not found
 
 See also
 -------------------
