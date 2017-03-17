@@ -1,8 +1,5 @@
 image: 
-  name: ssnn/immcantation
-  username: $USERNAME
-  password: $PASSWORD
-  email: $EMAIL
+  name: javh/immcantation/test-r
 
 pipelines:
   default:

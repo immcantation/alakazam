@@ -141,12 +141,12 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d     480.26 16.64218      0
+1 -1h != +7d     478.91 16.76462      0
 
 Slot "summary":
     GROUP   MEAN       SD
--1h   -1h 819.49 12.27010
-+7d   +7d 339.23 12.97461
+-1h   -1h 818.79 11.95471
++7d   +7d 339.88 12.39280
 
 Slot "groups":
 [1] "-1h" "+7d"
@@ -172,7 +172,7 @@ See also
 See [calcDiversity](calcDiversity.md) for the basic calculation and 
 [DiversityTest](DiversityTest-class.md) for the return object. 
 See [rarefyDiversity](rarefyDiversity.md) for curve generation.
-See [ecdf](http://www.inside-r.org/r-doc/stats/ecdf) for computation of the empirical cumulative 
+See [ecdf](http://www.rdocumentation.org/packages/stats/topics/ecdf) for computation of the empirical cumulative 
 distribution function.
 
 

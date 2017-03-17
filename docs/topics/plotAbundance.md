@@ -90,7 +90,7 @@ See also
 -------------------
 
 See [estimateAbundance](estimateAbundance.md) for generating the input abundance distribution.
-Plotting is performed with [ggplot](http://www.inside-r.org/packages/cran/ggplot2/docs/ggplot).
+Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

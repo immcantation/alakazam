@@ -82,16 +82,16 @@ print(x)
 
 ```
     PARENT   CHILD COUNT   EXPECTED PVALUE
-1      IgA     IgA    39  60.400000    1.0
-2      IgA IgA,IgG     3   2.800000    0.3
-3      IgA     IgG     2   4.500000    0.8
-4  IgA,IgG     IgA    29  10.666667    0.0
-5  IgA,IgG IgA,IgG     1   1.500000    0.5
-6  IgA,IgG     IgG    24   2.714286    0.0
-7  IgD,IgG     IgG     8   1.000000    0.0
-8      IgG     IgA     1   3.800000    0.9
-9      IgG IgD,IgG     1   1.000000    0.0
-10     IgG     IgG   112 136.700000    1.0
+1      IgA     IgA    39  62.000000  1.000
+2      IgA IgA,IgG     3   3.600000  0.600
+3      IgA     IgG     2   4.375000  0.875
+4  IgA,IgG     IgA    29   5.857143  0.000
+5  IgA,IgG IgA,IgG     1   2.000000  1.000
+6  IgA,IgG     IgG    24   4.750000  0.000
+7  IgD,IgG     IgG     8   2.400000  0.000
+8      IgG     IgA     1   4.700000  0.900
+9      IgG IgD,IgG     1   1.000000  0.000
+10     IgG     IgG   112 134.000000  1.000
 
 ```
 

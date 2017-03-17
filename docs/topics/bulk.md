@@ -91,7 +91,7 @@ bulk(seq, bulkiness=x)
 See also
 -------------------
 
-For additional size related indices see [aaindex](http://www.inside-r.org/packages/cran/seqinr/docs/aaindex).
+For additional size related indices see [aaindex](http://www.rdocumentation.org/packages/seqinr/topics/aaindex).
 
 
 

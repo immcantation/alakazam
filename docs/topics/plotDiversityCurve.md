@@ -104,7 +104,7 @@ See also
 -------------------
 
 See [rarefyDiversity](rarefyDiversity.md) for generating [DiversityCurve](DiversityCurve-class.md)
-objects for input. Plotting is performed with [ggplot](http://www.inside-r.org/packages/cran/ggplot2/docs/ggplot).
+objects for input. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

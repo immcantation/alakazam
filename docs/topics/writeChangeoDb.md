@@ -9,7 +9,7 @@
 Description
 --------------------
 
-`writeChangeoDb` is a simple wrapper around [write_delim](http://www.inside-r.org/packages/cran/readr/docs/write_delim) with defaults 
+`writeChangeoDb` is a simple wrapper around [write_delim](http://www.rdocumentation.org/packages/readr/topics/write_delim) with defaults 
 appropriate for writing a Change-O tab-delimited database file from a data.frame.
 
 
@@ -46,7 +46,7 @@ Examples
 See also
 -------------------
 
-Wraps [write_delim](http://www.inside-r.org/packages/cran/readr/docs/write_delim). See [readChangeoDb](readChangeoDb.md) for reading to Change-O files.
+Wraps [write_delim](http://www.rdocumentation.org/packages/readr/topics/write_delim). See [readChangeoDb](readChangeoDb.md) for reading to Change-O files.
 
 
 

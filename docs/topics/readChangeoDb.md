@@ -84,7 +84,7 @@ Examples
 See also
 -------------------
 
-Wraps [read_delim](http://www.inside-r.org/packages/cran/readr/docs/read_delim). 
+Wraps [read_delim](http://www.rdocumentation.org/packages/readr/topics/read_delim). 
 See [writeChangeoDb](writeChangeoDb.md) for writing to Change-O files.
 
 

@@ -45,7 +45,7 @@ Does not perform partial replacements. Each translation value must match a compl
 `strings` value or it will not be replaced.  Values that do not have a replacement
 named in the `translation` parameter will not be modified.
 
-Replacement is accomplished using [gsub](http://www.inside-r.org/r-doc/base/grep).
+Replacement is accomplished using [gsub](http://www.rdocumentation.org/packages/base/topics/grep).
 
 
 
@@ -86,7 +86,7 @@ translateStrings(strings, translation)
 See also
 -------------------
 
-See [gsub](http://www.inside-r.org/r-doc/base/grep) for single value replacement in the base package.
+See [gsub](http://www.rdocumentation.org/packages/base/topics/grep) for single value replacement in the base package.
 
 
 

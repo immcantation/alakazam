@@ -112,7 +112,7 @@ charge(seq, pK=x)
 See also
 -------------------
 
-For additional pK scales see `[pK](http://www.inside-r.org/packages/cran/seqinr/docs/pK)`.
+For additional pK scales see `[pK](http://www.rdocumentation.org/packages/seqinr/topics/pK)`.
 
 
 

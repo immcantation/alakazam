@@ -149,7 +149,7 @@ See also
 Takes as input a [ChangeoClone](ChangeoClone-class.md). 
 Temporary directories are created with [makeTempDir](makeTempDir.md).
 Distance is calculated using [seqDist](seqDist.md). 
-See [igraph](http://www.inside-r.org/packages/cran/igraph/docs/aaa-igraph-package) and [igraph.plotting](http://www.inside-r.org/packages/cran/igraph/docs/plot.common) for working 
+See [igraph](http://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package) and [igraph.plotting](http://www.rdocumentation.org/packages/igraph/topics/plot.common) for working 
 with igraph `graph` objects.
 
 

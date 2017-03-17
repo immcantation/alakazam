@@ -85,7 +85,7 @@ translateDNA(ExampleDb$JUNCTION[1:3], trim=TRUE)
 See also
 -------------------
 
-`[translate](http://www.inside-r.org/packages/cran/seqinr/docs/translate)`.
+`[translate](http://www.rdocumentation.org/packages/seqinr/topics/translate)`.
 
 
 

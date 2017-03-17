@@ -44,7 +44,7 @@ makeTempDir("Clone50")
 
 
 ```
-[1] "/tmp/RtmpFjbt5T/Clone50-temp-208659f49779"
+[1] "/tmp/RtmpebOz6h/Clone50-temp-2ebc42bc8698"
 
 ```
 
@@ -53,8 +53,8 @@ makeTempDir("Clone50")
 See also
 -------------------
 
-This is just a wrapper for [tempfile](http://www.inside-r.org/r-doc/base/tempfile) and 
-[dir.create](http://www.inside-r.org/r-doc/base/files2).
+This is just a wrapper for [tempfile](http://www.rdocumentation.org/packages/base/topics/tempfile) and 
+[dir.create](http://www.rdocumentation.org/packages/base/topics/files2).
 
 
 

@@ -92,7 +92,7 @@ gravy(seq, hydropathy=x)
 See also
 -------------------
 
-For additional hydrophobicity indices see `[aaindex](http://www.inside-r.org/packages/cran/seqinr/docs/aaindex)`.
+For additional hydrophobicity indices see `[aaindex](http://www.rdocumentation.org/packages/seqinr/topics/aaindex)`.
 
 
 
