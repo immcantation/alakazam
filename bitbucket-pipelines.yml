@@ -1,5 +1,5 @@
 image: 
-  name: javh/immcantation/test-r
+  name: javh/immcantation:test-r
 
 pipelines:
   default:
