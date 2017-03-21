@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.6
-Date: 2017-03-17
+Date: 2017-03-21
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -35,7 +35,7 @@ Imports:
     igraph (>= 1.0.0),
     lazyeval,
     methods,
-    Rcpp (>= 0.12.3),
+    Rcpp (>= 0.12.10),
     readr,
     scales,
     seqinr,
@@ -47,7 +47,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Collate:
     'Alakazam.R'
     'AminoAcids.R'

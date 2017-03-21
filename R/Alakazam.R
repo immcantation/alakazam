@@ -141,5 +141,5 @@
 #'                          stri_extract_all_regex stri_extract_first_regex  
 #'                          stri_replace_all_regex stri_replace_first_regex
 #' @importFrom  Rcpp evalCpp
-#' @useDynLib   alakazam
+#' @useDynLib   alakazam, .registration=TRUE
 NULL
