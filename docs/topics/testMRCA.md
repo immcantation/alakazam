@@ -79,10 +79,10 @@ print(x)
 
 
 ```
-  ANNOTATION COUNT  EXPECTED    PVALUE
-1        IgA    16 13.000000 0.0000000
-2    IgA,IgG     1  1.428571 0.4285714
-3        IgG    31 33.900000 0.9000000
+  ANNOTATION COUNT EXPECTED PVALUE
+1        IgA    16   13.100  0.000
+2    IgA,IgG     1    1.375  0.375
+3        IgG    31   33.700  1.000
 
 ```
 
