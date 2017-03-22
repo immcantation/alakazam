@@ -16,8 +16,7 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
 Description: Provides immunoglobulin (Ig) sequence lineage reconstruction,
-    diversity profiling, and amino acid property analysis. Also provides
-    core functionality for other tools in the Change-O suite.
+    diversity profiling, and amino acid property analysis.
 License: CC BY-SA 4.0
 URL: http://alakazam.readthedocs.org
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
