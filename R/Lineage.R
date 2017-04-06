@@ -42,8 +42,11 @@ NULL
 #'                        arguments, which contain the primary sequence data for the clone
 #'                        and should not be repeated in this argument.
 #' @param    add_count    if \code{TRUE} add an additional annotation column called 
-#'                        COLLAPSE_COUNT during duplicate removal that indicates the 
+#'                        \code{COLLAPSE_COUNT} during duplicate removal that indicates the 
 #'                        number of sequences that were collapsed.
+#' @param    verbose      passed on to \code{collapseDuplicates}. If \code{TRUE}, report the 
+#'                        numbers of input, discarded and output sequences; otherwise, process
+#'                        sequences silently.                        
 #'
 #' @return   A \link{ChangeoClone} object containing the modified clone.
 #'
@@ -104,7 +107,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                              germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL",
                              junc_len="JUNCTION_LENGTH", clone="CLONE",
                              max_mask=0, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                             add_count=TRUE) {
+                             add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
     check <- checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
                                   text_fields, num_fields, seq_fields))
@@ -118,7 +121,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     # Remove duplicates
     tmp_df <- collapseDuplicates(tmp_df, id=id, seq=seq, text_fields=text_fields, 
                                  num_fields=num_fields, seq_fields=seq_fields,
-                                 add_count=add_count)
+                                 add_count=add_count, verbose=verbose)
     
     # Define return object
     tmp_names <- names(tmp_df)
