@@ -9,7 +9,8 @@
 #'
 #' @param    data    data.frame with Change-O style columns.
 #' @param    gene    column containing allele assignments. Only the first allele in the
-#'                   column will be considered.
+#'                   column will be considered when \code{mode} is "gene", "family" or 
+#'                   "allele". The value will be used as it is with \code{mode="asis"}. 
 #' @param    groups  columns containing grouping variables. If \code{NULL} do not group.
 #' @param    copy    name of the \code{data} column containing copy numbers for each 
 #'                   sequence. If this value is specified, then total copy abundance
@@ -20,9 +21,12 @@
 #'                   once for each clone. Note, this is accomplished by using the most 
 #'                   common gene within each \code{clone} identifier. As such,
 #'                   ambiguous alleles within a clone will not be accurately represented.
-#' @param    mode    one of \code{c("gene", "family", "allele")} defining
+#' @param    mode    one of \code{c("gene", "family", "allele", "asis")} defining
 #'                   the degree of specificity regarding allele calls. Determines whether 
-#'                   to return counts for genes, families or alleles.
+#'                   to return counts for genes (calling \code{getGene}), 
+#'                   families (calling \code{getFamily}), alleles (calling 
+#'                   \code{getAllele}) or using the value as it is in the column
+#'                   \code{gene}, without any processing.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -56,7 +60,7 @@
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
-                       mode=c("gene", "allele", "family")) {
+                       mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
     # data=db; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
     # data=subset(db, CLONE == 3138)
@@ -83,11 +87,13 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
                 "The 'clone' argument will be ignored.")
     }
     # Extract gene, allele or family assignments
-    gene_func <- switch(mode,
-                        allele=getAllele,
-                        gene=getGene,
-                        family=getFamily)
-    data[[gene]] <- gene_func(data[[gene]], first=TRUE)
+    if (mode != "asis") {
+        gene_func <- switch(mode,
+                            allele=getAllele,
+                            gene=getGene,
+                            family=getFamily)
+        data[[gene]] <- gene_func(data[[gene]], first=TRUE)
+    }
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
