@@ -439,8 +439,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 
     # Generate edge null distribution via permutation
     if (progress) { 
-        cat("-> PERMUTING TREES\n")
-        pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3) 
+        pb <- progressBar(nperm) 
     }
     perm_list <- list()
     for (i in 1:nperm) {
@@ -452,7 +451,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
-        if (progress) { setTxtProgressBar(pb, i) }
+        if (progress) { pb$tick() }
     }
     cat("\n")
     perm_sum <- bind_rows(perm_list)
@@ -537,8 +536,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 
     # Generate edge null distribution via permutation
     if (progress) { 
-        cat("-> PERMUTING TREES\n")
-        pb <- txtProgressBar(min=0, max=nperm, initial=0, width=40, style=3) 
+        pb <- progressBar(nperm) 
     }
     perm_list <- list()
     for (i in 1:nperm) {
@@ -550,7 +548,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
         tmp_sum$ITER <- i
         perm_list[[i]] <- tmp_sum
         
-        if (progress) { setTxtProgressBar(pb, i) }
+        if (progress) { pb$tick() }
     }
     cat("\n")
     perm_sum <- bind_rows(perm_list)

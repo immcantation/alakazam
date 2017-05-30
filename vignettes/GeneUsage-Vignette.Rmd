@@ -24,7 +24,7 @@ geometry: margin=1in
 fontsize: 11pt
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Amino acid property analysis}
+  %\VignetteIndexEntry{Gene usage analysis}
   %\usepackage[utf8]{inputenc}
 ---
 

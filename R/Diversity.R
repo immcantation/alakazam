@@ -336,13 +336,10 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
     
     # Generate diversity index and confidence intervals via resampling
     if (progress) { 
-        cat("-> ESTIMATING ABUNDANCE\n")
-        pb <- txtProgressBar(min=0, max=length(group_set), initial=0, width=40, style=3) 
+        pb <- progressBar(length(group_set))
     }
     abund_list <- list()
-    i <- 0
     for (g in group_set) {
-        i <- i + 1
         nsam <- group_tab$SEQUENCES[group_tab[[group]] == g]
         
         # Infer complete abundance distribution
@@ -369,9 +366,8 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
         abund_df$RANK <- 1:nrow(abund_df)
         abund_list[[g]] <- abund_df
         
-        if (progress) { setTxtProgressBar(pb, i) }
+        if (progress) { pb$tick() }
     }
-    cat("\n")
     
     return(bind_rows(abund_list, .id="GROUP"))
 }
@@ -601,12 +597,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     
     # Generate diversity index and confidence intervals via resampling
     if (progress) { 
-        pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3) 
-        cat("-> CALCULATING DIVERSITY\n")
+        pb <- progressBar(length(group_keep))
     }
     div_list <- list()
     #coverage <- setNames(numeric(length(group_keep)), group_keep)
-    i <- 0
     for (g in group_keep) {
         n <- nsam[g]
         
@@ -655,9 +649,8 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
         # Update list with results
         div_list[[g]] <- as.data.frame(result_mat)
         
-        if (progress) { setTxtProgressBar(pb, i <- i + 1) }
+        if (progress) { pb$tick() }
     }
-    cat("\n")
     
     # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
     # Generate return object
@@ -800,8 +793,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 
     # Generate diversity index and confidence intervals via resampling
     if (progress) { 
-        cat("-> CALCULATING DIVERSITY\n")
-        pb <- txtProgressBar(min=0, max=length(group_keep), initial=0, width=40, style=3) 
+        pb <- progressBar(length(group_keep))
     }
     ngroup <- length(group_keep)
     div_mat <- matrix(NA, nboot, ngroup, dimnames=list(NULL, group_keep))
@@ -822,7 +814,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
         # Calculate diversity
         div_mat[, i] <- apply(sample_mat, 2, calcDiversity, q=q)
 
-        if (progress) { setTxtProgressBar(pb, i) }
+        if (progress) { pb$tick() }
     }
     cat("\n")
         

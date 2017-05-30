@@ -4,6 +4,7 @@ Version 0.2.6.999:  April 3, 2017
 General:
 
 + Fixed a bug in `readChangeoDb` causing the `select` argument to do nothing.
++ Added progress package dependency.
 
 
 Version 0.2.6:  March 21, 2017

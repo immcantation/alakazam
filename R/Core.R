@@ -236,7 +236,19 @@ checkColumns <- function(data, columns, logic=c("all", "any")) {
     return(TRUE)
 }
 
-#### Plotting functions ####
+#### Plotting and progress functions ####
+
+# Define a progress bar
+# 
+# @param   n  maximum number of ticks
+# @return  a  a progress_bar object
+progressBar <- function(n) {
+    pb <- progress::progress_bar$new(format="  PROGRESS> [:bar] :percent :elapsed",
+                                     width=40, clear=FALSE, stream=stdout(), force=TRUE,
+                                     total=n)
+    return(pb)
+}
+
 
 # Define universal plot settings
 #
