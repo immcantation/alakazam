@@ -31,16 +31,19 @@
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
 #'           \itemize{
-#'             \item \code{GENE}:        name of the family, gene or allele
-#'             \item \code{SEQ_COUNT}:   total number of sequences, or clones, for the gene.
-#'             \item \code{SEQ_FREQ}:    frequency of the gene as a fraction of the total
-#'                                       number of sequences, or clones, within each grouping.
-#'             \item \code{COPY_COUNT}:  sum of the copy counts in the \code{copy} column.
-#'                                       for each gene. Only present if the \code{copy} 
-#'                                       argument is specified.
-#'             \item \code{COPY_FREQ}:   frequency of the gene as a fraction of the total
-#'                                       copy number within each group. Only present if 
-#'                                       the \code{copy} argument is specified.
+#'             \item \code{GENE}:         name of the family, gene or allele
+#'             \item \code{SEQ_COUNT}:    total number of sequences for the gene.
+#'             \item \code{SEQ_FREQ}:     frequency of the gene as a fraction of the total
+#'                                        number of sequences within each grouping.
+#'             \item \code{COPY_COUNT}:   sum of the copy counts in the \code{copy} column.
+#'                                        for each gene. Only present if the \code{copy} 
+#'                                        argument is specified.
+#'             \item \code{COPY_FREQ}:    frequency of the gene as a fraction of the total
+#'                                        copy number within each group. Only present if 
+#'                                        the \code{copy} argument is specified.
+#'             \item \code{CLONE_COUNT}:  total number of clones for the gene.
+#'             \item \code{CLONE_FREQ}:   frequency of the gene as a fraction of the total
+#'                                        number of clones within each grouping.
 #'           }
 #'           Additional columns defined by the \code{groups} argument will also be present.
 #'
@@ -62,30 +65,14 @@
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
                        mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
-    # data=db; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
+    # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
     # data=subset(db, CLONE == 3138)
     
     # Check input
     mode <- match.arg(mode)
     check <- checkColumns(data, c(gene, groups, copy))
     if (check != TRUE) { stop(check) }
-    
-    # Subset to one sequence per clone if required
-    if (!is.null(clone) & is.null(copy)) {
-        # Find count of genes within each clone
-        data <- data %>%
-            group_by_(.dots=c(groups, clone, gene)) %>%
-            dplyr::mutate(CLONE_GENE_COUNT=n())
-        # Keep first row that corresponds to the most common gene
-        data <- data %>%
-            group_by_(.dots=c(groups, clone)) %>%
-            slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
-            ungroup() %>%
-            select_(interp(~-x, x=as.name("CLONE_GENE_COUNT")))
-    } else if (!is.null(clone) & !is.null(copy)) {
-        warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
-                "The 'clone' argument will be ignored.")
-    }
+
     # Extract gene, allele or family assignments
     if (mode != "asis") {
         gene_func <- switch(mode,
@@ -95,24 +82,44 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
         data[[gene]] <- gene_func(data[[gene]], first=TRUE)
     }
     
-    # Tabulate clonal abundance
-    if (is.null(copy)) {
+    # Tabulate abundance
+    if (is.null(copy) & is.null(clone)) {
+        # Tabulate sequence abundance
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
-            dplyr::rename_(.dots=c("GENE"=gene))
+            mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+            arrange_(.dots="desc(SEQ_COUNT)")
+    } else if (!is.null(clone) & is.null(copy)) {
+        # Find count of genes within each clone and keep first with maximum count
+        gene_tab <- data %>%
+            group_by_(.dots=c(groups, clone, gene)) %>%
+            dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
+            ungroup() %>%
+            group_by_(.dots=c(groups, clone)) %>%
+            slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
+            ungroup() %>%
+            group_by_(.dots=c(groups, gene)) %>%
+            dplyr::summarize(CLONE_COUNT=n()) %>%
+            mutate_(CLONE_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("CLONE_COUNT"))) %>%
+            arrange_(.dots="desc(CLONE_COUNT)")
     } else {
+        if (!is.null(clone) & !is.null(copy)) {
+            warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
+                    "The 'clone' argument will be ignored.")
+        }
+        # Tabulate copy abundance
         gene_tab <- data %>% 
             group_by_(.dots=c(groups, gene)) %>%
-            dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(gene)),
-                              COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
-                           COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(COPY_COUNT)") %>%
-            dplyr::rename_(.dots=c("GENE"=gene))
+            summarize_(SEQ_COUNT=interp(~length(x), x=as.name(gene)),
+                       COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
+            mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
+                    COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
+            arrange_(.dots="desc(COPY_COUNT)")
     }
+
+    # Rename gene column
+    gene_tab <- rename_(gene_tab, .dots=c("GENE"=gene))
     
     return(gene_tab)
 }
