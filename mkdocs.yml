@@ -16,6 +16,7 @@ pages:
     - 'Release Notes': news.md
     - 'Related Projects': projects.md
   - 'Vignettes':
+    - 'Basic gene usage analysis': vignettes/GeneUsage-Vignette.md
     - 'Amino acid physicochemical property analysis': vignettes/AminoAcids-Vignette.md
     - 'Analysis of clonal abundance and diversity': vignettes/Diversity-Vignette.md
     - 'Reconstruction of Ig lineage trees': vignettes/Lineage-Vignette.md
