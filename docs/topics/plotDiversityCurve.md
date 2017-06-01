@@ -83,21 +83,10 @@ Examples
 ```R
 # All groups pass default minimum sampling threshold of 10 sequences
 div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
-
-```
-
-
-```
-
-
-```
-
-
-```R
 plotDiversityCurve(div, legend_title="Sample")
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![6](plotDiversityCurve-6.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![4](plotDiversityCurve-4.png)
 
 
 See also

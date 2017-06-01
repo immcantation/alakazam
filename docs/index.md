@@ -26,7 +26,7 @@ Dependencies
 ---------------
 
 **Depends:** ggplot2  
-**Imports:** dplyr, graphics, grid, igraph, lazyeval, methods, Rcpp, readr, scales, seqinr, stats, stringi, utils  
+**Imports:** dplyr, graphics, grid, igraph, lazyeval, methods, progress, Rcpp, readr, scales, seqinr, stats, stringi, utils  
 **Suggests:** knitr, rmarkdown, testthat
 
 Authors

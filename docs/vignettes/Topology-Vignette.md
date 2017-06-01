@@ -358,10 +358,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.900000 0.0500000
-## 2    IgA   IgG     2  3.562500 0.6875000
-## 3    IgG   IgA     1  2.277778 0.7222222
-## 4    IgG   IgG    99 98.200000 0.3000000
+## 1    IgA   IgA    36 35.100000 0.0500000
+## 2    IgA   IgG     2  3.555556 0.6666667
+## 3    IgG   IgA     1  2.187500 0.7500000
+## 4    IgG   IgG    99 97.950000 0.2500000
 ```
 
 ```r
@@ -385,7 +385,7 @@ testing of MRCA sequences by annotation value, respectively.
 Extracting the MRCA from a tree is accomplished using the `getMRCA` function.
 The germline distance criteria are as described above for `getPathLengths`
 and can be either node hops or mutational events, with or without exclusion
-of nodes with specific annotations. To simply extact the annotations for the 
+of nodes with specific annotations. To simply extract the annotations for the 
 node(s) immediately below the germline, you can use the  `path=steps` argument 
 without any node exclusion:
 
@@ -442,8 +442,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12     11.4    0.0
-## 2        IgG    31     31.6    0.6
+## 1        IgA    12    11.25   0.00
+## 2        IgG    31    31.75   0.75
 ```
 
 ```r

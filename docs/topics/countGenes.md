@@ -17,7 +17,7 @@ Usage
 --------------------
 ```
 countGenes(data, gene, groups = NULL, copy = NULL, clone = NULL,
-mode = c("gene", "allele", "family"))
+mode = c("gene", "allele", "family", "asis"))
 ```
 
 Arguments
@@ -28,7 +28,8 @@ data
 
 gene
 :   column containing allele assignments. Only the first allele in the
-column will be considered.
+column will be considered when `mode` is "gene", "family" or 
+"allele". The value will be used as it is with `mode="asis"`.
 
 groups
 :   columns containing grouping variables. If `NULL` do not group.
@@ -47,9 +48,12 @@ common gene within each `clone` identifier. As such,
 ambiguous alleles within a clone will not be accurately represented.
 
 mode
-:   one of `c("gene", "family", "allele")` defining
+:   one of `c("gene", "family", "allele", "asis")` defining
 the degree of specificity regarding allele calls. Determines whether 
-to return counts for genes, families or alleles.
+to return counts for genes (calling `getGene`), 
+families (calling `getFamily`), alleles (calling 
+`getAllele`) or using the value as it is in the column
+`gene`, without any processing.
 
 
 
@@ -60,16 +64,19 @@ Value
 A data.frame summarizing family, gene or allele counts and frequencies 
 with columns:
 
-+  `GENE`:        name of the family, gene or allele
-+  `SEQ_COUNT`:   total number of sequences, or clones, for the gene.
-+  `SEQ_FREQ`:    frequency of the gene as a fraction of the total
-number of sequences, or clones, within each grouping.
-+  `COPY_COUNT`:  sum of the copy counts in the `copy` column.
++  `GENE`:         name of the family, gene or allele
++  `SEQ_COUNT`:    total number of sequences for the gene.
++  `SEQ_FREQ`:     frequency of the gene as a fraction of the total
+number of sequences within each grouping.
++  `COPY_COUNT`:   sum of the copy counts in the `copy` column.
 for each gene. Only present if the `copy` 
 argument is specified.
-+  `COPY_FREQ`:   frequency of the gene as a fraction of the total
++  `COPY_FREQ`:    frequency of the gene as a fraction of the total
 copy number within each group. Only present if 
 the `copy` argument is specified.
++  `CLONE_COUNT`:  total number of clones for the gene.
++  `CLONE_FREQ`:   frequency of the gene as a fraction of the total
+number of clones within each grouping.
 
 Additional columns defined by the `groups` argument will also be present.
 

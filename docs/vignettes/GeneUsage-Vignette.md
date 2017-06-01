@@ -1,32 +1,6 @@
----
-title: 'Alakazam: Gene usage analysis'
-author: "Susanna Marquez"
-date: '`r Sys.Date()`'
-output:
-  pdf_document:
-    dev: pdf
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
-  md_document:
-    fig_height: 4
-    fig_width: 7.5
-    preserve_yaml: no
-    toc: yes
-  html_document:
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    theme: readable
-    toc: yes
-geometry: margin=1in
-fontsize: 11pt
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Gene usage analysis}
-  %\usepackage[utf8]{inputenc}
----
+Gene usage analysis
+====================
+
 
 The 'alakazam' package provides basic gene usage quantification by either sequence count 
 or clonal grouping; with or without consideration of duplicate reads/mRNA. Additionally, 
@@ -45,7 +19,8 @@ Gene usages analysis requires only the following columns:
 However, the optional clonal clustering (`CLONE`) and duplicate count (`DUPCOUNT`) 
 columns may be used to quanitify usage by different abundance criteria.
 
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
+
+```r
 # Load required packages
 library(alakazam)
 library(dplyr)
@@ -63,11 +38,24 @@ different samples we will set `gene="V_CALL"` (the column containing gene data) 
 `groups="SAMPLE"` (the columns containing grouping variables). To quanitify abundance at
 the gene level we set `mode="gene"`:
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Quantify usage at the gene level
 gene <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
                    mode="gene")
 head(gene, n=4)
+```
+
+```
+## Source: local data frame [4 x 4]
+## Groups: SAMPLE [2]
+## 
+##   SAMPLE     GENE SEQ_COUNT SEQ_FREQ
+##    <chr>    <chr>     <int>    <dbl>
+## 1    +7d IGHV3-49       699    0.699
+## 2    -1h  IGHV3-9        83    0.083
+## 3    -1h IGHV5-51        60    0.060
+## 4    -1h IGHV3-30        58    0.058
 ```
 
 In the resultant `data.frame` the `SEQ_COUNT` columns is the number of raw sequences within each `SAMPLE` 
@@ -80,7 +68,8 @@ containing IGHV1 family genes. We extract the family portion of the gene name us
 (`method="name"`) for axis ordering using the `ggplot2` package. Alternatively, we could have 
 ordered the genes by genomic position by passing `method="position"` to `sortGenes`.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Assign sorted levels and subset to IGHV1
 ighv1 <- gene %>%
     mutate(GENE=factor(GENE, levels=sortGenes(unique(GENE), method="name"))) %>%
@@ -98,10 +87,13 @@ g1 <- ggplot(ighv1, aes(x=GENE, y=SEQ_FREQ)) +
     geom_point(aes(color=SAMPLE), size=5, alpha=0.8)
 plot(g1)
 ```
+
+![plot of chunk GeneUsage-Vignette-3](figure/GeneUsage-Vignette-3-1.png)
 Alternatively, usage can be quantified at the allele (`mode="allele"`) or 
 family level (`mode="family"`):
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Quantify V family usage by sample
 family <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
                      mode="family")
@@ -119,6 +111,8 @@ g2 <- ggplot(family, aes(x=GENE, y=SEQ_FREQ)) +
 plot(g2)
 ```
 
+![plot of chunk GeneUsage-Vignette-4](figure/GeneUsage-Vignette-4-1.png)
+
 
 ## Tabulating gene abundance using additional groupings
 
@@ -131,18 +125,32 @@ be counted only once regardless of how many sequences the clone represents.
 Clonal citeria are adding by passing a value to the `clone` argument of `countGenes`
 (`clone="CLONE"`).
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Quantify V family clonal usage by sample and isotype
 family <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                      clone="CLONE", mode="family")
 head(family, n=4)
 ```
 
+```
+## Source: local data frame [4 x 5]
+## Groups: SAMPLE, ISOTYPE [2]
+## 
+##   SAMPLE ISOTYPE  GENE CLONE_COUNT CLONE_FREQ
+##    <chr>   <chr> <chr>       <int>      <dbl>
+## 1    -1h     IgM IGHV3         222  0.4172932
+## 2    -1h     IgM IGHV1         110  0.2067669
+## 3    -1h     IgM IGHV4         102  0.1917293
+## 4    +7d     IgG IGHV3          94  0.9126214
+```
+
 The output `data.frame` contains the additional grouping column (`ISOTYPE`) along with the 
 `CLONE_COUNT` and `CLONE_FREQ` columns that represent the count of clones for each V family 
 and the frequencies within the given `SAMPLE` and `ISOTYPE` pair, respectively.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Subset to IgM and IgG for plotting
 family <- filter(family, ISOTYPE %in% c("IgM", "IgG"))
 # Plot V family clonal usage by sample and isotype
@@ -159,24 +167,40 @@ g3 <- ggplot(family, aes(x=GENE, y=CLONE_FREQ)) +
 plot(g3)
 ```
 
+![plot of chunk GeneUsage-Vignette-6](figure/GeneUsage-Vignette-6-1.png)
+
 Instead of calculating abundance by sequence or clone count, abundance can be calculated
 using copy numbers for the individual sequences.  This is accomplished by passing
 a copy number column to the `copy` argument (`copy="DUPCOUNT"`). Specifying both
 `clone` and `copy` arguments is not meaningful and will result in the `clone` argument
 being ignored.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Calculate V family copy numbers by sample and isotype
 family <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                     mode="family", copy="DUPCOUNT")
 head(family, n=4)
 ```
 
+```
+## Source: local data frame [4 x 7]
+## Groups: SAMPLE, ISOTYPE [3]
+## 
+##   SAMPLE ISOTYPE  GENE SEQ_COUNT COPY_COUNT  SEQ_FREQ COPY_FREQ
+##    <chr>   <chr> <chr>     <int>      <int>     <dbl>     <dbl>
+## 1    +7d     IgG IGHV3       516       1587 0.9772727 0.9838810
+## 2    +7d     IgA IGHV3       240       1224 0.9022556 0.9350649
+## 3    -1h     IgM IGHV3       237        250 0.4209591 0.3858025
+## 4    -1h     IgM IGHV4       110        162 0.1953819 0.2500000
+```
+
 The output `data.frame` includes the `SEQ_COUNT` and `SEQ_FREQ` columns as previously defined, 
 as well as the additional copy number columns `COPY_COUNT` and `COPY_FREQ` reflected the summed 
 copy number (`DUPCOUNT`) for each sequence within the given `GENE`, `SAMPLE` and `ISOTYPE`.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Subset to IgM and IgG for plotting
 family <- filter(family, ISOTYPE %in% c("IgM", "IgG"))
 # Plot V family copy abundance by sample and isotype
@@ -192,3 +216,5 @@ g4 <- ggplot(family, aes(x=GENE, y=COPY_FREQ)) +
     facet_grid(. ~ ISOTYPE)
 plot(g4)
 ```
+
+![plot of chunk GeneUsage-Vignette-8](figure/GeneUsage-Vignette-8-1.png)

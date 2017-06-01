@@ -22,7 +22,7 @@ makeChangeoClone(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 germ = "GERMLINE_IMGT_D_MASK", vcall = "V_CALL", jcall = "J_CALL",
 junc_len = "JUNCTION_LENGTH", clone = "CLONE", max_mask = 0,
 text_fields = NULL, num_fields = NULL, seq_fields = NULL,
-add_count = TRUE)
+add_count = TRUE, verbose = FALSE)
 ```
 
 Arguments
@@ -82,8 +82,13 @@ and should not be repeated in this argument.
 
 add_count
 :   if `TRUE` add an additional annotation column called 
-COLLAPSE_COUNT during duplicate removal that indicates the 
+`COLLAPSE_COUNT` during duplicate removal that indicates the 
 number of sequences that were collapsed.
+
+verbose
+:   passed on to `collapseDuplicates`. If `TRUE`, report the 
+numbers of input, discarded and output sequences; otherwise, process
+sequences silently.
 
 
 

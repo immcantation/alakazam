@@ -101,12 +101,6 @@ abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 ```
 
 
-```
-
-
-```
-
-
 
 See also
 -------------------

@@ -36,9 +36,9 @@ sub_db <- subset(ExampleDb, CLONE == 3138)
 
 ## Preprocess a clone
 
-Before a lineage can be contructed the sequences must first be cleaned of gap
+Before a lineage can be constructed the sequences must first be cleaned of gap
 (-, .) characters added by IMGT, duplicate sequences must be removed, and
-annotations must be conbined for each cluster of duplicate sequences. 
+annotations must be combined for each cluster of duplicate sequences. 
 Optionally, "ragged" ends of sequences, such as may occur from primer template
 switching, may also be cleaned by masking mismatched positions and the leading
 and trailing ends of each sequence. The function `makeChangeoClone` is a wrapper

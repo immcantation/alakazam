@@ -122,43 +122,21 @@ Examples
 ```R
 # Group by sample identifier
 div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
-
-```
-
-
-```
-
-
-```
-
-
-```R
 plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![6](rarefyDiversity-6.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![4](rarefyDiversity-4.png)
 
 ```R
 
 # Grouping by isotype rather than sample identifier
 div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
 nboot=100)
-
-```
-
-
-```
-
-
-```
-
-
-```R
 plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![12](rarefyDiversity-12.png)
+*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![8](rarefyDiversity-8.png)
 
 
 See also

@@ -69,21 +69,10 @@ Examples
 ```R
 # Estimate abundance by sample and plot
 abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
-
-```
-
-
-```
-
-
-```
-
-
-```R
 plotAbundance(abund)
 ```
 
-![4](plotAbundance-4.png)
+![2](plotAbundance-2.png)
 
 
 See also
