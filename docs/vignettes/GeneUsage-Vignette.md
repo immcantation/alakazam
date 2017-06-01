@@ -89,6 +89,7 @@ plot(g1)
 ```
 
 ![plot of chunk GeneUsage-Vignette-3](figure/GeneUsage-Vignette-3-1.png)
+
 Alternatively, usage can be quantified at the allele (`mode="allele"`) or 
 family level (`mode="family"`):
 

@@ -98,6 +98,7 @@ g1 <- ggplot(ighv1, aes(x=GENE, y=SEQ_FREQ)) +
     geom_point(aes(color=SAMPLE), size=5, alpha=0.8)
 plot(g1)
 ```
+
 Alternatively, usage can be quantified at the allele (`mode="allele"`) or 
 family level (`mode="family"`):
 
