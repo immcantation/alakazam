@@ -54,3 +54,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"alakazam_seqEqual", (DL_FUNC) &alakazam_seqEqual, 3},
+    {"alakazam_pairwiseEqual", (DL_FUNC) &alakazam_pairwiseEqual, 1},
+    {"alakazam_seqDistRcpp", (DL_FUNC) &alakazam_seqDistRcpp, 3},
+    {"alakazam_pairwiseDistRcpp", (DL_FUNC) &alakazam_pairwiseDistRcpp, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_alakazam(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
