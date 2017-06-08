@@ -103,7 +103,7 @@ bool seqEqual(std::string seq1, std::string seq2,
 //' 
 //' @export
 // [[Rcpp::export]]
-LogicalMatrix pairwiseEqual (StringVector seq) {
+LogicalMatrix pairwiseEqual(StringVector seq) {
     
     // allocate the matrix we will return
     LogicalMatrix rmat(seq.length(), seq.length());
@@ -229,7 +229,7 @@ double seqDistRcpp(std::string seq1, std::string seq2,
 
 // pairwiseDist
 // [[Rcpp::export]]
-NumericMatrix pairwiseDistRcpp (StringVector seq, NumericMatrix dist_mat) {
+NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
     // allocate the matrix we will return
     NumericMatrix rmat(seq.length(), seq.length());
     
