@@ -71,6 +71,7 @@ tableEdges(graph, "ISOTYPE")
 Source: local data frame [4 x 3]
 Groups: PARENT [?]
 
+# A tibble: 4 x 3
    PARENT   CHILD COUNT
     <chr>   <chr> <int>
 1     IgA IgA,IgG     1
@@ -93,6 +94,7 @@ tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 Source: local data frame [3 x 3]
 Groups: PARENT [?]
 
+# A tibble: 3 x 3
    PARENT   CHILD COUNT
     <chr>   <chr> <int>
 1     IgA IgA,IgG     1
@@ -113,6 +115,7 @@ tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 Source: local data frame [3 x 3]
 Groups: PARENT [?]
 
+# A tibble: 3 x 3
    PARENT   CHILD COUNT
     <chr>   <chr> <int>
 1     IgA IgA,IgG     1
