@@ -50,6 +50,7 @@ head(gene, n=4)
 ## Source: local data frame [4 x 4]
 ## Groups: SAMPLE [2]
 ## 
+## # A tibble: 4 x 4
 ##   SAMPLE     GENE SEQ_COUNT SEQ_FREQ
 ##    <chr>    <chr>     <int>    <dbl>
 ## 1    +7d IGHV3-49       699    0.699
@@ -138,6 +139,7 @@ head(family, n=4)
 ## Source: local data frame [4 x 5]
 ## Groups: SAMPLE, ISOTYPE [2]
 ## 
+## # A tibble: 4 x 5
 ##   SAMPLE ISOTYPE  GENE CLONE_COUNT CLONE_FREQ
 ##    <chr>   <chr> <chr>       <int>      <dbl>
 ## 1    -1h     IgM IGHV3         222  0.4172932
@@ -188,6 +190,7 @@ head(family, n=4)
 ## Source: local data frame [4 x 7]
 ## Groups: SAMPLE, ISOTYPE [3]
 ## 
+## # A tibble: 4 x 7
 ##   SAMPLE ISOTYPE  GENE SEQ_COUNT COPY_COUNT  SEQ_FREQ COPY_FREQ
 ##    <chr>   <chr> <chr>     <int>      <int>     <dbl>     <dbl>
 ## 1    +7d     IgG IGHV3       516       1587 0.9772727 0.9838810

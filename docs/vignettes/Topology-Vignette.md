@@ -285,6 +285,7 @@ tableEdges(graph, "ISOTYPE")
 ## Source: local data frame [5 x 3]
 ## Groups: PARENT [?]
 ## 
+## # A tibble: 5 x 3
 ##   PARENT CHILD COUNT
 ##    <chr> <chr> <int>
 ## 1    IgG   IgG     2
@@ -308,6 +309,7 @@ tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 ## Source: local data frame [1 x 3]
 ## Groups: PARENT [?]
 ## 
+## # A tibble: 1 x 3
 ##   PARENT CHILD COUNT
 ##    <chr> <chr> <int>
 ## 1    IgG   IgG     2
@@ -328,6 +330,7 @@ tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 ## Source: local data frame [2 x 3]
 ## Groups: PARENT [?]
 ## 
+## # A tibble: 2 x 3
 ##   PARENT CHILD COUNT
 ##    <chr> <chr> <int>
 ## 1    IgG   IgG     2
@@ -358,10 +361,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 35.100000 0.0500000
-## 2    IgA   IgG     2  3.555556 0.6666667
-## 3    IgG   IgA     1  2.187500 0.7500000
-## 4    IgG   IgG    99 97.950000 0.2500000
+## 1    IgA   IgA    36 35.050000 0.1000000
+## 2    IgA   IgG     2  3.000000 0.7058824
+## 3    IgG   IgA     1  2.333333 0.7222222
+## 4    IgG   IgG    99 98.300000 0.1500000
 ```
 
 ```r
@@ -442,8 +445,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.25   0.00
-## 2        IgG    31    31.75   0.75
+## 1        IgA    12     11.4    0.0
+## 2        IgG    31     31.6    0.6
 ```
 
 ```r
