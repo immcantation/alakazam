@@ -260,7 +260,7 @@ getPhylipInferred <- function(phylip_out) {
     inferred_num <- unique(grep("^[0-9]+$", seq_df[, 2], value=T))
     inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
-    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq))
+    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq, stringsAsFactors = FALSE))
 }
 
 
