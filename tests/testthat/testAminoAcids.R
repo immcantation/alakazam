@@ -106,9 +106,10 @@ test_that("aminoAcidProperties", {
     db[2,"JUNCTION"] <- "NA"
     db[3,"JUNCTION"] <- "NULL"
     db[4,"JUNCTION"] <- "NLL"
-    junction_properties_na <- aminoAcidProperties(db[1:4,], seq="JUNCTION", nt=FALSE,
+    expect_warning(junction_properties_na <- aminoAcidProperties(db[1:4,], seq="JUNCTION", nt=FALSE,
                                                  trim=FALSE, label="JUNCTION",
-                                                 hydropathy=h)
+                                                 hydropathy=h),
+                   "Found 2 sequences with non valid amino acid symbols")
     expect_equal(junction_properties_na$JUNCTION_AA_LENGTH, c(NA, 2, NA, 3))
     expect_equal(junction_properties_na$JUNCTION_AA_GRAVY, tolerance=0.001,
                  c(NA,0.27,NA,-0.463))
