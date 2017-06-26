@@ -444,6 +444,13 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         tmp_df <- data[idx[1], ]
         
         if (length(idx) > 1) {
+            
+            # Initialize with data from most informative sequence
+            seq_set <- data[idx, c(id, seq)]
+            inform_len <- .informativeLength(seq_set[[seq]])
+            max_inform <- which.max(inform_len)[1] # if ties, pick first
+            tmp_df <- data[idx[max_inform],]
+            
             # Define set of text fields for row
             for (f in text_fields) {
                 f_set <- na.omit(data[[f]][idx])
@@ -480,10 +487,6 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 tmp_df[, f] <- f_val
             }
             
-            # Assign id and sequence with least number of Ns
-            seq_set <- data[idx, c(id, seq)]
-            inform_len <- .informativeLength(seq_set[[seq]])
-            tmp_df[, c(id, seq)] <- seq_set[which.max(inform_len), c(id, seq)]
         }
         
         # Add row to unique list
