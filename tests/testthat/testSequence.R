@@ -221,6 +221,12 @@ test_that("collapseDuplicates", {
     )
     expect_equal(obs, exp)
     
+    obs_dry <- collapseDuplicates(db, verbose=F, dry=T, add_count = TRUE)
+    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "unique", "ambiguous"))
+    
+    expect_equal(length(setdiff(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"], obs$SEQUENCE_ID)), 
+                 0)
+    
     # Unique text_fields annotations are combined into a single string with ","
     # num_fields annotations are summed
     # Ambiguous duplicates are discarded

@@ -261,10 +261,16 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 #'                        delimiter.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
+#' @param    dry          dry run collapseDuplicates. Will only label the sequences.
 #'                        
 #' @return   A modified \code{data} data.frame with duplicate sequences removed and 
-#'           annotation fields collapsed. 
-#' 
+#'           annotation fields collapsed. If dry=TRUE, sequences will not be collapsed
+#'           and the columns COLLAPSE_ID, COLLAPSE_CLASS and COLLAPSE_PASS will be
+#'           added to the data.frame. Sequence with the same COLLAPSE_ID, belong to the 
+#'           same collapsing group. COLLAPSE_CLASS will be unique, duplicated or ambiguous.
+#'           COLLAPSE_PASS will be TRUE for the sequences that collapseDuplicates 
+#'           (with dry=FALSE) would keep.
+#'           
 #' @details
 #' \code{collapseDuplicates} identifies duplicate sequences in the \code{seq} column by
 #' testing for character identity, with consideration of IUPAC ambiguous nucleotide codes. 
@@ -328,7 +334,7 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
-                               sep=",", verbose=FALSE) {
+                               sep=",", verbose=FALSE, dry=FALSE) {
     # Verify column classes and exit if they are incorrect
     if (!is.null(text_fields)) {
         if (!all(sapply(subset(data, select=text_fields), is.character))) {
@@ -365,10 +371,17 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
     
-    # Intialize COLLAPSE_COUNT with 1 for each sequence
+    # Initialize COLLAPSE_COUNT with 1 for each sequence
     if(add_count) {
         data[["COLLAPSE_COUNT"]] <- rep(1, nrow(data))
         num_fields <- c(num_fields, "COLLAPSE_COUNT")
+    }
+    
+    # Initialize dry run columns 
+    if (dry) {
+        data$COLLAPSE_ID <- NA
+        data$COLLAPSE_CLASS <- "duplicated"
+        data$COLLAPSE_PASS <- TRUE
     }
     
     # Return input if there are no sequences to collapse
@@ -399,16 +412,26 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     discard_count <- length(ambig_rows)
     
+    if (dry & length(ambig_rows)>0) {
+        data[["COLLAPSE_CLASS"]][ambig_rows] <- "ambiguous"
+        data[["COLLAPSE_PASS"]][ambig_rows] <- FALSE
+    }
+    
     # Return single sequence if all sequence belong to ambiguous clusters
     if (discard_count == nrow(d_mat)) {
         inform_len <- .informativeLength(data[[seq]])
+        selected <- which.max(inform_len)
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
-        return(data[which.max(inform_len), ])
+        if (dry) {
+            data[["COLLAPSE_PASS"]][-selected] <- FALSE
+        } else {
+            return(data[selected, ])
+        }
     }
     
     # Exclude ambiguous sequences from clustering
-    if (discard_count > 0) {
-        d_mat <- d_mat[-ambig_rows, -ambig_rows]
+    if (!dry & discard_count > 0) {
+            d_mat <- d_mat[-ambig_rows, -ambig_rows]   
     }
     
     # Cluster remaining sequences into unique and duplicate sets
@@ -416,24 +439,57 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     uniq_taxa <- character()
     done_taxa <- character()
     taxa_names <- rownames(d_mat)
-    for (taxa in taxa_names) {
+    collapse_id <- 1
+    
+    for (taxa_i in 1:length(taxa_names)) {
+        
+        taxa <- taxa_names[taxa_i]
+        
         # Skip taxa if previously assigned to a cluster
         if (taxa %in% done_taxa) { next }
         
         # Find all zero distance taxa
         idx <- which(d_mat[taxa, ])
+        
+        # Update vector of clustered taxa
+        done_taxa <- c(done_taxa, taxa_names[idx])
+        
+        # Update collapse group
+        if (dry) {
+            data[["COLLAPSE_ID"]][idx] <- paste(data[["COLLAPSE_ID"]][idx], collapse_id, sep=",")
+        }
+        
+        idx <- idx[idx %in% ambig_rows == FALSE]
+        
         if (length(idx) == 1) {
             # Assign unique sequences to unique vector
             uniq_taxa <- append(uniq_taxa, taxa_names[idx])
+            if (dry) {
+                data[["COLLAPSE_CLASS"]][taxa_i] <- "unique"
+                data[["COLLAPSE_PASS"]][taxa_i] <- TRUE
+            }
         } else if (length(idx) > 1) {
             # Assign clusters of duplicates to duplicate list            
             dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
+            if (dry) {
+                # Keep COLLAPSE_PASS==TRUE for the sequence with the
+                # larger number of informative positions 
+                # (the first one if ties)
+                data[["COLLAPSE_PASS"]][idx[-which.max(.informativeLength(data[[seq]][idx]))][1]] <- FALSE
+            }
         } else {
             # Report error (should never occur)
-            stop("Error in distance matrix of collapseDuplicates")
+            if (!dry) {
+                stop("Error in distance matrix of collapseDuplicates")
+            }
         }
-        # Update vector of clustered taxa
-        done_taxa <- c(done_taxa, taxa_names[idx])
+        
+        collapse_id <- collapse_id+1
+    }
+   
+    if (dry) {
+        data[["COLLAPSE_ID"]] <-  sub("^NA,","",data[["COLLAPSE_ID"]])
+        return(data)
     }
     
     # Collapse duplicate sets and append entries to unique data.frame
@@ -637,7 +693,6 @@ seqDist <- function(seq1, seq2, dist_mat=getDNAMatrix()) {
 #'           If \code{seq} is a named vector, row and columns names will be added 
 #'           accordingly.
 #' 
-#' @seealso  Nucleotide distance matrix may be built with \link{getDNAMatrix}. 
 #'           Amino acid distance matrix may be built with \link{getAAMatrix}. 
 #'           Uses \link{seqDist} for calculating distances between pairs.
 #'           See \link{pairwiseEqual} for generating an equivalence matrix.
