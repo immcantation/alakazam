@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.7.999
-Date: 2017-07-10
+Date: 2017-07-11
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -48,7 +48,7 @@ Suggests:
     rmarkdown,
     testthat
 RoxygenNote: 6.0.1
-Collate:
+Collate: 
     'Alakazam.R'
     'AminoAcids.R'
     'Classes.R'

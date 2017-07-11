@@ -431,7 +431,8 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Exclude ambiguous sequences from clustering
     if (!dry & discard_count > 0) {
-            d_mat <- d_mat[-ambig_rows, -ambig_rows]   
+            d_mat <- d_mat[-ambig_rows, -ambig_rows]
+            data <- data[-ambig_rows,]
     }
     
     # Cluster remaining sequences into unique and duplicate sets
@@ -446,7 +447,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         taxa <- taxa_names[taxa_i]
         
         # Skip taxa if previously assigned to a cluster
+        # or if ambiguous
+        # (ambiguous taxa don't get their own COLLAPSE_ID)
         if (taxa %in% done_taxa) { next }
+        if (dry & taxa_i %in% ambig_rows) { next }
         
         # Find all zero distance taxa
         idx <- which(d_mat[taxa, ])
@@ -459,7 +463,9 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             data[["COLLAPSE_ID"]][idx] <- paste(data[["COLLAPSE_ID"]][idx], collapse_id, sep=",")
         }
         
-        idx <- idx[idx %in% ambig_rows == FALSE]
+        if (dry) {
+            idx <- idx[idx %in% ambig_rows == FALSE]
+        }
         
         if (length(idx) == 1) {
             # Assign unique sequences to unique vector
@@ -479,9 +485,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             }
         } else {
             # Report error (should never occur)
-            if (!dry) {
-                stop("Error in distance matrix of collapseDuplicates")
-            }
+                   stop("Error in distance matrix of collapseDuplicates")
         }
         
         collapse_id <- collapse_id+1
@@ -498,15 +502,15 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         # Define row indices of identical sequences
         idx <- which(data[[id]] %in% taxa)
         tmp_df <- data[idx[1], ]
-        
+
         if (length(idx) > 1) {
-            
+
             # Initialize with data from most informative sequence
             seq_set <- data[idx, c(id, seq)]
             inform_len <- .informativeLength(seq_set[[seq]])
             max_inform <- which.max(inform_len)[1] # if ties, pick first
             tmp_df <- data[idx[max_inform],]
-            
+
             # Define set of text fields for row
             for (f in text_fields) {
                 f_set <- na.omit(data[[f]][idx])
@@ -519,18 +523,18 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 }
                 tmp_df[, f] <- f_val
             }
-            
+
             # Sum numeric fields
             for (f in num_fields) {
                 f_set <- na.omit(data[[f]][idx])
-                if (length(f_set) > 0) { 
-                    f_val <- sum(f_set) 
-                } else { 
-                    f_val <- NA 
+                if (length(f_set) > 0) {
+                    f_val <- sum(f_set)
+                } else {
+                    f_val <- NA
                 }
                 tmp_df[, f] <- f_val
             }
-            
+
             # Select sequence fields with fewest Ns
             for (f in seq_fields) {
                 f_set <- na.omit(data[[f]][idx])
@@ -542,13 +546,13 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 }
                 tmp_df[, f] <- f_val
             }
-            
+
         }
-        
+
         # Add row to unique list
         unique_list <- c(unique_list, list(tmp_df))
     }
-    
+
     # Combine all rows into unique data.frame
     unique_df <- as.data.frame(bind_rows(unique_list))
     
