@@ -398,6 +398,11 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     # Return input if no sequences are equal
     if (!any(d_mat[lower.tri(d_mat, diag=F)])) {
         if (verbose) { .printVerbose(nseq, nseq, 0) }
+        if (dry) {
+            data$COLLAPSE_ID <- 1:nrow(data)
+            data$COLLAPSE_CLASS <- "unique"
+            data$COLLAPSE_PASS <- TRUE            
+        }
         return(data)
     }        
     
