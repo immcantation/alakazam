@@ -240,7 +240,7 @@ test_that("collapseDuplicates", {
     # Unique text_fields annotations are combined into a single string with ","
     # num_fields annotations are summed
     # Ambiguous duplicates are discarded
-    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        verbose=F)
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COUNT <- c(3,3)
@@ -248,13 +248,13 @@ test_that("collapseDuplicates", {
     
     
     # Use alternate delimiter for collapsing textual annotations
-    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        sep="/", verbose=F)
     exp$TYPE <- c("IgG","IgG/IgM")
     expect_equal(obs, exp)
     
     # Add count of duplicates
-    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        add_count=TRUE, verbose=F)
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COLLAPSE_COUNT <- c(1,2)
@@ -262,7 +262,7 @@ test_that("collapseDuplicates", {
     
     # Masking ragged ends may impact duplicate removal
     db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
-    obs <- collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+    obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        add_count=TRUE, verbose=F)    
     exp <- data.frame(
         "SEQUENCE_ID" = "A",
