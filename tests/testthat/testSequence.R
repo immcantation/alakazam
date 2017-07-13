@@ -201,11 +201,11 @@ test_that("maskSeqEnds", {
 
 test_that("collapseDuplicates", {
     # Example Change-O data.frame
-    db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-                     SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-                     TYPE=c("IgM", "IgG", "IgG", "IgA"),
-                     SAMPLE=c("S1", "S1", "S2", "S2"),
-                     COUNT=1:4,
+    db <- data.frame(SEQUENCE_ID=LETTERS[1:5],
+                     SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN", "NAACTGNG"),
+                     TYPE=c("IgM", "IgG", "IgG", "IgA", "IgG"),
+                     SAMPLE=c("S1", "S1", "S2", "S2","S2"),
+                     COUNT=1:5,
                      stringsAsFactors=FALSE)
     
     # Annotations are not parsed if neither text_fields nor num_fields is specified
@@ -219,18 +219,23 @@ test_that("collapseDuplicates", {
         "COUNT" = c(3,1),
         stringsAsFactors = F
     )
-    expect_equal(obs, exp)
+    expect_equivalent(obs, exp[2:1,])
     
-    obs_dry <- collapseDuplicates(db, verbose=F, dry=T)
+    obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T)
     expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "unique", "ambiguous"))
     
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
     
     ## Try messing up order
-    obs_dry <- collapseDuplicates(db[nrow(db):1,], verbose=F, dry=T)
+    ## C comes first
+    obs_dry <- collapseDuplicates(db, verbose=F, dry=T)
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
+    ## E comes first
+    obs_dry <- collapseDuplicates(db[nrow(db):1,], verbose=F, dry=T)
+    expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
+                 c("A","E"))
     
     # Unique text_fields annotations are combined into a single string with ","
     # num_fields annotations are summed

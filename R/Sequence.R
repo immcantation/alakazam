@@ -481,11 +481,12 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 # Keep COLLAPSE_PASS==TRUE for the sequence with the
                 # larger number of informative positions 
                 # (the first one if ties)
-                data[["COLLAPSE_PASS"]][idx[-which.max(.informativeLength(data[[seq]][idx]))][1]] <- FALSE
+                max_info_idx <- which.max(.informativeLength(data[[seq]][idx]))[1]
+                data[["COLLAPSE_PASS"]][idx[-max_info_idx]] <- FALSE
             }
         } else {
             # Report error (should never occur)
-                   stop("Error in distance matrix of collapseDuplicates")
+                stop("Error in distance matrix of collapseDuplicates")
         }
         
         collapse_id <- collapse_id+1
