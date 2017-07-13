@@ -380,7 +380,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     # Initialize dry run columns 
     if (dry) {
         data$COLLAPSE_ID <- NA
-        data$COLLAPSE_CLASS <- "duplicated"
+        data$COLLAPSE_CLASS <- NA
         data$COLLAPSE_PASS <- TRUE
     }
     
@@ -388,6 +388,11 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     nseq <- nrow(data)
     if (nseq <= 1) { 
         if (verbose) { .printVerbose(nseq, 1, 0) }
+        if (dry) {
+            data$COLLAPSE_ID <- 1
+            data$COLLAPSE_CLASS <- "unique"
+            data$COLLAPSE_PASS <- TRUE            
+        }
         return(data)
     }
     
@@ -487,6 +492,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 # larger number of informative positions 
                 # (the first one if ties)
                 max_info_idx <- which.max(.informativeLength(data[[seq]][idx]))[1]
+                data[["COLLAPSE_CLASS"]][idx] <- "duplicated"
                 data[["COLLAPSE_PASS"]][idx[-max_info_idx]] <- FALSE
             }
         } else {
