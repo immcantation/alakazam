@@ -433,7 +433,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         selected <- which.max(inform_len)
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {
-            data[["COLLAPSE_PASS"]][-selected] <- FALSE
+            data[["COLLAPSE_PASS"]][selected] <- TRUE
         } else {
             return(data[selected, ])
         }
@@ -474,6 +474,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         }
         
         if (dry) {
+            idx_copy <- idx
             idx <- idx[idx %in% ambig_rows == FALSE]
         }
         
@@ -481,7 +482,13 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             # Assign unique sequences to unique vector
             uniq_taxa <- append(uniq_taxa, taxa_names[idx])
             if (dry) {
-                data[["COLLAPSE_CLASS"]][taxa_i] <- "unique"
+                if (length(idx_copy)==1) {
+                    ## 'truly' unique
+                    data[["COLLAPSE_CLASS"]][taxa_i] <- "unique"    
+                } else {
+                    ## unique after ambiguous removal
+                    data[["COLLAPSE_CLASS"]][taxa_i] <- "unique2"
+                }
                 data[["COLLAPSE_PASS"]][taxa_i] <- TRUE
             }
         } else if (length(idx) > 1) {
