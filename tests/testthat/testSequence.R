@@ -222,7 +222,7 @@ test_that("collapseDuplicates", {
     expect_equivalent(obs, exp[2:1,])
     
     obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T)
-    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "unique", "ambiguous"))
+    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "unique2", "ambiguous"))
     
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
@@ -274,6 +274,37 @@ test_that("collapseDuplicates", {
         stringsAsFactors = F
     ) 
     expect_equal(obs, exp)
+    
+    
+    ## All sequences are ambiguous,
+    ## but belong to two independent ambiguous clusters
+    ## Should return two sequences
+    test <- data.frame(
+        list("SEQUENCE_IMGT" = c("AANCTANNT",
+                                 "AAACNNNNT",
+                                 "AATCTNNNT",
+                                 "AANCTCTTT")),
+        stringsAsFactors = F
+    )
+    
+    test2 <- data.frame(
+        list("SEQUENCE_IMGT" = c("ATATCNNNT",
+                                 "ATNNCANNT",
+                                 "ATNTCTNNT",
+                                 "ATCTCNTTT")),
+        stringsAsFactors = F
+    )
+    test <- bind_rows(test, test2)
+    test$SEQUENCE_ID <- test$SEQUENCE_IMGT
+    # d_mat <- pairwiseEqual(test$SEQUENCE_IMGT)
+    # colnames(d_mat) <- rownames(d_mat) <- test$SEQUENCE_ID
+    # g <- graph_from_adjacency_matrix(d_mat)
+    # plot(g)
+    expect <- c("AANCTCTTT", "ATCTCNTTT")
+    col <- collapseDuplicates(test)
+    expect_equal(col$SEQUENCE_ID, expect)
+    col_dry <- collapseDuplicates(test, dry=T)
+    expect_equal(col_dry$SEQUENCE_ID[col_dry$COLLAPSE_PASS], expect)
     
 })
 

@@ -429,10 +429,20 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Return single sequence if all sequence belong to ambiguous clusters
     if (discard_count == nrow(d_mat)) {
-        inform_len <- .informativeLength(data[[seq]])
-        selected <- which.max(inform_len)
+        inform_len <- data.frame(list("inform_len"=.informativeLength(data[[seq]])))
+        # For each ambiguous cluster, return the best sequence
+        g <- igraph::simplify(igraph::graph_from_adjacency_matrix(d_mat))
+        inform_len$clusters <- igraph::components(g)$membership[data[[id]]]
+        inform_len$select_id <- 1:nrow(inform_len)
+        selected <- inform_len %>%
+            dplyr::group_by(clusters) %>%
+            dplyr::slice(which.max(inform_len)) %>%
+            dplyr::ungroup() %>%
+            dplyr::select(select_id) %>% unlist() 
+        
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {
+            data[["COLLAPSE_ID"]] <- inform_len$clusters
             data[["COLLAPSE_PASS"]][selected] <- TRUE
         } else {
             return(data[selected, ])
