@@ -253,14 +253,19 @@ getPhylipInferred <- function(phylip_out) {
     fix.row <- c(1, which(is.na(seq_df[,1])) + 1)
     end_col <-  ncol(seq_df) - 2
     #seq_df[fix.row, ] <- cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:5], stringsAsFactors=F)
-    seq_df[fix.row, ] <- cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:end_col], stringsAsFactors=F)
-    seq_df <- seq_df[-(fix.row[-1] - 1), ]
+    seq_df[fix.row, ] <- data.frame(cbind(0, seq_df[fix.row, 1], "no", seq_df[fix.row, 2:end_col]), stringsAsFactors=F)
+    if (length(fix.row)>1) {
+        seq_df <- seq_df[-(fix.row[-1] - 1), ]
+    }
     
     # Create data.frame of inferred sequences
     inferred_num <- unique(grep("^[0-9]+$", seq_df[, 2], value=T))
     inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
-    return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq, stringsAsFactors = FALSE))
+    if (length(inferred_num)>0) {
+        return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq, stringsAsFactors = FALSE))
+    }
+    data.frame(SEQUENCE_ID=c(), SEQUENCE=c(), stringsAsFactors = FALSE)
 }
 
 
