@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // seqEqual
 bool seqEqual(std::string seq1, std::string seq2, CharacterVector ignore);
-RcppExport SEXP alakazam_seqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
+RcppExport SEXP _alakazam_seqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // pairwiseEqual
 LogicalMatrix pairwiseEqual(StringVector seq);
-RcppExport SEXP alakazam_pairwiseEqual(SEXP seqSEXP) {
+RcppExport SEXP _alakazam_pairwiseEqual(SEXP seqSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ END_RCPP
 }
 // seqDistRcpp
 double seqDistRcpp(std::string seq1, std::string seq2, NumericMatrix dist_mat);
-RcppExport SEXP alakazam_seqDistRcpp(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
+RcppExport SEXP _alakazam_seqDistRcpp(SEXP seq1SEXP, SEXP seq2SEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -44,7 +44,7 @@ END_RCPP
 }
 // pairwiseDistRcpp
 NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat);
-RcppExport SEXP alakazam_pairwiseDistRcpp(SEXP seqSEXP, SEXP dist_matSEXP) {
+RcppExport SEXP _alakazam_pairwiseDistRcpp(SEXP seqSEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -56,10 +56,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"alakazam_seqEqual", (DL_FUNC) &alakazam_seqEqual, 3},
-    {"alakazam_pairwiseEqual", (DL_FUNC) &alakazam_pairwiseEqual, 1},
-    {"alakazam_seqDistRcpp", (DL_FUNC) &alakazam_seqDistRcpp, 3},
-    {"alakazam_pairwiseDistRcpp", (DL_FUNC) &alakazam_pairwiseDistRcpp, 2},
+    {"_alakazam_seqEqual", (DL_FUNC) &_alakazam_seqEqual, 3},
+    {"_alakazam_pairwiseEqual", (DL_FUNC) &_alakazam_pairwiseEqual, 1},
+    {"_alakazam_seqDistRcpp", (DL_FUNC) &_alakazam_seqDistRcpp, 3},
+    {"_alakazam_pairwiseDistRcpp", (DL_FUNC) &_alakazam_pairwiseDistRcpp, 2},
     {NULL, NULL, 0}
 };
 

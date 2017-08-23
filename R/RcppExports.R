@@ -30,7 +30,7 @@
 #' 
 #' @export
 seqEqual <- function(seq1, seq2, ignore = as.character( c("N","-",".","?"))) {
-    .Call(alakazam_seqEqual, seq1, seq2, ignore)
+    .Call(`_alakazam_seqEqual`, seq1, seq2, ignore)
 }
 
 #' Calculate pairwise equivalence between sequences
@@ -56,14 +56,14 @@ seqEqual <- function(seq1, seq2, ignore = as.character( c("N","-",".","?"))) {
 #' 
 #' @export
 pairwiseEqual <- function(seq) {
-    .Call(alakazam_pairwiseEqual, seq)
+    .Call(`_alakazam_pairwiseEqual`, seq)
 }
 
 seqDistRcpp <- function(seq1, seq2, dist_mat) {
-    .Call(alakazam_seqDistRcpp, seq1, seq2, dist_mat)
+    .Call(`_alakazam_seqDistRcpp`, seq1, seq2, dist_mat)
 }
 
 pairwiseDistRcpp <- function(seq, dist_mat) {
-    .Call(alakazam_pairwiseDistRcpp, seq, dist_mat)
+    .Call(`_alakazam_pairwiseDistRcpp`, seq, dist_mat)
 }
 
