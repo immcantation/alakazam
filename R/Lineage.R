@@ -30,6 +30,7 @@ NULL
 #'                        for any given clone.
 #' @param    clone        name of the column containing the identifier for the clone. All 
 #'                        entries in this column should be identical.
+#' @param    mask_char    character to use for masking.
 #' @param    max_mask     maximum number of characters to mask at the leading and trailing
 #'                        sequence ends. If \code{NULL} then the upper masking bound will 
 #'                        be automatically determined from the maximum number of observed 
@@ -105,7 +106,7 @@ NULL
 #' @export
 makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
                              germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL",
-                             junc_len="JUNCTION_LENGTH", clone="CLONE",
+                             junc_len="JUNCTION_LENGTH", clone="CLONE", mask_char="N",
                              max_mask=0, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
@@ -115,8 +116,8 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
-    tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], outer_only=FALSE)
-    tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], max_mask=max_mask, trim=FALSE)
+    tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, outer_only=FALSE)
+    tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], mask_char=mask_char, max_mask=max_mask, trim=FALSE)
     
     # Remove duplicates
     tmp_df <- collapseDuplicates(tmp_df, id=id, seq=seq, text_fields=text_fields, 
@@ -133,7 +134,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
-                 germline=maskSeqGaps(data[[germ]][1], outer_only=FALSE), 
+                 germline=maskSeqGaps(data[[germ]][1], mask_char=mask_char, outer_only=FALSE), 
                  v_gene=getGene(data[[vcall]][1]), 
                  j_gene=getGene(data[[jcall]][1]), 
                  junc_len=data[[junc_len]][1])
@@ -409,6 +410,14 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @param    clone         \link{ChangeoClone} object containing clone data.
 #' @param    dnapars_exec  path to the PHYLIP dnapars executable.
+#' @param    dist_mat      Character distance matrix to use for reassigning edge weights. 
+#'                         Defaults to a Hamming distance matrix returned by \link{getDNAMatrix} 
+#'                         with \code{gap=0}. If gap characters, \code{c("-", ".")}, are assigned 
+#'                         a value of -1 in \code{dist_mat} then contiguous gaps of any run length,
+#'                         which are not present in both sequences, will be counted as a 
+#'                         distance of 1. Meaning, indels of any length will increase
+#'                         the sequence distance by 1. Gap values other than -1 will 
+#'                         return a distance that does not consider indels as a special case.
 #' @param    rm_temp       if \code{TRUE} delete the temporary directory after running dnapars;
 #'                         if \code{FALSE} keep the temporary directory.
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
@@ -468,10 +477,10 @@ phylipToGraph <- function(edges, clone) {
 #' Following tree construction using dnapars, the dnapars output is modified to allow
 #' input sequences to appear as internal nodes of the tree. Intermediate sequences 
 #' inferred by dnapars are replaced by children within the tree having a Hamming distance 
-#' of zero from their parent node. The distance calculation allows IUPAC ambiguous 
-#' character matches, where an ambiguous character has distance zero to any character in 
-#' the set of characters it represents. Distance calculation and movement of child nodes 
-#' up the tree is repeated until all parent-child pairs have a distance greater than zero 
+#' of zero from their parent node. With the default \code{dist_mat}, the distance calculation 
+#' allows IUPAC ambiguous character matches, where an ambiguous character has distance zero 
+#' to any character in the set of characters it represents. Distance calculation and movement of 
+#' child nodes up the tree is repeated until all parent-child pairs have a distance greater than zero 
 #' between them. The germline sequence (outgroup) is moved to the root of the tree and
 #' excluded from the node replacement processes, which permits the trunk of the tree to be
 #' the only edge with a distance of zero. Edge weights of the resultant tree are assigned 
@@ -495,8 +504,9 @@ phylipToGraph <- function(edges, clone) {
 #' @examples
 #' \dontrun{
 #' # Preprocess clone
-#' clone <- subset(ExampleDb, CLONE == 3138)
-#' clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
+#' db <- subset(ExampleDb, CLONE == 3138)
+#' clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
+#'                           num_fields="DUPCOUNT")
 #' 
 #' # Run PHYLIP and process output
 #' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
@@ -506,10 +516,18 @@ phylipToGraph <- function(edges, clone) {
 #' library(igraph)
 #' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
 #'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
+#' 
+#' # To consider each indel event as a mutation, change the masking character 
+#' # and distance matrix
+#' clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
+#'                           num_fields="DUPCOUNT", mask_char="-")
+#' graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
+#'                             rm_temp=TRUE)
 #' }
 #' 
 #' @export
-buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE) {
+buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0), 
+                               rm_temp=FALSE, verbose=FALSE) {
     # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
@@ -565,7 +583,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, rm_temp=FALSE, verbose=FALSE
     edges <- getPhylipEdges(phylip_out, id_map=id_map)
     
     # Modify PHYLIP tree to remove 0 distance edges
-    mod_list <- modifyPhylipEdges(edges, clone)
+    mod_list <- modifyPhylipEdges(edges, clone, dist_mat=dist_mat)
 
     # Convert edges and clone data to igraph graph object
     graph <- phylipToGraph(mod_list$edges, mod_list$clone)

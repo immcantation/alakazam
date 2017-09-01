@@ -137,7 +137,8 @@ translateDNA <- function (seq, trim=FALSE) {
 #' \code{maskSeqGaps} substitutes gap characters, \code{c("-", ".")}, with \code{"N"} 
 #' in a vector of DNA sequences.
 #'
-#' @param    seq         a character vector of DNA sequence strings.
+#' @param    seq         character vector of DNA sequence strings.
+#' @param    mask_char   character to use for masking.
 #' @param    outer_only  if \code{TRUE} replace only contiguous leading and trailing gaps;
 #'                       if \code{FALSE} replace all gap characters.
 #'                       
@@ -152,24 +153,24 @@ translateDNA <- function (seq, trim=FALSE) {
 #' maskSeqGaps("--ATG-C-", outer_only=TRUE)
 #' 
 #' @export
-maskSeqGaps <- function(seq, outer_only=FALSE) {
+maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
     if (outer_only) {
         for (i in 1:length(seq)) {
-            head_match <- attr(regexpr('^[-\\.]+', seq[i]), 'match.length')
-            tail_match <- attr(regexpr('[-\\.]+$', seq[i]), 'match.length')
+            head_match <- attr(regexpr("^[-\\.]+", seq[i]), "match.length")
+            tail_match <- attr(regexpr("[-\\.]+$", seq[i]), "match.length")
             if (head_match > 0) { 
-                seq[i] <- gsub('^[-\\.]+', 
-                                     paste(rep('N', head_match), collapse=''), 
+                seq[i] <- gsub("^[-\\.]+", 
+                                     paste(rep(mask_char, head_match), collapse=""), 
                                      seq[i]) 
             }
             if (tail_match > 0) { 
-                seq[i] <- gsub('[-\\.]+$', 
-                                     paste(rep('N', tail_match), collapse=''), 
+                seq[i] <- gsub("[-\\.]+$", 
+                                     paste(rep(mask_char, tail_match), collapse=""), 
                                      seq[i]) 
             }
         }
     } else {
-        seq <- gsub('[-\\.]', 'N', seq)
+        seq <- gsub("[-\\.]", mask_char, seq)
     }
     
     return(seq)
@@ -182,14 +183,15 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 #' and replaces the leading and trailing characters with \code{"N"} characters to create 
 #' a sequence vector with uniformly masked outer sequence segments.
 #' 
-#' @param    seq       a character vector of DNA sequence strings.
-#' @param    max_mask  the maximum number of characters to mask. If set to 0 then
-#'                     no masking will be performed. If set to \code{NULL} then the upper 
-#'                     masking bound will be automatically determined from the maximum 
-#'                     number of observed leading or trailing \code{"N"} characters amongst 
-#'                     all strings in \code{seq}. 
-#' @param    trim      if \code{TRUE} leading and trailing characters will be cut rather 
-#'                     than masked with \code{"N"} characters.
+#' @param    seq        character vector of DNA sequence strings.
+#' @param    mask_char  character to use for masking.
+#' @param    max_mask   the maximum number of characters to mask. If set to 0 then
+#'                      no masking will be performed. If set to \code{NULL} then the upper 
+#'                      masking bound will be automatically determined from the maximum 
+#'                      number of observed leading or trailing \code{"N"} characters amongst 
+#'                      all strings in \code{seq}. 
+#' @param    trim       if \code{TRUE} leading and trailing characters will be cut rather 
+#'                      than masked with \code{"N"} characters.
 #' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
 #' 
 #' @seealso   See \link{maskSeqGaps} for masking internal gaps.
@@ -210,10 +212,10 @@ maskSeqGaps <- function(seq, outer_only=FALSE) {
 #' maskSeqEnds(seq, max_mask=1, trim=TRUE)
 #' 
 #' @export
-maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
+maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
     # Find length of leading and trailing Ns
-    left_lengths <- attr(regexpr('(^N*)', seq, perl=T), 'capture.length')
-    right_lengths <- attr(regexpr('(N*$)', seq, perl=T), 'capture.length')
+    left_lengths <- attr(regexpr(paste0("(^", mask_char, "*)"), seq, perl=T), "capture.length")
+    right_lengths <- attr(regexpr(paste0("(", mask_char, "*$)"), seq, perl=T), "capture.length")
     
     # Mask to minimal inner sequence length
     left_mask <- min(max(left_lengths[, 1]), max_mask)
@@ -222,9 +224,9 @@ maskSeqEnds <- function(seq, max_mask=NULL, trim=FALSE) {
     if (trim) {
         seq <- substr(seq, left_mask + 1, seq_lengths - right_mask)
     } else {
-        substr(seq, 0, left_mask) <- paste(rep('N', left_mask), collapse='')
+        substr(seq, 0, left_mask) <- paste(rep(mask_char, left_mask), collapse='')
         substr(seq, seq_lengths - right_mask + 1, seq_lengths + 1) <- 
-            paste(rep('N', right_mask), collapse='')
+            paste(rep(mask_char, right_mask), collapse='')
     }
     
     return(seq)
