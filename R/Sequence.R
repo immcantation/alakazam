@@ -164,13 +164,13 @@ maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
             tail_match <- attr(regexpr("[-\\.]+$", seq[i]), "match.length")
             if (head_match > 0) { 
                 seq[i] <- gsub("^[-\\.]+", 
-                                     paste(rep(mask_char, head_match), collapse=""), 
-                                     seq[i]) 
+                               paste(rep(mask_char, head_match), collapse=""), 
+                               seq[i]) 
             }
             if (tail_match > 0) { 
                 seq[i] <- gsub("[-\\.]+$", 
-                                     paste(rep(mask_char, tail_match), collapse=""), 
-                                     seq[i]) 
+                               paste(rep(mask_char, tail_match), collapse=""), 
+                               seq[i]) 
             }
         }
     } else {
