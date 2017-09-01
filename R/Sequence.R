@@ -148,9 +148,13 @@ translateDNA <- function (seq, trim=FALSE) {
 #' @seealso  See \link{maskSeqEnds} for masking ragged edges.
 #'           
 #' @examples
+#' # Mask with Ns
 #' maskSeqGaps(c("ATG-C", "CC..C"))
 #' maskSeqGaps("--ATG-C-")
 #' maskSeqGaps("--ATG-C-", outer_only=TRUE)
+#' 
+#' # Mask with dashes
+#' maskSeqGaps(c("ATG-C", "CC..C"), mask_char="-")
 #' 
 #' @export
 maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
@@ -210,6 +214,10 @@ maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
 #' # Set max_mask to limit extent of masking and trimming
 #' maskSeqEnds(seq, max_mask=1)
 #' maskSeqEnds(seq, max_mask=1, trim=TRUE)
+#' 
+#' # Mask dashes instead of Ns
+#' seq <- c("CCCCTGGG", "-AACTGG-", "---CTG--")
+#' maskSeqEnds(seq, mask_char="-")
 #' 
 #' @export
 maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
