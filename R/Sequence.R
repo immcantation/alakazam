@@ -519,7 +519,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                     data[["COLLAPSE_CLASS"]][taxa_i] <- "unique"    
                 } else {
                     ## unique after ambiguous removal
-                    data[["COLLAPSE_CLASS"]][taxa_i] <- "unique2"
+                    data[["COLLAPSE_CLASS"]][taxa_i] <- "ambiguous_duplicate"
                 }
                 data[["COLLAPSE_PASS"]][taxa_i] <- TRUE
             }
