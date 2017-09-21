@@ -1,4 +1,25 @@
-Version 0.2.7:  Jun 12, 2017
+Version 0.2.7.999:  September 21, 2017
+-------------------------------------------------------------------------------
+
+General:
+
++ Updated Rcpp dependency to 0.12.12.
++ Added `dry` argument to `collapseDuplicates` which will annotate duplicate 
+  sequences but not remove them when set to `TRUE`.
++ Fixed a bug where `collapseDuplicates` was returning one sequence if all 
+  sequences were considered ambiguous.
+
+
+Lineage:
+
++ Added ability to change masking character and distance matrix used in 
+  `makeChangeoClone` and `buildPhylipLineage` for purposes of (optionally) 
+  treating indels as mismatches.
++ Fixed a bug in `buildPhylipLineage` when PHYLIP doesn't generate inferred
+  sequences and has only one block.
+
+
+Version 0.2.7:  June 12, 2017
 -------------------------------------------------------------------------------
 
 General:

@@ -269,17 +269,15 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' @param    sep          character to use for delimiting collapsed annotations in the 
 #'                        \code{text_fields} columns. Defines both the input and output 
 #'                        delimiter.
+#' @param    dry          if \code{TRUE} perform dry run. Only labels the sequences without 
+#'                        collapsing them.
 #' @param    verbose      if \code{TRUE} report the number input, discarded and output 
 #'                        sequences; if \code{FALSE} process sequences silently.
-#' @param    dry          dry run collapseDuplicates. Will only label the sequences.
 #'                        
 #' @return   A modified \code{data} data.frame with duplicate sequences removed and 
-#'           annotation fields collapsed. If dry=TRUE, sequences will not be collapsed
-#'           and the columns COLLAPSE_ID, COLLAPSE_CLASS and COLLAPSE_PASS will be
-#'           added to the data.frame. Sequence with the same COLLAPSE_ID, belong to the 
-#'           same collapsing group. COLLAPSE_CLASS will be unique, duplicated or ambiguous.
-#'           COLLAPSE_PASS will be TRUE for the sequences that collapseDuplicates 
-#'           (with dry=FALSE) would keep.
+#'           annotation fields collapsed if \code{dry=FALSE}. If \code{dry=TRUE}, 
+#'           sequences will be labeled with the collapse action, but the input will be
+#'           otherwise unmodifed (see Details).
 #'           
 #' @details
 #' \code{collapseDuplicates} identifies duplicate sequences in the \code{seq} column by
@@ -300,10 +298,22 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' An ambiguous sequence is one that can be assigned to two different clusters, wherein
 #' the ambiguous sequence is equivalent to two sequences which are themselves 
 #' non-equivalent. Ambiguous sequences arise due to ambiguous characters at positions that
-#' vary across sequences, and are discarded along with their annotations. Thus, ambiguous
-#' sequences are removed as duplicates of some sequence, but do not create a potential
+#' vary across sequences, and are discarded along with their annotations when \code{dry=FALSE}. 
+#' Thus, ambiguous sequences are removed as duplicates of some sequence, but do not create a potential
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
 #' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
+#' 
+#' If \code{dry=TRUE} sequences will not be removed from the input. Instead, the following columns
+#' will be appended to the input defining the collapse action that would have been performed in the
+#' \code{dry=FALSE} case.
+#' 
+#' \itemize{
+#'   \item  \code{COLLAPSE_ID}:     an identifer for the group of identical sequences.
+#'   \item  \code{COLLAPSE_CLASS}:  one of \code{"unique"}, \code{"unique2"}, \code{"duplicated"} 
+#'                                  or \code{"ambiguous"}, defining whether the sequence
+#'                                  matches to other sequences.
+#'   \item  \code{COLLAPSE_PASS}:   \code{TRUE} for the sequences that would be retained.
+#' }
 #' 
 #' @seealso  Equality is tested with \link{seqEqual} and \link{pairwiseEqual}. 
 #'           For IUPAC ambiguous character codes see \link{IUPAC_DNA}.
@@ -344,7 +354,7 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
-                               sep=",", verbose=FALSE, dry=FALSE) {
+                               sep=",", dry=FALSE, verbose=FALSE) {
     # Verify column classes and exit if they are incorrect
     if (!is.null(text_fields)) {
         if (!all(sapply(subset(data, select=text_fields), is.character))) {
@@ -448,7 +458,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             dplyr::group_by_("clusters") %>%
             dplyr::slice(which.max(inform_len)) %>%
             dplyr::ungroup() %>%
-            dplyr::select(select_id) %>% unlist() 
+            dplyr::select_("select_id") %>% unlist() 
         
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {
