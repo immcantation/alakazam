@@ -222,7 +222,7 @@ test_that("collapseDuplicates", {
     expect_equivalent(obs, exp[2:1,])
     
     obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T)
-    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "unique2", "ambiguous"))
+    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "ambiguous_duplicate", "ambiguous"))
     
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
