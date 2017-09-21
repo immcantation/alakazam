@@ -309,9 +309,11 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' 
 #' \itemize{
 #'   \item  \code{COLLAPSE_ID}:     an identifer for the group of identical sequences.
-#'   \item  \code{COLLAPSE_CLASS}:  one of \code{"unique"}, \code{"unique2"}, \code{"duplicated"} 
-#'                                  or \code{"ambiguous"}, defining whether the sequence
-#'                                  matches to other sequences.
+#'   \item  \code{COLLAPSE_CLASS}:  string defining how the sequence matches to the other in the set.
+#'                                  one of \code{"duplicated"} (has duplicates),
+#'                                  \code{"unique"} (no duplicates), \code{"ambiguous_duplicate"} 
+#'                                  (no duplicates after ambiguous sequences are removed), 
+#'                                  or \code{"ambiguous"} (matches multiple non-duplicate sequences).
 #'   \item  \code{COLLAPSE_PASS}:   \code{TRUE} for the sequences that would be retained.
 #' }
 #' 

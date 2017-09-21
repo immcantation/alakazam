@@ -16,7 +16,8 @@ dnapars application of the PHYLIP package.
 Usage
 --------------------
 ```
-buildPhylipLineage(clone, dnapars_exec, rm_temp = FALSE, verbose = FALSE)
+buildPhylipLineage(clone, dnapars_exec, dist_mat = getDNAMatrix(gap = 0),
+rm_temp = FALSE, verbose = FALSE)
 ```
 
 Arguments
@@ -27,6 +28,16 @@ clone
 
 dnapars_exec
 :   path to the PHYLIP dnapars executable.
+
+dist_mat
+:   Character distance matrix to use for reassigning edge weights. 
+Defaults to a Hamming distance matrix returned by [getDNAMatrix](getDNAMatrix.md) 
+with `gap=0`. If gap characters, `c("-", ".")`, are assigned 
+a value of -1 in `dist_mat` then contiguous gaps of any run length,
+which are not present in both sequences, will be counted as a 
+distance of 1. Meaning, indels of any length will increase
+the sequence distance by 1. Gap values other than -1 will 
+return a distance that does not consider indels as a special case.
 
 rm_temp
 :   if `TRUE` delete the temporary directory after running dnapars;
@@ -99,10 +110,10 @@ for the outgroup.
 Following tree construction using dnapars, the dnapars output is modified to allow
 input sequences to appear as internal nodes of the tree. Intermediate sequences 
 inferred by dnapars are replaced by children within the tree having a Hamming distance 
-of zero from their parent node. The distance calculation allows IUPAC ambiguous 
-character matches, where an ambiguous character has distance zero to any character in 
-the set of characters it represents. Distance calculation and movement of child nodes 
-up the tree is repeated until all parent-child pairs have a distance greater than zero 
+of zero from their parent node. With the default `dist_mat`, the distance calculation 
+allows IUPAC ambiguous character matches, where an ambiguous character has distance zero 
+to any character in the set of characters it represents. Distance calculation and movement of 
+child nodes up the tree is repeated until all parent-child pairs have a distance greater than zero 
 between them. The germline sequence (outgroup) is moved to the root of the tree and
 excluded from the node replacement processes, which permits the trunk of the tree to be
 the only edge with a distance of zero. Edge weights of the resultant tree are assigned 
@@ -128,8 +139,9 @@ Examples
 ```R
 ### Not run:
 # Preprocess clone
-# clone <- subset(ExampleDb, CLONE == 3138)
-# clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), num_fields="DUPCOUNT")
+# db <- subset(ExampleDb, CLONE == 3138)
+# clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
+# num_fields="DUPCOUNT")
 # 
 # # Run PHYLIP and process output
 # dnapars_exec <- "~/apps/phylip-3.69/dnapars"
@@ -139,6 +151,13 @@ Examples
 # library(igraph)
 # plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
 # vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
+# 
+# # To consider each indel event as a mutation, change the masking character 
+# # and distance matrix
+# clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
+# num_fields="DUPCOUNT", mask_char="-")
+# graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
+# rm_temp=TRUE)
 ```
 
 

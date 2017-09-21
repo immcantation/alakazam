@@ -19,7 +19,7 @@ Usage
 collapseDuplicates(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 text_fields = NULL, num_fields = NULL, seq_fields = NULL,
 add_count = FALSE, ignore = c("N", "-", ".", "?"), sep = ",",
-verbose = FALSE)
+dry = FALSE, verbose = FALSE)
 ```
 
 Arguments
@@ -66,6 +66,10 @@ sep
 `text_fields` columns. Defines both the input and output 
 delimiter.
 
+dry
+:   if `TRUE` perform dry run. Only labels the sequences without 
+collapsing them.
+
 verbose
 :   if `TRUE` report the number input, discarded and output 
 sequences; if `FALSE` process sequences silently.
@@ -77,7 +81,9 @@ Value
 -------------------
 
 A modified `data` data.frame with duplicate sequences removed and 
-annotation fields collapsed.
+annotation fields collapsed if `dry=FALSE`. If `dry=TRUE`, 
+sequences will be labeled with the collapse action, but the input will be
+otherwise unmodifed (see Details).
 
 
 Details
@@ -101,10 +107,24 @@ amongst all sequences in a cluster of duplicates.
 An ambiguous sequence is one that can be assigned to two different clusters, wherein
 the ambiguous sequence is equivalent to two sequences which are themselves 
 non-equivalent. Ambiguous sequences arise due to ambiguous characters at positions that
-vary across sequences, and are discarded along with their annotations. Thus, ambiguous
-sequences are removed as duplicates of some sequence, but do not create a potential
+vary across sequences, and are discarded along with their annotations when `dry=FALSE`. 
+Thus, ambiguous sequences are removed as duplicates of some sequence, but do not create a potential
 false-positive annotation merger. Ambiguous sequences are not included in the 
 `COLLAPSE_COUNT` annotation that is added when `add_count=TRUE`.
+
+If `dry=TRUE` sequences will not be removed from the input. Instead, the following columns
+will be appended to the input defining the collapse action that would have been performed in the
+`dry=FALSE` case.
+
+
++ `COLLAPSE_ID`:     an identifer for the group of identical sequences.
++ `COLLAPSE_CLASS`:  string defining how the sequence matches to the other in the set.
+one of `"duplicated"` (has duplicates),
+`"unique"` (no duplicates), `"ambiguous_duplicate"` 
+(no duplicates after ambiguous sequences are removed), 
+or `"ambiguous"` (matches multiple non-duplicate sequences).
++ `COLLAPSE_PASS`:   `TRUE` for the sequences that would be retained.
+
 
 
 

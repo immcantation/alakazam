@@ -44,6 +44,10 @@ A matrix of numerical distance between each entry in `seq`.
 If `seq` is a named vector, row and columns names will be added 
 accordingly.
 
+Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md). 
+Uses [seqDist](seqDist.md) for calculating distances between pairs.
+See [pairwiseEqual](pairwiseEqual.md) for generating an equivalence matrix.
+
 
 
 Examples
@@ -103,15 +107,6 @@ D 1 2 2 0
 
 ```
 
-
-
-See also
--------------------
-
-Nucleotide distance matrix may be built with [getDNAMatrix](getDNAMatrix.md). 
-Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md). 
-Uses [seqDist](seqDist.md) for calculating distances between pairs.
-See [pairwiseEqual](pairwiseEqual.md) for generating an equivalence matrix.
 
 
 

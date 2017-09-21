@@ -16,14 +16,17 @@ in a vector of DNA sequences.
 Usage
 --------------------
 ```
-maskSeqGaps(seq, outer_only = FALSE)
+maskSeqGaps(seq, mask_char = "N", outer_only = FALSE)
 ```
 
 Arguments
 -------------------
 
 seq
-:   a character vector of DNA sequence strings.
+:   character vector of DNA sequence strings.
+
+mask_char
+:   character to use for masking.
 
 outer_only
 :   if `TRUE` replace only contiguous leading and trailing gaps;
@@ -44,6 +47,7 @@ Examples
 -------------------
 
 ```R
+# Mask with Ns
 maskSeqGaps(c("ATG-C", "CC..C"))
 
 ```
@@ -69,11 +73,25 @@ maskSeqGaps("--ATG-C-")
 
 ```R
 maskSeqGaps("--ATG-C-", outer_only=TRUE)
+
 ```
 
 
 ```
 [1] "NNATG-CN"
+
+```
+
+
+```R
+
+# Mask with dashes
+maskSeqGaps(c("ATG-C", "CC..C"), mask_char="-")
+```
+
+
+```
+[1] "ATG-C" "CC--C"
 
 ```
 

@@ -22,6 +22,13 @@ Alakazam serves five main purposes:
 5. Performing physicochemical property analyses of lymphocyte receptor 
    sequences.
 
+
+Contact
+-------------------------------------------------------------------------------
+
+For help and questions please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
+or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).
+
 Dependencies
 ---------------
 

@@ -17,14 +17,17 @@ a sequence vector with uniformly masked outer sequence segments.
 Usage
 --------------------
 ```
-maskSeqEnds(seq, max_mask = NULL, trim = FALSE)
+maskSeqEnds(seq, mask_char = "N", max_mask = NULL, trim = FALSE)
 ```
 
 Arguments
 -------------------
 
 seq
-:   a character vector of DNA sequence strings.
+:   character vector of DNA sequence strings.
+
+mask_char
+:   character to use for masking.
 
 max_mask
 :   the maximum number of characters to mask. If set to 0 then
@@ -108,11 +111,26 @@ maskSeqEnds(seq, max_mask=1)
 
 ```R
 maskSeqEnds(seq, max_mask=1, trim=TRUE)
+
 ```
 
 
 ```
 [1] "CCCTGG" "AACTGG" "NNCTGN"
+
+```
+
+
+```R
+
+# Mask dashes instead of Ns
+seq <- c("CCCCTGGG", "-AACTGG-", "---CTG--")
+maskSeqEnds(seq, mask_char="-")
+```
+
+
+```
+[1] "---CTG--" "---CTG--" "---CTG--"
 
 ```
 
