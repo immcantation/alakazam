@@ -129,7 +129,7 @@
 #'                          degree shortest_paths all_shortest_paths distances
 #' @importFrom  lazyeval    interp
 #' @importFrom  progress    progress_bar
-#' @importFrom  readr       read_delim read_tsv write_delim write_tsv
+#' @importFrom  readr       read_delim read_tsv write_delim write_tsv cols
 #' @importFrom  scales      log2_trans log10_trans trans_breaks trans_format
 #'                          math_format percent scientific pretty_breaks
 #' @importFrom  seqinr      translate
