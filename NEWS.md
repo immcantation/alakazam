@@ -1,9 +1,14 @@
-Version 0.2.8.999:  October 9, 2017
+Version 0.2.8.999:  November 14, 2017
 -------------------------------------------------------------------------------
 
 General:
 
 + Added explicit type casting for known columns to `readChangeoDb`.
+
+Lineage:
+
++ Fixed a bug in `makeChangeoClone` preventing it from interpreting the `id`
+  argument correctly.
 
 
 Version 0.2.8:  September 21, 2017
