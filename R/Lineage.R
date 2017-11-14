@@ -131,6 +131,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         tmp_names <- names(tmp_df)
     }
     names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
+    names(tmp_df)[tmp_names == id] <- "SEQUENCE_ID"
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
@@ -313,7 +314,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     # Move germline to root position
     germ_idx <- which(edges$to == "Germline")
     edges[germ_idx, c('from', 'to')] <- edges[germ_idx, c('to', 'from')]
-    
+
     # Calculate edge mutations
     for (i in 1:nrow(edges)) {
         if (edges$from[i] == "Germline") {
