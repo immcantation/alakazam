@@ -1,10 +1,15 @@
-Version 0.2.8.999:  November 14, 2017
+Version 0.2.8.999:  February 2, 2018
 -------------------------------------------------------------------------------
 
 General:
 
 + Added explicit type casting for known columns to `readChangeoDb`.
 
+Diversity:
+
++ Added the `uniform` argument to `rarefyDiversity` allowing users to toggle
+  uniform vs non-uniform sampling.
+  
 Lineage:
 
 + Fixed a bug in `makeChangeoClone` preventing it from interpreting the `id`

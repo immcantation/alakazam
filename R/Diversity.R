@@ -467,7 +467,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' Generate a clonal diversity index curve
 #'
 #' \code{rarefyDiversity} divides a set of clones by a group annotation,
-#' uniformly resamples the sequences from each group, and calculates diversity
+#' resamples the sequences from each group, and calculates diversity
 #' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
 #' 
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
@@ -483,10 +483,13 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' @param    step_q    value by which to increment \eqn{q}.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
-#' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
-#'                     if automatically determined from the size of the largest group.
+#' @param    max_n     maximum number of observations to sample. If \code{NULL} then no 
+#'                     maximum is set.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
+#' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
+#'                     number of observations. If \code{FALSE} then allow each group to
+#'                     be resampled to its original size or, if specified, \code{max_size}.
 #' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
@@ -501,9 +504,9 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' frequency described in Chao et al, 2015.
 #'
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
-#' \code{min_q} to \code{max_q} incremented by \code{step_q}.  Variability in total 
-#' sequence counts across unique values in the \code{group} column is corrected by
-#' repeated resampling from the estimated complete clonal distribution to a 
+#' \code{min_q} to \code{max_q} incremented by \code{step_q}.  When \code{uniform=TRUE}
+#' variability in total sequence counts across unique values in the \code{group} column 
+#' is corrected by repeated resampling from the estimated complete clonal distribution to a 
 #' common number of sequences.
 #' 
 #' The diversity index (\eqn{D}) for each group is the mean value of over all resampling 
@@ -542,7 +545,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
-                            ci=0.95, nboot=2000, progress=FALSE) {
+                            ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
     #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
     # Check input
@@ -577,8 +580,13 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     group_keep <- as.character(group_tab[[group]])
     
     # Set number of samples sequence
-    nsam <- min(group_tab$SEQUENCES, max_n)
-    nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
+    if (uniform) {
+        nsam <- min(group_tab$SEQUENCES, max_n)
+        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
+    } else {
+        nsam <- if (is.null(max_n)) { group_tab$SEQUENCES } else { pmin(group_tab$SEQUENCES, max_n) }
+        nsam <- setNames(nsam, group_keep)
+    }
 
     # Set diversity orders and confidence interval
     q <- seq(min_q, max_q, step_q)
