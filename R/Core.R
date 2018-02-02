@@ -71,7 +71,7 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
     select_columns <- colnames(db)
     if(!is.null(select)) { select_columns <- intersect(select_columns, select) }
     if(!is.null(drop)) { select_columns <- setdiff(select_columns, drop) }
-    db <- select_(db, .dots=select_columns)
+    db <- select_(db, .dots=paste("`",select_columns,"`", sep=""))
     
     # Convert sequence fields to upper case
     upper_cols <- intersect(seq_columns, names(db))
