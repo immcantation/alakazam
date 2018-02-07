@@ -533,7 +533,10 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
     
     # Count edges of observed data
     obs_sum <- .countEdges(graphs, field, exclude)
-
+    if (nrow(obs_sum) == 0) {
+        stop("No valid edges found in graphs")
+    }
+    
     # Generate edge null distribution via permutation
     if (progress) { 
         pb <- progressBar(nperm) 
@@ -550,7 +553,6 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
         
         if (progress) { pb$tick() }
     }
-    cat("\n")
     perm_sum <- bind_rows(perm_list)
     
     # Test observed against permutation distribution
