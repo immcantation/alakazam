@@ -1,9 +1,11 @@
-Version 0.2.8.999:  February 2, 2018
+Version 0.2.8.999:  February 28, 2018
 -------------------------------------------------------------------------------
 
 General:
 
 + Added explicit type casting for known columns to `readChangeoDb`.
++ Added the `padSeqEnds` function which pads sequences with Ns to make
+  then equal in length.
 
 Diversity:
 

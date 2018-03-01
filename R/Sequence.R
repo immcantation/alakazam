@@ -198,7 +198,8 @@ maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
 #'                      than masked with \code{"N"} characters.
 #' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
 #' 
-#' @seealso   See \link{maskSeqGaps} for masking internal gaps.
+#' @seealso  See \link{maskSeqGaps} for masking internal gaps.
+#'           See \link{padSeqEnds} for padding sequence of unequal length.
 #' 
 #' @examples
 #' # Default behavior uniformly masks ragged ends
@@ -237,6 +238,50 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
             paste(rep(mask_char, right_mask), collapse='')
     }
     
+    return(seq)
+}
+
+
+#' Pads ragged ends of aligned DNA sequences
+#' 
+#' \code{padSeqEnds} takes a vector of DNA sequences, as character strings,
+#' and appends the ends of each sequence with an appropriate number of \code{"N"} 
+#' characters to create a sequence vector with uniform lengths.
+#' 
+#' @param    seq       character vector of DNA sequence strings.
+#' @param    pad_char  character to use for padding.
+#' @param    front     if \code{TRUE} pad the beginning of each sequence instead of the end. 
+
+#' @return   A modified \code{seq} vector with padded sequences.
+#' 
+#' @seealso  See \link{maskSeqEnds} for creating uniform masking from existing masking.
+#' 
+#' @examples
+#' # Default behavior uniformly pads ragged ends
+#' seq <- c("CCCCTGGG", "ACCCTG", "CCCC")
+#' padSeqEnds(seq)
+#'
+#' # Pad to fixed length
+#' padSeqEnds(seq, length=15)
+#'
+#' # Add padding to the beginning of the sequences instead of the ends
+#' padSeqEnds(seq, head=TRUE)
+#' padSeqEnds(seq, length=15, head=TRUE)
+#' 
+#' @export
+padSeqEnds <- function(seq, length=NULL, head=FALSE, pad_char="N") {
+    # Set length to max input length
+    if (is.null(length)) { 
+        length <- max(stri_length(seq))
+    }
+
+    # Pad
+    if (!head) { 
+        seq <- stri_pad_right(seq, width=length, pad="N")
+    } else {
+        seq <- stri_pad_left(seq, width=length, pad="N")
+    }
+
     return(seq)
 }
 
@@ -375,12 +420,14 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     }
     seq_len <- stri_length(data[[seq]])
     if (any(seq_len != seq_len[1])) {
-        warning("All sequences are not the same length")
+        warning("All sequences are not the same length for data with first ", 
+                id, " = ", data[[id]][1])
     }
     
     # Define verbose reporting function
     .printVerbose <- function(n_total, n_unique, n_discard) {
         cat(" FUNCTION> collapseDuplicates\n", sep="")
+        cat(" FIRST_ID> ", data[[id]][1], "\n", sep="")
         cat("    TOTAL> ", n_total, "\n", sep="")
         cat("   UNIQUE> ", n_unique, "\n", sep="")
         cat("COLLAPSED> ", n_total - n_unique - n_discard, "\n", sep="")
