@@ -141,6 +141,7 @@
 #'                          stri_count_boundaries stri_count_regex 
 #'                          stri_extract_all_regex stri_extract_first_regex  
 #'                          stri_replace_all_regex stri_replace_first_regex
+#'                          stri_pad_left stri_pad_right
 #' @importFrom  Rcpp evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

@@ -586,7 +586,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                 stop("Error in distance matrix of collapseDuplicates")
         }
         
-        collapse_id <- collapse_id+1
+        collapse_id <- collapse_id + 1
     }
    
     if (dry) {
@@ -607,7 +607,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
             seq_set <- data[idx, c(id, seq)]
             inform_len <- .informativeLength(seq_set[[seq]])
             max_inform <- which.max(inform_len)[1] # if ties, pick first
-            tmp_df <- data[idx[max_inform],]
+            tmp_df <- data[idx[max_inform], ]
 
             # Define set of text fields for row
             for (f in text_fields) {
