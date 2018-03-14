@@ -55,8 +55,10 @@ pages:
       - topics/estimateAbundance.md
       - topics/rarefyDiversity.md
       - topics/testDiversity.md
-      - topics/plotAbundance.md
+      - topics/plotAbundanceCurve.md
       - topics/plotDiversityCurve.md
+      - topics/plotDiversityTest.md
+      - topics/AbundanceCurve-class.md
       - topics/DiversityCurve-class.md
       - topics/DiversityTest-class.md
     - 'Ig and TCR Sequence Annotation':

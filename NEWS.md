@@ -1,4 +1,4 @@
-Version 0.2.8.999:  February 28, 2018
+Version 0.2.8.999:  March 14, 2018
 -------------------------------------------------------------------------------
 
 General:
@@ -11,7 +11,17 @@ Diversity:
 
 + Added the `uniform` argument to `rarefyDiversity` allowing users to toggle
   uniform vs non-uniform sampling.
-  
++ Renamed `plotAbundance` to `plotAbundanceCurve`.
++ Changed `estimateAbundance` return object from a data.frame to a new 
+  `AbundanceCurve` custom class.
++ Set default `plot` call for `AbundanceCurve` to `plotAbundanceCurve`.
++ Added the `annotate` argument from `plotDiversityCurve` to 
+  `plotAbundanceCurve`.
++ Added the `score` argument to  `plotDiversityCurve` to toggle between 
+  plotting diversity or evenness.
++ Added the function `plotDiversityTest` to generate a simple plot of
+  `DiversityTest` object summaries.
+
 Lineage:
 
 + Fixed a bug in `makeChangeoClone` preventing it from interpreting the `id`

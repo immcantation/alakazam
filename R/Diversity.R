@@ -294,7 +294,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' }
 #' 
 #' @seealso  
-#' See \link{plotAbundance} for plotting of the abundance distribution.
+#' See \link{plotAbundanceCurve} for plotting of the abundance distribution.
 #' See \link{rarefyDiversity} for a similar application to clonal diversity.
 #'           
 #' @examples
@@ -330,6 +330,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
         group_by_(.dots=c(group)) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_set <- as.character(group_tab[[group]])
+    nsam <- setNames(group_tab$SEQUENCES, group_set)
     
     # Set confidence interval
     ci_z <- ci + (1 - ci) / 2
@@ -340,7 +341,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
     }
     abund_list <- list()
     for (g in group_set) {
-        nsam <- group_tab$SEQUENCES[group_tab[[group]] == g]
+        n <- nsam[g]
         
         # Infer complete abundance distribution
         # TODO:  can be a single function (wrapper) for both this and rarefyDiversity
@@ -352,7 +353,7 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
         names(p) <- c(clone_tab$CLONE[clone_tab[[group]] == g], p2_names)
         
         # Bootstrap abundance
-        boot_mat <- rmultinom(nboot, nsam, p) / nsam
+        boot_mat <- rmultinom(nboot, n, p) / n
         
         # Assign confidence intervals based on variance of bootstrap realizations
         boot_sd <- apply(boot_mat, 1, sd)
@@ -369,7 +370,15 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
         if (progress) { pb$tick() }
     }
     
-    return(bind_rows(abund_list, .id="GROUP"))
+    # Generate return object
+    curve <- new("AbundanceCurve", 
+                 data=as.data.frame(bind_rows(abund_list, .id="GROUP")), 
+                 groups=group_set, 
+                 n=nsam,
+                 nboot=nboot, 
+                 ci=ci)
+    
+    return(curve)
 }
 
 
@@ -871,11 +880,11 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 
 #' Plots a clonal abundance distribution
 #' 
-#' \code{plotAbundance} plots the results from estimating the complete clonal relative 
-#' abundance distribution. The distribution is plotted as a log rank abundance 
+#' \code{plotAbundanceCurve} plots the results from estimating the complete clonal 
+#' relative abundance distribution. The distribution is plotted as a log rank abundance 
 #' distribution.
 #' 
-#' @param    data          data.frame returned by \link{estimateAbundance}.
+#' @param    data          \link{AbundanceCurve} object returned by \link{estimateAbundance}.
 #' @param    colors        named character vector whose names are values in the 
 #'                         \code{group} column of \code{data} and whose values are 
 #'                         colors to assign to those group names.
@@ -885,6 +894,10 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #'                         \code{c(lower, upper)} x-axis limits.
 #' @param    ylim          numeric vector of two values specifying the 
 #'                         \code{c(lower, upper)} y-axis limits.
+#' @param    annotate      string defining whether to added values to the group labels 
+#'                         of the legend. When \code{"none"} (default) is specified no
+#'                         annotations are added. Specifying (\code{"depth"}) adds 
+#'                         sequence counts to the labels.
 #' @param    silent        if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                         object; if \code{FALSE} draw the plot.
 #' @param    ...           additional arguments to pass to ggplot2::theme.
@@ -892,24 +905,36 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  
-#' See \link{estimateAbundance} for generating the input abundance distribution.
+#' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for 
+#' generating the input abundance distribution.
 #' Plotting is performed with \link{ggplot}.
 #'           
 #' @examples
 #' # Estimate abundance by sample and plot
 #' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
-#' plotAbundance(abund)
+#' plotAbundanceCurve(abund, legend_title="Sample")
 #' 
 #' @export
-plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance", 
-                          legend_title=NULL, xlim=NULL, ylim=NULL, 
-                          silent=FALSE, ...) {
-    # TODO: additional styles. rank abundance, box/violin
-
+plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance", 
+                               legend_title=NULL, xlim=NULL, ylim=NULL, 
+                               annotate=c("none", "depth"),
+                               silent=FALSE, ...) {
+    # Check arguments
+    annotate <- match.arg(annotate)
+    
+    # Define group label annotations
+    if (annotate == "none") {
+        group_labels <- setNames(data@groups, data@groups)
+    } else if (annotate == "depth") {
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
+                                 data@groups)
+    }
+    
     # Stupid hack for check NOTE about `.x` in math_format
-    .x <- NULL    
+    .x <- NULL
+    
     # Define base plot elements
-    g1 <- ggplot(data, aes_string(x="RANK", y="P", group="GROUP")) + 
+    p1 <- ggplot(data@data, aes_string(x="RANK", y="P", group="GROUP")) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('Rank') +
@@ -923,20 +948,20 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
     
     # Set colors and legend
     if (!is.null(colors)) {
-        g1 <- g1 + scale_color_manual(name=legend_title, values=colors) +
-            scale_fill_manual(name=legend_title, values=colors)
+        p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
+            scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
     } else {
-        g1 <- g1 + scale_color_discrete(name=legend_title) +
-            scale_fill_discrete(name=legend_title)
+        p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
+            scale_fill_discrete(name=legend_title, labels=group_labels)
     }
     
     # Add additional theme elements
-    g1 <- g1 + do.call(theme, list(...))
+    p1 <- p1 + do.call(theme, list(...))
     
     # Plot
-    if (!silent) { plot(g1) }
+    if (!silent) { plot(p1) }
     
-    invisible(g1)
+    invisible(p1)
 }
 
 
@@ -951,9 +976,9 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #'                           and whose values are colors to assign to those group names.
 #' @param    main_title      string specifying the plot title.
 #' @param    legend_title    string specifying the legend title.
-#' @param    log_q           if \code{TRUE} then plot \eqn{q} on a log scale;
+#' @param    log_x           if \code{TRUE} then plot \eqn{q} on a log scale;
 #'                           if \code{FALSE} plot on a linear scale.
-#' @param    log_d           if \code{TRUE} then plot the diversity scores \eqn{D} 
+#' @param    log_y           if \code{TRUE} then plot the diversity/evenness scores 
 #'                           on a log scale; if \code{FALSE} plot on a linear scale.
 #' @param    xlim            numeric vector of two values specifying the 
 #'                           \code{c(lower, upper)} x-axis limits.
@@ -963,6 +988,8 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #'                           of the legend. When \code{"none"} (default) is specified no
 #'                           annotations are added. Specifying (\code{"depth"}) adds 
 #'                           sequence counts to the labels.
+#' @param    score           one of \code{"diversity"} or \code{"evenness"} specifying which
+#'                           score to plot on the y-asis.
 #' @param    silent          if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                           object; if \code{FALSE} draw the plot.
 #' @param    ...             additional arguments to pass to ggplot2::theme.
@@ -973,37 +1000,56 @@ plotAbundance <- function(data, colors=NULL, main_title="Rank Abundance",
 #'           objects for input. Plotting is performed with \link{ggplot}.
 #' 
 #' @examples
-#' # All groups pass default minimum sampling threshold of 10 sequences
-#' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+#' # Calculate diversity
+#' div <- rarefyDiversity(ExampleDb, "SAMPLE", nboot=100)
+#' 
+#' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample")
+#'
+#' #' # Plot diversity
+#' plotDiversityCurve(div, legend_title="Sample", score="evenness")
 #' 
 #' @export
 plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity", 
-                               legend_title="Group", log_q=TRUE, log_d=TRUE,
-                               xlim=NULL, ylim=NULL, 
-                               annotate=c("none", "depth"),
+                               legend_title="Group", log_x=FALSE, log_y=FALSE,
+                               xlim=NULL, ylim=NULL, annotate=c("none", "depth"), 
+                               score=c("diversity", "evenness"),
                                silent=FALSE, ...) {
     # Check arguments
     annotate <- match.arg(annotate)
+    score <- match.arg(score)
     
     # Define group label annotations
     if (annotate == "none") {
         group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data@groups, 
-                                        " (N=", data@n, ")"), 
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
                                  data@groups)
+    }
+    
+    # Define y-axis scores
+    if (score == "diversity") {
+        y_value <- "D"
+        y_min <- "D_LOWER"
+        y_max <- "D_UPPER"
+        y_label <- expression(''^q * D)
+    } else if (score == "evenness") {
+        y_value <- "E"
+        y_min <- "E_LOWER"
+        y_max <- "E_UPPER"
+        y_label <- expression(''^q * E)
     }
     
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
+    
     # Define base plot elements
-    p1 <- ggplot(data@data, aes_string(x="Q", y="D", group="GROUP")) + 
+    p1 <- ggplot(data@data, aes_string(x="Q", y=y_value, group="GROUP")) + 
         ggtitle(main_title) + 
         getBaseTheme() + 
         xlab('q') +
-        ylab(expression(''^q * D)) +
-        geom_ribbon(aes_string(ymin="D_LOWER", ymax="D_UPPER", fill="GROUP"), alpha=0.4) +
+        ylab(y_label) +
+        geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill="GROUP"), alpha=0.4) +
         geom_line(aes_string(color="GROUP"))
     
     # Set colors and legend
@@ -1016,7 +1062,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     }
     
     # Set x-axis style
-    if (log_q) {
+    if (log_x) {
         p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(), limits=xlim,
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
@@ -1025,7 +1071,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     }
     
     # Set y-axis style
-    if (log_d) {
+    if (log_y) {
         p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(), limits=ylim,
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
@@ -1036,6 +1082,96 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     # Add additional theme elements
     p1 <- p1 + do.call(theme, list(...))
 
+    # Plot
+    if (!silent) { plot(p1) }
+    
+    invisible(p1)
+}
+
+
+#' Plot the results of TestDiversity
+#' 
+#' \code{plotDiversityTest} plots a \code{DiversityTest} object as the mean
+#' with a line range indicating plus/minus one standard deviation.
+#'
+#' @param    data            \link{DiversityTest} object returned by 
+#'                           \link{testDiversity}.
+#' @param    colors          named character vector whose names are values in the 
+#'                           \code{group} column of the \code{data} slot of \code{data},
+#'                           and whose values are colors to assign to those group names.
+#' @param    main_title      string specifying the plot title.
+#' @param    legend_title    string specifying the legend title.
+#' @param    log_d           if \code{TRUE} then plot the diversity scores \eqn{D} 
+#'                           on a log scale; if \code{FALSE} plot on a linear scale.
+#' @param    annotate        string defining whether to added values to the group labels 
+#'                           of the legend. When \code{"none"} (default) is specified no
+#'                           annotations are added. Specifying (\code{"depth"}) adds 
+#'                           sequence counts to the labels.
+#' @param    silent          if \code{TRUE} do not draw the plot and just return the ggplot2 
+#'                           object; if \code{FALSE} draw the plot.
+#' @param    ...             additional arguments to pass to ggplot2::theme.
+#'
+#' @return   A \code{ggplot} object defining the plot.
+#' 
+#' @seealso  See \link{testDiversity} for generating \link{DiversityTest}
+#'           objects for input. Plotting is performed with \link{ggplot}.
+#' 
+#' @examples
+#' # All groups pass default minimum sampling threshold of 10 sequences
+#' div <- testDiversity(ExampleDb, "SAMPLE", q=0, nboot=100)
+#' plotDiversityTest(div, legend_title="Sample")
+#' 
+#' @export
+plotDiversityTest <- function(data, colors=NULL, main_title="Diversity", 
+                              legend_title="Group", log_d=FALSE, 
+                              annotate=c("none", "depth"),
+                              silent=FALSE, ...) {
+    # Check arguments
+    annotate <- match.arg(annotate)
+    
+    # Define group label annotations
+    if (annotate == "none") {
+        group_labels <- setNames(data@groups, data@groups)
+    } else if (annotate == "depth") {
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
+                                 data@groups)
+    }
+    
+    # Stupid hack for check NOTE about `.x` in math_format
+    .x <- NULL
+
+    # Define plot values
+    df <- data@summary %>%
+        dplyr::mutate_(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
+    
+    # Define base plot elements
+    p1 <- ggplot(df, aes_string(x="GROUP")) + 
+        ggtitle(main_title) + 
+        getBaseTheme() + 
+        xlab("") +
+        ylab(bquote("Mean " ^ .(data@q) * D %+-% "SD")) +
+        geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color="GROUP"), alpha=0.8) +
+        geom_point(aes_string(y="MEAN", color="GROUP"))
+    
+    # Set colors and legend
+    if (!is.null(colors)) {
+        p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors)
+    } else {
+        p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels)
+    }
+
+    # Set x-axis style
+    if (log_d) {
+        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(),
+                                      breaks=scales::trans_breaks('log2', function(x) 2^x),
+                                      labels=scales::trans_format('log2', scales::math_format(2^.x)))
+    } else {
+        p1 <- p1 + scale_y_continuous()
+    }
+
+    # Add additional theme elements
+    p1 <- p1 + do.call(theme, list(...))
+    
     # Plot
     if (!silent) { plot(p1) }
     

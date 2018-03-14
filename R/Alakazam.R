@@ -55,7 +55,7 @@
 #'                                       confidence intervals.
 #'   \item  \link{rarefyDiversity}:      Generate clonal diversity curves.
 #'   \item  \link{testDiversity}:        Test significance of clonal diversity scores.
-#'   \item  \link{plotAbundance}:        Plot clone size distribution as a rank-abundance 
+#'   \item  \link{plotAbundanceCurve}:   Plot clone size distribution as a rank-abundance 
 #'                                       curve.
 #'   \item  \link{plotDiversityCurve}:   Plot clonal diversity curves.
 #' }

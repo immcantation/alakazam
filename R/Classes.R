@@ -11,7 +11,39 @@
 
 #### Diversity classes ####
 
-#' S4 class defining diversity curve 
+#' S4 class defining a clonal abundance curve
+#'
+#' \code{AbundanceCurve} defines clonal abundance values.
+#' 
+#' @slot  data    data.frame with relative clonal abundance data and confidence intervals,
+#'                containing the following columns:
+#'                \itemize{
+#'                  \item  \code{GROUP}:  group identifier.
+#'                  \item  \code{CLONE}:  clone identifier.
+#'                  \item  \code{P}:      relative abundance of the clone.
+#'                  \item  \code{LOWER}:  lower confidence inverval bound.
+#'                  \item  \code{UPPER}:  upper confidence interval bound.
+#'                  \item  \code{RANK}:   the rank of the clone abundance.
+#'                }
+#' @slot  groups  character vector of group values.
+#' @slot  n       numeric vector indication the number of sequences in each group.
+#' @slot  nboot   number of bootstrap realizations performed.
+#' @slot  ci      confidence interval defining the upper and lower bounds 
+#'                (a value between 0 and 1).
+#' 
+#' @name         AbundanceCurve-class
+#' @rdname       AbundanceCurve-class
+#' @aliases      AbundanceCurve
+#' @exportClass  AbundanceCurve
+setClass("AbundanceCurve", 
+         slots=c(data="data.frame", 
+                 groups="character", 
+                 n="numeric", 
+                 nboot="numeric", 
+                 ci="numeric"))
+
+
+#' S4 class defining a diversity curve 
 #'
 #' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
 #' orders (\eqn{Q}).
@@ -47,6 +79,7 @@ setClass("DiversityCurve",
                  n="numeric", 
                  nboot="numeric", 
                  ci="numeric"))
+
 
 #' S4 class defining diversity significance
 #'
@@ -94,6 +127,22 @@ setClass("DiversityTest",
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve
 
+#' @param    x    AbundanceCurve object
+#' 
+#' @rdname   AbundanceCurve-class
+#' @aliases  AbundanceCurve-method
+#' @export
+setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@data) })
+
+#' @param    y    ignored.
+#' @param    ...  arguments to pass to \link{plotDiversityCurve}.
+#' 
+#' @rdname   AbundanceCurve-class
+#' @aliases  AbundanceCurve-method
+#' @export
+setMethod("plot", c(x="AbundanceCurve", y="missing"),
+          function(x, y, ...) { plotAbundanceCurve(x, ...) })
+
 #' @param    x    DiversityCurve object
 #' 
 #' @rdname   DiversityCurve-class
@@ -116,6 +165,15 @@ setMethod("plot", c(x="DiversityCurve", y="missing"),
 #' @aliases  DiversityTest-method
 #' @export
 setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
+
+#' @param    y    ignored.
+#' @param    ...  arguments to pass to \link{plotDiversityTest}.
+#' 
+#' @rdname   DiversityTest-class
+#' @aliases  DiversityTest-method
+#' @export
+setMethod("plot", c(x="DiversityTest", y="missing"),
+          function(x, y, ...) { plotDiversityTest(x, ...) })
 
 
 #### Lineage classes ####
