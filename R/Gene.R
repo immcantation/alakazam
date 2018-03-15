@@ -145,6 +145,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
 #' @param     strip_d         if \code{TRUE} remove the "D" from the end of gene annotations 
 #'                            (denoting a duplicate gene in the locus); 
 #'                            if \code{FALSE} do not alter gene names.
+#' @param     omit_nl         if \code{TRUE} remove non-localized (NL) genes from the result.
+#'                            Only applies at the gene or allele level.
 #' @param     sep             character defining both the input and output segment call 
 #'                            delimiter.
 #' 
@@ -156,6 +158,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
 #' @seealso  \link{countGenes}
 #'
 #' @examples
+#' # Light chain examples
 #' kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
 #'                 "Homsap IGKJ5*01 F")
 #'
@@ -172,6 +175,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
 #' getFamily(kappa_call, first=FALSE, collapse=FALSE)
 #' getFamily(kappa_call, first=FALSE, strip_d=FALSE)
 #' 
+#' # Heavy chain examples
 #' heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
 #'                 "Homsap IGHD1-1*01 F", 
 #'                 "Homsap IGHJ1*01 F")
@@ -182,15 +186,31 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
 #' getGene(heavy_call, first=FALSE)
 #' getGene(heavy_call, first=FALSE, strip_d=FALSE)
 #'
+#' # Filtering non-localized genes
+#' nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
+#'              "Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
+#'              "IGHV1-NL1*01")
+#'              
+#' getAllele(nl_call, first=FALSE, omit_nl=TRUE)
+#' getGene(nl_call, first=FALSE, omit_nl=TRUE)
+#' getFamily(nl_call, first=FALSE, omit_nl=TRUE)
+#'
 #' @export
 getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, 
-                       strip_d=TRUE, sep=",") {
+                       strip_d=TRUE, omit_nl=FALSE, sep=",") {
     # Define boundaries of individual segment calls
     edge_regex <- paste0("[^", sep, "]*")
     
     # Extract calls
     r <- gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), "\\1", 
               segment_call, perl=T)
+    
+    # Remove NL genes
+    if (omit_nl) {
+        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
+                           sep, "|$)")
+        r <- gsub(nl_regex, "", r, perl=TRUE)
+    }
     
     # Strip D from gene names if required
     if (strip_d) {
@@ -211,10 +231,11 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
 
 #' @rdname getSegment
 #' @export
-getAllele <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {    
+getAllele <- function(segment_call, first=TRUE, collapse=TRUE, 
+                      strip_d=TRUE, omit_nl=FALSE, sep=",") {    
     allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*][\\.\\w]+)'
     r <- getSegment(segment_call, allele_regex, first=first, collapse=collapse, 
-                    strip_d=strip_d, sep=sep)
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
     return(r)
 }
@@ -222,10 +243,11 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep
 
 #' @rdname getSegment
 #' @export
-getGene <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {
+getGene <- function(segment_call, first=TRUE, collapse=TRUE, 
+                    strip_d=TRUE, omit_nl=FALSE, sep=",") {
     gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*)'
     r <- getSegment(segment_call, gene_regex, first=first, collapse=collapse, 
-                    strip_d=strip_d, sep=sep)
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
     return(r)
 }
@@ -233,10 +255,11 @@ getGene <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep="
 
 #' @rdname getSegment
 #' @export
-getFamily <- function(segment_call, first=TRUE, collapse=TRUE, strip_d=TRUE, sep=",") {
+getFamily <- function(segment_call, first=TRUE, collapse=TRUE, 
+                      strip_d=TRUE, omit_nl=FALSE, sep=",") {
     family_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+)'
     r <- getSegment(segment_call, family_regex, first=first, collapse=collapse, 
-                    strip_d=strip_d, sep=sep)
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
     return(r)
 }

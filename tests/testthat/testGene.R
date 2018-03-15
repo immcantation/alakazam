@@ -1,6 +1,8 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
+### countGenes ####
+
 test_that("countGenes",{
     # Without copy numbers
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
@@ -43,6 +45,7 @@ test_that("countGenes",{
                  tolerance=0.01)
 })
 
+### getSegment ####
 
 test_that("getSegment", {
     kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
@@ -85,11 +88,27 @@ test_that("getSegment", {
                  c("IGHV1-69*01,IGHV1-69D*01", "IGHD1-1*01", "IGHJ1*01"))
     
     expect_equal(getGene(heavy_call, first=FALSE), 
-                 c( "IGHV1-69", "IGHD1-1", "IGHJ1"))
+                 c("IGHV1-69", "IGHD1-1", "IGHJ1"))
     
     expect_equal(getGene(heavy_call, first=FALSE, strip_d=FALSE),
-                 c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1" ))
+                 c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1"))
+    
+    # Filtering non-localized genes
+    nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
+                 "Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
+                 "IGHV1-NL1*01")
+    
+    expect_equal(getAllele(nl_call, first=FALSE, omit_nl=TRUE),
+                 c("IGHV3-30-3*01,IGHV3-30*01", "IGHV3-30*01", ""))
+                 
+    expect_equal(getGene(nl_call, first=FALSE, omit_nl=TRUE),
+                 c("IGHV3-30-3,IGHV3-30", "IGHV3-30", ""))
+    
+    expect_equal(getFamily(nl_call, first=FALSE, omit_nl=TRUE),
+                 c("IGHV3", "IGHV3", "IGHV1"))
 })
+
+### sortGenes ####
 
 test_that("sortGenes",{
     genes <- c("IGHV1-69D*01", "IGHV1-69*01", "IGHV4-38-2*01", "IGHV1-69-2*01",

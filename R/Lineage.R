@@ -30,12 +30,14 @@ NULL
 #'                        for any given clone.
 #' @param    clone        name of the column containing the identifier for the clone. All 
 #'                        entries in this column should be identical.
-#' @param    mask_char    character to use for masking.
+#' @param    mask_char    character to use for masking and padding.
 #' @param    max_mask     maximum number of characters to mask at the leading and trailing
 #'                        sequence ends. If \code{NULL} then the upper masking bound will 
 #'                        be automatically determined from the maximum number of observed 
 #'                        leading or trailing Ns amongst all sequences. If set to \code{0} 
 #'                        (default) then masking will not be performed.
+#' @param    pad_end      if \code{TRUE} pad the end of each sequence with \code{mask_char}
+#'                        to make every sequence the same length.
 #' @param    text_fields  text annotation columns to retain and merge during duplicate removal.
 #' @param    num_fields   numeric annotation columns to retain and sum during duplicate removal.
 #' @param    seq_fields   sequence annotation columns to retain and collapse during duplicate 
@@ -79,8 +81,8 @@ NULL
 #' \code{germ}, \code{vcall}, \code{jcall}, \code{junc_len} and \code{clone} columns, 
 #' respectively. For any given clone, each value in these columns should be identical.
 #'  
-#' @seealso  Executes in order \link{maskSeqGaps}, \link{maskSeqEnds}
-#'           and \link{collapseDuplicates}. 
+#' @seealso  Executes in order \link{maskSeqGaps}, \link{maskSeqEnds}, 
+#'           \link{padSeqEnds}, and \link{collapseDuplicates}. 
 #'           Returns a \link{ChangeoClone} object which serves as input to
 #'           \link{buildPhylipLineage}.
 #' 
@@ -107,7 +109,7 @@ NULL
 makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
                              germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL",
                              junc_len="JUNCTION_LENGTH", clone="CLONE", mask_char="N",
-                             max_mask=0, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
+                             max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
     check <- checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
@@ -118,6 +120,11 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
     tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, outer_only=FALSE)
     tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], mask_char=mask_char, max_mask=max_mask, trim=FALSE)
+    
+    # Pad ends
+    if (pad_end) {
+        tmp_df[[seq]] <- padSeqEnds(tmp_df[[seq]], pad_char=mask_char)
+    }
     
     # Remove duplicates
     tmp_df <- collapseDuplicates(tmp_df, id=id, seq=seq, text_fields=text_fields, 

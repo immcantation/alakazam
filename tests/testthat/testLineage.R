@@ -13,14 +13,12 @@ test_that("makeChangeoClone",{
                      TYPE=c("IgM", "IgG", "IgG", "IgA"),
                      COUNT=1:4,
                      stringsAsFactors=FALSE)
-    exp <- data.frame(
-        "SEQUENCE_ID" = c("C", "A"),
-        "SEQUENCE" = c("NAACTGGN", "CCCCTGGG"),
-        "TYPE" = c("IgG", "IgG,IgM"),
-        "COUNT" = c(3,3),
-        "COLLAPSE_COUNT" = c(1,2),
-        stringsAsFactors = F
-    )
+    exp <- data.frame("SEQUENCE_ID"=c("C", "A"),
+                      "SEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
+                      "TYPE"=c("IgG", "IgG,IgM"),
+                      "COUNT"=c(3, 3),
+                      "COLLAPSE_COUNT"=c(1, 2),
+                      stringsAsFactors=FALSE)
     
     # Without end masking
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
@@ -33,17 +31,26 @@ test_that("makeChangeoClone",{
     expect_equal(clone@junc_len, 2)
     expect_equal(clone@data, exp, tolerance=0.001)
     
+    # With padding
+    db_trim <- db
+    db_trim$SEQUENCE_IMGT <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
+    clone <- makeChangeoClone(db_trim, text_fields="TYPE", num_fields="COUNT", pad_end=TRUE)
+    expect_true(inherits(clone, "ChangeoClone"))
+    expect_equal(clone@clone, "1")
+    expect_equal(clone@germline, "CCCCAGGG")
+    expect_equal(clone@v_gene, "IGKV1-39")
+    expect_equal(clone@j_gene, "IGKJ5")
+    expect_equal(clone@junc_len, 2)
+    expect_equal(clone@data, exp, tolerance=0.001)
     
     # With end masking
     clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
-    exp <- data.frame(
-        "SEQUENCE_ID" = "A",
-        "SEQUENCE" = c("NNNCTGNN"),
-        "TYPE" = c("IgA,IgG,IgM"),
-        "COUNT" = c(10),
-        "COLLAPSE_COUNT" = c(4),
-        stringsAsFactors = F
-    )
+    exp <- data.frame("SEQUENCE_ID"="A",
+                      "SEQUENCE"=c("NNNCTGNN"),
+                      "TYPE"=c("IgA, IgG, IgM"),
+                      "COUNT"=c(10),
+                      "COLLAPSE_COUNT"=c(4),
+                      stringsAsFactors=F)
     
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")

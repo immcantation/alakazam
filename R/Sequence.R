@@ -249,9 +249,11 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' characters to create a sequence vector with uniform lengths.
 #' 
 #' @param    seq       character vector of DNA sequence strings.
+#' @param    len       length to pad to. Only applies if longer than the maximum length of
+#'                     the data in \code{seq}.
+#' @param    start     if \code{TRUE} pad the beginning of each sequence instead of the end. 
 #' @param    pad_char  character to use for padding.
-#' @param    front     if \code{TRUE} pad the beginning of each sequence instead of the end. 
-
+#' 
 #' @return   A modified \code{seq} vector with padded sequences.
 #' 
 #' @seealso  See \link{maskSeqEnds} for creating uniform masking from existing masking.
@@ -262,24 +264,22 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' padSeqEnds(seq)
 #'
 #' # Pad to fixed length
-#' padSeqEnds(seq, length=15)
+#' padSeqEnds(seq, len=15)
 #'
 #' # Add padding to the beginning of the sequences instead of the ends
-#' padSeqEnds(seq, head=TRUE)
-#' padSeqEnds(seq, length=15, head=TRUE)
+#' padSeqEnds(seq, start=TRUE)
+#' padSeqEnds(seq, len=15, start=TRUE)
 #' 
 #' @export
-padSeqEnds <- function(seq, length=NULL, head=FALSE, pad_char="N") {
+padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
     # Set length to max input length
-    if (is.null(length)) { 
-        length <- max(stri_length(seq))
-    }
-
+    width <- max(stri_length(seq),len)
+    
     # Pad
-    if (!head) { 
-        seq <- stri_pad_right(seq, width=length, pad="N")
+    if (!start) { 
+        seq <- stri_pad_right(seq, width=width, pad="N")
     } else {
-        seq <- stri_pad_left(seq, width=length, pad="N")
+        seq <- stri_pad_left(seq, width=width, pad="N")
     }
 
     return(seq)
@@ -663,11 +663,11 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' Extracts FWRs and CDRs from IMGT-gapped sequences
 #' 
 #' \code{extractVRegion} extracts the framework and complementarity determining regions of 
-#' the V-segment for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the 
+#' the V segment for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the 
 #' IMGT numbering scheme.
 #'
 #' @param     sequences  character vector of IMGT-gapped nucleotide sequences.
-#' @param     region     string defining the region(s) of the V-segment to extract. 
+#' @param     region     string defining the region(s) of the V segment to extract. 
 #'                       May be a single region or multiple regions (as a vector) from
 #'                       \code{c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")}.  By default, all
 #'                       regions will be returned.
@@ -704,7 +704,7 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 #' extractVRegion(clone$SEQUENCE_IMGT, c("FWR1", "FWR2", "FWR3"))
 #'
 #' @export
-extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")) {
+extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")) {
     # Check region argument
     region <- match.arg(region, several.ok=TRUE)
     

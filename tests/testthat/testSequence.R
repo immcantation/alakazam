@@ -8,6 +8,8 @@ load(file.path("..", "data-tests", "TestDb.rda"), envir=e1)
 db2 <- get("TestDb", envir=e1)
 rm(e1)
 
+#### seqDist ####
+
 test_that("seqDist: short toy sequences", {
     
     expect_equal(seqDist("AC-A", "AC-G", getDNAMatrix(gap=0)), 1)
@@ -129,6 +131,8 @@ test_that("seqDist: long IMGT-gapped sequences", {
     }
 })
 
+#### pairwiseDist ####
+
 test_that("pairwiseDist", {
     # Gaps will be treated as Ns with a gap=0 distance matrix
     obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
@@ -151,6 +155,8 @@ test_that("pairwiseDist", {
                  check.attributes=F)
 })
 
+#### seqEqual ####
+
 test_that("seqEqual", {
     # Ignore gaps
     expect_true(seqEqual("ATG-C", "AT--C"))
@@ -163,6 +169,8 @@ test_that("seqEqual", {
     expect_false(seqEqual("AT--T", "ATGGC", ignore="N"))
 })
 
+#### translateDNA ####
+
 test_that("translateDNA", {
     expect_equal(
         translateDNA(db$JUNCTION[1:3]),
@@ -174,6 +182,8 @@ test_that("translateDNA", {
     expect_equal(translateDNA("ACTGACTCGA"), "TDS")
 })
 
+#### maskSeqGaps ####
+
 test_that("maskSeqGaps", {
     expect_equal(maskSeqGaps(c("ATG-C", "CC..C")),
                  c("ATGNC", "CCNNC"))
@@ -182,6 +192,7 @@ test_that("maskSeqGaps", {
     expect_equal(maskSeqGaps("--ATG-C-", outer_only=TRUE), "NNATG-CN")
 })
 
+#### maskSeqEnds ####
 
 test_that("maskSeqEnds", {
     # Default behavior uniformly masks ragged ends
@@ -198,6 +209,32 @@ test_that("maskSeqEnds", {
     maskSeqEnds(seq, max_mask=1)
     expect_equal(maskSeqEnds(seq, max_mask=1, trim=TRUE), c("CCCTGG", "AACTGG", "NNCTGN"))
 })
+
+#### padSeqEnds ####
+
+test_that("padSeqEnds", {
+    seq <- c("CCCCTGGG", "ACCCTG", "CCCC")
+    
+    # Default behavior pads ends to longest length
+    expect_equal(padSeqEnds(seq), 
+                 c("CCCCTGGG", "ACCCTGNN", "CCCCNNNN"))
+    
+    # start argument pads beginning instead of end
+    expect_equal(padSeqEnds(seq, start=TRUE), 
+                 c("CCCCTGGG", "NNACCCTG", "NNNNCCCC"))
+    
+    # len argument pads to defined length
+    expect_equal(padSeqEnds(seq, len=15), 
+                 c("CCCCTGGGNNNNNNN", "ACCCTGNNNNNNNNN", "CCCCNNNNNNNNNNN"))
+    expect_equal(padSeqEnds(seq, len=15, start=TRUE), 
+                 c("NNNNNNNCCCCTGGG", "NNNNNNNNNACCCTG", "NNNNNNNNNNNCCCC"))
+
+    # Invalid length same as default
+    expect_equal(padSeqEnds(seq, len=2), 
+                 c("CCCCTGGG", "ACCCTGNN", "CCCCNNNN"))
+})
+
+#### collapseDuplicates ####
 
 test_that("collapseDuplicates", {
     # Example Change-O data.frame
@@ -307,6 +344,8 @@ test_that("collapseDuplicates", {
     expect_equal(col_dry$SEQUENCE_ID[col_dry$COLLAPSE_PASS], expect)
     
 })
+
+#### extractVRegion ####
 
 test_that("extractVRegion", {
     clone <- subset(db, CLONE == 164)

@@ -26,6 +26,8 @@ Lineage:
 
 + Fixed a bug in `makeChangeoClone` preventing it from interpreting the `id`
   argument correctly.
++ Added the `pad_end` argument to `makeChangeoClone` to allow automatic 
+  padding of ends to make sequences the same length.
 
 
 Version 0.2.8:  September 21, 2017

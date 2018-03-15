@@ -29,6 +29,7 @@ pages:
       - topics/collapseDuplicates.md
       - topics/maskSeqEnds.md
       - topics/maskSeqGaps.md
+      - topics/padSeqEnds.md
       - topics/translateDNA.md
       - topics/isValidAASeq.md
     - 'Lineage Reconstruction':
