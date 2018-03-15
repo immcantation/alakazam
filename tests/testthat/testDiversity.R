@@ -1,6 +1,8 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
+#### calcCoverage ####
+
 test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(db, groups="SAMPLE")
@@ -8,6 +10,8 @@ test_that("calcCoverage", {
     obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
+
+#### countClones ####
 
 test_that("countClones", {
     # Without copy numbers
@@ -23,9 +27,32 @@ test_that("countClones", {
     expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
     expect_equal(clones$COPY_FREQ[6:11], 
                  c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
-                 tolerance = 0.01)
-})
-
+                 tolerance=0.01)
+    
+    # Toy database
+    db_toy <- tibble::data_frame(SEQUENCE_ID=1:10, 
+                                 GROUP=c(rep("A", 3), rep("B", 7)),
+                                 CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
+                                 COPY=10:1)
+    ungrouped_toy <- tibble::data_frame(CLONE=as.character(1:5), 
+                                        SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
+                                        COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
+                                        SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
+                                        COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
+    grouped_toy <- tibble::data_frame(GROUP=c("A", rep("B", 5)),
+                                      CLONE=as.character(c(1, 1:5)), 
+                                      SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
+                                      COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
+                                      SEQ_FREQ=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
+                                      COPY_FREQ=c(sum(10:8)/sum(10:8), 
+                                                  sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
+    # Check toy ungrouped
+    expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), ungrouped_toy, tolerance=0.01)
+    
+    # Check toy grouped
+    expect_equal(countClones(db_toy, group="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
+    
+#### estimateAbundance ####
 
 test_that("estimateAbundance", {
     set.seed(90)
@@ -48,6 +75,8 @@ test_that("estimateAbundance", {
     expect_equal(abund$RANK,c(1,1))
 })
 
+#### calcDiversity ####
+
 test_that("calcDiversity", {
     # May define p as clonal member counts
     p <- c(1, 1, 3, 10)
@@ -61,6 +90,8 @@ test_that("calcDiversity", {
     obs <- calcDiversity(p, q)
     expect_equal(obs, exp, tolerance = 0.001)  
 })
+
+#### rarefyDiversity ####
 
 test_that("rarefyDiversity", {
     set.seed(5)
@@ -105,6 +136,8 @@ test_that("rarefyDiversity", {
     )
     expect_equal(colnames(obs), colnames(exp))
 })
+
+#### testDiversity ####
 
 test_that("testDiversity", {
     set.seed(3)
