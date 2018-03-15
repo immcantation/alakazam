@@ -833,7 +833,6 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 
         if (progress) { pb$tick() }
     }
-    cat("\n")
         
     # Compute ECDF of bootstrap distribution shift from bootstrap deltas
     group_pairs <- combn(group_keep, 2, simplify=F)

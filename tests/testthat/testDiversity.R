@@ -51,28 +51,29 @@ test_that("countClones", {
     
     # Check toy grouped
     expect_equal(countClones(db_toy, group="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
-    
+})
+
 #### estimateAbundance ####
 
 test_that("estimateAbundance", {
     set.seed(90)
     abund <- estimateAbundance(db, "SAMPLE", nboot=100)
-    expect_equal(abund$P[1:6], 
+    expect_equal(abund@data$P[1:6], 
                  c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
                  tolerance=0.001)
-    expect_equal(abund$LOWER[c(1:3,8:10)],
+    expect_equal(abund@data$LOWER[c(1:3,8:10)],
                  c(0.001102, 0.000786, 0, 0, 0, 0),
                  tolerance = 0.001)
-    expect_equal(abund$UPPER[45:50],
+    expect_equal(abund@data$UPPER[45:50],
                  c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
                  tolerance = 0.001)
-    expect_equal(abund$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    expect_equal(abund@data$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1,289),],"SAMPLE", nboot=100)
-    expect_equal(abund$LOWER,c(1,1))
-    expect_equal(abund$UPPER,c(1,1))
-    expect_equal(abund$RANK,c(1,1))
+    expect_equal(abund@data$LOWER,c(1,1))
+    expect_equal(abund@data$UPPER,c(1,1))
+    expect_equal(abund@data$RANK,c(1,1))
 })
 
 #### calcDiversity ####
