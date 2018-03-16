@@ -402,6 +402,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
                                sep=",", dry=FALSE, verbose=FALSE) {
+    # Stop if ids are not unique
+    if (any(duplicated(data[[id]]))) {
+        stop("All values in the id column are not unique")
+    }
     # Verify column classes and exit if they are incorrect
     if (!is.null(text_fields)) {
         if (!all(sapply(subset(data, select=text_fields), is.character))) {
