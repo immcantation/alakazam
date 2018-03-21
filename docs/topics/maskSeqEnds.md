@@ -140,6 +140,7 @@ See also
 -------------------
 
 See [maskSeqGaps](maskSeqGaps.md) for masking internal gaps.
+See [padSeqEnds](padSeqEnds.md) for padding sequence of unequal length.
 
 
 

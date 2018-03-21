@@ -10,7 +10,7 @@ Description
 --------------------
 
 `extractVRegion` extracts the framework and complementarity determining regions of 
-the V-segment for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the 
+the V segment for IMGT-gapped immunoglobulin (Ig) nucleotide sequences according to the 
 IMGT numbering scheme.
 
 
@@ -27,7 +27,7 @@ sequences
 :   character vector of IMGT-gapped nucleotide sequences.
 
 region
-:   string defining the region(s) of the V-segment to extract. 
+:   string defining the region(s) of the V segment to extract. 
 May be a single region or multiple regions (as a vector) from
 `c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")`.  By default, all
 regions will be returned.

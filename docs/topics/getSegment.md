@@ -19,19 +19,19 @@ Usage
 --------------------
 ```
 getSegment(segment_call, segment_regex, first = TRUE, collapse = TRUE,
-strip_d = TRUE, sep = ",")
+strip_d = TRUE, omit_nl = FALSE, sep = ",")
 ```
 ```
 getAllele(segment_call, first = TRUE, collapse = TRUE, strip_d = TRUE,
-sep = ",")
+omit_nl = FALSE, sep = ",")
 ```
 ```
 getGene(segment_call, first = TRUE, collapse = TRUE, strip_d = TRUE,
-sep = ",")
+omit_nl = FALSE, sep = ",")
 ```
 ```
 getFamily(segment_call, first = TRUE, collapse = TRUE, strip_d = TRUE,
-sep = ",")
+omit_nl = FALSE, sep = ",")
 ```
 
 Arguments
@@ -58,6 +58,10 @@ strip_d
 (denoting a duplicate gene in the locus); 
 if `FALSE` do not alter gene names.
 
+omit_nl
+:   if `TRUE` remove non-localized (NL) genes from the result.
+Only applies at the gene or allele level.
+
 sep
 :   character defining both the input and output segment call 
 delimiter.
@@ -82,6 +86,7 @@ Examples
 -------------------
 
 ```R
+# Light chain examples
 kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
 "Homsap IGKJ5*01 F")
 
@@ -208,6 +213,7 @@ getFamily(kappa_call, first=FALSE, strip_d=FALSE)
 
 ```R
 
+# Heavy chain examples
 heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
 "Homsap IGHD1-1*01 F", 
 "Homsap IGHJ1*01 F")
@@ -250,11 +256,53 @@ getGene(heavy_call, first=FALSE)
 
 ```R
 getGene(heavy_call, first=FALSE, strip_d=FALSE)
+
 ```
 
 
 ```
 [1] "IGHV1-69,IGHV1-69D" "IGHD1-1"            "IGHJ1"             
+
+```
+
+
+```R
+
+# Filtering non-localized genes
+nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
+"Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
+"IGHV1-NL1*01")
+
+getAllele(nl_call, first=FALSE, omit_nl=TRUE)
+
+```
+
+
+```
+[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"               ""                         
+
+```
+
+
+```R
+getGene(nl_call, first=FALSE, omit_nl=TRUE)
+
+```
+
+
+```
+[1] "IGHV3-30-3,IGHV3-30" "IGHV3-30"            ""                   
+
+```
+
+
+```R
+getFamily(nl_call, first=FALSE, omit_nl=TRUE)
+```
+
+
+```
+[1] "IGHV3" "IGHV3" "IGHV1"
 
 ```
 

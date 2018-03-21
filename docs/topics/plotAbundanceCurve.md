@@ -4,28 +4,29 @@
 
 
 
-**plotAbundance** - *Plots a clonal abundance distribution*
+**plotAbundanceCurve** - *Plots a clonal abundance distribution*
 
 Description
 --------------------
 
-`plotAbundance` plots the results from estimating the complete clonal relative 
-abundance distribution. The distribution is plotted as a log rank abundance 
+`plotAbundanceCurve` plots the results from estimating the complete clonal 
+relative abundance distribution. The distribution is plotted as a log rank abundance 
 distribution.
 
 
 Usage
 --------------------
 ```
-plotAbundance(data, colors = NULL, main_title = "Rank Abundance",
-legend_title = NULL, xlim = NULL, ylim = NULL, silent = FALSE, ...)
+plotAbundanceCurve(data, colors = NULL, main_title = "Rank Abundance",
+legend_title = NULL, xlim = NULL, ylim = NULL, annotate = c("none",
+"depth"), silent = FALSE, ...)
 ```
 
 Arguments
 -------------------
 
 data
-:   data.frame returned by [estimateAbundance](estimateAbundance.md).
+:   [AbundanceCurve](AbundanceCurve-class.md) object returned by [estimateAbundance](estimateAbundance.md).
 
 colors
 :   named character vector whose names are values in the 
@@ -45,6 +46,12 @@ xlim
 ylim
 :   numeric vector of two values specifying the 
 `c(lower, upper)` y-axis limits.
+
+annotate
+:   string defining whether to added values to the group labels 
+of the legend. When `"none"` (default) is specified no
+annotations are added. Specifying (`"depth"`) adds 
+sequence counts to the labels.
 
 silent
 :   if `TRUE` do not draw the plot and just return the ggplot2 
@@ -69,16 +76,17 @@ Examples
 ```R
 # Estimate abundance by sample and plot
 abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
-plotAbundance(abund)
+plotAbundanceCurve(abund, legend_title="Sample")
 ```
 
-![2](plotAbundance-2.png)
+![2](plotAbundanceCurve-2.png)
 
 
 See also
 -------------------
 
-See [estimateAbundance](estimateAbundance.md) for generating the input abundance distribution.
+See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for 
+generating the input abundance distribution.
 Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 

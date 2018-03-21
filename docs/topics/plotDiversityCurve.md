@@ -16,8 +16,9 @@ Usage
 --------------------
 ```
 plotDiversityCurve(data, colors = NULL, main_title = "Diversity",
-legend_title = "Group", log_q = TRUE, log_d = TRUE, xlim = NULL,
-ylim = NULL, annotate = c("none", "depth"), silent = FALSE, ...)
+legend_title = "Group", log_x = FALSE, log_y = FALSE, xlim = NULL,
+ylim = NULL, annotate = c("none", "depth"), score = c("diversity",
+"evenness"), silent = FALSE, ...)
 ```
 
 Arguments
@@ -38,12 +39,12 @@ main_title
 legend_title
 :   string specifying the legend title.
 
-log_q
+log_x
 :   if `TRUE` then plot <code class = 'eq'>q</code> on a log scale;
 if `FALSE` plot on a linear scale.
 
-log_d
-:   if `TRUE` then plot the diversity scores <code class = 'eq'>D</code> 
+log_y
+:   if `TRUE` then plot the diversity/evenness scores 
 on a log scale; if `FALSE` plot on a linear scale.
 
 xlim
@@ -59,6 +60,10 @@ annotate
 of the legend. When `"none"` (default) is specified no
 annotations are added. Specifying (`"depth"`) adds 
 sequence counts to the labels.
+
+score
+:   one of `"diversity"` or `"evenness"` specifying which
+score to plot on the y-asis.
 
 silent
 :   if `TRUE` do not draw the plot and just return the ggplot2 
@@ -81,12 +86,23 @@ Examples
 -------------------
 
 ```R
-# All groups pass default minimum sampling threshold of 10 sequences
-div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=0.1, max_q=10, nboot=100)
+# Calculate diversity
+div <- rarefyDiversity(ExampleDb, "SAMPLE", nboot=100)
+
+# Plot diversity
 plotDiversityCurve(div, legend_title="Sample")
+
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![4](plotDiversityCurve-4.png)
+![2](plotDiversityCurve-2.png)
+
+```R
+
+#' # Plot diversity
+plotDiversityCurve(div, legend_title="Sample", score="evenness")
+```
+
+![4](plotDiversityCurve-4.png)
 
 
 See also

@@ -72,29 +72,18 @@ graphs <- ExampleTrees[1-10]
 # Perform edge test on isotypes
 x <- testEdges(graphs, "ISOTYPE", nperm=10)
 
-```
-
-
-```
-
-
-```
-
-
-```R
-
 # Plot
 plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-![4](plotEdgeTest-4.png)
+![2](plotEdgeTest-2.png)
 
 ```R
 plotEdgeTest(x, style="cdf")
 ```
 
-![6](plotEdgeTest-6.png)
+![4](plotEdgeTest-4.png)
 
 
 See also

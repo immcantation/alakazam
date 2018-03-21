@@ -105,7 +105,7 @@ abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 See also
 -------------------
 
-See [plotAbundance](plotAbundance.md) for plotting of the abundance distribution.
+See [plotAbundanceCurve](plotAbundanceCurve.md) for plotting of the abundance distribution.
 See [rarefyDiversity](rarefyDiversity.md) for a similar application to clonal diversity.
 
 

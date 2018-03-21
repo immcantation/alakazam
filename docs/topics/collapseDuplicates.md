@@ -149,6 +149,7 @@ collapseDuplicates(db, verbose=TRUE)
 
 ```
  FUNCTION> collapseDuplicates
+ FIRST_ID> A
     TOTAL> 4
    UNIQUE> 2
 COLLAPSED> 1
@@ -179,6 +180,7 @@ verbose=TRUE)
 
 ```
  FUNCTION> collapseDuplicates
+ FIRST_ID> A
     TOTAL> 4
    UNIQUE> 2
 COLLAPSED> 1
@@ -207,6 +209,7 @@ sep="/", verbose=TRUE)
 
 ```
  FUNCTION> collapseDuplicates
+ FIRST_ID> A
     TOTAL> 4
    UNIQUE> 2
 COLLAPSED> 1
@@ -235,6 +238,7 @@ add_count=TRUE, verbose=TRUE)
 
 ```
  FUNCTION> collapseDuplicates
+ FIRST_ID> A
     TOTAL> 4
    UNIQUE> 2
 COLLAPSED> 1
@@ -263,6 +267,7 @@ add_count=TRUE, verbose=TRUE)
 
 ```
  FUNCTION> collapseDuplicates
+ FIRST_ID> A
     TOTAL> 4
    UNIQUE> 1
 COLLAPSED> 3

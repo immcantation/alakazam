@@ -53,13 +53,16 @@ Citing
 To cite the alakazam package in publications, please use:
 
 Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G and Kleinstein S (2015). “Change-O: a toolkit for analyzing
-large-scale B cell immunoglobulin repertoire sequencing data.” _Bioinformatics_, pp. 1-3. doi: 10.1093/bioinformatics/btv359
-(URL: http://doi.org/10.1093/bioinformatics/btv359).
+large-scale B cell immunoglobulin repertoire sequencing data.” _Bioinformatics_, pp. 1-3. doi:
+10.1093/bioinformatics/btv359 (URL: http://doi.org/10.1093/bioinformatics/btv359).
 
 To cite the Ig-specific lineage reconstruction and diversity methods, please use:
 
-Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan
-S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D and O'Connor K (2014). “B cells populating the multiple sclerosis brain
-mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), pp. 248ra107. doi:
-10.1126/scitranslmed.3008879 (URL: http://doi.org/10.1126/scitranslmed.3008879).
+Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D,
+Ramanan S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D and O'Connor K (2014). “B cells populating the multiple
+sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), pp. 248ra107.
+doi: 10.1126/scitranslmed.3008879 (URL: http://doi.org/10.1126/scitranslmed.3008879).
+
+To see these entries in BibTeX format, use 'print(<citation>, bibtex=TRUE)', 'toBibtex(.)', or set
+'options(citation.bibtex.max=999)'.
 

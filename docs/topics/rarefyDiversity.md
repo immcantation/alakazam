@@ -10,7 +10,7 @@ Description
 --------------------
 
 `rarefyDiversity` divides a set of clones by a group annotation,
-uniformly resamples the sequences from each group, and calculates diversity
+resamples the sequences from each group, and calculates diversity
 scores (<code class = 'eq'>D</code>) over an interval of diversity orders (<code class = 'eq'>q</code>).
 
 
@@ -19,7 +19,7 @@ Usage
 ```
 rarefyDiversity(data, group, clone = "CLONE", copy = NULL, min_q = 0,
 max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,
-nboot = 2000, progress = FALSE)
+nboot = 2000, uniform = TRUE, progress = FALSE)
 ```
 
 Arguments
@@ -55,14 +55,19 @@ min_n
 A group with less observations than the minimum is excluded.
 
 max_n
-:   maximum number of observations to sample. If `NULL` the maximum
-if automatically determined from the size of the largest group.
+:   maximum number of observations to sample. If `NULL` then no 
+maximum is set.
 
 ci
 :   confidence interval to calculate; the value must be between 0 and 1.
 
 nboot
 :   number of bootstrap realizations to generate.
+
+uniform
+:   if `TRUE` then uniformly resample each group to the same 
+number of observations. If `FALSE` then allow each group to
+be resampled to its original size or, if specified, `max_size`.
 
 progress
 :   if `TRUE` show a progress bar.
@@ -88,9 +93,9 @@ of seen clones, and applying the relative abundance correction and unseen clone
 frequency described in Chao et al, 2015.
 
 To generate a smooth curve, <code class = 'eq'>D</code> is calculated for each value of <code class = 'eq'>q</code> from
-`min_q` to `max_q` incremented by `step_q`.  Variability in total 
-sequence counts across unique values in the `group` column is corrected by
-repeated resampling from the estimated complete clonal distribution to a 
+`min_q` to `max_q` incremented by `step_q`.  When `uniform=TRUE`
+variability in total sequence counts across unique values in the `group` column 
+is corrected by repeated resampling from the estimated complete clonal distribution to a 
 common number of sequences.
 
 The diversity index (<code class = 'eq'>D</code>) for each group is the mean value of over all resampling 
@@ -126,7 +131,7 @@ plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![4](rarefyDiversity-4.png)
+![2](rarefyDiversity-2.png)
 
 ```R
 
@@ -136,7 +141,7 @@ nboot=100)
 plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-*Warning*:Transformation introduced infinite values in continuous x-axis*Warning*:Transformation introduced infinite values in continuous x-axis![8](rarefyDiversity-8.png)
+![4](rarefyDiversity-4.png)
 
 
 See also

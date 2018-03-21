@@ -49,12 +49,12 @@ head(gene, n=4)
 ```
 ## # A tibble: 4 x 4
 ## # Groups:   SAMPLE [2]
-##   SAMPLE     GENE SEQ_COUNT SEQ_FREQ
-##    <chr>    <chr>     <int>    <dbl>
-## 1    +7d IGHV3-49       699    0.699
-## 2    -1h  IGHV3-9        83    0.083
-## 3    -1h IGHV5-51        60    0.060
-## 4    -1h IGHV3-30        58    0.058
+##   SAMPLE GENE     SEQ_COUNT SEQ_FREQ
+##   <chr>  <chr>        <int>    <dbl>
+## 1 +7d    IGHV3-49       699   0.699 
+## 2 -1h    IGHV3-9         83   0.0830
+## 3 -1h    IGHV5-51        60   0.0600
+## 4 -1h    IGHV3-30        58   0.0580
 ```
 
 In the resultant `data.frame` the `SEQ_COUNT` columns is the number of raw sequences within each `SAMPLE` 
@@ -136,12 +136,12 @@ head(family, n=4)
 ```
 ## # A tibble: 4 x 5
 ## # Groups:   SAMPLE, ISOTYPE [2]
-##   SAMPLE ISOTYPE  GENE CLONE_COUNT CLONE_FREQ
-##    <chr>   <chr> <chr>       <int>      <dbl>
-## 1    -1h     IgM IGHV3         222  0.4172932
-## 2    -1h     IgM IGHV1         110  0.2067669
-## 3    -1h     IgM IGHV4         102  0.1917293
-## 4    +7d     IgG IGHV3          94  0.9126214
+##   SAMPLE ISOTYPE GENE  CLONE_COUNT CLONE_FREQ
+##   <chr>  <chr>   <chr>       <int>      <dbl>
+## 1 -1h    IgM     IGHV3         222      0.417
+## 2 -1h    IgM     IGHV1         110      0.207
+## 3 -1h    IgM     IGHV4         102      0.192
+## 4 +7d    IgG     IGHV3          94      0.913
 ```
 
 The output `data.frame` contains the additional grouping column (`ISOTYPE`) along with the 
@@ -185,12 +185,12 @@ head(family, n=4)
 ```
 ## # A tibble: 4 x 7
 ## # Groups:   SAMPLE, ISOTYPE [3]
-##   SAMPLE ISOTYPE  GENE SEQ_COUNT COPY_COUNT  SEQ_FREQ COPY_FREQ
-##    <chr>   <chr> <chr>     <int>      <int>     <dbl>     <dbl>
-## 1    +7d     IgG IGHV3       516       1587 0.9772727 0.9838810
-## 2    +7d     IgA IGHV3       240       1224 0.9022556 0.9350649
-## 3    -1h     IgM IGHV3       237        250 0.4209591 0.3858025
-## 4    -1h     IgM IGHV4       110        162 0.1953819 0.2500000
+##   SAMPLE ISOTYPE GENE  SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
+##   <chr>  <chr>   <chr>     <int>      <int>    <dbl>     <dbl>
+## 1 +7d    IgG     IGHV3       516       1587    0.977     0.984
+## 2 +7d    IgA     IGHV3       240       1224    0.902     0.935
+## 3 -1h    IgM     IGHV3       237        250    0.421     0.386
+## 4 -1h    IgM     IGHV4       110        162    0.195     0.250
 ```
 
 The output `data.frame` includes the `SEQ_COUNT` and `SEQ_FREQ` columns as previously defined, 

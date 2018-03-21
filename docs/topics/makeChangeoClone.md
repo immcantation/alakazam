@@ -21,7 +21,7 @@ Usage
 makeChangeoClone(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 germ = "GERMLINE_IMGT_D_MASK", vcall = "V_CALL", jcall = "J_CALL",
 junc_len = "JUNCTION_LENGTH", clone = "CLONE", mask_char = "N",
-max_mask = 0, text_fields = NULL, num_fields = NULL,
+max_mask = 0, pad_end = FALSE, text_fields = NULL, num_fields = NULL,
 seq_fields = NULL, add_count = TRUE, verbose = FALSE)
 ```
 
@@ -62,7 +62,7 @@ clone
 entries in this column should be identical.
 
 mask_char
-:   character to use for masking.
+:   character to use for masking and padding.
 
 max_mask
 :   maximum number of characters to mask at the leading and trailing
@@ -70,6 +70,10 @@ sequence ends. If `NULL` then the upper masking bound will
 be automatically determined from the maximum number of observed 
 leading or trailing Ns amongst all sequences. If set to `0` 
 (default) then masking will not be performed.
+
+pad_end
+:   if `TRUE` pad the end of each sequence with `mask_char`
+to make every sequence the same length.
 
 text_fields
 :   text annotation columns to retain and merge during duplicate removal.
@@ -218,8 +222,8 @@ Slot "junc_len":
 See also
 -------------------
 
-Executes in order [maskSeqGaps](maskSeqGaps.md), [maskSeqEnds](maskSeqEnds.md)
-and [collapseDuplicates](collapseDuplicates.md). 
+Executes in order [maskSeqGaps](maskSeqGaps.md), [maskSeqEnds](maskSeqEnds.md), 
+[padSeqEnds](padSeqEnds.md), and [collapseDuplicates](collapseDuplicates.md). 
 Returns a [ChangeoClone](ChangeoClone-class.md) object which serves as input to
 [buildPhylipLineage](buildPhylipLineage.md).
 

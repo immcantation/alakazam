@@ -84,7 +84,7 @@ Diversity analysis
 confidence intervals.
 + [rarefyDiversity](rarefyDiversity.md):      Generate clonal diversity curves.
 + [testDiversity](testDiversity.md):        Test significance of clonal diversity scores.
-+ [plotAbundance](plotAbundance.md):        Plot clone size distribution as a rank-abundance 
++ [plotAbundanceCurve](plotAbundanceCurve.md):   Plot clone size distribution as a rank-abundance 
 curve.
 + [plotDiversityCurve](plotDiversityCurve.md):   Plot clonal diversity curves.
 

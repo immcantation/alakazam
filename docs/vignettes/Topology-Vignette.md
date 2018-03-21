@@ -285,12 +285,12 @@ tableEdges(graph, "ISOTYPE")
 ## # A tibble: 5 x 3
 ## # Groups:   PARENT [?]
 ##   PARENT CHILD COUNT
-##    <chr> <chr> <int>
-## 1    IgG   IgG     2
-## 2    IgM  <NA>     1
-## 3   <NA>   IgG     2
-## 4   <NA>   IgM     2
-## 5   <NA>  <NA>     1
+##   <chr>  <chr> <int>
+## 1 IgG    IgG       2
+## 2 IgM    <NA>      1
+## 3 <NA>   IgG       2
+## 4 <NA>   IgM       2
+## 5 <NA>   <NA>      1
 ```
 
 The above output is cluttered with the `NA` annotations from the germline and 
@@ -307,8 +307,8 @@ tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 ## # A tibble: 1 x 3
 ## # Groups:   PARENT [?]
 ##   PARENT CHILD COUNT
-##    <chr> <chr> <int>
-## 1    IgG   IgG     2
+##   <chr>  <chr> <int>
+## 1 IgG    IgG       2
 ```
 
 As there are inferred nodes in the tree, we might want to consider indirect
@@ -326,9 +326,9 @@ tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 ## # A tibble: 2 x 3
 ## # Groups:   PARENT [?]
 ##   PARENT CHILD COUNT
-##    <chr> <chr> <int>
-## 1    IgG   IgG     2
-## 2    IgM   IgG     2
+##   <chr>  <chr> <int>
+## 1 IgG    IgG       2
+## 2 IgM    IgG       2
 ```
 
 ### Significance testing of edges in a population of trees
@@ -346,19 +346,17 @@ annotation pair is observed more often than expected.
 ```r
 # Test isotype relationships
 edge_test <- testEdges(graph_list, "ISOTYPE", nperm=20)
-```
 
-```r
 # Print p-value table
 print(edge_test)
 ```
 
 ```
-##   PARENT CHILD COUNT EXPECTED PVALUE
-## 1    IgA   IgA    36  34.7000 0.0000
-## 2    IgA   IgG     2   3.3125 0.5625
-## 3    IgG   IgA     1   2.0500 0.6500
-## 4    IgG   IgG    99  98.6000 0.4000
+##   PARENT CHILD COUNT  EXPECTED    PVALUE
+## 1    IgA   IgA    36 34.900000 0.0500000
+## 2    IgA   IgG     2  2.642857 0.5000000
+## 3    IgG   IgA     1  2.578947 0.7368421
+## 4    IgG   IgG    99 98.800000 0.4000000
 ```
 
 ```r
@@ -439,8 +437,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.35   0.00
-## 2        IgG    31    31.65   0.65
+## 1        IgA    12     11.2    0.0
+## 2        IgG    31     31.8    0.8
 ```
 
 ```r
