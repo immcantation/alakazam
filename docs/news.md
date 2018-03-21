@@ -6,6 +6,7 @@ General:
 + Added explicit type casting for known columns to `readChangeoDb`.
 + Added the `padSeqEnds` function which pads sequences with Ns to make
   then equal in length.
++ Added verification of unique sequence IDs to `collapseDuplicates`.
 
 Diversity:
 
@@ -21,6 +22,11 @@ Diversity:
   plotting diversity or evenness.
 + Added the function `plotDiversityTest` to generate a simple plot of
   `DiversityTest` object summaries.
+
+Gene Usage:
+
++ Added the `omit_nl` argument to `getAllele`, `getGene` and `getFamily` to
+  allow optional filtering of non-localized (NL) genes.
 
 Lineage:
 
@@ -40,7 +46,6 @@ General:
   sequences but not remove them when set to `TRUE`.
 + Fixed a bug where `collapseDuplicates` was returning one sequence if all 
   sequences were considered ambiguous.
-
 
 Lineage:
 
