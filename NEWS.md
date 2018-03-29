@@ -3,8 +3,8 @@ Version 0.2.9.999:  March 29, 2018
 
 General:
 
-+ Fixed a bug in IPUAC_AA wherein X was not properly matching against Q.
-
++ Fixed a bug in `IPUAC_AA` wherein X was not properly matching against Q.
++ Changed behavior in `getAAMatrix` to treat * (stop codon) as a mismatch.
 
 Version 0.2.9:  March 21, 2018
 -------------------------------------------------------------------------------

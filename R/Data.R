@@ -187,9 +187,11 @@ IUPAC_AA <-  list("A"="A",
                   "W"="W",
                   "X"=c("A","B","C","D","E","F","G","H",
                         "I","J","K","L","M","N","P","Q",
-                        "R","S","T","V","W","X","Y","Z"),
+                        "R","S","T","V","W","X","Y","Z",
+                        "*"),
                   "Y"="Y",
-                  "Z"=c("E","Q"))
+                  "Z"=c("E","Q"),
+                  "*"="*")
 
 
 #' Amino acid abbreviation translations

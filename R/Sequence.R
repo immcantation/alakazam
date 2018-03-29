@@ -66,7 +66,7 @@ getDNAMatrix <- function(gap=-1) {
 getAAMatrix <- function(gap=0) {
   # Define Hamming distance matrix
   sub_mat <- diag(27)
-  colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_AA), c("*", "-", "."))
+  colnames(sub_mat) <- rownames(sub_mat) <- c(names(IUPAC_AA), c("-", "."))
   for (i in 1:length(IUPAC_AA)) {
     for (j in i:length(IUPAC_AA)) {
       sub_mat[i, j] <- sub_mat[j, i] <- any(IUPAC_AA[[i]] %in% IUPAC_AA[[j]])
