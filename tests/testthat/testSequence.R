@@ -133,7 +133,7 @@ test_that("seqDist: long IMGT-gapped sequences", {
 
 #### pairwiseDist ####
 
-test_that("pairwiseDist", {
+test_that("pairwiseDist Nucleotide", {
     # Gaps will be treated as Ns with a gap=0 distance matrix
     obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
                  dist_mat=getDNAMatrix(gap=0))
@@ -153,6 +153,57 @@ test_that("pairwiseDist", {
     expect_equal(obs,
                  matrix(c(0, 1, 1, 1, 1, 0, 0, 2, 1, 0, 0, 2, 1, 2, 2, 0),ncol=4),
                  check.attributes=F)
+})
+
+
+test_that("pairwiseDist AminoAcid", {
+    # Create a toy junction set with stop codon
+    seq_uniq <- c("ACGTACGTACGTACGTACGTACGTACGTATCGT", 
+                  "ACGTACGTACGTACGTACGTACGTACGTATTGA")  # <- stop codon: TGA
+    seq_uniq <- setNames(alakazam::translateDNA(seq_uniq), seq_uniq)
+    dist_mat <- alakazam::pairwiseDist(seq_uniq, dist_mat=alakazam::getAAMatrix())
+    
+    expect_equal(dist_mat[1,2], 1, tolerance=0)
+    expect_equal(dist_mat[2,1], 1, tolerance=0)
+    
+    # Create a toy junction set with N
+    seq_uniq <- c("ACGTACGTACGTACGTACGTACGTACGTATCGT", 
+                  "ACGTACGTACGTACGTACGTACGTACGTATAAT")  # <- N <- AAT 
+    
+    seq_uniq <- setNames(alakazam::translateDNA(seq_uniq), seq_uniq)
+    dist_mat <- alakazam::pairwiseDist(seq_uniq, dist_mat=alakazam::getAAMatrix())
+    
+    expect_equal(dist_mat[1,2], 1, tolerance=0)
+    expect_equal(dist_mat[2,1], 1, tolerance=0)
+    
+    # Create a toy junction set with X
+    seq_uniq <- c("ACGTACGTACGTACGTACGTACGTACGTATCGT", 
+                  "ACGTACGTACGTACGTACGTACGTACGTATNNN")  # <- X <- NNN
+    
+    seq_uniq <- setNames(alakazam::translateDNA(seq_uniq), seq_uniq)
+    dist_mat <- alakazam::pairwiseDist(seq_uniq, dist_mat=alakazam::getAAMatrix())
+    
+    expect_equal(dist_mat[1,2], 0, tolerance=0)
+    expect_equal(dist_mat[2,1], 0, tolerance=0)
+    
+    # Create a toy junction set with X from gaps
+    seq_uniq <- c("ACGTACGTACGTACGTACGTACGTACGTATCGT", 
+                  "ACGTACGTACGTACGTACGTACGTACGTAT---")  # X <- ---
+    
+    seq_uniq <- setNames(alakazam::translateDNA(seq_uniq), seq_uniq)
+    dist_mat <- alakazam::pairwiseDist(seq_uniq, dist_mat=alakazam::getAAMatrix())
+
+    expect_equal(dist_mat[1,2], 0, tolerance=0)
+    expect_equal(dist_mat[2,1], 0, tolerance=0)
+
+    # Create a toy junction set with all possible characters
+    aa_uniq <- c("-ABCDEFGHIJKLMNPQRSTVWXYZ*", 
+                 "-.BCDEFGHIJKLMNPQRSTVWXYZ*")
+    
+    dist_mat <- alakazam::pairwiseDist(aa_uniq, dist_mat=alakazam::getAAMatrix())
+    
+    expect_equal(dist_mat[1,2], 0, tolerance=0)
+    expect_equal(dist_mat[2,1], 0, tolerance=0)
 })
 
 #### seqEqual ####
