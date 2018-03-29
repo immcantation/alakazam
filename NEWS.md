@@ -5,7 +5,6 @@ General:
 
 + Fixed a bug in `IPUAC_AA` wherein X was not properly matching against Q.
 + Changed behavior in `getAAMatrix` to treat * (stop codon) as a mismatch.
-+ Added a set of tests for `pairwiseDist` with AminoAcid.
 
 Version 0.2.9:  March 21, 2018
 -------------------------------------------------------------------------------
