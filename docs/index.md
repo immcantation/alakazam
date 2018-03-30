@@ -43,7 +43,8 @@ Authors
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
-[Roy Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
+[Rouyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb) 
+[Nima Nouri](mailto:nima.nouri@yale.edu) (ctb) 
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 Citing
