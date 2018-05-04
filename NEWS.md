@@ -1,3 +1,12 @@
+Version 0.2.10.999:  May 5, 2018
+-------------------------------------------------------------------------------
+
+Toplogy Analysis:
+
++ Fixed a bug in tableEdges causing it to fail when no parent/child 
+  relationships exist when specifying `indirect=TRUE`.
+
+
 Version 0.2.10:  March 30, 2018
 -------------------------------------------------------------------------------
 
