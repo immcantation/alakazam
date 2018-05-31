@@ -1,3 +1,17 @@
+Version 0.2.10.999:  May 31, 2018
+-------------------------------------------------------------------------------
+
+General:
+
++ Exported some internal utility functions to make them available to dependent 
+  packages: `progressBar`, `baseTheme`, `checkColumns` and `cpuCount`.
+  
+Toplogy Analysis:
+
++ Fixed a bug in tableEdges causing it to fail when no parent/child 
+  relationships exist when specifying `indirect=TRUE`.
+
+
 Version 0.2.10:  March 30, 2018
 -------------------------------------------------------------------------------
 

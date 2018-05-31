@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **testDiversity** - *Pairwise test of the diversity index*
 
 Description
@@ -135,12 +129,12 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d      477.1 16.83161      0
+1 -1h != +7d     478.95 18.13495      0
 
 Slot "summary":
     GROUP   MEAN       SD
--1h   -1h 818.47 12.13181
-+7d   +7d 341.37 12.20503
+-1h   -1h 819.62 11.06526
++7d   +7d 340.67 13.43827
 
 Slot "groups":
 [1] "-1h" "+7d"

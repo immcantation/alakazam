@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **getSegment** - *Get Ig segment allele, gene and family names*
 
 Description

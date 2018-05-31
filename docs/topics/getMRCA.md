@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **getMRCA** - *Retrieve the first non-root node of a lineage tree*
 
 Description

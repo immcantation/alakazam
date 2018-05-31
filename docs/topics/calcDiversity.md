@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **calcDiversity** - *Calculate the diversity index*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **ExampleTrees** - *Example Ig lineage trees*
 
 Description

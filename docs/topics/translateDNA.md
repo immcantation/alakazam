@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **translateDNA** - *Translate nucleotide sequences to amino acids*
 
 Description

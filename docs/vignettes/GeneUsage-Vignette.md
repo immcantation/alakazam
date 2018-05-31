@@ -1,6 +1,4 @@
-Gene usage analysis
-====================
-
+# Gene usage analysis
 
 The 'alakazam' package provides basic gene usage quantification by either sequence count 
 or clonal grouping; with or without consideration of duplicate reads/mRNA. Additionally, 

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **makeChangeoClone** - *Generate a ChangeoClone object for lineage construction*
 
 Description

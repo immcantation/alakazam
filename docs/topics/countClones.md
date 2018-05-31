@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **countClones** - *Tabulates clones sizes*
 
 Description

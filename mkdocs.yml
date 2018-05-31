@@ -83,10 +83,14 @@ pages:
       - topics/gravy.md
       - topics/polar.md
     - 'Miscellaneous':
-      - topics/translateStrings.md
-      - topics/makeTempDir.md
+      - topics/baseTheme.md
+      - topics/checkColumns.md
+      - topics/cpuCount.md
       - topics/gridPlot.md
+      - topics/makeTempDir.md
+      - topics/progressBar.md
       - topics/stoufferMeta.md
+      - topics/translateStrings.md
     - 'Data and Constants':
       - topics/ExampleDb.md
       - topics/ExampleTrees.md

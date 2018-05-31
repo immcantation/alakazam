@@ -1,6 +1,4 @@
-Topology analysis
-====================
-
+# Topology analysis
 
 This vignette covers the basics of analyzing the topologies of Ig lineage 
 trees built using `buildPhylipLineage`, using some built-in alakazam functions
@@ -353,10 +351,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 35.000000 0.1000000
-## 2    IgA   IgG     2  3.411765 0.5882353
-## 3    IgG   IgA     1  2.750000 0.8125000
-## 4    IgG   IgG    99 97.900000 0.1500000
+## 1    IgA   IgA    36 34.550000 0.0000000
+## 2    IgA   IgG     2  2.769231 0.4615385
+## 3    IgG   IgA     1  2.888889 0.8888889
+## 4    IgG   IgG    99 99.050000 0.4500000
 ```
 
 ```r
@@ -437,8 +435,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.45   0.00
-## 2        IgG    31    31.55   0.55
+## 1        IgA    12     11.4    0.0
+## 2        IgG    31     31.6    0.6
 ```
 
 ```r

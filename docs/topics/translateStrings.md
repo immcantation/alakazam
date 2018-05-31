@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **translateStrings** - *Translate a vector of strings*
 
 Description

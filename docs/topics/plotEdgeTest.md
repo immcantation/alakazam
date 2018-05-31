@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotEdgeTest** - *Plot the results of an edge permutation test*
 
 Description

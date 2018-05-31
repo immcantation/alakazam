@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **maskSeqGaps** - *Masks gap characters in DNA sequences*
 
 Description

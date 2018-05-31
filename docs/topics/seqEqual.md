@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **seqEqual** - *Test DNA sequences for equality.*
 
 Description

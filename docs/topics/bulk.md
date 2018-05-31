@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **bulk** - *Calculates the average bulkiness of amino acid sequences*
 
 Description

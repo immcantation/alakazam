@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **isValidAASeq** - *Validate amino acid sequences*
 
 Description

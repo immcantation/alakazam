@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **permuteLabels** - *Permute the node labels of a tree*
 
 Description

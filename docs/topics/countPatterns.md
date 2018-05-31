@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **countPatterns** - *Count sequence patterns*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **estimateAbundance** - *Estimates the complete clonal relative abundance distribution*
 
 Description

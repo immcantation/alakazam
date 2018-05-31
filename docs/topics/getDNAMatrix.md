@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **getDNAMatrix** - *Build a DNA distance matrix*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **readChangeoDb** - *Read a Change-O tab-delimited database file*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **gridPlot** - *Plot multiple ggplot objects*
 
 Description

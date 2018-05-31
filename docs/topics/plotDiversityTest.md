@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotDiversityTest** - *Plot the results of TestDiversity*
 
 Description

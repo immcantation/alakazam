@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **testMRCA** - *Tests for MRCA annotation enrichment in lineage trees*
 
 Description
@@ -80,9 +74,9 @@ print(x)
 
 ```
   ANNOTATION COUNT EXPECTED PVALUE
-1        IgA    16    13.10   0.00
+1        IgA    16    13.40   0.00
 2    IgA,IgG     1     1.25   0.25
-3        IgG    31    33.90   1.00
+3        IgG    31    34.10   1.00
 
 ```
 

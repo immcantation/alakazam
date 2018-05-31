@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **gravy** - *Calculates the hydrophobicity of amino acid sequences*
 
 Description

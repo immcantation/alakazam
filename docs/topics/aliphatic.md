@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **aliphatic** - *Calculates the aliphatic index of amino acid sequences*
 
 Description

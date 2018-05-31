@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **summarizeSubtrees** - *Generate subtree summary statistics for a tree*
 
 Description

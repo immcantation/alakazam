@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **ChangeoClone-class** - *S4 class defining a clone*
 
 Description

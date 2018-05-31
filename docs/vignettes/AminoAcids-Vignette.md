@@ -1,6 +1,4 @@
-Amino acid property analysis
-====================
-
+# Amino acid property analysis
 
 The `alakazam` package includes a set of function to analyze the physicochemical 
 properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 

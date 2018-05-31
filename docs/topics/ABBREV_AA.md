@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **ABBREV_AA** - *Amino acid abbreviation translations*
 
 Description

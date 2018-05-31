@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **charge** - *Calculates the net charge of amino acid sequences.*
 
 Description

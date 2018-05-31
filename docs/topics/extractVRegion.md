@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **extractVRegion** - *Extracts FWRs and CDRs from IMGT-gapped sequences*
 
 Description

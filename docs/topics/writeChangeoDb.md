@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **writeChangeoDb** - *Write a Change-O tab-delimited database file*
 
 Description

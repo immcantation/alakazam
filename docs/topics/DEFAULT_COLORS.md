@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **DEFAULT_COLORS** - *Default colors*
 
 Description

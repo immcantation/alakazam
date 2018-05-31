@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **getPathLengths** - *Calculate path lengths from the tree root*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **getAAMatrix** - *Build an AA distance matrix*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **countGenes** - *Tabulates V(D)J allele, gene or family usage.*
 
 Description

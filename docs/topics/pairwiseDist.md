@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **pairwiseDist** - *Calculate pairwise distances between sequences*
 
 Description

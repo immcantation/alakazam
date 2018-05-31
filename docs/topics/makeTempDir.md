@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **makeTempDir** - *Create a temporary folder*
 
 Description
@@ -44,7 +38,7 @@ makeTempDir("Clone50")
 
 
 ```
-[1] "/tmp/RtmpftxTSC/Clone50-temp-6db047d2613f"
+[1] "/tmp/RtmpNt1knc/Clone50-temp-5a247e3f0011"
 
 ```
 

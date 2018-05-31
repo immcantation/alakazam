@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **collapseDuplicates** - *Remove duplicate DNA sequences and combine annotations*
 
 Description

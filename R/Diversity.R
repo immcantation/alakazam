@@ -935,7 +935,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Define base plot elements
     p1 <- ggplot(data@data, aes_string(x="RANK", y="P", group="GROUP")) + 
         ggtitle(main_title) + 
-        getBaseTheme() + 
+        baseTheme() + 
         xlab('Rank') +
         ylab('Abundance') +
         scale_x_log10(limits=xlim,
@@ -1045,7 +1045,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     # Define base plot elements
     p1 <- ggplot(data@data, aes_string(x="Q", y=y_value, group="GROUP")) + 
         ggtitle(main_title) + 
-        getBaseTheme() + 
+        baseTheme() + 
         xlab('q') +
         ylab(y_label) +
         geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill="GROUP"), alpha=0.4) +
@@ -1146,7 +1146,7 @@ plotDiversityTest <- function(data, colors=NULL, main_title="Diversity",
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x="GROUP")) + 
         ggtitle(main_title) + 
-        getBaseTheme() + 
+        baseTheme() + 
         xlab("") +
         ylab(bquote("Mean " ^ .(data@q) * D %+-% "SD")) +
         geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color="GROUP"), alpha=0.8) +

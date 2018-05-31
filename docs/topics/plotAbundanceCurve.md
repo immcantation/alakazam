@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotAbundanceCurve** - *Plots a clonal abundance distribution*
 
 Description

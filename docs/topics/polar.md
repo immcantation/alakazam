@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **polar** - *Calculates the average polarity of amino acid sequences*
 
 Description

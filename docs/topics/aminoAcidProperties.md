@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **aminoAcidProperties** - *Calculates amino acid chemical properties for sequence data*
 
 Description

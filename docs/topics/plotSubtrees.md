@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotSubtrees** - *Plots subtree statistics for multiple trees*
 
 Description

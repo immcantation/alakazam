@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **rarefyDiversity** - *Generate a clonal diversity index curve*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **IMGT_REGIONS** - *IMGT V-segment regions*
 
 Description

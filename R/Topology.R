@@ -647,7 +647,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
     if (style == "histogram") {
         # Plot edge null distribution
         p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
-            getBaseTheme() + 
+            baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("Number of realizations") + 
@@ -658,7 +658,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
         p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
-            getBaseTheme() + 
+            baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("P-value") +
@@ -733,7 +733,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
     if (style == "histogram") {
         # Plot MRCA null distribution
         p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
-            getBaseTheme() + 
+            baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("Number of realizations") + 
@@ -744,7 +744,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
     } else if (style == "cdf") {
         # Plot ECDF of MRCA null distribution
         p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
-            getBaseTheme() + 
+            baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("P-value") +
@@ -888,7 +888,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
     
     # Make plot object
     p1 <- ggplot(sum_df, aes_string(x=field, y=stat_col)) + 
-        getBaseTheme() + 
+        baseTheme() + 
         ggtitle(main_title) + 
         xlab("") +
         ylab(y_lab) +

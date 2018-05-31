@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **padSeqEnds** - *Pads ragged ends of aligned DNA sequences*
 
 Description

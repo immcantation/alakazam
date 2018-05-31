@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotDiversityCurve** - *Plot the results of rarefyDiversity*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **EdgeTest-class** - *S4 class defining edge significance*
 
 Description

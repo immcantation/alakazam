@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotMRCATest** - *Plot the results of a founder permutation test*
 
 Description

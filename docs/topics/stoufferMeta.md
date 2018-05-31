@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **stoufferMeta** - *Weighted meta-analysis of p-values via Stouffer's method*
 
 Description

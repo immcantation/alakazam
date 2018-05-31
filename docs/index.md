@@ -29,26 +29,26 @@ Contact
 For help and questions please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
 or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).
 
-Dependencies
----------------
+
+# Dependencies
 
 **Depends:** ggplot2  
 **Imports:** dplyr, graphics, grid, igraph, lazyeval, methods, progress, Rcpp, readr, scales, seqinr, stats, stringi, utils  
 **Suggests:** knitr, rmarkdown, testthat
 
-Authors
----------------
+
+# Authors
 
 [Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (aut, cre)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
-[Rouyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb) 
-[Nima Nouri](mailto:nima.nouri@yale.edu) (ctb) 
+[Rouyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
+[Nima Nouri](mailto:nima.nouri@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
-Citing
----------------
+
+# Citing
 
 
 To cite the alakazam package in publications, please use:

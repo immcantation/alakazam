@@ -176,22 +176,24 @@ translateStrings <- function(strings, translation) {
 }
 
 
-# Check data.frame for valid columns and issue message if invalid
-#
-# @param   data     data.frame to check
-# @param   columns  vector of column names to check
-# @param   logic    one of "all" or "any" controlling whether all or at least one of
-#                   the columns must be valid
-# @return  TRUE if columns are valid and a string message if not.
+#' Check data.frame for valid columns and issue message if invalid
+#'
+#' @param   data     data.frame to check.
+#' @param   columns  vector of column names to check.
+#' @param   logic    one of \code{"all"} or \code{"any"} controlling whether all,
+#'                   or at least one, of the columns must be valid, respectively.
+#' @return  \code{TRUE} if columns are valid and a string message if not.
 # 
-# @examples
-# df <- data.frame(A=1:3, B=4:6, C=rep(NA, 3))
-# alakazam:::checkColumns(df, c("A", "B"), logic="all")
-# alakazam:::checkColumns(df, c("A", "B"), logic="any")
-# alakazam:::checkColumns(df, c("A", "C"), logic="all")
-# alakazam:::checkColumns(df, c("A", "C"), logic="any")
-# alakazam:::checkColumns(df, c("A", "D"), logic="all")
-# alakazam:::checkColumns(df, c("A", "D"), logic="any")
+#' @examples
+#' df <- data.frame(A=1:3, B=4:6, C=rep(NA, 3))
+#' checkColumns(df, c("A", "B"), logic="all")
+#' checkColumns(df, c("A", "B"), logic="any")
+#' checkColumns(df, c("A", "C"), logic="all")
+#' checkColumns(df, c("A", "C"), logic="any")
+#' checkColumns(df, c("A", "D"), logic="all")
+#' checkColumns(df, c("A", "D"), logic="any")
+#' 
+#' @export
 checkColumns <- function(data, columns, logic=c("all", "any")) {
     ## DEBUG
     # data=df; columns=c("A", "D"); logic="any"
@@ -239,10 +241,15 @@ checkColumns <- function(data, columns, logic=c("all", "any")) {
 
 #### Plotting and progress functions ####
 
-# Define a progress bar
-# 
-# @param   n  maximum number of ticks
-# @return  a  a progress_bar object
+#' Standard progress bar
+#' 
+#' \code{progressBar} defines a common progress bar format.
+#' 
+#' @param   n  maximum number of ticks
+#' 
+#' @return  A \link[progress]{progress_bar} object.
+#'
+#' @export
 progressBar <- function(n) {
     pb <- progress::progress_bar$new(format="  PROGRESS> [:bar] :percent :elapsed",
                                      width=40, clear=FALSE, stream=stdout(), force=TRUE,
@@ -251,15 +258,21 @@ progressBar <- function(n) {
 }
 
 
-# Define universal plot settings
-#
-# @param    sizing  defines the style and sizing of the theme. One of 
-#                   \code{c("figure", "window")} where \code{sizing="figure"} is appropriately
-#                   sized for pdf export at 7 to 7.5 inch width, and \code{sizing="window"}
-#                   is sized for an interactive session.
-#
-# @return   A ggplot2 theme object.
-getBaseTheme <- function(sizing=c("figure", "window")) {
+#' Standard ggplot settings
+#' 
+#' \code{baseTheme} defines common ggplot theme settings for plotting.
+#'
+#' @param    sizing  defines the style and sizing of the theme. One of 
+#'                   \code{c("figure", "window")} where \code{sizing="figure"} is appropriately
+#'                   sized for pdf export at 7 to 7.5 inch width, and \code{sizing="window"}
+#'                   is sized for an interactive session.
+#'
+#' @return   A ggplot2 object.
+#' 
+#' @seealso \link[ggplot2]{theme}.
+#' 
+#' @export
+baseTheme <- function(sizing=c("figure", "window")) {
     # Check arguments
     sizing <- match.arg(sizing)
     
@@ -308,8 +321,7 @@ getBaseTheme <- function(sizing=c("figure", "window")) {
 #' @param   ncol   number of columns in the plot.
 #' @return  NULL
 #' 
-#' @seealso
-#' \link{ggplot}.
+#' @seealso \link{ggplot}.
 #' 
 #' @references
 #' Modified from:
@@ -334,6 +346,29 @@ gridPlot <- function(..., ncol=1) {
     }
 }
 
+#### Multiprocessing functions ####
+
+#' Available CPU cores
+#'
+#' \code{cpuCount} determines the number of CPU cores available.
+#' 
+#' @return  Count of available cores. Returns 1 if undeterminable.
+#'
+#' @examples
+#' cpuCount()
+#' 
+#' @export
+cpuCount <-function(){
+    if (.Platform$OS.type == "windows") {
+        nproc <- as.numeric(Sys.getenv('NUMBER_OF_PROCESSORS'))
+    } else if (.Platform$OS.type == "unix") { 
+        nproc <- parallel::detectCores()
+    } else {
+        nproc <- 1    
+    }
+    
+    return(nproc)
+}
 
 #### Generic statistical functions ####
 

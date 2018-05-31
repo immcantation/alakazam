@@ -1,6 +1,4 @@
-Lineage reconstruction
-====================
-
+# Lineage reconstruction
 
 Reconstruction of an Ig lineage requires the following steps:
 

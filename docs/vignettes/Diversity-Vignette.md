@@ -1,6 +1,4 @@
-Diversity analysis
-====================
-
+# Diversity analysis
 
 The clonal diversity of the repertoire can be analyzed using the general form
 of the diversity index, as proposed by Hill in:
@@ -182,7 +180,7 @@ print(sample_test)
 
 ```
 ##         test DELTA_MEAN DELTA_SD PVALUE
-## 1 -1h != +7d   523.9603 37.39858      0
+## 1 -1h != +7d   520.7538 37.90251      0
 ```
 
 
@@ -198,12 +196,12 @@ print(isotype_test)
 
 ```
 ##         test DELTA_MEAN  DELTA_SD PVALUE
-## 1 IgA != IgD  189.37656 11.994448      0
-## 2 IgA != IgG   26.84489  4.673037      0
-## 3 IgA != IgM  229.30884  6.873559      0
-## 4 IgD != IgG  162.53167 12.091943      0
-## 5 IgD != IgM   39.93228 12.914517      0
-## 6 IgG != IgM  202.46395  7.634256      0
+## 1 IgA != IgD  189.57967 10.937034      0
+## 2 IgA != IgG   26.49489  4.362663      0
+## 3 IgA != IgM  229.15972  7.024998      0
+## 4 IgD != IgG  163.08477 10.705093      0
+## 5 IgD != IgM   39.58005 12.570166      0
+## 6 IgG != IgM  202.66482  7.226409      0
 ```
 
 ```r

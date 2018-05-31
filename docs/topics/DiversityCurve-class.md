@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **DiversityCurve-class** - *S4 class defining a diversity curve*
 
 Description

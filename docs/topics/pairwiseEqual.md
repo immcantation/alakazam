@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **pairwiseEqual** - *Calculate pairwise equivalence between sequences*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **AbundanceCurve-class** - *S4 class defining a clonal abundance curve*
 
 Description

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **maskSeqEnds** - *Masks ragged leading and trailing edges of aligned DNA sequences*
 
 Description

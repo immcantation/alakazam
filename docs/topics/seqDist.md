@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **seqDist** - *Calculate distance between two sequences*
 
 Description

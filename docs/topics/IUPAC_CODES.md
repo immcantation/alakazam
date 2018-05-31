@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **IUPAC_CODES** - *IUPAC ambiguous characters*
 
 Description

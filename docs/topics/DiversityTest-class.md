@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **DiversityTest-class** - *S4 class defining diversity significance*
 
 Description

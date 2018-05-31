@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **calcCoverage** - *Calculate sample coverage*
 
 Description
