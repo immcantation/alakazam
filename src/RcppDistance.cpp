@@ -254,3 +254,42 @@ NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
     rmat.attr("dimnames") = dimnames;
     return rmat;
 }
+
+
+// subPairwiseDist
+// [[Rcpp::export]]
+NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat)
+{
+    // defien variables
+    int m, n, i, j;
+    double distance;
+    // extract the sizes. Note: This should be satisfied (n<=m)
+    m = seq.size();  //nrow
+    n = indx.size(); //ncolumn
+    // push indices back by 1 to match c++ indexing
+    for (j = 0; j < n; j++) indx[j] -= 1;
+    // allocate the matrix
+    NumericMatrix rmat(m,m);
+    // begin filling rmat
+    for (j = 0; j < m; j++) {
+        if (std::find(indx.begin(), indx.end(), j) == indx.end()) continue;
+        std::string col_seq = as<std::string>(seq[j]);     //col sequence 
+        for (i = 0; i < m; i++) {
+            if (i == j) continue;
+            std::string row_seq = as<std::string>(seq[i]); //row sequence
+            rmat(i,j) = seqDistRcpp(row_seq, col_seq, dist_mat);
+            rmat(j,i) = rmat(i,j);
+        }
+    }
+    // subset matrix
+    NumericMatrix subrmat(m,n);
+    for(j=0; j<indx.size(); j++)
+        subrmat(_,j)= rmat(_,indx[j]);
+    // Add row and column names
+    StringVector subSeq = seq[indx] ;
+    Rcpp::List dimnames = Rcpp::List::create(seq.attr("names"),      //rownames
+                                             subSeq.attr("names"));  //colnames
+    subrmat.attr("dimnames") = dimnames;
+    // return matrix
+    return subrmat;
+}

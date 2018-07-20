@@ -67,3 +67,7 @@ pairwiseDistRcpp <- function(seq, dist_mat) {
     .Call(`_alakazam_pairwiseDistRcpp`, seq, dist_mat)
 }
 
+subPairwiseDistRcpp <- function(seq, indx, dist_mat) {
+    .Call(`_alakazam_subPairwiseDistRcpp`, seq, indx, dist_mat)
+}
+

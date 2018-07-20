@@ -134,24 +134,37 @@ test_that("seqDist: long IMGT-gapped sequences", {
 #### pairwiseDist ####
 
 test_that("pairwiseDist Nucleotide", {
+    seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C")
     # Gaps will be treated as Ns with a gap=0 distance matrix
-    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(seq, 
                  dist_mat=getDNAMatrix(gap=0))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0),ncol=4),
                  check.attributes=F)
     # Gaps will be treated as universally non-matching characters with gap=1
-    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(seq, 
                  dist_mat=getDNAMatrix(gap=1))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 2, 1, 0, 0, 3, 1, 0, 0, 3, 2, 3, 3, 0),ncol=4),
                  check.attributes=F)
     
     # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
-    obs <- pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
+    obs <- pairwiseDist(seq, 
                  dist_mat=getDNAMatrix(gap=-1))
     expect_equal(obs,
                  matrix(c(0, 1, 1, 1, 1, 0, 0, 2, 1, 0, 0, 2, 1, 2, 2, 0),ncol=4),
+                 check.attributes=F)
+    
+    
+    # test subset pairwise function
+    seq <- c("TGTGCGAGAGGCCTCACGGAACCTCGCACA", "TGTGCGAGACAGGTTTACTATGATAGTAGT", "TGTGCGAGAGGTTTGGTAGATACAGCTATG", "TGTGCGAGAGGCTTCTCCGGGAGGGGGCCG", 
+             "TGTGCGAGAGTCCGGGGTCGCAAGCTGCAG", "TGTGCGAGACCTTATTCGCACGACGGTGGT", "TGTGCGAGAGATTACCGGCTACAGGCGTGC", "TGTGCGAAAGATCTCTCCCACCGCCTAGGA")
+    obs <- pairwiseDist(seq, 
+                        dist_mat=getDNAMatrix(gap=0))
+    subobs <- subPairwiseDist(seq, indx=c(7,2,5),
+                              dist_mat=getDNAMatrix(gap=0))
+    expect_equal(obs[,c(7,2,5)],
+                 subobs,
                  check.attributes=F)
 })
 

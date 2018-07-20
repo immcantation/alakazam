@@ -230,7 +230,7 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' @param    field     string defining the annotation field to count.
 #' @param    indirect  if \code{FALSE} count direct connections (edges) only. If 
 #'                     \code{TRUE} walk through any nodes with annotations specified in 
-#'                     the \code{exclude} argument to count indirect connections. Specifying
+#'                     the \code{argument} to count indirect connections. Specifying
 #'                     \code{indirect=TRUE} with \code{exclude=NULL} will have no effect.
 #' @param    exclude   vector of strings defining \code{field} values to exclude from counts.
 #'                     Edges that either start or end with the specified annotations will not
@@ -242,9 +242,6 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #'             \item  \code{CHILD}:   child annotation
 #'             \item  \code{COUNT}:   count of edges for the parent-child relationship
 #'           }
-#'           
-#'           Returns \code{NULL} if no children are found, which may occur when 
-#'           \code{indirect=TRUE}.
 #'           
 #' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
 #'           
@@ -258,10 +255,8 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #' # Count direct edges excluding edges to and from germline and inferred nodes
 #' tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 #' 
-#' # Count indirect edges
-#' # Walks through germline, inferred, and nodes annotated as "IgA,IgG"
-#' tableEdges(graph, "ISOTYPE", indirect=TRUE, 
-#'            exclude=c("Germline", "IgA,IgG", NA))
+#' # Count indirect edges walking through germline and inferred nodes
+#' tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 #' 
 #' @export
 tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
@@ -305,7 +300,8 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
         
         # Merge edge list into data.frame
         edge_df <- bind_rows(edge_list)        
-    } else {
+    }
+    else {
         # Get adjacency list
         edge_mat <- as_edgelist(graph, names=FALSE)
         edge_mat <- vertex_attr(graph, name=field, index=edge_mat)
@@ -317,14 +313,10 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
     }
     
     # Count edges
-    if (nrow(edge_df) > 0) {
-        edge_tab <- edge_df %>%
-            group_by_("PARENT", "CHILD") %>%
-            dplyr::summarize(COUNT=n())
-    } else {
-        edge_tab <- NULL
-    }
-    
+    edge_tab <- edge_df %>%
+        group_by_("PARENT", "CHILD") %>%
+        dplyr::summarize(COUNT=n())
+
     return(edge_tab)
 }
 
@@ -495,7 +487,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' @param    field     string defining the annotation field to permute.
 #' @param    indirect  if \code{FALSE} count direct connections (edges) only. If 
 #'                     \code{TRUE} walk through any nodes with annotations specified in 
-#'                     the \code{exclude} argument to count indirect connections. Specifying
+#'                     the \code{argument} to count indirect connections. Specifying
 #'                     \code{indirect=TRUE} with \code{exclude=NULL} will have no effect.
 #' @param    exclude   vector of strings defining \code{field} values to exclude from 
 #'                     permutation.
@@ -515,12 +507,6 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' 
 #' # Perform edge test on isotypes
 #' x <- testEdges(graphs, "ISOTYPE", nperm=10)
-#' print(x)
-#' 
-#' # Perform edge test with inclusion of indirect connections
-#' # Walks through germline, inferred, and nodes annotated as "IgM"
-#' x <- testEdges(graphs, "ISOTYPE", nperm=10, indirect=TRUE, 
-#'                exclude=c("Germline", "IgM", NA))
 #' print(x)
 #' }
 #' 
