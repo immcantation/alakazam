@@ -262,31 +262,35 @@ NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericM
 {
     // defien variables
     int m, n, i, j;
+    int id = 0;
     double distance;
+    std::string col_seq, row_seq;
     // extract the sizes. Note: This should be satisfied (n<=m)
     m = seq.size();  //nrow
     n = indx.size(); //ncolumn
-    // push indices back by 1 to match c++ indexing
-    for (j = 0; j < n; j++) indx[j] -= 1;
-    // allocate the matrix
+    // allocate the main matrix and subset matrix
     NumericMatrix rmat(m,m);
+    std::fill(rmat.begin(), rmat.end(), NA_REAL);
+    rmat.fill_diag(0);
+    NumericMatrix subrmat(m,n);
+    // push indices back by 1 to match c++ indexing
+    std::sort(indx.begin(), indx.end());
+    indx = indx - 1;
     // begin filling rmat
     for (j = 0; j < m; j++) {
-        if (std::find(indx.begin(), indx.end(), j) == indx.end()) continue;
-        std::string col_seq = as<std::string>(seq[j]);     //col sequence 
+        if (!std::binary_search(indx.begin(), indx.end(), j)) continue;
+        col_seq = as<std::string>(seq[j]);     //col sequence 
         for (i = 0; i < m; i++) {
-            if (i == j) continue;
-            std::string row_seq = as<std::string>(seq[i]); //row sequence
+            if (!R_IsNA(rmat(i,j))) continue;
+            row_seq = as<std::string>(seq[i]); //row sequence
             rmat(i,j) = seqDistRcpp(row_seq, col_seq, dist_mat);
             rmat(j,i) = rmat(i,j);
         }
+        subrmat(_,id)= rmat(_,j);
+        id++;
     }
-    // subset matrix
-    NumericMatrix subrmat(m,n);
-    for(j=0; j<indx.size(); j++)
-        subrmat(_,j)= rmat(_,indx[j]);
     // Add row and column names
-    StringVector subSeq = seq[indx] ;
+    StringVector subSeq = seq[indx];
     Rcpp::List dimnames = Rcpp::List::create(seq.attr("names"),      //rownames
                                              subSeq.attr("names"));  //colnames
     subrmat.attr("dimnames") = dimnames;

@@ -159,12 +159,13 @@ test_that("pairwiseDist Nucleotide", {
     # test subset pairwise function
     seq <- c("TGTGCGAGAGGCCTCACGGAACCTCGCACA", "TGTGCGAGACAGGTTTACTATGATAGTAGT", "TGTGCGAGAGGTTTGGTAGATACAGCTATG", "TGTGCGAGAGGCTTCTCCGGGAGGGGGCCG", 
              "TGTGCGAGAGTCCGGGGTCGCAAGCTGCAG", "TGTGCGAGACCTTATTCGCACGACGGTGGT", "TGTGCGAGAGATTACCGGCTACAGGCGTGC", "TGTGCGAAAGATCTCTCCCACCGCCTAGGA")
+    seq <- setNames(seq, seq)
     obs <- pairwiseDist(seq, 
                         dist_mat=getDNAMatrix(gap=0))
     subobs <- subPairwiseDist(seq, indx=c(7,2,5),
                               dist_mat=getDNAMatrix(gap=0))
-    expect_equal(obs[,c(7,2,5)],
-                 subobs,
+    expect_equal(subobs,
+                 obs[,colnames(subobs)],
                  check.attributes=F)
 })
 
