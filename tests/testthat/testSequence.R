@@ -164,7 +164,7 @@ test_that("pairwiseDist Nucleotide", {
     subobs <- subPairwiseDist(seq, indx=c(7,2,5),
                               dist_mat=getDNAMatrix(gap=0))
     expect_equal(subobs,
-                 obs[,colnames(subobs)],
+                 obs[rownames(subobs),],
                  check.attributes=F)
 })
 
