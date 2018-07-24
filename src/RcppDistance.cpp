@@ -273,7 +273,7 @@ NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericM
     std::fill(rmat.begin(), rmat.end(), NA_REAL);
     rmat.fill_diag(0);
     NumericMatrix subrmat(m,n);
-    // push indices back by 1 to match c++ indexing
+    // sort and push indices back by 1 to match c++ indexing
     std::sort(indx.begin(), indx.end());
     indx = indx - 1;
     // begin filling rmat
