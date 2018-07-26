@@ -62,7 +62,7 @@
 #'                     clone="CLONE", mode="family")
 #'
 #'@export
-countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
+countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, count_absent=F,
                        mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
     # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
@@ -90,6 +90,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
             dplyr::summarize(SEQ_COUNT=n()) %>%
             mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
             arrange_(.dots="desc(SEQ_COUNT)")
+        count_columns <- c('SEQ_COUNT', 'SEQ_FREQ') #@
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
@@ -103,6 +104,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
             dplyr::summarize(CLONE_COUNT=n()) %>%
             mutate_(CLONE_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("CLONE_COUNT"))) %>%
             arrange_(.dots="desc(CLONE_COUNT)")
+        count_columns <- c('CLONE_COUNT', 'CLONE_FREQ') #@
     } else {
         if (!is.null(clone) & !is.null(copy)) {
             warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
@@ -116,6 +118,23 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
             mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
                     COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
             arrange_(.dots="desc(COPY_COUNT)")
+        count_columns <- c('SEQ_COUNT', 'COPY_COUNT', 'SEQ_FREQ', 'COPY_FREQ') #@
+    }
+
+    #@ If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
+    if(count_absent){
+        #choose separator that is highly unlikely to be in names found in GROUP for tidyr functions 
+        char_separator = '~'
+        
+        #unite key/value columns, spread to fill with 0s, gather, separate
+        gene_tab <- gene_tab %>%
+            unite(temp_key, groups, sep = char_separator) %>%
+            unite(temp_value, count_columns, sep = char_separator) %>%
+            spread(temp_key, temp_value, fill = paste(rep(0, length(count_columns)), collapse=char_separator)) %>%
+            gather(temp_key, temp_value, -gene) %>%
+            separate(temp_key, groups, sep = char_separator) %>%
+            separate(temp_value, c(count_columns), sep = char_separator) %>%
+            mutate_at(vars(count_columns), funs(as.numeric))
     }
 
     # Rename gene column
