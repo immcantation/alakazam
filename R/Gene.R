@@ -27,6 +27,8 @@
 #'                   families (calling \code{getFamily}), alleles (calling 
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
+#' @param    count_absent    bool of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
+#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -60,6 +62,9 @@
 #' # Count by clone
 #' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     clone="CLONE", mode="family")
+#'
+#' # Count absent genes 
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", count_absent = TRUE)
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, count_absent=F,
@@ -130,7 +135,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, count_abs
         gene_tab <- gene_tab %>%
             unite(temp_key, groups, sep = char_separator) %>%
             unite(temp_value, count_columns, sep = char_separator) %>%
-            spread(temp_key, temp_value, fill = paste(rep(0, length(count_columns)), collapse=char_separator)) %>%
+            spread(temp_key, temp_value, 
+                   fill = paste(rep(0, length(count_columns)), collapse=char_separator)) %>%
             gather(temp_key, temp_value, -gene) %>%
             separate(temp_key, groups, sep = char_separator) %>%
             separate(temp_value, c(count_columns), sep = char_separator) %>%
