@@ -27,7 +27,7 @@
 #'                   families (calling \code{getFamily}), alleles (calling 
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
-#' @param    count_absent    bool of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
+#' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
 #'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
@@ -64,10 +64,10 @@
 #'                     clone="CLONE", mode="family")
 #'
 #' # Count absent genes 
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", count_absent = TRUE)
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = FALSE)
 #'
 #'@export
-countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, count_absent=F,
+countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
                        mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
     # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
@@ -127,7 +127,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, count_abs
     }
 
     #@ If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
-    if(count_absent){
+    if(fill){
         #choose separator that is highly unlikely to be in names found in GROUP for tidyr functions 
         char_separator = '~'
         
