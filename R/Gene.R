@@ -27,7 +27,7 @@
 #'                   families (calling \code{getFamily}), alleles (calling 
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
-#' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
+#' @param    fill  logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
 #'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
@@ -64,7 +64,7 @@
 #'                     clone="CLONE", mode="family")
 #'
 #' # Count absent genes 
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = FALSE)
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = TRUE)
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
