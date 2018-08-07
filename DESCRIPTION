@@ -31,6 +31,7 @@ BugReports: https://bitbucket.org/kleinstein/alakazam/issues
 LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
+Encoding: UTF-8
 SystemRequirements: C++11
 Depends:
     R (>= 3.1.2),
