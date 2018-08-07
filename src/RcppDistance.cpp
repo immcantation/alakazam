@@ -263,7 +263,6 @@ NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericM
     // defien variables
     int m, n, i, j;
     int id = 0;
-    double distance;
     std::string col_seq, row_seq;
     // extract the sizes. Note: This should be satisfied (n<=m)
     m = indx.size(); //nrow
