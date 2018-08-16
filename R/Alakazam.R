@@ -142,6 +142,7 @@
 #'                          stri_extract_all_regex stri_extract_first_regex  
 #'                          stri_replace_all_regex stri_replace_first_regex
 #'                          stri_pad_left stri_pad_right
+#' @importFrom  tidyr       complete_
 #' @importFrom  Rcpp evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

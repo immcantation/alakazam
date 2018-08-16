@@ -27,6 +27,8 @@
 #'                   families (calling \code{getFamily}), alleles (calling 
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
+#' @param    fill  logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
+#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -61,8 +63,11 @@
 #' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 #'                     clone="CLONE", mode="family")
 #'
+#' # Count absent genes 
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = TRUE)
+#'
 #'@export
-countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
+countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
                        mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
     # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
@@ -116,6 +121,14 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL,
             mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
                     COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
             arrange_(.dots="desc(COPY_COUNT)")
+    }
+
+    # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
+    if(fill){
+        gene_tab <- gene_tab %>%
+            ungroup() %>%
+            complete_(as.list(c(groups, gene))) %>%
+            replace(is.na(.), 0)
     }
 
     # Rename gene column

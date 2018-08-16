@@ -49,6 +49,7 @@ Imports:
     seqinr,
     stats,
     stringi,
+    tidyr,
     utils
 LinkingTo: Rcpp
 Suggests:
