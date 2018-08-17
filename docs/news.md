@@ -5,7 +5,8 @@ General:
 
 + Exported some internal utility functions to make them available to dependent 
   packages: `progressBar`, `baseTheme`, `checkColumns` and `cpuCount`.
-  
++ countGenes fill option included, used when GROUP specified
+
 Toplogy Analysis:
 
 + Fixed a bug in tableEdges causing it to fail when no parent/child 
