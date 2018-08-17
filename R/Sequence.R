@@ -824,7 +824,7 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 
 #' Calculate pairwise distances between sequences
 #' 
-#' \code{subPairwiseDist} calculates all pairwise distance between a set of sequences and a subset of it.
+#' \code{nonsquareDist} calculates all pairwise distance between a set of sequences and a subset of it.
 #'
 #' @param    seq       character vector containing a DNA sequences.
 #' @param    indx      numeric vector contating the indices (a subset of indices of \code{seq}).
@@ -852,10 +852,10 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #' pairwiseDist(seq, 
 #'              dist_mat=getDNAMatrix(gap=0))
 #' 
-#' subPairwiseDist(seq, indx=c(1,3), 
+#' nonsquareDist(seq, indx=c(1,3), 
 #'              dist_mat=getDNAMatrix(gap=0))
 #' 
 #' @export
-subPairwiseDist <- function(seq, indx, dist_mat=getDNAMatrix()) {
-    subPairwiseDistRcpp(seq, indx, dist_mat)
+nonsquareDist <- function(seq, indx, dist_mat=getDNAMatrix()) {
+    nonsquareDistRcpp(seq, indx, dist_mat)
 }

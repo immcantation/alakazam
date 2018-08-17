@@ -54,16 +54,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// subPairwiseDistRcpp
-NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat);
-RcppExport SEXP _alakazam_subPairwiseDistRcpp(SEXP seqSEXP, SEXP indxSEXP, SEXP dist_matSEXP) {
+// nonsquareDistRcpp
+NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat);
+RcppExport SEXP _alakazam_nonsquareDistRcpp(SEXP seqSEXP, SEXP indxSEXP, SEXP dist_matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< StringVector >::type seq(seqSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type indx(indxSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type dist_mat(dist_matSEXP);
-    rcpp_result_gen = Rcpp::wrap(subPairwiseDistRcpp(seq, indx, dist_mat));
+    rcpp_result_gen = Rcpp::wrap(nonsquareDistRcpp(seq, indx, dist_mat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,7 +73,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_pairwiseEqual", (DL_FUNC) &_alakazam_pairwiseEqual, 1},
     {"_alakazam_seqDistRcpp", (DL_FUNC) &_alakazam_seqDistRcpp, 3},
     {"_alakazam_pairwiseDistRcpp", (DL_FUNC) &_alakazam_pairwiseDistRcpp, 2},
-    {"_alakazam_subPairwiseDistRcpp", (DL_FUNC) &_alakazam_subPairwiseDistRcpp, 3},
+    {"_alakazam_nonsquareDistRcpp", (DL_FUNC) &_alakazam_nonsquareDistRcpp, 3},
     {NULL, NULL, 0}
 };
 

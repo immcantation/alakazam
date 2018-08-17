@@ -57,7 +57,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Collate: 
     'Alakazam.R'
     'AminoAcids.R'

@@ -256,9 +256,9 @@ NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
 }
 
 
-// subPairwiseDist
+// nonsquareDist
 // [[Rcpp::export]]
-NumericMatrix subPairwiseDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat)
+NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat)
 {
     // defien variables
     int m, n, i, j;
