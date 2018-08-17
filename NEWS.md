@@ -1,12 +1,13 @@
-Version 0.2.10.999:  July 24, 2018
+Version 0.2.10.999:  August 17, 2018
 -------------------------------------------------------------------------------
 
 General:
 
 + Added and exported `subPairwiseDist` function.
-
 + Exported some internal utility functions to make them available to dependent 
   packages: `progressBar`, `baseTheme`, `checkColumns` and `cpuCount`.
++ Added `fill` argument to `countGenes`. When set TRUE, adds zeros to `group` pairs 
+  that do not exist in data.
   
 Toplogy Analysis:
 
