@@ -417,7 +417,7 @@ phylipToGraph <- function(edges, clone) {
 #' dnapars application of the PHYLIP package.
 #' 
 #' @param    clone         \link{ChangeoClone} object containing clone data.
-#' @param    dnapars_exec  path to the PHYLIP dnapars executable.
+#' @param    dnapars_exec  absolute path to the PHYLIP dnapars executable.
 #' @param    dist_mat      Character distance matrix to use for reassigning edge weights. 
 #'                         Defaults to a Hamming distance matrix returned by \link{getDNAMatrix} 
 #'                         with \code{gap=0}. If gap characters, \code{c("-", ".")}, are assigned 
