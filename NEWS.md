@@ -1,4 +1,4 @@
-Version 0.2.10.999:  August 17, 2018
+Version 0.2.10.999:  August 27, 2018
 -------------------------------------------------------------------------------
 
 General:
@@ -14,6 +14,9 @@ Toplogy Analysis:
 
 + Fixed a bug in tableEdges causing it to fail when no parent/child 
   relationships exist when specifying `indirect=TRUE`.
++ `makeChangeoClone` will now issue an error and terminate, instead of 
+  continuing with a warning, when all sequences are not the same length.
+  
 
 Version 0.2.10:  March 30, 2018
 -------------------------------------------------------------------------------
