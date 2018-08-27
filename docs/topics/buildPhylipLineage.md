@@ -21,7 +21,7 @@ clone
 :   [ChangeoClone](ChangeoClone-class.md) object containing clone data.
 
 dnapars_exec
-:   path to the PHYLIP dnapars executable.
+:   absolute path to the PHYLIP dnapars executable.
 
 dist_mat
 :   Character distance matrix to use for reassigning edge weights. 

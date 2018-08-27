@@ -11,7 +11,7 @@ Usage
 --------------------
 ```
 countGenes(data, gene, groups = NULL, copy = NULL, clone = NULL,
-mode = c("gene", "allele", "family", "asis"))
+fill = FALSE, mode = c("gene", "allele", "family", "asis"))
 ```
 
 Arguments
@@ -40,6 +40,10 @@ sequence. If this value is specified, then genes will be counted only
 once for each clone. Note, this is accomplished by using the most 
 common gene within each `clone` identifier. As such,
 ambiguous alleles within a clone will not be accurately represented.
+
+fill
+:   logical of `c(TRUE, FALSE)` specifying when if groups (when specified)
+lacking a particular gene should be counted as 0 if TRUE or not (omitted)
 
 mode
 :   one of `c("gene", "family", "allele", "asis")` defining
@@ -92,6 +96,9 @@ copy="DUPCOUNT", mode="family")
 # Count by clone
 genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
 clone="CLONE", mode="family")
+
+# Count absent genes 
+genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = TRUE)
 ```
 
 

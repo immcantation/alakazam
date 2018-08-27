@@ -61,11 +61,11 @@ head(clones, 5)
 ## # Groups:   SAMPLE [1]
 ##   SAMPLE CLONE SEQ_COUNT SEQ_FREQ
 ##   <chr>  <chr>     <int>    <dbl>
-## 1 +7d    3128        100   0.100 
-## 2 +7d    3100         50   0.0500
-## 3 +7d    3141         44   0.0440
-## 4 +7d    3177         30   0.0300
-## 5 +7d    3170         28   0.0280
+## 1 +7d    3128        100    0.1  
+## 2 +7d    3100         50    0.05 
+## 3 +7d    3141         44    0.044
+## 4 +7d    3177         30    0.03 
+## 5 +7d    3170         28    0.028
 ```
 
 You may also specify a column containing the abundance count of each sequence 
@@ -180,7 +180,7 @@ print(sample_test)
 
 ```
 ##         test DELTA_MEAN DELTA_SD PVALUE
-## 1 -1h != +7d   520.7538 37.90251      0
+## 1 -1h != +7d   521.2854 37.14777      0
 ```
 
 
@@ -196,12 +196,12 @@ print(isotype_test)
 
 ```
 ##         test DELTA_MEAN  DELTA_SD PVALUE
-## 1 IgA != IgD  189.57967 10.937034      0
-## 2 IgA != IgG   26.49489  4.362663      0
-## 3 IgA != IgM  229.15972  7.024998      0
-## 4 IgD != IgG  163.08477 10.705093      0
-## 5 IgD != IgM   39.58005 12.570166      0
-## 6 IgG != IgM  202.66482  7.226409      0
+## 1 IgA != IgD  187.30718 11.923859      0
+## 2 IgA != IgG   26.87442  4.392204      0
+## 3 IgA != IgM  229.08072  7.012931      0
+## 4 IgD != IgG  160.43276 12.378512      0
+## 5 IgD != IgM   41.77354 13.636881      0
+## 6 IgG != IgM  202.20630  7.641174      0
 ```
 
 ```r

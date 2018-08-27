@@ -10,10 +10,10 @@ set of lineage trees, broken down by annotation value.
 Usage
 --------------------
 ```
-plotSubtrees(graphs, field, stat, root = "Germline", exclude = c("Germline",
-NA), colors = NULL, main_title = "Subtrees",
-legend_title = "Annotation", style = c("box", "violin"), silent = FALSE,
-...)
+plotSubtrees(graphs, field, stat, root = "Germline",
+exclude = c("Germline", NA), colors = NULL,
+main_title = "Subtrees", legend_title = "Annotation",
+style = c("box", "violin"), silent = FALSE, ...)
 ```
 
 Arguments

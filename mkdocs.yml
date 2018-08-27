@@ -65,6 +65,7 @@ pages:
     - 'Ig and TCR Sequence Annotation':
       - topics/countGenes.md
       - topics/sortGenes.md
+      - topics/groupGenes.md
       - topics/getSegment.md
       - topics/extractVRegion.md
     - 'Sequence Distance Calculation':
@@ -74,6 +75,7 @@ pages:
       - topics/seqEqual.md
       - topics/pairwiseDist.md
       - topics/pairwiseEqual.md
+      - topics/nonsquareDist.md
     - 'Amino Acid Propertes':
       - topics/aminoAcidProperties.md
       - topics/countPatterns.md

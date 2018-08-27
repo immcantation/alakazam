@@ -11,8 +11,8 @@ rarefaction and bootstrapping.
 Usage
 --------------------
 ```
-testDiversity(data, q, group, clone = "CLONE", copy = NULL, min_n = 30,
-max_n = NULL, nboot = 2000, progress = FALSE)
+testDiversity(data, q, group, clone = "CLONE", copy = NULL,
+min_n = 30, max_n = NULL, nboot = 2000, progress = FALSE)
 ```
 
 Arguments
@@ -129,12 +129,12 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d     478.95 18.13495      0
+1 -1h != +7d     479.08 16.44623      0
 
 Slot "summary":
     GROUP   MEAN       SD
--1h   -1h 819.62 11.06526
-+7d   +7d 340.67 13.43827
+-1h   -1h 818.32 12.72783
++7d   +7d 339.24 12.32073
 
 Slot "groups":
 [1] "-1h" "+7d"

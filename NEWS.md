@@ -7,8 +7,12 @@ General:
   sequences.
 + Exported some internal utility functions to make them available to dependent 
   packages: `progressBar`, `baseTheme`, `checkColumns` and `cpuCount`.
+
+Gene Usage:
+
 + Added `fill` argument to `countGenes`. When set TRUE, adds zeros to `group` 
   pairs that do not exist in data.
++ Added new function `groupGenes` to group sequences sharing same V and J gene.
   
 Toplogy Analysis:
 

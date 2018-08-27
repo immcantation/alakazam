@@ -280,6 +280,108 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 
 #### Utility functions ####
 
+
+
+
+#' Group sequences by gene assignment
+#'
+#' \code{groupGenes} will group rows by shared V and J gene assignments. 
+#' In the case of ambiguous (multiple) gene assignments, the grouping will
+#' be a union across all ambiguous V and J gene pairs, analagous to 
+#' single-linkage clustering (i.e., allowing for chaining).
+#'
+#' @param    data    data.frame containing sequence data.
+#' @param    v_call  name of the column containing the V-segment allele calls.
+#' @param    j_call  name of the column containing the J-segment allele calls.
+#' @param    first   if \code{TRUE} only the first call of the gene assignments 
+#'                   is used. if \code{FALSE} the union of ambiguous gene 
+#'                   assignments is used to group all sequences with any 
+#'                   overlapping gene calls.
+#'
+#' @return   Returns a modified \code{data} data.frame with union indices 
+#'           in the \code{VJ_GROUP} column.
+#'
+#' @details
+#' All rows containing \code{NA} valies in their \code{v_call} or \code{j_call} column will be removed. 
+#' A warning will be issued when a row containing an \code{NA} is removed.
+#' 
+#' Ambiguous gene assignments are assumed to be separated by commas.
+#' 
+#' @examples
+#' # Group by genes
+#' db <- groupGenes(ExampleDb)
+#'  
+#' @export
+groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE) {
+    # # STEP 0: Check V_CALL and J_CALL columns
+    # chek na(s)
+    int_nrow <- nrow(data)
+    data <- data[!is.na(data[[v_call]]), ]
+    data <- data[!is.na(data[[j_call]]), ]
+    fin_nrow <- nrow(data)
+    if (int_nrow - fin_nrow > 0) {
+        warning("NA(s) found in ", v_call, " or/and ", j_call , " columns. ", int_nrow - fin_nrow, " sequence(s) removed.\n")
+    }
+    
+    # begin parsing
+    if (first) {
+        data$V <- getGene(data[[v_call]], first=first)
+        data$J <- getGene(data[[j_call]], first=first)
+        data$VJ_GROUP <- data %>%
+            dplyr::group_by_(.dots = c("V", "J")) %>%
+            dplyr::group_indices()
+    } else {
+        # STEP 1: make a list of unique V and J combinations
+        data$V <- getGene(data[[v_call]], first=first)
+        data$J <- getGene(data[[j_call]], first=first)
+        v_ls <- strsplit(data$V, split=",")
+        j_ls <- strsplit(data$J, split=",")
+        vj_ls <- lapply(1:nrow(data), function(x) c(v_ls[[x]],j_ls[[x]]))
+        vj_ls <- unique(vj_ls)
+        m <- length(vj_ls)
+        # STEP 2: make groups map key
+        gr_ls <- rep(list(NA), m)
+        for (gr_id in 1:m) {
+            vj <- vj_ls[[gr_id]]
+            v <- vj[grepl("(IG[HLK]|TR[ABGD])V", vj)]
+            j <- vj[grepl("(IG[HLK]|TR[ABGD])J", vj)]
+            n <- length(gr_ls[!is.na(gr_ls)])
+            for (x in 1:n) {
+                if (1 > n) break
+                gr_v <- gr_ls[[x]][grepl("(IG[HLK]|TR[ABGD])V", gr_ls[[x]])]
+                gr_j <- gr_ls[[x]][grepl("(IG[HLK]|TR[ABGD])J", gr_ls[[x]])]
+                if (all(any(v %in% gr_v), 
+                        any(j %in% gr_j))) {
+                    v <- union(v, gr_v)
+                    j <- union(j, gr_j)
+                    gr_ls[[x]] <- NA
+                }
+            }
+            gr_ls[[gr_id]] <- c(v, j, gr_id)
+            gr_ls <- c(gr_ls[!is.na(gr_ls)], gr_ls[is.na(gr_ls)])
+        }
+        gr_ls <- gr_ls[!is.na(gr_ls)]
+        # STEP 3: assign V and J group ids
+        data$GROUP_TEMP <- NA
+        for (x in 1:m) {
+            v <- vj_ls[[x]][grepl("(IG[HLK]|TR[ABGD])V", vj_ls[[x]])]
+            j <- vj_ls[[x]][grepl("(IG[HLK]|TR[ABGD])J", vj_ls[[x]])]
+            for (y in gr_ls) {
+                if (all(any(v %in% y), any(j %in% y))) {
+                    data$GROUP_TEMP[data$V == paste(v, collapse=",") & data$J == paste(j, collapse=",")] <- y[length(y)]
+                    break
+                }
+            }
+        }
+        # STEP 4: fix group ids
+        data$VJ_GROUP <- data %>%
+            dplyr::group_by_(.dots = "GROUP_TEMP") %>%
+            dplyr::group_indices()
+    }
+    return(data[, !(names(data) %in% c("GROUP_TEMP", "V", "J"))])
+}
+
+
 #' Sort V(D)J genes
 #'
 #' \code{sortGenes} sorts a vector of V(D)J gene names by either lexicographic ordering 

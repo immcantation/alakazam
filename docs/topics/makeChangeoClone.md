@@ -15,8 +15,9 @@ Usage
 makeChangeoClone(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
 germ = "GERMLINE_IMGT_D_MASK", vcall = "V_CALL", jcall = "J_CALL",
 junc_len = "JUNCTION_LENGTH", clone = "CLONE", mask_char = "N",
-max_mask = 0, pad_end = FALSE, text_fields = NULL, num_fields = NULL,
-seq_fields = NULL, add_count = TRUE, verbose = FALSE)
+max_mask = 0, pad_end = FALSE, text_fields = NULL,
+num_fields = NULL, seq_fields = NULL, add_count = TRUE,
+verbose = FALSE)
 ```
 
 Arguments

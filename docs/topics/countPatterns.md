@@ -10,7 +10,8 @@ in a set of sequences.
 Usage
 --------------------
 ```
-countPatterns(seq, patterns, nt = FALSE, trim = FALSE, label = "REGION")
+countPatterns(seq, patterns, nt = FALSE, trim = FALSE,
+label = "REGION")
 ```
 
 Arguments

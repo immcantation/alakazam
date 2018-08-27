@@ -10,7 +10,8 @@ path lengths from the root of a lineage tree.
 Usage
 --------------------
 ```
-getPathLengths(graph, root = "Germline", field = NULL, exclude = NULL)
+getPathLengths(graph, root = "Germline", field = NULL,
+exclude = NULL)
 ```
 
 Arguments

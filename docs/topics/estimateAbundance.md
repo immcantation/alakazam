@@ -10,8 +10,8 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, group, clone = "CLONE", copy = NULL, ci = 0.95,
-nboot = 2000, progress = FALSE)
+estimateAbundance(data, group, clone = "CLONE", copy = NULL,
+ci = 0.95, nboot = 2000, progress = FALSE)
 ```
 
 Arguments

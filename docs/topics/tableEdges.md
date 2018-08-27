@@ -25,7 +25,7 @@ field
 indirect
 :   if `FALSE` count direct connections (edges) only. If 
 `TRUE` walk through any nodes with annotations specified in 
-the `exclude` argument to count indirect connections. Specifying
+the `argument` to count indirect connections. Specifying
 `indirect=TRUE` with `exclude=NULL` will have no effect.
 
 exclude
@@ -45,9 +45,6 @@ A data.frame defining total annotation connections in the tree with columns:
 + `CHILD`:   child annotation
 + `COUNT`:   count of edges for the parent-child relationship
 
-
-Returns `NULL` if no children are found, which may occur when 
-`indirect=TRUE`.
 
 
 
@@ -99,20 +96,19 @@ tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 
 ```R
 
-# Count indirect edges
-# Walks through germline, inferred, and nodes annotated as "IgA,IgG"
-tableEdges(graph, "ISOTYPE", indirect=TRUE, 
-exclude=c("Germline", "IgA,IgG", NA))
+# Count indirect edges walking through germline and inferred nodes
+tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
 
 ```
-# A tibble: 2 x 3
+# A tibble: 3 x 3
 # Groups:   PARENT [?]
-  PARENT CHILD COUNT
-  <chr>  <chr> <int>
-1 IgA    IgA       1
-2 IgA    IgG       3
+  PARENT  CHILD   COUNT
+  <chr>   <chr>   <int>
+1 IgA     IgA,IgG     1
+2 IgA,IgG IgA         1
+3 IgA,IgG IgG         3
 
 ```
 
