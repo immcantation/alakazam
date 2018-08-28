@@ -169,3 +169,19 @@ test_that("sortGenes",{
     expect_equal(sorted_locus, expected_locus)
     
 })
+
+### groupGenes ####
+test_that("groupGenes",{
+    # make a data frame
+    db <- data.frame(SEQUENCE_ID = c(1,2,3,4,5,6,7,8), 
+                     V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"), 
+                     J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"))
+    # group VJ genes
+    db <- groupGenes(db,
+                     v_call="V_CALL",
+                     j_call="J_CALL",
+                     first=F)
+    # test
+    expected <- c(2, 3, 2, 2, 2, 1, 2, 3) 
+    expect_equal(db$VJ_GROUP, expected)
+})
