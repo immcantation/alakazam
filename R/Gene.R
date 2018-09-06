@@ -64,7 +64,8 @@
 #'                     clone="CLONE", mode="family")
 #'
 #' # Count absent genes 
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = TRUE)
+#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
+#'                     mode="allele", fill=TRUE)
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
@@ -72,6 +73,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     ## DEBUG
     # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
     # data=subset(db, CLONE == 3138)
+    # Hack for visibility of dplyr variables
+    . <- NULL
     
     # Check input
     mode <- match.arg(mode)
@@ -124,7 +127,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
-    if(fill){
+    if (fill) {
         gene_tab <- gene_tab %>%
             ungroup() %>%
             complete_(as.list(c(groups, gene))) %>%
