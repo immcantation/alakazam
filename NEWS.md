@@ -15,8 +15,8 @@ Diversity:
 
 Gene Usage:
 
-+ Added `fill` argument to `countGenes`. When set TRUE, adds zeros to `group` 
-  pairs that do not exist in data.
++ Added `fill` argument to `countGenes`. When set `TRUE` this adds zeroes 
+  to the `group` pairs that do not exist in the data.
 + Added new function `groupGenes` to group sequences sharing same V and J gene.
   
 Toplogy Analysis:

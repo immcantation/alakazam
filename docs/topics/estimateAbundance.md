@@ -10,7 +10,7 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, group, clone = "CLONE", copy = NULL,
+estimateAbundance(data, group = NULL, clone = "CLONE", copy = NULL,
 ci = 0.95, nboot = 2000, progress = FALSE)
 ```
 
@@ -21,7 +21,9 @@ data
 :   data.frame with Change-O style columns containing clonal assignments.
 
 group
-:   name of the `data` column containing group identifiers.
+:   name of the `data` column containing group identifiers. 
+If `NULL` then no grouping is performed and the `GROUP` 
+column of the output will contain the value `NA` for each row.
 
 clone
 :   name of the `data` column containing clone identifiers.
@@ -51,7 +53,7 @@ Value
 A data.frame with relative clonal abundance data and confidence intervals,
 containing the following columns:
 
-+ `GROUP`:  group identifier.
++ `GROUP`:  group identifier. Will be codeNA if `group=NULL`.
 + `CLONE`:  clone identifier.
 + `P`:      relative abundance of the clone.
 + `LOWER`:  lower confidence inverval bound.
