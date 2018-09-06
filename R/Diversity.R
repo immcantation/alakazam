@@ -244,6 +244,45 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     return(clone_tab)
 }
 
+# Perform boostrap abundance calculation
+# 
+# @param    x      named vector of observed abundance values.
+# @param    n      number of samples to draw from the estimate complete abundance distribution.
+# @param    z      Confidence interval tail probability. Meaning, \code{ci + (1 - ci) / 2)}.
+# @param    nboot  number of bootstrap realizations.
+# 
+# @return   A data.frame summarizing abundance with columns:
+#           \itemize{
+#             \item \code{CLONE}:  clone identifier.
+#             \item \code{P}:      abundance (clonal frequency).
+#             \item \code{LOWER}:  lower confidence interval bound.
+#             \item \code{UPPER}:  upper confidence interval bound.
+#             \item \code{RANK}:   adundance rank.
+bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
+    # Calculate estimated complete abundance distribution
+    p1 <- adjustObservedAbundance(x)
+    p2 <- inferUnseenAbundance(x)
+    p <- c(p1, p2)
+    p2_names <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
+    names(p) <- c(names(x), p2_names)
+    
+    # Bootstrap abundance
+    boot_mat <- rmultinom(nboot, n, p) / n
+    
+    # Assign confidence intervals based on variance of bootstrap realizations
+    boot_sd <- apply(boot_mat, 1, sd)
+    boot_err <- qnorm(z) * boot_sd
+    p_lower <- pmax(p - boot_err, 0)
+    p_upper <- p + boot_err
+    
+    # Assemble and sort abundance data.frame
+    abund_df <- dplyr::data_frame(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
+    abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
+    abund_df$RANK <- 1:nrow(abund_df)
+    
+    return(abund_df)
+}
+
 
 #' Estimates the complete clonal relative abundance distribution
 #' 
@@ -251,7 +290,9 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' and confidence intervals on clone sizes using bootstrapping.
 #' 
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
-#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    group     name of the \code{data} column containing group identifiers. 
+#'                     If \code{NULL} then no grouping is performed and the \code{GROUP} 
+#'                     column of the output will contain the value \code{NA} for each row.
 #' @param    clone     name of the \code{data} column containing clone identifiers.
 #' @param    copy      name of the \code{data} column containing copy numbers for each 
 #'                     sequence. If \code{copy=NULL} (the default), then clone abundance
@@ -265,7 +306,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @return   A data.frame with relative clonal abundance data and confidence intervals,
 #'           containing the following columns:
 #'           \itemize{
-#'             \item  \code{GROUP}:  group identifier.
+#'             \item  \code{GROUP}:  group identifier. Will be code{NA} if \code{group=NULL}.
 #'             \item  \code{CLONE}:  clone identifier.
 #'             \item  \code{P}:      relative abundance of the clone.
 #'             \item  \code{LOWER}:  lower confidence inverval bound.
@@ -301,7 +342,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 #'
 #' @export
-estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95, 
+estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.95, 
                               nboot=2000, progress=FALSE) {
     ## DEBUG
     # group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
@@ -325,54 +366,51 @@ estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, ci=0.95,
             dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
     }
     
-    # Summarize groups
-    group_tab <- clone_tab %>%
-        group_by_(.dots=c(group)) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
-    group_set <- as.character(group_tab[[group]])
-    nsam <- setNames(group_tab$SEQUENCES, group_set)
-    
     # Set confidence interval
     ci_z <- ci + (1 - ci) / 2
     
-    # Generate diversity index and confidence intervals via resampling
-    if (progress) { 
-        pb <- progressBar(length(group_set))
-    }
-    abund_list <- list()
-    for (g in group_set) {
-        n <- nsam[g]
+    if (!is.null(group)) {
+        # Summarize groups
+        group_tab <- clone_tab %>%
+            group_by_(.dots=c(group)) %>%
+            dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
+        group_set <- as.character(group_tab[[group]])
+        nsam <- setNames(group_tab$SEQUENCES, group_set)
+
+        # Generate diversity index and confidence intervals via resampling
+        if (progress) { 
+            pb <- progressBar(length(group_set))
+        }
+        abund_list <- list()
+        for (g in group_set) {
+            n <- nsam[g]
+            
+            # Extract abundance vector
+            abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
+            names(abund_obs) <- clone_tab$CLONE[clone_tab[[group]] == g]
+     
+            # Infer complete abundance distribution
+            abund_list[[g]] <- bootstrapAbundance(abund_obs, n, z=ci_z, nboot=nboot)
+            
+            if (progress) { pb$tick() }
+        }
+        curve_df <- as.data.frame(bind_rows(abund_list, .id="GROUP"))
+    } else {
+        # Summarize counts
+        group_set <- as.character(NA)
+        nsam <- sum(clone_tab$COUNT, na.rm=TRUE)
+        
+        # Extract abundance vector
+        abund_obs <- clone_tab$COUNT
+        names(abund_obs) <- clone_tab$CLONE
         
         # Infer complete abundance distribution
-        # TODO:  can be a single function (wrapper) for both this and rarefyDiversity
-        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        p1 <- adjustObservedAbundance(abund_obs)
-        p2 <- inferUnseenAbundance(abund_obs)
-        p <- c(p1, p2)
-        p2_names <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
-        names(p) <- c(clone_tab$CLONE[clone_tab[[group]] == g], p2_names)
-        
-        # Bootstrap abundance
-        boot_mat <- rmultinom(nboot, n, p) / n
-        
-        # Assign confidence intervals based on variance of bootstrap realizations
-        boot_sd <- apply(boot_mat, 1, sd)
-        boot_err <- qnorm(ci_z) * boot_sd
-        p_lower <- pmax(p - boot_err, 0)
-        p_upper <- p + boot_err
-        
-        # Assemble and sort abundance data.frame
-        abund_df <- dplyr::data_frame(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
-        abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
-        abund_df$RANK <- 1:nrow(abund_df)
-        abund_list[[g]] <- abund_df
-        
-        if (progress) { pb$tick() }
+        curve_df <- bootstrapAbundance(abund_obs, nsam, z=ci_z, nboot=nboot)
+        curve_df$GROUP <- NA
     }
-    
     # Generate return object
     curve <- new("AbundanceCurve", 
-                 data=as.data.frame(bind_rows(abund_list, .id="GROUP")), 
+                 data=curve_df, 
                  groups=group_set, 
                  n=nsam,
                  nboot=nboot, 
@@ -922,7 +960,9 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     annotate <- match.arg(annotate)
     
     # Define group label annotations
-    if (annotate == "none") {
+    if (all(is.na(data@groups))) {
+        group_labels <- NA  
+    } else if (annotate == "none") {
         group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
         group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
@@ -932,26 +972,47 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    # Define base plot elements
-    p1 <- ggplot(data@data, aes_string(x="RANK", y="P", group="GROUP")) + 
-        ggtitle(main_title) + 
-        baseTheme() + 
-        xlab('Rank') +
-        ylab('Abundance') +
-        scale_x_log10(limits=xlim,
-                      breaks=scales::trans_breaks('log10', function(x) 10^x),
-                      labels=scales::trans_format('log10', scales::math_format(10^.x))) +
-        scale_y_continuous(labels=scales::percent) +
-        geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill="GROUP"), alpha=0.4) +
-        geom_line(aes_string(color="GROUP"))
-    
-    # Set colors and legend
-    if (!is.null(colors)) {
-        p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
-            scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
+    if (any(!is.na(data@groups))) {
+        # Define grouped plot
+        p1 <- ggplot(data@data, aes_string(x="RANK", y="P", group="GROUP")) + 
+            ggtitle(main_title) + 
+            baseTheme() + 
+            xlab('Rank') +
+            ylab('Abundance') +
+            scale_x_log10(limits=xlim,
+                          breaks=scales::trans_breaks('log10', function(x) 10^x),
+                          labels=scales::trans_format('log10', scales::math_format(10^.x))) +
+            scale_y_continuous(labels=scales::percent) +
+            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill="GROUP"), alpha=0.4) +
+            geom_line(aes_string(color="GROUP"))
+        
+        # Set colors and legend
+        if (!is.null(colors)) {
+            p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
+                scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
+        } else {
+            p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
+                scale_fill_discrete(name=legend_title, labels=group_labels)
+        }
     } else {
-        p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
-            scale_fill_discrete(name=legend_title, labels=group_labels)
+        # Set color
+        if (!is.null(colors) & length(colors) == 1) {
+            line_color <- colors
+        } else {
+            line_color <- "black"
+        }
+        # Define plot
+        p1 <- ggplot(data@data, aes_string(x="RANK", y="P")) + 
+            ggtitle(main_title) + 
+            baseTheme() + 
+            xlab('Rank') +
+            ylab('Abundance') +
+            scale_x_log10(limits=xlim,
+                          breaks=scales::trans_breaks('log10', function(x) 10^x),
+                          labels=scales::trans_format('log10', scales::math_format(10^.x))) +
+            scale_y_continuous(labels=scales::percent) +
+            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER"), fill=line_color, alpha=0.4) +
+            geom_line(color=line_color)
     }
     
     # Add additional theme elements

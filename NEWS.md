@@ -1,4 +1,4 @@
-Version 0.2.10.999:  August 27, 2018
+Version 0.2.11:  September 7, 2018
 -------------------------------------------------------------------------------
 
 General:
@@ -7,6 +7,11 @@ General:
   sequences.
 + Exported some internal utility functions to make them available to dependent 
   packages: `progressBar`, `baseTheme`, `checkColumns` and `cpuCount`.
+
+Diversity:
+
++ `estimateAbundance`, and `plotAbundanceCurve`, will now allow `group=NULL`
+  to be specified to performance abundance calculations on ungrouped data.
 
 Gene Usage:
 
