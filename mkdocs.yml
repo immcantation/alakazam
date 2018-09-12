@@ -1,4 +1,5 @@
 site_name: alakazam
+site_favicon: img/immcantation.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
 theme: readthedocs
 markdown_extensions:
