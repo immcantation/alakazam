@@ -17,11 +17,11 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
-Description: alakazam provides methods for high-throughput adaptive immune 
-            receptor repertoire sequencing (AIRR-Seq; Rep-Seq) analysis. In 
-            particular, immunoglobulin (Ig) sequence lineage reconstruction, 
-            diversity profiling, amino acid property analysis and gene or 
-            family usage.
+Description: Provides methods for high-throughput adaptive immune 
+    receptor repertoire sequencing (AIRR-Seq; Rep-Seq) analysis. In 
+    particular, immunoglobulin (Ig) sequence lineage reconstruction, 
+    lineage topology analysis, diversity profiling, amino acid property 
+    analysis and gene usage.
     Citations: 
     Gupta and Vander Heiden, et al (2017) <doi:10.1093/bioinformatics/btv359>,
     Stern, Yaari and Vander Heiden, et al (2014) <doi:10.1126/scitranslmed.3008879>.
