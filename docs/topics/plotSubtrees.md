@@ -93,9 +93,8 @@ Examples
 # Define example tree set
 graphs <- ExampleTrees[1-10]
 
-# Plot violins of outdegree by sample
-plotSubtrees(graphs, "SAMPLE", "out", main_title="Node outdegree", 
-style="v")
+# Violin plots of node outdegree by sample
+plotSubtrees(graphs, "SAMPLE", "out", style="v")
 
 ```
 
@@ -103,7 +102,7 @@ style="v")
 
 ```R
 
-# Plot violins of subtree by sample
+# Violin plots of subtree size by sample
 plotSubtrees(graphs, "SAMPLE", "size", style="v")
 
 ```
@@ -112,21 +111,11 @@ plotSubtrees(graphs, "SAMPLE", "size", style="v")
 
 ```R
 
-# Plot boxplot of pathlength by isotype
-plotSubtrees(graphs, "ISOTYPE", "path", colors=IG_COLORS, 
-legend_title="Isotype", style="b")
-
-```
-
-*Warning*:The following are missing from the 'colors' argument and will be colored grey: IgA,IgG IgD,IgG![7](plotSubtrees-7.png)
-
-```R
-
-# Plot boxplot of depth by isotype
+# Boxplot of node depth by isotype
 plotSubtrees(graphs,  "ISOTYPE", "depth", style="b")
 ```
 
-![9](plotSubtrees-9.png)
+![6](plotSubtrees-6.png)
 
 
 See also

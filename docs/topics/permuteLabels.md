@@ -46,9 +46,6 @@ library(igraph)
 
 *
 Attaching package: ‘igraph’
-**The following objects are masked from ‘package:dplyr’:
-
-    as_data_frame, groups, union
 **The following objects are masked from ‘package:stats’:
 
     decompose, spectrum
@@ -63,7 +60,7 @@ vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
-![7](permuteLabels-7.png)
+![6](permuteLabels-6.png)
 
 ```R
 
@@ -73,7 +70,7 @@ plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE,
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
-![9](permuteLabels-9.png)
+![8](permuteLabels-8.png)
 
 
 See also

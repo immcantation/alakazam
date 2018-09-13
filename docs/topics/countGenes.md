@@ -98,7 +98,8 @@ genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"),
 clone="CLONE", mode="family")
 
 # Count absent genes 
-genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele", fill = TRUE)
+genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
+mode="allele", fill=TRUE)
 ```
 
 
