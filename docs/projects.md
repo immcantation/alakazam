@@ -15,3 +15,5 @@ Related Projects
   physicochemical property analysis
 * [TIgGER](http://tigger.readthedocs.io) - 
   Polymorphism detection and genotyping
+* [RDI](http://rdi.readthedocs.io) - 
+  Repertoire Dissimilarity Index
