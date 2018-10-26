@@ -261,7 +261,7 @@ NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
 NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMatrix dist_mat)
 {
     // defien variables
-    int m, n, i, j, pos;
+    int m, n, i, j;
     std::string row_seq, col_seq;
     // extract the sizes. Note: This should be satisfied (n<=m)
     m = indx.size(); //number of rows
@@ -272,6 +272,11 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
     // sort and push indices back by 1 to match c++ indexing
     std::sort(indx.begin(), indx.end());
     indx = indx - 1;
+    // find the position of the column ids in the indx vector
+    NumericVector pos(n);
+    for (j = 0; j < n; j++) {
+        pos[j] = std::find(indx.begin(), indx.end(), j) - indx.begin();
+    }
     // begin filling rmat
     for (i = 0; i < m; i++) {
         row_seq = as<std::string>(seq[indx[i]]);     //row sequence 
@@ -281,8 +286,7 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
             else {
                 col_seq = as<std::string>(seq[j]); //col sequence
                 rmat(i,j) = seqDistRcpp(row_seq, col_seq, dist_mat);
-                pos = std::find(indx.begin(), indx.end(), j) - indx.begin();
-                if (pos < m) rmat(pos,indx[i]) = rmat(i,j);
+                if (pos[j] < m) rmat(pos[j],indx[i]) = rmat(i,j);
             }
         }
     }
