@@ -2,8 +2,8 @@ Download
 -------------------------------------------------------------------------------
 
 The latest stable release of Alakazam can be downloaded from 
-[CRAN](http://cran.rstudio.com/web/packages/alakazam) or 
-[Bitbucket](https://bitbucket.org/kleinstein/alakazam/downloads).
+<a href="http://cran.rstudio.com/web/packages/alakazam" target="_blank">CRAN</a>
+or <a href="https://bitbucket.org/kleinstein/alakazam/downloads" target="_blank">Bitbucket</a>.
 
 Installing Released Versions
 -------------------------------------------------------------------------------

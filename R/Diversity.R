@@ -257,7 +257,9 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #             \item \code{P}:      abundance (clonal frequency).
 #             \item \code{LOWER}:  lower confidence interval bound.
 #             \item \code{UPPER}:  upper confidence interval bound.
-#             \item \code{RANK}:   adundance rank.
+#             \item \code{RANK}:   adundance rank. Lower ranks correspond to higher abundance values.
+#                                  Ties of P get increasing rank values.
+#                                  
 bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
     # Calculate estimated complete abundance distribution
     p1 <- adjustObservedAbundance(x)
