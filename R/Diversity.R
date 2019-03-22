@@ -387,7 +387,7 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
             
             # Extract abundance vector
             abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-            names(abund_obs) <- clone_tab$CLONE[clone_tab[[group]] == g]
+            names(abund_obs) <- clone_tab[[clone]][clone_tab[[group]] == g]
      
             # Infer complete abundance distribution
             abund_list[[g]] <- bootstrapAbundance(abund_obs, n, z=ci_z, nboot=nboot)
@@ -402,7 +402,7 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
         
         # Extract abundance vector
         abund_obs <- clone_tab$COUNT
-        names(abund_obs) <- clone_tab$CLONE
+        names(abund_obs) <- clone_tab[[clone]]
         
         # Infer complete abundance distribution
         curve_df <- bootstrapAbundance(abund_obs, nsam, z=ci_z, nboot=nboot)

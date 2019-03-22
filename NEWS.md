@@ -1,5 +1,10 @@
-Version 0.2.11.999:  October 20, 2018
+Version 0.2.11.999:  March 22, 2019
 -------------------------------------------------------------------------------
+
+Diversity:
+
++ Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
+  non-default value produced an error.
 
 
 Version 0.2.11:  September 12, 2018
