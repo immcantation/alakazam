@@ -145,6 +145,17 @@ test_that("getSegment", {
     
     expect_equal(getFamily(nl_call, first=FALSE, omit_nl=TRUE),
                  c("IGHV3", "IGHV3", "IGHV1"))
+    
+    # Test for issue found in TIgGER
+    # If there's no allele info,
+    # getAllele should return the same input value
+    # Before the change in allele_regex used by getAllele,
+    # getAllele("TRAV38-2/DV8") returned TRAV38-2
+    # which in TIgGER introduced NAs and an error, as TRAV38-2 was not a valid name
+    # for the list of alleles, the valid name was TRAV38-2/DV8.
+    # getAllele("IGHV1-01") returned IGHV1-01
+    getAllele(getGene("IGHV1-01*02")) == getGene("IGHV1-01*02")
+    getAllele(getGene("TRAV38-2/DV8*01")) == getGene("TRAV38-2/DV8*01")
 })
 
 ### sortGenes ####

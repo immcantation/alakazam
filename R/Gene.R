@@ -249,7 +249,7 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
 #' @export
 getAllele <- function(segment_call, first=TRUE, collapse=TRUE, 
                       strip_d=TRUE, omit_nl=FALSE, sep=",") {    
-    allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*][\\.\\w]+)'
+    allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
     r <- getSegment(segment_call, allele_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
