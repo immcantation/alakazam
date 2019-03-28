@@ -182,17 +182,64 @@ test_that("sortGenes",{
 })
 
 ### groupGenes ####
-test_that("groupGenes",{
+test_that("groupGenes heavy only",{
     # make a data frame
     db <- data.frame(SEQUENCE_ID = c(1,2,3,4,5,6,7,8), 
                      V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"), 
-                     J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"))
+                     J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"),
+                     stringsAsFactors=F)
     # group VJ genes
     db <- groupGenes(db,
                      v_call="V_CALL",
                      j_call="J_CALL",
                      first=F)
     # test
-    expected <- c(2, 3, 2, 2, 2, 1, 2, 3) 
+    #expected <- c(2, 3, 2, 2, 2, 1, 2, 3)
+    # same underlying spirit as before
+    expected <- c("G1","G2","G1","G1","G1","G3","G1","G2")
     expect_equal(db$VJ_GROUP, expected)
 })
+
+test_that("groupGenes heavy and light", {
+    # load db with light chains
+    # by design: each row represents a cell; each cell could have multiple heavy and/or light chains
+    # (yes, in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
+    load(file.path("..", "data-tests", "db_with_light.rda")) 
+    
+    # manual deduction
+    # first=F/T
+    # 1 IGHV3-11
+    # 2 IGHV3-7; IGHV1-4
+    # 
+    # first=F
+    # 3-5 IGHV3-7, IGHJ5, 90, IGLV3-30, IGLJ3, 36
+    # first=T
+    # 3-4 IGHV3-7, IGHJ5, 90, IGLV3-30, IGLJ3, 36
+    # 5   IGHV3-7, IGHJ5, 90, IGLV2-20, IGLJ3, 36
+    # 
+    # first=F/T
+    # 6-9   IGHV4-59, IGHJ1, 84, IGKV1-27, IGKJ5, 39
+    # 10-11 IGHV4-59, IGHJ1, 84, IGKV1-6,  IGKJ4, 42
+    
+    # gg1 first=F
+    gg1_expect = c("G2", "G1", rep("G3", 3), rep("G4", 4), rep("G5", 2))
+    
+    # gg2 first=T
+    gg2_expect = c("G2", "G1", rep("G4", 2), "G3", rep("G5", 4), rep("G6", 2))
+    
+    
+    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=F,
+                      separator_within_seq=",", separator_between_seq=";", 
+                      single_cell_with_light=T, v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
+                      junc_len_heavy="LEN", junc_len_light="LEN_LIGHT")
+    
+    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=T,
+                      separator_within_seq=",", separator_between_seq=";", 
+                      single_cell_with_light=T, v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
+                      junc_len_heavy="LEN", junc_len_light="LEN_LIGHT")
+    
+    expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
+    expect_equal(gg2[["VJ_GROUP"]], gg2_expect)
+})
+
+
