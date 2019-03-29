@@ -362,7 +362,7 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 #' 
 #' @examples
 #' # Group by genes
-#' db <- groupGenes(ExampleDb)
+#' db <- groupGenes(data=ExampleDb)
 #'  
 #' @export
 groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
@@ -482,6 +482,8 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     
     for (i_orig in 1:nrow(data)) {
         
+        #if (i_orig %% 1000 == 0) { cat(i_orig, "\n") }
+        
         ## heavy
         cur_heavy_chains <- data[i_orig, cols_for_grouping_heavy]
         # matrix
@@ -574,28 +576,85 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
         
     }
     
+    exp_uniq <- sort(unique(unlist(exp_lst)))
+    n_cells_or_seqs <- length(exp_lst)
+    
+    # notes on implementation
+    
+    # regular/dense matrix is more straightforward to implement but very costly memory-wise
+    # sparse matrix is less straightforward to implement but way more memory efficient
+    
+    # sparse matrix is very slow to modify to on-the-fly (using a loop like for dense matrix)
+    # way faster to construct in one go
+    
+    # (DO NOT DELETE)
+    # for illustrating the concept 
+    # this is the way to go if using regular matrix (memory-intensive)
+    # same concept implemented using sparse matrix
+    
+    # mtx_cell_VJL <- matrix(0, nrow=nrow(data), ncol=length(exp_uniq))
+    # colnames(mtx_cell_VJL) <- exp_uniq
+    # 
+    # mtx_adj <- matrix(0, nrow=length(exp_uniq), ncol=length(exp_uniq))
+    # rownames(mtx_adj) <- exp_uniq
+    # colnames(mtx_adj) <- exp_uniq
+    # 
+    # for (i_cell in 1:length(exp_lst)) {
+    #     #if (i_cell %% 1000 == 0) { cat(i_cell, "\n") }
+    #     cur_uniq <- unique(exp_lst[[i_cell]])
+    #     mtx_cell_VJL[i_cell, cur_uniq] <- 1
+    #     mtx_adj[cur_uniq, cur_uniq] <- 1
+    # }
+    
+    # actual implementation using sparse matrix from Matrix package
+    
     ### matrix indicating relationship between cell and VJ(L) combinations
     # row: cell
     # col: unique heavy VJ(L) (and light VJ(L))
     
-    exp_uniq <- sort(unique(unlist(exp_lst)))
-    mtx_cell_VJL <- matrix(0, nrow=nrow(data), ncol=length(exp_uniq))
-    colnames(mtx_cell_VJL) <- exp_uniq
+    # row indices
+    m1_i <- lapply(1:length(exp_lst), function(i){rep(i, length(exp_lst[[i]]))})
+    m1_i_v <- unlist(m1_i)
+    
+    # column indices
+    m1_j <- lapply(exp_lst, function(x){
+        idx <- match(unique(x), exp_uniq)
+        #stopifnot( all.equal( exp_uniq[idx], unique(x) ) )
+    })
+    m1_j_v <- unlist(m1_j)
+    
+    stopifnot( length(m1_i_v) == length(m1_j_v) )
+    
+    # no particular need for this to be not of class "nsparseMatrix"
+    # so no need to specify x=rep(1, length(m1_i))
+    # not specifying makes it even more space-efficient
+    mtx_cell_VJL <- Matrix::sparseMatrix(i=m1_i_v, j=m1_j_v, 
+                                        dims=c(n_cells_or_seqs, length(exp_uniq)), 
+                                        symmetric=F, triangular=F, index1=T, 
+                                        dimnames=list(NULL, exp_uniq))
     
     ### adjacency matrix
     # row and col: unique heavy VJ(L) (and light VJ(L))
     
-    mtx_adj <- matrix(0, nrow=length(exp_uniq), ncol=length(exp_uniq))
-    rownames(mtx_adj) <- exp_uniq
-    colnames(mtx_adj) <- exp_uniq
+    # row indices
+    m2_i <- lapply(m1_j, function(x){ rep(x, each=length(x)) })
+    m2_i_v <- unlist(m2_i)
     
-    for (i_cell in 1:length(exp_lst)) {
-        cur_uniq <- unique(exp_lst[[i_cell]])
-        
-        mtx_cell_VJL[i_cell, cur_uniq] <- 1
-        
-        mtx_adj[cur_uniq, cur_uniq] <- 1
-    }
+    # col indices
+    m2_j <- lapply(m1_j, function(x){ rep(x, times=length(x)) })
+    m2_j_v <- unlist(m2_j)
+    
+    stopifnot( length(m2_i_v) == length(m2_j_v) )
+    
+    # important: x must be specified for mtx_adj in order to make it not of class "nsparseMatrix"
+    # this is because igraph accepts sparse matrix from Matrix but not the "pattern" matrices variant
+    mtx_adj <- Matrix::sparseMatrix(i=m2_i_v, j=m2_j_v, x=rep(1,length(m2_i_v)), 
+                                   dims=c(length(exp_uniq), length(exp_uniq)), 
+                                   symmetric=F, triangular=F, index1=T, 
+                                   dimnames=list(exp_uniq, exp_uniq))
+    mtx_adj <- mtx_adj>0
+    
+    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v, exp_lst)
     
     ### identify connected components based on adjcencey matrix
     # this is the grouping
@@ -610,26 +669,33 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     
     ### identify cells associated with each connected component (grouping)
     
-    # each entry corresponds to a group
+    # each entry corresponds to a group/partition
     # each element within an entry is a cell
-    bool_lst <- lapply(VJL_groups, function(x){ 
+    
+    cellIdx_byGroup_lst <- lapply(VJL_groups, function(x){ 
         if (length(x)>1) {
             # matrix
-            bool <- rowSums(mtx_cell_VJL[, x])>0
+            # important to specify rowSums from Matrix package
+            # base::rowSums will NOT work
+            cell_idx <- which(Matrix::rowSums(mtx_cell_VJL[, x])>0)
         } else {
             # vector
-            bool <- mtx_cell_VJL[, x]>0
+            cell_idx <- which(mtx_cell_VJL[, x]>0)
         }
-        return(bool)
+        return(cell_idx)
     })
     
-    # there should be a perfect partition (each cell has exactly one group assignment)
-    # row: cell; col: group
-    bool_mtx <- do.call(cbind, bool_lst)
-    stopifnot( all( rowSums(bool_mtx) == 1 ) )
+    # sanity check: there should be perfect/disjoint partitioning 
+    # (each cell has exactly one group assignment)
+    stopifnot( n_cells_or_seqs == length(unique(unlist(cellIdx_byGroup_lst))) )
     
-    # get the actual groups
-    data$VJ_GROUP <- apply(bool_mtx, 1, function(bool){ colnames(bool_mtx)[bool] })
+    # assign
+    data$VJ_GROUP <- NA
+    for (i in 1:length(cellIdx_byGroup_lst)) {
+        data[["VJ_GROUP"]][cellIdx_byGroup_lst[[i]]] <- names(VJL_groups)[i]
+    }
+    stopifnot(!any(is.na(data[["VJ_GROUP"]])))
+    
     return(data)
 }
 

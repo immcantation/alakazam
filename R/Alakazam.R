@@ -127,7 +127,9 @@
 #'                          make_graph make_directed_graph make_undirected_graph
 #'                          vertex_attr set_vertex_attr 
 #'                          degree shortest_paths all_shortest_paths distances
+#'                          graph_from_adjacency_matrix components groups
 #' @importFrom  lazyeval    interp
+#' @importFrom  Matrix      sparseMatrix rowSums
 #' @importFrom  progress    progress_bar
 #' @importFrom  readr       read_delim read_tsv write_delim write_tsv cols
 #' @importFrom  scales      log2_trans log10_trans trans_breaks trans_format
@@ -138,9 +140,10 @@
 #'                          dnorm pnorm qnorm rnorm
 #'                          dmultinom rmultinom
 #' @importFrom  stringi     stri_dup stri_flatten stri_join stri_length 
-#'                          stri_count_boundaries stri_count_regex 
-#'                          stri_extract_all_regex stri_extract_first_regex  
-#'                          stri_replace_all_regex stri_replace_first_regex
+#'                          stri_count_boundaries stri_count_fixed 
+#'                          stri_count_regex stri_extract_all_regex 
+#'                          stri_extract_first_regex stri_replace_all_regex 
+#'                          stri_replace_first_regex stri_split_fixed
 #'                          stri_pad_left stri_pad_right
 #' @importFrom  tidyr       complete_
 #' @importFrom  Rcpp evalCpp

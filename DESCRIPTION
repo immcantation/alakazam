@@ -42,6 +42,7 @@ Imports:
     grid,
     igraph (>= 1.0.0),
     lazyeval,
+    Matrix,
     methods,
     progress,
     Rcpp (>= 0.12.12),
