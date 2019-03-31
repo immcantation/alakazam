@@ -204,39 +204,55 @@ test_that("groupGenes heavy and light", {
     # load db with light chains
     # by design: each row represents a cell; each cell could have multiple heavy and/or light chains
     # (yes, in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
-    load(file.path("..", "data-tests", "db_with_light.rda")) 
+    load(file.path("..", "data-tests", "db_with_light.rda")) # data_t1
+    
+    # View(data_t1[, c("V_CALL", "J_CALL", "LEN", "V_CALL_LIGHT", "J_CALL_LIGHT", "LEN_LIGHT")])
     
     # manual deduction
-    # first=F/T
-    # 1 IGHV3-11
-    # 2 IGHV3-7; IGHV1-4
+    # 1 
+    # IGHV3-11 IGHJ4 93 IGKV1-39 IGLJ6 30
+    # 2 
+    # IGHV3-7 IGHJ1 24 IGLV2-11 IGLJ6 33
+    # IGHV3-6 IGHJ1 24 IGLV2-11 IGLJ6 33 (first=F)
+    # IGHV1-4 IGHJ3 27 IGLV2-11 IGLJ6 33
+    # IGHV1-4 IGHJ4 27 IGLV2-11 IGLJ6 33 (first=F)
+    # IGHV3-7 IGHJ1 24 IGKV2-13 IGLJ3 57
+    # IGHV3-6 IGHJ1 24 IGKV2-13 IGLJ3 57 (first=F)
+    # IGHV1-4 IGHJ3 27 IGKV2-13 IGLJ3 57
+    # IGHV1-4 IGHJ4 27 IGKV2-13 IGLJ3 57 (first=F)
     # 
-    # first=F
-    # 3-5 IGHV3-7, IGHJ5, 90, IGLV3-30, IGLJ3, 36
-    # first=T
-    # 3-4 IGHV3-7, IGHJ5, 90, IGLV3-30, IGLJ3, 36
-    # 5   IGHV3-7, IGHJ5, 90, IGLV2-20, IGLJ3, 36
+    # 3 IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36
+    # 4 IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36
+    # 5 IGHV3-7 IGHJ5 90 IGLV2-20 IGLJ3 36
+    #   IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36 (first=F)
     # 
-    # first=F/T
-    # 6-9   IGHV4-59, IGHJ1, 84, IGKV1-27, IGKJ5, 39
-    # 10-11 IGHV4-59, IGHJ1, 84, IGKV1-6,  IGKJ4, 42
+    # 6 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
+    #   IGHV4-59 IGHJ1 84 IGKV1-25 IGKJ3 60
+    # 7 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
+    # 8 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
+    # 9 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
+    # 
+    # 10 IGHV4-59 IGHJ1 84 IGKV1-6 IGKJ4 42
+    # 11 IGHV4-59 IGHJ1 84 IGKV1-6 IGKJ4 42
     
     # gg1 first=F
+    # 1 by itself; 2 by itself; 3-5 together; 6-9 together; 10-11 together
     gg1_expect = c("G2", "G1", rep("G3", 3), rep("G4", 4), rep("G5", 2))
     
     # gg2 first=T
+    # 1 by itself; 2 by itself; 3-4 together; 5 by itself; 6-9 together; 10-11 together
     gg2_expect = c("G2", "G1", rep("G4", 2), "G3", rep("G5", 4), rep("G6", 2))
     
     
-    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=F,
-                      separator_within_seq=",", separator_between_seq=";", 
-                      single_cell_with_light=T, v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
-                      junc_len_heavy="LEN", junc_len_light="LEN_LIGHT")
+    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=FALSE,
+                     separator_within_seq=",", separator_between_seq=";", 
+                     v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
+                     junc_len="LEN", junc_len_light="LEN_LIGHT")
     
-    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=T,
-                      separator_within_seq=",", separator_between_seq=";", 
-                      single_cell_with_light=T, v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
-                      junc_len_heavy="LEN", junc_len_light="LEN_LIGHT")
+    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=TRUE,
+                     separator_within_seq=",", separator_between_seq=";", 
+                     v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
+                     junc_len="LEN", junc_len_light="LEN_LIGHT")
     
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     expect_equal(gg2[["VJ_GROUP"]], gg2_expect)

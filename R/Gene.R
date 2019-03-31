@@ -260,11 +260,11 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @rdname getSegment
 #' @export
 getGene <- function(segment_call, first=TRUE, collapse=TRUE, 
-                    strip_d=TRUE, omit_nl=FALSE, sep=",") {
+                    strip_d=TRUE, omit_nl=FALSE, sep=",", unique=FALSE) {
     gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*)'
     r <- getSegment(segment_call, gene_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
-    
+    if (unique) { r <- unique(r) }
     return(r)
 }
 
@@ -283,7 +283,118 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 
 #### Utility functions ####
 
-
+# Get all VJ(L) combinations from one or more chains of the same type
+#
+# Input: 
+# V annotation, J annotation, and optionally junction length of
+# one of more chains of the same type
+# - v: V annotation
+# - j: J annotation
+# - l: junction length (optional)
+# - sep_chain: character separting multiple chains
+# - sep_anno: character separating multiple/ambiguous annotations within each chain
+# - first: to be passed to getGene()
+# 
+# Output:
+# A vector containing all unique VJ(L) combinations represented
+#
+# Assumption: 
+# 1) number of chains match across v, j, l
+# 2) if length value is supplied, each chain has a single length value
+#
+# Example input
+# v <- "Homsap IGLV2-20*09 F,Homsap IGLV3-30*09 F;Homsap IGKV1-27*01 F;Homsap IGKV1-25*01 F,Homsap IGKV1-25*38 F,Homsap IGKV1-32*02 F"
+# j <- "Homsap IGLJ3*02 F;Homsap IGKJ5*02 F;Homsap IGKJ3*03 F,Homsap IGKJ9*03 F"
+# l <- "36;39;60"
+# getAllVJL(v, j, l, ";", ",", FALSE)
+# - 3 light chains
+# - number of V annotations per chain: 2/1/3
+# - number of J annotations per chain: 1/1/2
+# - Expected supremum of the number of VJL combinations: 2*1 + 1*1 + 3*2 = 9
+# - Note that this is the supremum because the ACTUAL number (7) CAN be lower due to presence
+#   of different alleles from the SAME gene (since computation is performed at the gene level)
+getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
+    # is l NULL?
+    l_NULL <- is.null(l)
+    
+    # are there multiple chains?
+    # assumes that number of chains match across v, j, l
+    # (pre-checked in groupGenes)
+    multi_chain <- stringi::stri_detect_fixed(str=v, pattern=sep_chain)
+    
+    # are there multiple annotations per chain?
+    multi_anno_v <- stringi::stri_detect_fixed(str=v, pattern=sep_anno)
+    multi_anno_j <- stringi::stri_detect_fixed(str=j, pattern=sep_anno)
+    
+    # separate chains
+    # gets a vector of strings
+    # each vector entry corresponds to a chain
+    if (multi_chain) {
+        v <- stringi::stri_split_fixed(str=v, pattern=sep_chain)[[1]]
+        j <- stringi::stri_split_fixed(str=j, pattern=sep_chain)[[1]]
+        
+        if (!l_NULL) { l <- stringi::stri_split_fixed(str=l, pattern=sep_chain)[[1]] }
+    }
+    
+    # separate annotations
+    # gets a list
+    # each list entry has a vector of one or more strings
+    if (multi_anno_v) {
+        v <- stringi::stri_split_fixed(str=v, pattern=sep_anno)
+        # take care of 'first' here because getGene will not split by ","
+        if (first) { v <- lapply(v, function(x){x[1]}) }
+    }
+    if (multi_anno_j) {
+        j <- stringi::stri_split_fixed(str=j, pattern=sep_anno)
+        if (first) { j <- lapply(j, function(x){x[1]}) }
+    }
+    
+    # get gene
+    # gets a list
+    # each list entry corresponds to a chain, and is a vector of one or more strings
+    v <- sapply(v, getGene, unique=TRUE, simplify=FALSE, USE.NAMES=FALSE)
+    j <- sapply(j, getGene, unique=TRUE, simplify=FALSE, USE.NAMES=FALSE)
+    
+    # if there is multiple chains and/or multiple annotations
+    if ( multi_chain | (multi_anno_v & first) | (multi_anno_j & first) ) {
+        # gets a list
+        # each list entry is a vector of one or more strings
+        # do if/else outside sapply so it only gets evaluated once
+        if (!l_NULL) {
+            exp <- sapply(1:length(v), function(i){
+                #eg_df = expand.grid(v[[i]], j[[i]], l[i])
+                #eg_vec = apply(eg_df, 1, stringi::stri_paste, collapse="@")
+                n_v = length(v[[i]])
+                n_j = length(j[[i]])
+                eg_vec = stringi::stri_paste(rep.int(v[[i]], times=n_j),
+                                             rep(j[[i]], each=n_v),
+                                             rep.int(l[i], times=n_v*n_j),
+                                             sep="@")
+            }, simplify=FALSE, USE.NAMES=FALSE)
+        } else {
+            exp <- sapply(1:length(v), function(i){
+                #eg_df = expand.grid(v[[i]], j[[i]])
+                #eg_vec = apply(eg_df, 1, stringi::stri_paste, collapse="@")
+                n_v = length(v[[i]])
+                n_j = length(j[[i]])
+                eg_vec = stringi::stri_paste(rep.int(v[[i]], times=n_j),
+                                             rep(j[[i]], each=n_v),
+                                             sep="@")
+            }, simplify=FALSE, USE.NAMES=FALSE)
+        }
+        
+        # concat and convert to vector; keep distinct values
+        exp <- unique(unlist(exp, use.names=FALSE))
+    } else {
+        if (!l_NULL) {
+            exp <- stringi::stri_paste(v[[1]], j[[1]], l[1], sep="@")
+        } else {
+            exp <- stringi::stri_paste(v[[1]], j[[1]], sep="@")
+        }
+    }
+    
+    return(exp)
+}
 
 
 #' Group sequences by gene assignment
@@ -296,62 +407,75 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 #' be specified to be a union across all ambiguous V and J gene pairs, 
 #' analagous to single-linkage clustering (i.e., allowing for chaining).
 #'
-#' @param    data    data.frame containing sequence data.
-#' @param    v_call  name of the column containing the heavy chain V-segment allele calls.
-#' @param    j_call  name of the column containing the heavy chain J-segment allele calls.
-#' @param    first   if \code{TRUE} only the first call of the gene assignments 
-#'                   is used. if \code{FALSE} the union of ambiguous gene 
-#'                   assignments is used to group all sequences with any 
-#'                   overlapping gene calls.
-#' @param    separator_within_seq    a single character specifying the separator
-#'                                   between multiple annotations for a single
-#'                                   sequence. Defaults to \code{,}.
-#' @param    separator_between_seq   a single character specifying the separator
-#'                                   between multiple sequences. Defaults to \code{;}.
-#' @param    single_cell_with_light  a Boolean value specifying whether single-cell
-#'                                   mode with VH:VL paired BCR input is being supplied.
-#'                                   Defaults to \code{FALSE}.
+#' @param    data                    data.frame containing sequence data.
+#' @param    v_call                  name of the column containing the heavy chain V-segment 
+#'                                   allele calls.
+#' @param    j_call                  name of the column containing the heavy chain J-segment 
+#'                                   allele calls.
+#' @param    junc_len                name of the column containing the heavy chain junction
+#'                                   length. Optional.
+#' @param    first                   if \code{TRUE} only the first call of the gene assignments 
+#'                                   is used. if \code{FALSE} the union of ambiguous gene 
+#'                                   assignments is used to group all sequences with any 
+#'                                   overlapping gene calls.
 #' @param    v_call_light            name of the column containing the light chain V-segment
 #'                                   allele calls. Only applicable for single-cell mode.
 #' @param    j_call_light            name of the column containing the light chain J-segment
 #'                                   allele calls. Only applicable for single-cell mode.
-#' @param    junc_len_heavy          name of the column containing the heavy chain junction
-#'                                   length. Optional.
 #' @param    junc_len_light          name of the column containing the light chain junction
 #'                                   length. Optional and only applicable for single-cell mode.
+#' @param    separator_within_seq    a single character specifying the separator
+#'                                   between multiple annotations for a single
+#'                                   sequence. Defaults to \code{","}.
+#' @param    separator_between_seq   a single character specifying the separator
+#'                                   between multiple sequences. Defaults to \code{";"}.
 #'
-#' @return   Returns a modified \code{data} data.frame with union indices 
-#'           in the \code{VJ_GROUP} column.
+#' @return   Returns a modified data.frame with disjoint union indices 
+#'           in a new \code{VJ_GROUP} column. 
+#'           
+#'           Note that if \code{junc_len} (and \code{junc_len_light} for single-cell) 
+#'           is/are supplied, the grouping this \code{VJ_GROUP} will have been based on 
+#'           V, J, and L simultaneously despite the column name being \code{VJ_GROUP}.
 #'
 #' @details
-#' All rows containing \code{NA} valies in their \code{v_call}, \code{j_call},
-#' \code{v_call_light}, \code{j_call_light}, \code{junc_len_heavy}, \code{junc_len_light} 
-#' (if specified) columns will be removed. 
-#' A warning will be issued when a row containing an \code{NA} is removed.
+#' All rows containing \code{NA} values in their \code{v_call}, \code{j_call}, and, if
+#' specified, \code{v_call_light}, \code{j_call_light}, \code{junc_len}, and
+#' \code{junc_len_light} columns will be removed. A warning will be issued when a row 
+#' containing an \code{NA} is removed.
 #' 
-#' Ambiguous gene assignments are assumed to be separated by commas.
+#' By default, ambiguous gene assignments are assumed to be separated by commas. This
+#' can be specified otherwise via \code{separator_within_seq}.
 #' 
-#' @section Expectation for single-cell input with VH:VL pairing
-#' With \code{single_cell_with_light=TRUE}, it is assumed that 
+#' By supplying \code{junc_len} (and \code{junc_len_light} for single-cell), the call
+#' amounts to a 1-stage partitioning of the sequences/cells based on V annotation,
+#' J annotation, and junction length simultaneously. Without supplying these columns,
+#' the call amounts to the first stage of a 2-stage partitioning, in which
+#' sequences/cells are partitioned in the first stage based on V annotation and 
+#' J annotation, and then in the second stage further split based on junction length.
+#' 
+#' 
+#' @section Expectation for single-cell input:
+#' 
+#' For single-cell BCR data with VH:VL pairing, it is assumed that 
 #'   \itemize{
 #'      \item every row represents a single cell
-#'      \item each cell possibly contains multiple heavy and/pr light chains
-#'      \item multiple chains, if any, are separated by \code{separator_between_seq}
-#'            without any space
+#'      \item each cell possibly contains multiple heavy and/or light chains
+#'      \item multiple chains of the same type, if any, are separated by 
+#'            \code{separator_between_seq} without any space
+#'      \item every chain has its own V(D)J annotation, in which ambiguous V(D)J 
+#'            annotations, if any, are separated by \code{separator_within_seq}
 #'   }
 #'   
-#' Every chain must have its own V(D)J annotation. Example:
+#' An example:
+#'   \itemize{
+#'      \item A cell/row has 1 heavy chain (V and J annotations in \code{v_call} and \code{j_call}) 
+#'            and 2 light chains (V and J annotations in \code{v_call_light} and \code{j_call_light}).
+#'      \item V annotations for the light chains: \code{Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F;Homsap IGLV2-11*01 F}.
+#'      \item J annotations for the light chains: \code{Homsap IGLJ2*01 F;Homsap IGLJ3*01 F}.
+#'   }
 #' 
-#' A cell/row has 1 heavy chain and 2 light chains.
-#' 
-#' The two light chains are separated by \code{;}.   
-#' 
-#' V annotations for the light chains: \code{Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F;Homsap IGLV2-11*01 F}.
-#' 
-#' J annotations for the light chains: \code{Homsap IGLJ2*01 F;Homsap IGLJ3*01 F}.
-#' 
-#' Notice that for both the V and the J annotations, there is a \code{;} separating the 
-#' two annotations for the two light chains.
+#' Notice that for both the V and the J annotations, there is a \code{";"} separating 
+#' the two annotations for the two light chains.
 #' 
 #' It cannot be the case that there are 2 V annotations but only 1 J annotation for 
 #' the two light chains. Both J annotations must be spelled out for each light chain,
@@ -365,35 +489,43 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 #' db <- groupGenes(data=ExampleDb)
 #'  
 #' @export
-groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
-                       separator_within_seq=",", separator_between_seq=";", 
-                       single_cell_with_light=F, v_call_light, j_call_light, 
-                       junc_len_heavy=NULL, junc_len_light=NULL) {
+groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
+                       first=FALSE, 
+                       v_call_light=NULL, j_call_light=NULL, junc_len_light=NULL,
+                       separator_within_seq=",", separator_between_seq=";") {
     
-    # if using data in which each row represents a cell with both heavy and light chains
-    if (single_cell_with_light) {
+    # single-cell mode?
+    # each row represents a cell with both heavy and light chains
+    if ( !is.null(v_call_light) & !is.null(j_call_light) ) {
+        single_cell_with_light <- TRUE
         
-        # argument check for `v_call_light` and `j_call_light`
-        # must be specified
-        missing(v_call_light)
-        missing(j_call_light)
-        
-        # must be in colnames of `data`
+        # check that v/j_call_light in data
         if (!all( c(v_call_light, j_call_light) %in% colnames(data) )) {
             stop("v_call_light and/or j_call_light not found as a column in data")
+        }
+        
+        # check that junc_len_light, if set, is present
+        if (!is.null(junc_len_light)) {
+            if (!(junc_len_light %in% colnames(data))) {
+                stop(junc_len_light, " not found as a column in data")
+            }
         }
         
         # one-to-one annotation-to-chain correspondence for both V and J (light)
         # for each cell/row, number of bewteen_seq separators in light V annotation and in light J annotation must match
         n_separator_btw_seq_v_light <- stringi::stri_count_fixed(str=data[[v_call_light]], pattern=separator_between_seq)
         n_separator_btw_seq_j_light <- stringi::stri_count_fixed(str=data[[j_call_light]], pattern=separator_between_seq)
-        if (!all( n_separator_btw_seq_v_light == n_separator_btw_seq_j_light )) {
+        if (any( n_separator_btw_seq_v_light != n_separator_btw_seq_j_light )) {
             stop("Requirement not met: one-to-one annotation-to-chain correspondence for both V and J (light)")
         }
         
+    } else if ( is.null(v_call_light) & is.null(j_call_light) )  {
+        single_cell_with_light <- FALSE
+        
+        # explicitly (re)set to NULL, in case user set it to non-NULL by mistake
+        junc_len_light <- NULL
     } else {
-        v_call_light <- NULL
-        j_call_light <- NULL
+        stop("If using single-cell mode, both v_call_light and j_call_light must be set")
     }
     
     # one-to-one annotation-to-chain correspondence for both V and J (heavy)
@@ -402,183 +534,269 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     #  you never know if the user will supply this cell as input)
     n_separator_btw_seq_v_heavy <- stringi::stri_count_fixed(str=data[[v_call]], pattern=separator_between_seq)
     n_separator_btw_seq_j_heavy <- stringi::stri_count_fixed(str=data[[j_call]], pattern=separator_between_seq)
-    if (!all( n_separator_btw_seq_v_heavy == n_separator_btw_seq_j_heavy )) {
+    if (any( n_separator_btw_seq_v_heavy != n_separator_btw_seq_j_heavy )) {
         stop("Requirement not met: one-to-one annotation-to-chain correspondence for both V and J (heavy)")
     }
     
     # check existence of additional columns, if specified
-    if (!is.null(junc_len_heavy)) {
-        if (!junc_len_heavy %in% colnames(data)) {
-            stop("not all junc_len_heavy found as column(s) in data")
+    if (!is.null(junc_len)) {
+        if (!junc_len %in% colnames(data)) {
+            stop(junc_len, " not found as a column in data")
         }
     }
-    if (!is.null(junc_len_light)) {
-        if (!junc_len_light %in% colnames(data)) {
-            stop("not all junc_len_light found as column(s) in data")
-        }
-    }
-    
-    # # STEP 0: Check V_CALL and J_CALL columns
-    # chek na(s)
-    int_nrow <- nrow(data)
-    data <- data[!is.na(data[[v_call]]), ]
-    data <- data[!is.na(data[[j_call]]), ]
-    if (single_cell_with_light) {
-        data <- data[!is.na(data[[v_call_light]]), ]
-        data <- data[!is.na(data[[j_call_light]]), ]
-    }
-    if (!is.null(junc_len_heavy)) {
-        data <- data[!is.na(data[[junc_len_heavy]]), ]
-    }
-    if (!is.null(junc_len_light)) {
-        data <- data[!is.na(data[[junc_len_light]]), ]
-    }
-    fin_nrow <- nrow(data)
-    if (int_nrow - fin_nrow > 0) {
-        if (single_cell_with_light) {
-            msg <- paste0("NA(s) found in one or more of { ", 
-                          v_call, ", ", j_call, ", ", v_call_light, ", ", j_call_light, 
-                          ifelse(is.null(junc_len_heavy), "", ", "), junc_len_heavy,
-                          ifelse(is.null(junc_len_light), "", ", "), junc_len_light,
-                          " } columns. ", int_nrow - fin_nrow, " sequence(s) removed.\n")
-        } else {
-            msg <- paste0("NA(s) found in one or more of { ", 
-                          v_call, ", ", j_call, ifelse(is.null(junc_len_heavy), "", ", "), junc_len_heavy,
-                          " } columns. ", int_nrow - fin_nrow, " sequence(s) removed.\n")
-        }
-        warning(msg)
-    }
-    
-    ### expand
-    
-    # A1,A2;A3             [2 chains; 2/1 annotations per chain]
-    # B1,B2;B1,B2;B3;B1,B3 [4 chains; 2/2/1/2 annotations per chain]
-    
-    # want 2*(2+2+1+2) + 1*(2+2+1+2) = (2+1)*(2+2+1+2) = 21
-    
-    # assumes that there is only one junction length per chain
-    # (unlike annotations, which a chain could have multiple)
     
     # NULL will disappear when doing c()
     # c(NULL,NULL) gives NULL still
-    cols_for_grouping_heavy <- c(v_call, j_call, junc_len_heavy)
+    cols_for_grouping_heavy <- c(v_call, j_call, junc_len)
     cols_for_grouping_light <- c(v_call_light, j_call_light, junc_len_light)
     
     # cols cannot be factor
-    if (any( sapply(cols_for_grouping_heavy, function(x)class(data[[x]])) == "factor" )) {
+    if (any( sapply(cols_for_grouping_heavy, function(x){class(data[[x]]) == "factor"}) )) {
         stop("one or more of { ", v_call, ", ", j_call,  
-             ifelse(is.null(junc_len_heavy), " ", ", "), junc_len_heavy, 
+             ifelse(is.null(junc_len), " ", ", "), junc_len, 
              "} is factor. Must be character.\n")
     }
-    if (!is.null(cols_for_grouping_light)) {
-        if (any( sapply(cols_for_grouping_light, function(x)class(data[[x]])) == "factor" )) {
+    if (single_cell_with_light) {
+        if (any( sapply(cols_for_grouping_light, function(x) {class(data[[x]]) == "factor"}) )) {
             stop("one or more of { ", v_call_light, ", ", j_call_light,  
                  ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
                  "} is factor. Must be character.\n")
         }  
     }
     
-    exp_lst <- vector(mode="list", length=nrow(data))
+    # Check NA(s) in columns
+    bool_na <- rowSums( is.na( data[, c(cols_for_grouping_heavy, cols_for_grouping_light)] ) ) >0
+    if (any(bool_na)) {
+        msg <- paste0("NA(s) found in one or more of { ", 
+                      v_call, ", ", j_call, 
+                      ifelse(is.null(junc_len), "", ", "), junc_len,
+                      ifelse(is.null(v_call_light), "", ", "), v_call_light,
+                      ifelse(is.null(j_call_light), "", ", "), j_call_light,
+                      ifelse(is.null(junc_len_light), "", ", "), junc_len_light,
+                      " } columns. ", sum(bool_na), " sequence(s) removed.\n")
+        warning(msg)
+        data <- data[!bool_na, ]              
+    }
+
+    ### expand
     
-    for (i_orig in 1:nrow(data)) {
+    # speed-up strategy
+    # compute expanded VJL combos for unique rows
+    # then distribute back to all rows
+    
+    # unique combinations of VJL
+    if (!single_cell_with_light) {
+        combo_unique <- unique(data[, cols_for_grouping_heavy])
         
-        #if (i_orig %% 1000 == 0) { cat(i_orig, "\n") }
+        # unique components
+        v_unique <- unique(combo_unique[[v_call]])
+        j_unique <- unique(combo_unique[[j_call]])
         
-        ## heavy
-        cur_heavy_chains <- data[i_orig, cols_for_grouping_heavy]
-        # matrix
-        # each column is a chain
-        # rows: V, J, (L)
-        cur_heavy_chains_split <- stringi::stri_split_fixed(str=cur_heavy_chains, pattern=separator_between_seq, simplify=T)
+        # map each row in full data to unique combo
+        m_v = match(data[[v_call]], v_unique)
+        m_j = match(data[[j_call]], j_unique)
         
-        
-        if (first) {
-            # get gene name
-            cur_heavy_chains_split[1:2, ] <- getGene(cur_heavy_chains_split[1:2, ], first=TRUE)
-            cur_heavy_chains_split_total <- ncol(cur_heavy_chains_split)
+        if (is.null(junc_len)) {
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v = which( v_unique == combo_unique[[v_call]][i] )
+                idx_j = which( j_unique == combo_unique[[j_call]][i] )
+                idx = which(m_v==idx_v & m_j==idx_j)
+            }, simplify=FALSE, USE.NAMES=FALSE) 
         } else {
-            # get gene name
-            cur_heavy_chains_split[1:2, ] <- getGene(cur_heavy_chains_split[1:2, ], first=FALSE)
-            # number of expansion per chain
-            cur_heavy_chains_split_num <- sapply(1:ncol(cur_heavy_chains_split), function(i_chain){ 
-                (stringi::stri_count_fixed(str=cur_heavy_chains_split[1,i_chain], pattern=separator_within_seq)+1) * 
-                    (stringi::stri_count_fixed(str=cur_heavy_chains_split[2,i_chain], pattern=separator_within_seq)+1) })
-            # number of expanded
-            cur_heavy_chains_split_total <- sum(cur_heavy_chains_split_num)
+            l_unique <- unique(combo_unique[[junc_len]])
+            m_l = match(data[[junc_len]], l_unique)
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v = which( v_unique == combo_unique[[v_call]][i] )
+                idx_j = which( j_unique == combo_unique[[j_call]][i] )
+                idx_l = which( l_unique == combo_unique[[junc_len]][i] )
+                idx = which(m_v==idx_v & m_j==idx_j & m_l==idx_l)
+            }, simplify=FALSE, USE.NAMES=FALSE)
         }
         
-        cur_heavy_chains_exp <- rep(NA, length(cur_heavy_chains_split_total))
-        i_exp <- 1
-        for (i_chain in 1:ncol(cur_heavy_chains_split)) {
-            v_i_chain <- stringi::stri_split_fixed(str=cur_heavy_chains_split[1, i_chain], pattern=separator_within_seq, simplify=F)[[1]]
-            j_i_chain <- stringi::stri_split_fixed(str=cur_heavy_chains_split[2, i_chain], pattern=separator_within_seq, simplify=F)[[1]]
-            
-            for (ii_v in 1:length(v_i_chain)) {
-                for (ii_j in 1:length(j_i_chain)) {
-                    cur_heavy_chains_exp[i_exp] <- paste( v_i_chain[ii_v], j_i_chain[ii_j], 
-                                                          ifelse(nrow(cur_heavy_chains_split)==3, cur_heavy_chains_split[3, i_chain], ""), 
-                                                          sep="@")
-                    i_exp <- i_exp+1
-                }
-            }
-        }
-        
-        
-        if (single_cell_with_light) {
-            
-            ## light
-            
-            cur_light_chains <- data[i_orig, cols_for_grouping_light]
-            # matrix
-            # each column is a chain
-            # rows: V, J, (L)
-            cur_light_chains_split <- stringi::stri_split_fixed(str=cur_light_chains, pattern=separator_between_seq, simplify=T)
-            
-            if (first) {
-                # get gene name
-                cur_light_chains_split[1:2, ] <- getGene(cur_light_chains_split[1:2, ], first=TRUE)
-                cur_light_chains_split_total <- ncol(cur_light_chains_split)
-            } else {
-                # get gene name
-                cur_light_chains_split[1:2, ] <- getGene(cur_light_chains_split[1:2, ], first=FALSE)
-                # number of expansion per chain
-                cur_light_chains_split_num <- sapply(1:ncol(cur_light_chains_split), function(i_chain){ 
-                    (stringi::stri_count_fixed(str=cur_light_chains_split[1,i_chain], pattern=separator_within_seq)+1) * 
-                        (stringi::stri_count_fixed(str=cur_light_chains_split[2,i_chain], pattern=separator_within_seq)+1) })
-                # number of expanded
-                cur_light_chains_split_total <- sum(cur_light_chains_split_num)
-            }
-            
-            cur_light_chains_exp <- rep(NA, length(cur_light_chains_split_total))
-            i_exp <- 1
-            for (i_chain in 1:ncol(cur_light_chains_split)) {
-                v_i_chain <- stringi::stri_split_fixed(str=cur_light_chains_split[1, i_chain], pattern=separator_within_seq, simplify=F)[[1]]
-                j_i_chain <- stringi::stri_split_fixed(str=cur_light_chains_split[2, i_chain], pattern=separator_within_seq, simplify=F)[[1]]
-                
-                for (ii_v in 1:length(v_i_chain)) {
-                    for (ii_j in 1:length(j_i_chain)) {
-                        cur_light_chains_exp[i_exp] <- paste( v_i_chain[ii_v], j_i_chain[ii_j], 
-                                                              ifelse(nrow(cur_light_chains_split)==3, cur_light_chains_split[3, i_chain], ""), 
-                                                              sep="@")
-                        i_exp <- i_exp+1
-                    }
-                }
-            }
-            
-            ## pair with heavy
-            cur_all <- expand.grid(cur_heavy_chains_exp, cur_light_chains_exp, stringsAsFactors=FALSE)
-            cur_all_cat <- sapply(1:nrow(cur_all), function(x){paste0(cur_all[x,], collapse="@")})
+        # expand combo_unique
+        if (is.null(junc_len)) {
+            exp_lst <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=F, USE.NAMES=FALSE)
         } else {
-            cur_all_cat <- cur_heavy_chains_exp
+            exp_lst <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=combo_unique[[junc_len]][i], first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=F, USE.NAMES=FALSE)
+        }
+
+    } else {
+        # important: do not do this separately for heavy and light
+        # must keep the pairing structure
+        combo_unique <- unique(data[, c(cols_for_grouping_heavy, cols_for_grouping_light)])
+        
+        # unique components
+        v_unique_h <- unique(combo_unique[[v_call]])
+        j_unique_h <- unique(combo_unique[[j_call]])
+        v_unique_l <- unique(combo_unique[[v_call_light]])
+        j_unique_l <- unique(combo_unique[[j_call_light]])
+        
+        # map each row in full data to unique combo
+        m_v_h = match(data[[v_call]], v_unique_h)
+        m_j_h = match(data[[j_call]], j_unique_h)
+        m_v_l = match(data[[v_call_light]], v_unique_l)
+        m_j_l = match(data[[j_call_light]], j_unique_l)
+        
+        if (!is.null(junc_len)) {
+            l_unique_h <- unique(combo_unique[[junc_len]])
+            m_l_h = match(data[[junc_len]], l_unique_h)
+        }
+        if (!is.null(junc_len_light)) {
+            l_unique_l <- unique(combo_unique[[junc_len_light]])
+            m_l_l = match(data[[junc_len_light]], l_unique_l)
         }
         
-        exp_lst[[i_orig]] <- cur_all_cat
+        # expand combo_unique
+        if (is.null(junc_len) & is.null(junc_len_light)) {
+            
+            # map
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v_h = which( v_unique_h == combo_unique[[v_call]][i] )
+                idx_j_h = which( j_unique_h == combo_unique[[j_call]][i] )
+                idx_v_l = which( v_unique_l == combo_unique[[v_call_light]][i] )
+                idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
+                idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_v_l==idx_v_l & m_j_l==idx_j_l)
+            }, simplify=FALSE, USE.NAMES=FALSE) 
+            
+            # heavy
+            exp_h <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            # light
+            exp_l <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+
+            
+        } else if (!is.null(junc_len) & !is.null(junc_len_light)) {
+            
+            # map
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v_h = which( v_unique_h == combo_unique[[v_call]][i] )
+                idx_j_h = which( j_unique_h == combo_unique[[j_call]][i] )
+                idx_l_h = which( l_unique_h == combo_unique[[junc_len]][i] )
+                idx_v_l = which( v_unique_l == combo_unique[[v_call_light]][i] )
+                idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
+                idx_l_l = which( l_unique_l == combo_unique[[junc_len_light]][i] )
+                idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
+                            m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
+            }, simplify=FALSE, USE.NAMES=FALSE) 
+            
+            # heavy
+            exp_h <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=combo_unique[[junc_len]][i], first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            # light
+            exp_l <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
+                          l=combo_unique[[junc_len_light]][i], first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+
+        } else if (is.null(junc_len) & !is.null(junc_len_light)) {
+            
+            # map
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v_h = which( v_unique_h == combo_unique[[v_call]][i] )
+                idx_j_h = which( j_unique_h == combo_unique[[j_call]][i] )
+                idx_v_l = which( v_unique_l == combo_unique[[v_call_light]][i] )
+                idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
+                idx_l_l = which( l_unique_l == combo_unique[[junc_len_light]][i] )
+                idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & 
+                            m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
+            }, simplify=FALSE, USE.NAMES=FALSE) 
+            
+            # heavy
+            exp_h <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            # light
+            exp_l <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
+                          l=combo_unique[[junc_len_light]][i], first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            
+        } else if (!is.null(junc_len) & is.null(junc_len_light)) {
+            
+            # map
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
+                idx_v_h = which( v_unique_h == combo_unique[[v_call]][i] )
+                idx_j_h = which( j_unique_h == combo_unique[[j_call]][i] )
+                idx_l_h = which( l_unique_h == combo_unique[[junc_len]][i] )
+                idx_v_l = which( v_unique_l == combo_unique[[v_call_light]][i] )
+                idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
+                idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
+                            m_v_l==idx_v_l & m_j_l==idx_j_l)
+            }, simplify=FALSE, USE.NAMES=FALSE) 
+            
+            # heavy
+            exp_h <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=combo_unique[[junc_len]][i], first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            # light
+            exp_l <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            
+        }
+        
+        # pair heavy & light
+        stopifnot( length(exp_h) == length(exp_l) )
+        exp_lst <- sapply(1:length(exp_h), function(i){
+            n_h <- length(exp_h[[i]])
+            n_l <- length(exp_l[[i]])
+            stringi::stri_paste(rep.int(exp_h[[i]], times=n_l),
+                                rep(exp_l[[i]], each=n_h),
+                                sep="@")
+        }, simplify=FALSE, USE.NAMES=FALSE)
         
     }
     
-    exp_uniq <- sort(unique(unlist(exp_lst)))
-    n_cells_or_seqs <- length(exp_lst)
+    # one-to-one correspondence btw exp_lst and combo_unique_full_idx
+    # exp_lst: VJL combinations
+    # combo_unique_full_idx: rows in data carrying each exp_lst
+    # exp_lst may not be all unique because gene-level info is kept instead of allele-level
+    # make exp_lst unique
     
+    exp_lst_uniq <- unique(exp_lst)
+    exp_lst_uniq_full_idx <- sapply(exp_lst_uniq, function(x){
+        # wrt exp_lst, therefore also wrt combo_unique_full_idx
+        idx_lst <- which(unlist(lapply(exp_lst, function(y){ 
+            length(y)==length(x) && all(y==x) 
+        })))
+        # merge
+        
+        unlist(combo_unique_full_idx[idx_lst], use.names=FALSE)
+    }, simplify=FALSE, USE.NAMES=FALSE)
+    
+    stopifnot( length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data) )
+    
+    # tip: unlist with use.names=F makes it much faster (>100x)
+    # https://www.r-bloggers.com/speed-trick-unlist-use-namesfalse-is-heaps-faster/
+    exp_uniq <- sort(unique(unlist(exp_lst_uniq, use.names=FALSE)))
+    n_cells_or_seqs <- nrow(data)
+
     # notes on implementation
     
     # regular/dense matrix is more straightforward to implement but very costly memory-wise
@@ -599,7 +817,8 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     # rownames(mtx_adj) <- exp_uniq
     # colnames(mtx_adj) <- exp_uniq
     # 
-    # for (i_cell in 1:length(exp_lst)) {
+    # outdated:
+    # for (i_cell in 1:length(exp_lst)) { 
     #     #if (i_cell %% 1000 == 0) { cat(i_cell, "\n") }
     #     cur_uniq <- unique(exp_lst[[i_cell]])
     #     mtx_cell_VJL[i_cell, cur_uniq] <- 1
@@ -613,15 +832,20 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     # col: unique heavy VJ(L) (and light VJ(L))
     
     # row indices
-    m1_i <- lapply(1:length(exp_lst), function(i){rep(i, length(exp_lst[[i]]))})
-    m1_i_v <- unlist(m1_i)
-    
-    # column indices
-    m1_j <- lapply(exp_lst, function(x){
-        idx <- match(unique(x), exp_uniq)
-        #stopifnot( all.equal( exp_uniq[idx], unique(x) ) )
+    m1_i <- lapply(1:length(exp_lst_uniq), function(i){
+        rep(exp_lst_uniq_full_idx[[i]], each=length(exp_lst_uniq[[i]]))
     })
-    m1_j_v <- unlist(m1_j)
+    m1_i_v <- unlist(m1_i, use.names=FALSE)
+
+    # column indices
+    m1_j <- lapply(1:length(exp_lst_uniq), function(i){
+        # wrt exp_uniq
+        idx <- match(exp_lst_uniq[[i]], exp_uniq)
+        #stopifnot( all.equal( exp_uniq[idx], exp_lst_uniq[[i]] ) )
+        
+        rep.int(idx, length(exp_lst_uniq_full_idx[[i]]))
+    })
+    m1_j_v <- unlist(m1_j, use.names=FALSE)
     
     stopifnot( length(m1_i_v) == length(m1_j_v) )
     
@@ -637,12 +861,24 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     # row and col: unique heavy VJ(L) (and light VJ(L))
     
     # row indices
-    m2_i <- lapply(m1_j, function(x){ rep(x, each=length(x)) })
-    m2_i_v <- unlist(m2_i)
+    m2_i <- lapply(1:length(exp_lst_uniq), function(i){
+        # wrt exp_uniq
+        idx <- match(exp_lst_uniq[[i]], exp_uniq)
+        #stopifnot( all.equal( exp_uniq[idx], exp_lst_uniq[[i]] ) )
+        
+        rep(idx, each=length(exp_lst_uniq[[i]]))
+    })
+    m2_i_v <- unlist(m2_i, use.names=FALSE)
     
     # col indices
-    m2_j <- lapply(m1_j, function(x){ rep(x, times=length(x)) })
-    m2_j_v <- unlist(m2_j)
+    m2_j <- lapply(1:length(exp_lst_uniq), function(i){
+        # wrt exp_uniq
+        idx <- match(exp_lst_uniq[[i]], exp_uniq)
+        #stopifnot( all.equal( exp_uniq[idx], exp_lst_uniq[[i]] ) )
+        
+        rep.int(idx, length(exp_lst_uniq[[i]]))
+    })
+    m2_j_v <- unlist(m2_j, use.names=FALSE)
     
     stopifnot( length(m2_i_v) == length(m2_j_v) )
     
@@ -652,7 +888,6 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
                                    dims=c(length(exp_uniq), length(exp_uniq)), 
                                    symmetric=F, triangular=F, index1=T, 
                                    dimnames=list(exp_uniq, exp_uniq))
-    mtx_adj <- mtx_adj>0
     
     rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v, exp_lst)
     
@@ -687,7 +922,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", first=FALSE,
     
     # sanity check: there should be perfect/disjoint partitioning 
     # (each cell has exactly one group assignment)
-    stopifnot( n_cells_or_seqs == length(unique(unlist(cellIdx_byGroup_lst))) )
+    stopifnot( n_cells_or_seqs == length(unique(unlist(cellIdx_byGroup_lst, use.names=FALSE))) )
     
     # assign
     data$VJ_GROUP <- NA
