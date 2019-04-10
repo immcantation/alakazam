@@ -721,6 +721,183 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     return(div)
 }
 
+#' Computes generalized alpha, beta, gamma diversity 
+#'
+#' \code{generalizeDiversity} parses a Change-O table, selects a mode for diversity calculation
+#' bootstraps the calculation, and calculates diversity using a choice of hill index, possible
+#' rarefaction and using corrections for unseen species.
+
+generalizeDiversity <- function(DF, sample, status = NULL, clone="CLONE", 
+    rarefy = FALSE, generalization = c("alpha", "beta_rdi", "beta_pair"), q = 0, nboot = 20){
+    
+    diversity <- function(DF, sample=1000, clone="CLONE", q=0){
+        #Note, setting sample does nothing
+        
+        #Abundance curve
+        abund_obs <- DF %>% 
+            group_by_(.dots=c(clone)) %>%
+            dplyr::summarize(COUNT=n()) %>%
+            select(COUNT) %>% unlist()
+        
+        #Chao estimator
+        abund_inf <- c(adjustObservedAbundance(abund_obs)
+                   ,inferUnseenAbundance(abund_obs))
+        
+        #Hill diversity
+        div <- calcDiversity(abund_inf, q=q)
+        
+        return(div)
+    }
+
+    diversity_rarefy <- function(DF, sample=1000, clone="CLONE", q=0){
+    
+        #Abundance curve
+        abund_obs <- DF %>% 
+            sample_n(sample) %>%
+            group_by_(.dots=c(clone)) %>%
+            dplyr::summarize(COUNT=n()) %>%
+            select(COUNT) %>% unlist()
+        
+        #Chao estimator
+        abund_inf <- c(adjustObservedAbundance(abund_obs)
+                   ,inferUnseenAbundance(abund_obs))
+        
+        #Hill diversity
+        div <- calcDiversity(abund_inf, q=q)
+        
+        return(div)
+    }
+
+    # check generalization arguments
+    generalization <- match.arg(generalization)
+    to_boot <- DF
+    
+    # define the diversity function if rarefaction is used
+    if(rarefy){
+        div_func <- diversity_rarefy
+    } else{
+        div_func <- diversity
+    }
+
+    if(is.null(status)){
+        # create dummy status
+        status <- "STATUS"
+        to_boot[[status]] <- factor('1', levels='1')
+    } 
+    
+    # convert to factors for boot::boot
+    to_boot[[sample]] <- factor(to_boot[[sample]], levels=unique(to_boot[[sample]]))
+    to_boot[[status]] <- factor(to_boot[[status]], levels=unique(to_boot[[status]]))
+
+    if(generalization == "alpha"){
+        if(rarefy){min_depth <- min(table(to_boot[[sample]]))}
+        
+        # diversity bootstrap function
+        boot_diversity <- function(DF, idx) {
+
+            div <- DF[idx,] %>%
+                group_by_(.dots=c(sample, status)) %>%
+                do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
+                ungroup() %>%
+                group_by_(.dots=c(status)) %>%
+                summarize(RESULT = mean(as.numeric(RESULT))) %>%
+                ungroup() %>%
+                select(RESULT) %>%
+                unlist()
+
+            return(div)
+        }
+        
+    } else if(generalization == "beta_rdi"){
+        #zeta diversity https://www.journals.uchicago.edu/doi/10.1086/678125
+        
+        if(rarefy){min_depth <- min(table(to_boot[[status]]))}
+        
+        # diversity bootstrap function
+        boot_diversity <- function(DF, idx) {
+                
+            alpha <- DF[idx,] %>%
+                mutate_(SAMPLE_CLONE=interp(~paste(x, y,sep='_'), x=as.name(sample), y=as.name(clone))) %>%
+                group_by_(.dots=c(status)) %>%
+                do(RESULT = div_func(., sample = min_depth, clone="SAMPLE_CLONE", q=q)) %>%
+                ungroup() %>%
+                group_by_(.dots=c(status)) %>%
+                summarize(RESULT = mean(as.numeric(RESULT))) %>%
+                ungroup() %>%
+                select(RESULT) %>%
+                unlist()
+
+            gamma <- DF[idx,] %>%
+                group_by_(.dots=c(status)) %>%
+                do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
+                ungroup() %>%
+                select(RESULT) %>%
+                unlist()
+
+            div <- sapply(alpha, function(a,g) g/a, gamma)
+
+            return(div)
+        }
+
+    } else if(generalization == "beta_pair"){
+        samples <- levels(to_boot[[sample]])
+        
+        # find the min sampling depth if rarefying (if not, div_func will take the argument but do nothing)
+        counts <- c()
+        colnames <- c()
+        for(s1 in samples){
+            for(s2 in samples){
+                if(s1 != s2){
+                    counts <- c(counts, dim(filter(DF, SAMPLE %in% c(s1,s2)))[1])
+                    colnames <- c(colnames, paste(s1, s2, sep = '-')) 
+                }
+            }
+        }
+        min_depth <- min(counts)
+    
+        # diversity bootstrap function
+        boot_diversity <- function(DF, idx) {
+
+            div <- c()
+            for(s1 in samples){
+                for(s2 in samples){
+                    if(s1 != s2){
+                        alpha <- DF[idx,] %>%
+                            filter(.[[sample]] %in% c(s1, s2)) %>%
+                            mutate_(SAMPLE_CLONE=interp(~paste(x, y,sep='_'), x=as.name(sample), y=as.name(clone))) %>%
+                            do(RESULT = div_func(., sample = min_depth,  clone="SAMPLE_CLONE", q=q)) %>%
+                            ungroup() %>%
+                            summarize(RESULT = mean(as.numeric(RESULT))) %>%
+                            ungroup() %>%
+                            select(RESULT) %>%
+                            unlist()
+                        gamma <- DF[idx,] %>%
+                            filter(.[[sample]] %in% c(s1, s2)) %>%
+                            do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
+                            select(RESULT) %>%
+                            unlist()
+                        div <- c(div, gamma - alpha)                        
+                    }
+                    
+                }
+            }
+            return(div)
+        }
+    }
+    
+    # compute bootstrap 
+    b_clone = boot(to_boot, boot_diversity, R=nboot, strata=to_boot[[sample]])
+    boot_df <- data.frame(b_clone$t)
+    
+    # output bootstrap dataframe
+    if(generalization != "beta_pair"){
+        colnames(boot_df) <- levels(to_boot[[status]])
+    } else {
+        colnames(boot_df) <- colnames
+    }
+
+    return(boot_df)
+}                
 
 #' Pairwise test of the diversity index
 #' 
