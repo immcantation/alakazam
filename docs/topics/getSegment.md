@@ -21,7 +21,7 @@ strip_d = TRUE, omit_nl = FALSE, sep = ",")
 ```
 ```
 getGene(segment_call, first = TRUE, collapse = TRUE, strip_d = TRUE,
-omit_nl = FALSE, sep = ",")
+omit_nl = FALSE, sep = ",", unique = FALSE)
 ```
 ```
 getFamily(segment_call, first = TRUE, collapse = TRUE,

@@ -26,6 +26,7 @@ pages:
     - 'File I/O':
       - topics/readChangeoDb.md
       - topics/writeChangeoDb.md
+      - topics/readIgphyml.md
     - 'Sequence Cleaning and Manipulation':
       - topics/collapseDuplicates.md
       - topics/maskSeqEnds.md

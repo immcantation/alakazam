@@ -1,16 +1,16 @@
-**read.igphyml** - *Read in output from IgPhyML*
+**readIgphyml** - *Read in output from IgPhyML*
 
 Description
 --------------------
 
-`read.igphyml` reads output from the IgPhyML phylogenetics inference package for 
+`readIgphyml` reads output from the IgPhyML phylogenetics inference package for 
 B cell repertoires
 
 
 Usage
 --------------------
 ```
-read.igphyml(file, id = NULL, igraph = TRUE, collapse = TRUE)
+readIgphyml(file, id = NULL, igraph = TRUE, collapse = TRUE)
 ```
 
 Arguments
@@ -62,8 +62,8 @@ For this row, `NSEQ` is the total number of sequences,
 `TREE_LENGTH` is the mean tree length. For most 
 applications, parameter values will be the same for all 
 lineages within the repertoire, so access them simply by:
-`<object>$parm$OMEGA_CDR_MLE[1]` to, for instance,
-get the estimate of dN/dS at the repertoire level.
+`<object>$param$OMEGA_CDR_MLE[1]` to, for instance,
+get the estimate of dN/dS on the CDRs at the repertoire level.
 + `trees`:     List of tree objects estimated by IgPhyML. If 
 `igraph=TRUE` these are igraph `graph` objects. 
 If `igraph=TRUE`, these are ape `phylo` objects.
@@ -75,7 +75,7 @@ If `igraph=TRUE`, these are ape `phylo` objects.
 Details
 -------------------
 
-`read.igphyml` reads output from the IgPhyML repertoire phylogenetics inference package. 
+`readIgphyml` reads output from the IgPhyML repertoire phylogenetics inference package. 
 The resulting object is divded between parameter estimates (usually under the HLP19 model),
 which provide information about mutation and selection pressure operating on the sequences.
 
@@ -106,14 +106,10 @@ Examples
 
 ```R
 ### Not run:
-s1 = read.igphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab",id="+7d")
-
-```
-
-*Warning*:cannot open file 'IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab': No such file or directory**Error in file(file, "rt")**: cannot open the connection
-```R
-#  print(s1$param$OMEGA_CDR_MLE[1])
-#  plot(s1$trees[[1]],layout=layout_as_tree,edge.label=E(s1$trees[[1]])$weight)
+library(igraph)
+# s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+# print(s1$param$OMEGA_CDR_MLE[1])
+# plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 ```
 
 

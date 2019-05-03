@@ -148,6 +148,6 @@
 #'                          stri_detect_fixed stri_paste
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root
 #' @importFrom  tidyr       complete_
-#' @importFrom  Rcpp evalCpp
+#' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

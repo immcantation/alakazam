@@ -618,24 +618,25 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
 # of the true UCA of the tree by removing the node specified as the \code{uca}
 # attribute from rerootGermline.
 #
-# @param   t  An ape \code{phylo} object which has been processed through 
-#             rerootGermine.
-phylo2igraph <- function(t){
-    names <- 1:length(unique(c(t$edge[,1],t$edge[,2])))
-    for(i in 1:length(t$tip.label)){
-        names[i] <- t$tip.label[i]
+# @param   phylo  An ape \code{phylo} object which has been processed through 
+#                 rerootGermine.
+phyloToGraph <- function(phylo) {
+    names <- 1:length(unique(c(phylo$edge[, 1],phylo$edge[, 2])))
+    for(i in 1:length(phylo$tip.label)){
+        names[i] <- phylo$tip.label[i]
     }
-    d <- data.frame(cbind(t$edge,t$edge.length))
-    names(d)=c("from","to","weight")
+    d <- data.frame(cbind(phylo$edge,phylo$edge.length))
+    names(d)=c("from", "to", "weight")
 
-    germnode <- which(t$tip.label == t$germid)
-    d[d$from == t$uca,]$from <- germnode
-    d <- d[!(d$from == germnode & d$to == germnode),]
+    germnode <- which(phylo$tip.label == phylo$germid)
+    d[d$from == phylo$uca, ]$from <- germnode
+    d <- d[!(d$from == germnode & d$to == germnode),] 
 
     d$to <- as.character(d$to)
     d$from <- as.character(d$from)
     g <- igraph::graph_from_data_frame(d)
     igraph::V(g)$name <- names[as.numeric(igraph::V(g)$name)]
+    
     return(g)
 }
 
@@ -649,15 +650,15 @@ phylo2igraph <- function(t){
 # @param   resolve  If \code{TRUE} reroots tree to specified germline sequnece.
 #                   usually not necessary with IgPhyML trees analyzed with HLP model.
 rerootGermline <- function(tree, germid, resolve=TRUE){
-    if(resolve){
+    if(resolve) {
         tree <- ape::root(phy=tree, outgroup=germid, resolve.root=T, edge.label=TRUE)
     }
     tree <- ape::reorder.phylo(tree, "postorder")  
     edges <- tree$edge
     rootnode <- which(tree$tip.label==germid)
-    rootedge <- which(edges[,2] == rootnode)
-    rootanc <- edges[edges[,2] == rootnode,1]
-    mrcaedge <- which(edges[,1] == rootanc & edges[,2] != rootnode)
+    rootedge <- which(edges[, 2] == rootnode)
+    rootanc <- edges[edges[, 2] == rootnode, 1]
+    mrcaedge <- which(edges[, 1] == rootanc & edges[, 2] != rootnode)
     if(length(mrcaedge) > 1){
             print("POLYTOMY AT ROOT?!")
             quit(save="no", status=1, runLast=FALSE)
@@ -671,7 +672,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 
 #' Read in output from IgPhyML
 #' 
-#' \code{read.igphyml} reads output from the IgPhyML phylogenetics inference package for 
+#' \code{readIgphyml} reads output from the IgPhyML phylogenetics inference package for 
 #' B cell repertoires
 #' 
 #' @param    file          IgPhyML output file (.tab)
@@ -717,7 +718,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'           }
 #'           
 #' @details
-#' \code{read.igphyml} reads output from the IgPhyML repertoire phylogenetics inference package. 
+#' \code{readIgphyml} reads output from the IgPhyML repertoire phylogenetics inference package. 
 #' The resulting object is divded between parameter estimates (usually under the HLP19 model),
 #' which provide information about mutation and selection pressure operating on the sequences.
 #' 
@@ -740,35 +741,37 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'
 #' @examples
 #' \dontrun{
-#'  library(igraph)
-#'  s1 = read.igphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab",id="+7d")
-#'  print(s1$param$OMEGA_CDR_MLE[1])
-#'  plot(s1$trees[[1]],layout=layout_as_tree,edge.label=E(s1$trees[[1]])$weight)
+#'    library(igraph)
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    print(s1$param$OMEGA_CDR_MLE[1])
+#'    plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 #' }
 #' 
 #' @export
-read.igphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
     out <- list()
     trees <- list()
-    t <- read.table(file,sep="\t",head=TRUE,stringsAsFactors=FALSE)
-    params <- t[,!names(t)%in%c("TREE")]
+    df <- read.table(file, sep="\t", head=TRUE, stringsAsFactors=FALSE)
+    params <- df[, !names(df) %in% c("TREE")]
     out[["param"]] <- params
-    out[["command"]] <- t[1,]$TREE
-    for(i in 2:nrow(t)){
-        tree <- ape::read.tree(text=t[i,]$TREE)
-        rtree <- rerootGermline(tree,paste0(t[i,]$CLONE,"_GERM"))
+    out[["command"]] <- df[1, ]$TREE
+    for(i in 2:nrow(df)){
+        tree <- ape::read.tree(text=df[i, ]$TREE)
+        rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"))
         if(collapse){
-            rtree$edge.length <- round(rtree$edge.length*t[i,]$NSITE,digits=1)
-            rtree <- ape::di2multi(rtree,tol=0.1)
+            rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
+            rtree <- ape::di2multi(rtree, tol=0.1)
         }
         if(igraph){
-            ig <- phylo2igraph(rtree)
-            trees[[t[i,]$CLONE]] <- ig
+            ig <- phyloToGraph(rtree)
+            trees[[df[i, ]$CLONE]] <- ig
         }else{
-            trees[[t[i,]$CLONE]] <- tree
+            trees[[df[i, ]$CLONE]] <- tree
         }
     }
+    
     out[["trees"]] <- trees
     out[["id"]] <- id
+    
     return(out)
 }
