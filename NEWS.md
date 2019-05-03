@@ -1,11 +1,15 @@
 Version 0.2.11.999:  March 22, 2019
 -------------------------------------------------------------------------------
 
+General:
+
++ Added `read.igphyml` to Lineage.R to read in IgPhyML output, with accompanying
+  functions `rerootGermline` and `phylo2igraph`
+
 Diversity:
 
 + Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
   non-default value produced an error.
-
 
 Version 0.2.11:  September 12, 2018
 -------------------------------------------------------------------------------

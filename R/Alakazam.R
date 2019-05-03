@@ -125,7 +125,7 @@
 #'                          transmute transmute_ rename rename_
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
-#'                          vertex_attr set_vertex_attr 
+#'                          vertex_attr set_vertex_attr
 #'                          degree shortest_paths all_shortest_paths distances
 #'                          graph_from_adjacency_matrix components groups
 #' @importFrom  lazyeval    interp
@@ -146,6 +146,7 @@
 #'                          stri_replace_first_regex stri_split_fixed
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
+#' @importFrom	ape 		read.tree di2multi reorder.phylo root
 #' @importFrom  tidyr       complete_
 #' @importFrom  Rcpp evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
