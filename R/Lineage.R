@@ -823,16 +823,17 @@ readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
 #' 
 #' @export
 combineIgphyml <- function(iglist, format="wide") {
-    ordered_params <- c("ID","NSEQ","NSITE","LHOOD","TREE_LENGTH",
-        "OMEGA_FWR_MLE","OMEGA_FWR_LCI","OMEGA_FWR_UCI",
-        "OMEGA_CDR_MLE","OMEGA_CDR_LCI","OMEGA_CDR_UCI",
-        "KAPPA_MLE","KAPPA_LCI","KAPPA_UCI",
-        "WRC_2_MLE","WRC_2_LCI","WRC_2_UCI",
-        "GYW_0_MLE","GYW_0_LCI","GYW_0_UCI",
-        "WA_1_MLE","WA_1_LCI","WA_1_UCI",
-        "TW_0_MLE","TW_0_LCI","TW_0_UCI",
-        "SYC_2_MLE","SYC_2_LCI","SYC_2_UCI",
-        "GRS_0_MLE","GRS_0_LCI","GRS_0_UCI")
+    ordered_params <- c(
+        "ID", "NSEQ", "NSITE", "LHOOD", "TREE_LENGTH", 
+        "OMEGA_FWR_MLE", "OMEGA_FWR_LCI", "OMEGA_FWR_UCI", 
+        "OMEGA_CDR_MLE", "OMEGA_CDR_LCI", "OMEGA_CDR_UCI", 
+        "KAPPA_MLE", "KAPPA_LCI", "KAPPA_UCI", 
+        "WRC_2_MLE", "WRC_2_LCI", "WRC_2_UCI", 
+        "GYW_0_MLE", "GYW_0_LCI", "GYW_0_UCI", 
+        "WA_1_MLE", "WA_1_LCI", "WA_1_UCI", 
+        "TW_0_MLE", "TW_0_LCI", "TW_0_UCI", 
+        "SYC_2_MLE", "SYC_2_LCI", "SYC_2_UCI", 
+        "GRS_0_MLE", "GRS_0_LCI", "GRS_0_UCI")
     paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
     params <- names(paramCount[paramCount == max(paramCount)])
     params <- ordered_params[ordered_params %in% params]
@@ -840,11 +841,11 @@ combineIgphyml <- function(iglist, format="wide") {
         message <- "ID not specified in objects. Use 'ID' flag in readIgphyml."
         stop(message)
     }
-    repertoires <- lapply(iglist, function(x) x$param[1,params])
+    repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
     if(format == "long"){
-        combined <- reshape2::melt(combined,id.vars=c("ID"))
-        combined$variable <- factor(combined$variable,levels=params)
+        combined <- reshape2::melt(combined, id.vars=c("ID"))
+        combined$variable <- factor(combined$variable, levels=params)
     }
     combined
 }
