@@ -89,6 +89,7 @@ pages:
     - 'Miscellaneous':
       - topics/baseTheme.md
       - topics/checkColumns.md
+      - topics/combineIgphyml.md
       - topics/cpuCount.md
       - topics/gridPlot.md
       - topics/makeTempDir.md

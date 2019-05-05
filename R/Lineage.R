@@ -676,7 +676,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' B cell repertoires
 #' 
 #' @param    file          IgPhyML output file (.tab)
-#' @param    id            ID to assign to output object
+#' @param    ID            ID to assign to output object
 #' @param    igraph        if \code{TRUE} return trees as igraph \code{graph} objects. Otherwise,
 #'                         return trees as ape \code{phylo} objects.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
@@ -714,7 +714,6 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'                                      \code{igraph=TRUE} these are igraph \code{graph} objects. 
 #'                                      If \code{igraph=TRUE}, these are ape \code{phylo} objects.
 #'             \item  \code{command}:   Command used to run IgPhyML.
-#'             \item  \code{id}:        Optional name given to object.
 #'           }
 #'           
 #' @details
@@ -742,13 +741,13 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' @examples
 #' \dontrun{
 #'    library(igraph)
-#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
 #'    print(s1$param$OMEGA_CDR_MLE[1])
 #'    plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
+readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
     out <- list()
     trees <- list()
     df <- read.table(file, sep="\t", head=TRUE, stringsAsFactors=FALSE)
@@ -771,7 +770,81 @@ readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
     }
     
     out[["trees"]] <- trees
-    out[["id"]] <- id
+
+    if(!is.null(ID)){
+        out$param$ID = ID
+    }
     
     return(out)
+}
+
+#' Combine IgPhyML object parameters into a dataframe
+#' 
+#' \code{combineIgphyml} combines IgPhyML object parameters into a dataframe
+#' 
+#' @param    iglist        list of igphyml objects (see readIgphyml). Each must have
+#'                         an \code{ID} column in its \code{param} attribute, which
+#'                         can be added automatically using the \code{ID} option of 
+#'                         \code{readIgphyml}
+#' @param   format         string specifying whether each column of the resulting data
+#'                         frame should represent a parameter (\code{wide}) or if 
+#'                         there should only be three columns; i.e. ID, varable, and value
+#'                         (\code{long}).
+#'                                                
+#' @return   A dataframe containing HLP model parameter estimates for all igphyml objects.
+#'           Only parameters shared among all objects will be returned.
+#'           
+#' @details
+#' \code{combineIgphyml} combines repertoire-wide parameter estimates from mutliple igphyml
+#' objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
+#' other hypothesis testing analyses.
+#' 
+#' All igphyml objects used must have an "ID" column in their \code{param} attribute, which
+#' can be added automatically from the \code{ID} flag of \code{readIgphyml}. 
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hoehn KB, Lunter G, Pybus OG - A Phylogenetic Codon Substitution Model for Antibody 
+#'              Lineages. Genetics 2017 206(1):417-427
+#'              https://doi.org/10.1534/genetics.116.196303 
+#'  \item  Hoehn KB, Vander Heiden JA, Zhou JQ, Lunter G, Pybus OG, Kleinstein SHK - 
+#'              Repertoire-wide phylogenetic models of B cell molecular evolution reveal 
+#'              evolutionary signatures of aging and vaccination. bioRxiv 2019  
+#'              https://doi.org/10.1101/558825 
+#' }
+#'
+#' @examples
+#' \dontrun{
+#'    library(igraph)
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
+#'    s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="s2")
+#'    combineIgphyml(list(s1,s2))
+#' }
+#' 
+#' @export
+combineIgphyml <- function(iglist, format="wide") {
+    ordered_params <- c("ID","NSEQ","NSITE","LHOOD","TREE_LENGTH",
+        "OMEGA_FWR_MLE","OMEGA_FWR_LCI","OMEGA_FWR_UCI",
+        "OMEGA_CDR_MLE","OMEGA_CDR_LCI","OMEGA_CDR_UCI",
+        "KAPPA_MLE","KAPPA_LCI","KAPPA_UCI",
+        "WRC_2_MLE","WRC_2_LCI","WRC_2_UCI",
+        "GYW_0_MLE","GYW_0_LCI","GYW_0_UCI",
+        "WA_1_MLE","WA_1_LCI","WA_1_UCI",
+        "TW_0_MLE","TW_0_LCI","TW_0_UCI",
+        "SYC_2_MLE","SYC_2_LCI","SYC_2_UCI",
+        "GRS_0_MLE","GRS_0_LCI","GRS_0_UCI")
+    paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
+    params <- names(paramCount[paramCount == max(paramCount)])
+    params <- ordered_params[ordered_params %in% params]
+    if(sum(params == "ID") == 0){
+        message <- "ID not specified in objects. Use 'ID' flag in readIgphyml."
+        stop(message)
+    }
+    repertoires <- lapply(iglist, function(x) x$param[1,params])
+    combined <- dplyr::bind_rows(repertoires)
+    if(format == "long"){
+        combined <- reshape2::melt(combined,id.vars=c("ID"))
+        combined$variable <- factor(combined$variable,levels=params)
+    }
+    combined
 }

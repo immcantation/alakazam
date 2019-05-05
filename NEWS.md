@@ -5,7 +5,8 @@ General:
 
 Lineage:
 
-+ Added `readIgphyml` to read in IgPhyML output.
++ Added `readIgphyml` to read in IgPhyML output, and `combineIgphyml` to 
+  combine parameter estimates across samples.
 
 Diversity:
 
