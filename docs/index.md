@@ -33,7 +33,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 # Dependencies
 
 **Depends:** ggplot2  
-**Imports:** ape, dplyr, graphics, grid, igraph, lazyeval, Matrix, methods, progress, Rcpp, readr, reshape2, scales, seqinr, stats, stringi, tidyr, utils  
+**Imports:** ape, dplyr, graphics, grid, igraph, lazyeval, Matrix, methods, progress, Rcpp, readr, scales, seqinr, stats, stringi, tidyr, utils  
 **Suggests:** knitr, rmarkdown, testthat
 
 
@@ -45,6 +45,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
 [Nima Nouri](mailto:nima.nouri@yale.edu) (ctb)  
+[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 

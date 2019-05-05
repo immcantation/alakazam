@@ -147,8 +147,7 @@
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root
-#' @importFrom	reshape2 	melt
-#' @importFrom  tidyr       complete_
+#' @importFrom  tidyr       complete_ gather
 #' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

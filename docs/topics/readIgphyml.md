@@ -10,7 +10,7 @@ B cell repertoires
 Usage
 --------------------
 ```
-readIgphyml(file, ID = NULL, igraph = TRUE, collapse = TRUE)
+readIgphyml(file, id = NULL, igraph = TRUE, collapse = TRUE)
 ```
 
 Arguments
@@ -19,7 +19,7 @@ Arguments
 file
 :   IgPhyML output file (.tab)
 
-ID
+id
 :   ID to assign to output object
 
 igraph
@@ -105,10 +105,11 @@ Examples
 
 ```R
 ### Not run:
-library(igraph)
-# s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
-# print(s1$param$OMEGA_CDR_MLE[1])
-# plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+#read in and plot a tree from an igphyml run
+#  library(igraph)
+#  s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#  print(s1$param$OMEGA_CDR_MLE[1])
+#  plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 ```
 
 

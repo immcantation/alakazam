@@ -41,13 +41,29 @@ Examples
 ```R
 # Define and plot example graph
 library(igraph)
+
+```
+
+*
+Attaching package: ‘igraph’
+**The following object is masked from ‘package:testthat’:
+
+    compare
+**The following objects are masked from ‘package:stats’:
+
+    decompose, spectrum
+**The following object is masked from ‘package:base’:
+
+    union
+*
+```R
 graph <- ExampleTrees[[23]]
 plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
-![2](permuteLabels-2.png)
+![7](permuteLabels-7.png)
 
 ```R
 
@@ -57,7 +73,7 @@ plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE,
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
-![4](permuteLabels-4.png)
+![9](permuteLabels-9.png)
 
 
 See also

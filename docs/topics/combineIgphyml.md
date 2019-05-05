@@ -18,7 +18,7 @@ Arguments
 iglist
 :   list of igphyml objects (see readIgphyml). Each must have
 an `ID` column in its `param` attribute, which
-can be added automatically using the `ID` option of 
+can be added automatically using the `id` option of 
 `readIgphyml`
 
 format
@@ -45,7 +45,7 @@ objects produced by readIgphyml into a dataframe that can be easily used for plo
 other hypothesis testing analyses.
 
 All igphyml objects used must have an "ID" column in their `param` attribute, which
-can be added automatically from the `ID` flag of `readIgphyml`.
+can be added automatically from the `id` flag of `readIgphyml`.
 
 
 References
@@ -68,9 +68,9 @@ Examples
 
 ```R
 ### Not run:
-library(igraph)
-# s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
-# s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="s2")
+#read in and combine two igphyml runs
+# s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+# s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
 # combineIgphyml(list(s1,s2))
 ```
 

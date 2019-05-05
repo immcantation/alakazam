@@ -676,7 +676,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' B cell repertoires
 #' 
 #' @param    file          IgPhyML output file (.tab)
-#' @param    ID            ID to assign to output object
+#' @param    id            ID to assign to output object
 #' @param    igraph        if \code{TRUE} return trees as igraph \code{graph} objects. Otherwise,
 #'                         return trees as ape \code{phylo} objects.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
@@ -740,14 +740,15 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'
 #' @examples
 #' \dontrun{
-#'    library(igraph)
-#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
-#'    print(s1$param$OMEGA_CDR_MLE[1])
-#'    plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+#'  #read in and plot a tree from an igphyml run
+#'  library(igraph)
+#'  s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'  print(s1$param$OMEGA_CDR_MLE[1])
+#'  plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
     out <- list()
     trees <- list()
     df <- read.table(file, sep="\t", head=TRUE, stringsAsFactors=FALSE)
@@ -771,8 +772,8 @@ readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
     
     out[["trees"]] <- trees
 
-    if(!is.null(ID)){
-        out$param$ID = ID
+    if(!is.null(id)){
+        out$param$ID = id
     }
     
     return(out)
@@ -784,7 +785,7 @@ readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
 #' 
 #' @param    iglist        list of igphyml objects (see readIgphyml). Each must have
 #'                         an \code{ID} column in its \code{param} attribute, which
-#'                         can be added automatically using the \code{ID} option of 
+#'                         can be added automatically using the \code{id} option of 
 #'                         \code{readIgphyml}
 #' @param   format         string specifying whether each column of the resulting data
 #'                         frame should represent a parameter (\code{wide}) or if 
@@ -800,7 +801,7 @@ readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
 #' other hypothesis testing analyses.
 #' 
 #' All igphyml objects used must have an "ID" column in their \code{param} attribute, which
-#' can be added automatically from the \code{ID} flag of \code{readIgphyml}. 
+#' can be added automatically from the \code{id} flag of \code{readIgphyml}. 
 #' 
 #' @references
 #' \enumerate{
@@ -815,9 +816,9 @@ readIgphyml <- function(file, ID=NULL, igraph=TRUE, collapse=TRUE) {
 #'
 #' @examples
 #' \dontrun{
-#'    library(igraph)
-#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="+7d")
-#'    s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", ID="s2")
+#'    #read in and combine two igphyml runs
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
 #'    combineIgphyml(list(s1,s2))
 #' }
 #' 
@@ -838,13 +839,13 @@ combineIgphyml <- function(iglist, format="wide") {
     params <- names(paramCount[paramCount == max(paramCount)])
     params <- ordered_params[ordered_params %in% params]
     if(sum(params == "ID") == 0){
-        message <- "ID not specified in objects. Use 'ID' flag in readIgphyml."
+        message <- "ID not specified in objects. Use 'id' flag in readIgphyml."
         stop(message)
     }
     repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
     if(format == "long"){
-        combined <- reshape2::melt(combined, id.vars=c("ID"))
+        combined <- tidyr::gather(combined, variable, value,-ID)
         combined$variable <- factor(combined$variable, levels=params)
     }
     combined
