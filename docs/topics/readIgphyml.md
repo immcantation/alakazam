@@ -10,7 +10,7 @@ B cell repertoires
 Usage
 --------------------
 ```
-readIgphyml(file, id = NULL, igraph = TRUE, collapse = TRUE)
+readIgphyml(file, id = NULL, format = "graph", collapse = TRUE)
 ```
 
 Arguments
@@ -22,9 +22,9 @@ file
 id
 :   ID to assign to output object
 
-igraph
-:   if `TRUE` return trees as igraph `graph` objects. Otherwise,
-return trees as ape `phylo` objects.
+format
+:   if `"graph"` return trees as igraph `graph` objects. 
+if `"phylo"` return trees as ape `phylo` objects.
 
 collapse
 :   if `TRUE` transform branch lengths to units of substitutions, 
@@ -65,8 +65,8 @@ lineages within the repertoire, so access them simply by:
 `<object>$param$OMEGA_CDR_MLE[1]` to, for instance,
 get the estimate of dN/dS on the CDRs at the repertoire level.
 + `trees`:     List of tree objects estimated by IgPhyML. If 
-`igraph=TRUE` these are igraph `graph` objects. 
-If `igraph=TRUE`, these are ape `phylo` objects.
+`format="graph"` these are igraph `graph` objects. 
+If `format="phylo"`, these are ape `phylo` objects.
 + `command`:   Command used to run IgPhyML.
 
 

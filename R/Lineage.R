@@ -677,8 +677,8 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' 
 #' @param    file          IgPhyML output file (.tab)
 #' @param    id            ID to assign to output object
-#' @param    igraph        if \code{TRUE} return trees as igraph \code{graph} objects. Otherwise,
-#'                         return trees as ape \code{phylo} objects.
+#' @param    format        if \code{"graph"} return trees as igraph \code{graph} objects. 
+#'                         if \code{"phylo"} return trees as ape \code{phylo} objects.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
 #'                         rather than substitutions per site, and collapse internal nodes
 #'                         separated by branches < 0.1 substitutions 
@@ -711,8 +711,8 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'                                      \code{<object>$param$OMEGA_CDR_MLE[1]} to, for instance,
 #'                                      get the estimate of dN/dS on the CDRs at the repertoire level.
 #'             \item  \code{trees}:     List of tree objects estimated by IgPhyML. If 
-#'                                      \code{igraph=TRUE} these are igraph \code{graph} objects. 
-#'                                      If \code{igraph=TRUE}, these are ape \code{phylo} objects.
+#'                                      \code{format="graph"} these are igraph \code{graph} objects. 
+#'                                      If \code{format="phylo"}, these are ape \code{phylo} objects.
 #'             \item  \code{command}:   Command used to run IgPhyML.
 #'           }
 #'           
@@ -748,7 +748,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, format="graph", collapse=TRUE) {
     out <- list()
     trees <- list()
     df <- read.table(file, sep="\t", head=TRUE, stringsAsFactors=FALSE)
@@ -762,11 +762,13 @@ readIgphyml <- function(file, id=NULL, igraph=TRUE, collapse=TRUE) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
         }
-        if(igraph){
+        if(format == "graph"){
             ig <- phyloToGraph(rtree)
             trees[[df[i, ]$CLONE]] <- ig
-        }else{
+        }else if(format == "phylo"){
             trees[[df[i, ]$CLONE]] <- tree
+        }else{
+            stop("Format must be either 'graph' or 'phylo'.")
         }
     }
     
