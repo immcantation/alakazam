@@ -187,7 +187,7 @@ adjustObservedAbundance <- function(x) {
 #' clonal groups.
 #'
 #' @param    data    data.frame with Change-O style columns containing clonal assignments.
-#' @param    groups  character vector defining \code{data} columns containing grouping 
+#' @param    group  character vector defining \code{data} columns containing grouping 
 #'                   variables. If \code{group=NULL}, then do not group data.
 #' @param    copy    name of the \code{data} column containing copy numbers for each 
 #'                   sequence. If this value is specified, then total copy abundance
@@ -211,28 +211,28 @@ adjustObservedAbundance <- function(x) {
 #' 
 #' @examples
 #' # Without copy numbers
-#' clones <- countClones(ExampleDb, groups="SAMPLE")
+#' clones <- countClones(ExampleDb, group="SAMPLE")
 #'
 #' # With copy numbers and multiple groups
-#' clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 #' 
 #' @export
-countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
+countClones <- function(data, group=NULL, copy=NULL, clone="CLONE") {
     # Check input
-    check <- checkColumns(data, c(clone, copy, groups))
+    check <- checkColumns(data, c(clone, copy, group))
     if (check != TRUE) { stop(check) }
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(groups, clone)) %>%
+            group_by_(.dots=c(group, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
             dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
             dplyr::rename_(.dots=c("CLONE"=clone))
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(groups, clone)) %>%
+            group_by_(.dots=c(group, clone)) %>%
             dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(clone)),
                               COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
             dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
@@ -243,184 +243,6 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     
     return(clone_tab)
 }
-
-# Perform boostrap abundance calculation
-# 
-# @param    x      named vector of observed abundance values.
-# @param    n      number of samples to draw from the estimate complete abundance distribution.
-# @param    z      Confidence interval tail probability. Meaning, \code{ci + (1 - ci) / 2)}.
-# @param    nboot  number of bootstrap realizations.
-# 
-# @return   A data.frame summarizing abundance with columns:
-#           \itemize{
-#             \item \code{CLONE}:  clone identifier.
-#             \item \code{P}:      abundance (clonal frequency).
-#             \item \code{LOWER}:  lower confidence interval bound.
-#             \item \code{UPPER}:  upper confidence interval bound.
-#             \item \code{RANK}:   adundance rank. Lower ranks correspond to higher abundance values.
-#                                  Ties of P get increasing rank values.
-#                                  
-bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
-    # Calculate estimated complete abundance distribution
-    p1 <- adjustObservedAbundance(x)
-    p2 <- inferUnseenAbundance(x)
-    p <- c(p1, p2)
-    p2_names <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
-    names(p) <- c(names(x), p2_names)
-    
-    # Bootstrap abundance
-    boot_mat <- rmultinom(nboot, n, p) / n
-    
-    # Assign confidence intervals based on variance of bootstrap realizations
-    boot_sd <- apply(boot_mat, 1, sd)
-    boot_err <- qnorm(z) * boot_sd
-    p_lower <- pmax(p - boot_err, 0)
-    p_upper <- p + boot_err
-    
-    # Assemble and sort abundance data.frame
-    abund_df <- dplyr::data_frame(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
-    abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
-    abund_df$RANK <- 1:nrow(abund_df)
-    
-    return(abund_df)
-}
-
-
-#' Estimates the complete clonal relative abundance distribution
-#' 
-#' \code{estimateAbundance} estimates the complete clonal relative abundance distribution 
-#' and confidence intervals on clone sizes using bootstrapping.
-#' 
-#' @param    data      data.frame with Change-O style columns containing clonal assignments.
-#' @param    group     name of the \code{data} column containing group identifiers. 
-#'                     If \code{NULL} then no grouping is performed and the \code{GROUP} 
-#'                     column of the output will contain the value \code{NA} for each row.
-#' @param    clone     name of the \code{data} column containing clone identifiers.
-#' @param    copy      name of the \code{data} column containing copy numbers for each 
-#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
-#'                     is determined by the number of sequences. If a \code{copy} column
-#'                     is specified, then clone abundances is determined by the sum of 
-#'                     copy numbers within each clonal group.
-#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
-#' @param    nboot     number of bootstrap realizations to generate.
-#' @param    progress  if \code{TRUE} show a progress bar. 
-#' 
-#' @return   A data.frame with relative clonal abundance data and confidence intervals,
-#'           containing the following columns:
-#'           \itemize{
-#'             \item  \code{GROUP}:  group identifier. Will be code{NA} if \code{group=NULL}.
-#'             \item  \code{CLONE}:  clone identifier.
-#'             \item  \code{P}:      relative abundance of the clone.
-#'             \item  \code{LOWER}:  lower confidence inverval bound.
-#'             \item  \code{UPPER}:  upper confidence interval bound.
-#'             \item  \code{RANK}:   the rank of the clone abundance.
-#'           }
-#'           
-#' @details
-#' The complete clonal abundance distribution determined inferred by using the Chao1 
-#' estimator to estimate the number of seen clones, and then applying the relative abundance 
-#' correction and unseen clone frequencies described in Chao et al, 2015.
-#'
-#' Confidence intervals are derived using the standard deviation of the resampling 
-#' realizations, as described in Chao et al, 2015.
-#' 
-#' @references
-#' \enumerate{
-#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
-#'            Scand J Stat. 1984 11, 265270.
-#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
-#'            A framework for sampling and estimation in species diversity studies. 
-#'            Ecol Monogr. 2014 84:45-67.
-#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
-#'            generalizing the Good-Turing sample coverage theory. 
-#'            Ecology. 2015 96, 11891201.
-#' }
-#' 
-#' @seealso  
-#' See \link{plotAbundanceCurve} for plotting of the abundance distribution.
-#' See \link{rarefyDiversity} for a similar application to clonal diversity.
-#'           
-#' @examples
-#' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
-#'
-#' @export
-estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.95, 
-                              nboot=2000, progress=FALSE) {
-    ## DEBUG
-    # group="SAMPLE"; clone="CLONE"; copy="UID_CLUSTCOUNT"; ci=0.95; nboot=200
-    # data=clones; group="SUBJECT"; clone="CLONE"; copy=NULL; ci=0.95; nboot=200; progress=FALSE
-    
-    # Check input
-    if (!is.data.frame(data)) {
-        stop("Input data is not a data.frame")
-    }
-    check <- checkColumns(data, c(group, clone, copy))
-    if (check != TRUE) { stop(check) }
-    
-    # Tabulate clonal abundance
-    if (is.null(copy)) {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize(COUNT=n())
-    } else {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
-    }
-    
-    # Set confidence interval
-    ci_z <- ci + (1 - ci) / 2
-    
-    if (!is.null(group)) {
-        # Summarize groups
-        group_tab <- clone_tab %>%
-            group_by_(.dots=c(group)) %>%
-            dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
-        group_set <- as.character(group_tab[[group]])
-        nsam <- setNames(group_tab$SEQUENCES, group_set)
-
-        # Generate diversity index and confidence intervals via resampling
-        if (progress) { 
-            pb <- progressBar(length(group_set))
-        }
-        abund_list <- list()
-        for (g in group_set) {
-            n <- nsam[g]
-            
-            # Extract abundance vector
-            abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-            names(abund_obs) <- clone_tab[[clone]][clone_tab[[group]] == g]
-     
-            # Infer complete abundance distribution
-            abund_list[[g]] <- bootstrapAbundance(abund_obs, n, z=ci_z, nboot=nboot)
-            
-            if (progress) { pb$tick() }
-        }
-        curve_df <- as.data.frame(bind_rows(abund_list, .id="GROUP"))
-    } else {
-        # Summarize counts
-        group_set <- as.character(NA)
-        nsam <- sum(clone_tab$COUNT, na.rm=TRUE)
-        
-        # Extract abundance vector
-        abund_obs <- clone_tab$COUNT
-        names(abund_obs) <- clone_tab[[clone]]
-        
-        # Infer complete abundance distribution
-        curve_df <- bootstrapAbundance(abund_obs, nsam, z=ci_z, nboot=nboot)
-        curve_df$GROUP <- NA
-    }
-    # Generate return object
-    curve <- new("AbundanceCurve", 
-                 data=curve_df, 
-                 groups=group_set, 
-                 n=nsam,
-                 nboot=nboot, 
-                 ci=ci)
-    
-    return(curve)
-}
-
 
 #### Diversity functions ####
 
@@ -467,7 +289,9 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
 #' calcDiversity(p, q)
 #' 
 #' @export
-calcDiversity <- function(p, q) {
+calcInferredDiversity <- function(p, q) {
+    # Use Chao estimators for unseen abundance correction
+    p <- c(p, inferUnseenAbundance(p))
     # Add jitter to q=1
     q[q == 1] <- 0.9999
     # Remove zeros
@@ -479,7 +303,6 @@ calcDiversity <- function(p, q) {
     
     return(D)
 }
-
 
 # Calculates diversity under rarefaction
 # 
@@ -512,10 +335,60 @@ inferRarefiedDiversity <- function(x, q, m) {
     return(D)
 }
 
+# Bootstraps clonal distributions under rarefaction
+#
+#' \code{bootstrapAbundance} divides a set of clones by a group annotation,
+#' and resamples the sequences from each group, returning distributions of clone sizes.
+#'
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    ndepth    number of observations to sample. If \code{NULL} then 
+#'                     no rarefaction is performed. 
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
+#'
+#' @return   A matrix of bootstrap iterations from rmultinom.
+bootstrapAbundance <- function(data, clone="CLONE", 
+	copy=NULL, ci=0.95, nboot=2000, ndepth = NULL){
+    
+    # Check input
+    if (!is.data.frame(data)) {
+        stop("Input data is not a data.frame")
+    }
+    check <- checkColumns(data, c(clone, copy))
+    if (check != TRUE) { stop(check) }
+    
+    # Tabulate clones
+    clone_tab <- data %>% countClones(copy=copy, clone=clone)
+    
+    # Check ndepth is reasonable
+    ndepth_check <- clone_tab %>%
+        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+        min(.$SEQUENCES)
+    if(is.null(ndepth)){ndepth <- ndepth_check}
+    if(ndepth_check < ndepth){stop("ndepth is too small")}
+    
+    # Infer abundance
+    abund_obs <- clone_tab %>% 
+        select(one_of(c(clone, "SEQ_COUNT"))) %>% 
+        tibble::deframe() %>%
+        adjustObservedAbundance()
+    
+    # Generate bootstrap distributions
+    sample_mat <- rmultinom(n=nboot, size=ndepth, abund_obs)
+    
+    return(sample_mat)
+}
 
 #' Generate a clonal diversity index curve
 #'
-#' \code{rarefyDiversity} divides a set of clones by a group annotation,
+#' \code{generalizeDiversity} divides a set of clones by a group annotation,
 #' resamples the sequences from each group, and calculates diversity
 #' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
 #' 
@@ -592,312 +465,167 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
-rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
-                            min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
-                            ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
-    #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
-    # Check input
-    if (!is.data.frame(data)) {
-        stop("Input data is not a data.frame")
+generalizeDiversity <- function(data, group, 
+    status = NULL, clone="CLONE", copy = NULL, 
+    generalize = c("alpha", "beta_rdi", "beta_pair"), 
+    min_q=0, max_q=4, step_q=0.1, uniform=TRUE,
+    ndepth = NULL, nboot = 200, ci = 0.95, min_n = 30){
+    
+    # Define private functions
+    calculateDiversity_ <- function(data, q, clone=NULL, group=NULL, status=NULL){
+
+        # Compute diversity from a column of each bootstrap
+        output <- data %>% 
+            ungroup() %>%
+            select(-one_of(c(clone, group, status))) %>%
+            as.matrix() %>% 
+            apply(2, calcInferredDiversity, q = q) %>%
+            data.frame() %>% mutate(Q = q)
+
+        return(output)
     }
-    check <- checkColumns(data, c(group, clone, copy))
+
+    calculateBetaDiversity_ <- function(boot_output){
+
+        # Compute gamma diversity metrics
+        gamma <- boot_output %>%
+            group_by_(.dots=c(clone)) %>%
+            select(-one_of(c(group, status))) %>%
+            summarize_all(sum) %>%
+            do(calculateDiversity_(., q = q, clone=clone)) %>%
+            tidyr::gather(key = "N", value = "GAMMA", -Q) %>%
+            mutate(GAMMA = as.numeric(GAMMA))
+
+        # Compute alpha diversity metrics
+        alpha <- boot_output %>%
+            group_by_(.dots=c(group, status)) %>%
+            do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
+            group_by(Q) %>%
+            select(-one_of(c(group, status))) %>%
+            summarize_all(mean) %>%
+            tidyr::gather(key = "N", value = "ALPHA", -Q) %>%
+            mutate(ALPHA = as.numeric(ALPHA))
+
+        # Perform comparisons of alpha and gamma to extract beta
+        div <- bind_cols(gamma, alpha) %>%
+            group_by(Q) %>%
+            mutate(D = GAMMA/ALPHA) %>%
+            summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
+            mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
+
+        return(div)
+    }
+
+	# Check arguments
+    generalize <- match.arg(generalize)
+
+    # Check columns that are reported are real columns (can be NULL)
+    check <- checkColumns(data, c(clone, copy, group, status))
     if (check != TRUE) { stop(check) }
-    
-    # Cast grouping to columns to character
-    data[[group]] <- as.character(data[[group]])
-    data[[clone]] <- as.character(data[[clone]])
 
-    # Tabulate clonal abundance
-    # TODO: Can this be replaced by countClones?
-    if (is.null(copy)) {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize(COUNT=n())
-    } else {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
-    }
+    # Check the smallest sample depth
+    min_ndepth <- data %>% 
+        countClones(copy=copy, clone=clone, group=group) %>%
+        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+        select(SEQUENCES) %>% unlist() %>% min()
     
-    # Count observations per group and set sampling criteria
-    group_tab <- clone_tab %>%
-        group_by_(.dots=c(group)) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
-    group_all <- as.character(group_tab[[group]])
-    group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
-    group_keep <- as.character(group_tab[[group]])
+    # Check the smallest sample is not smaller than min_n
+    if(min_ndepth < min_n){stop("too few sequences in some samples")}
     
-    # Set number of samples sequence
-    if (uniform) {
-        nsam <- min(group_tab$SEQUENCES, max_n)
-        nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
-    } else {
-        nsam <- if (is.null(max_n)) { group_tab$SEQUENCES } else { pmin(group_tab$SEQUENCES, max_n) }
-        nsam <- setNames(nsam, group_keep)
-    }
-
+    # If rarefaction is turned on, set an ndepth. Otherwise NULL ndepth.
+    if(uniform & is.null(ndepth)){ndepth <- min_ndepth} else {ndepth <- NULL}
+    
     # Set diversity orders and confidence interval
-    q <- seq(min_q, max_q, step_q)
     ci_z <- ci + (1 - ci) / 2
-    
-    # Check for q=0 and set index of q=0 
-    q0 <- (0 %in% q)
-    if (!q0) { q <- c(0, q) }
-    qi <- which(q == 0)
-    
-    # Warn if groups removed
-    if (length(group_keep) < length(group_all)) {
-        warning("Not all groups passed threshold min_n=", min_n, ".", 
-                "Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
-    }
-    
-    # Generate diversity index and confidence intervals via resampling
-    if (progress) { 
-        pb <- progressBar(length(group_keep))
-    }
-    div_list <- list()
-    #coverage <- setNames(numeric(length(group_keep)), group_keep)
-    for (g in group_keep) {
-        n <- nsam[g]
-        
-        # Get observed abundance
-        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
+    q <- seq(min_q, max_q, step_q)
 
-        # Calculate rarefied coverage
-        #coverage[g] <- iNEXT:::Chat.Ind(abund_obs, n)
-        #coverage[g] <- inferRarefiedCoverage(abund_obs, n)
+    # Bootstrap abundance curves
+    boot_output <- data %>%
+        group_by_(.dots=c(group, status)) %>%
+        do(data.frame(bootstrapAbundance(., 
+        clone=clone, copy=copy, ci=ci, nboot=nboot, ndepth=ndepth)) %>% 
+        tibble::rownames_to_column(clone))
+    
+    # Alpha diversity (also produces bootstrapped abundance curve)
+    if(generalize == "alpha"){
         
-        # Estimate complete abundance distribution
-        #abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
-        p1 <- adjustObservedAbundance(abund_obs)
-        p2 <- inferUnseenAbundance(abund_obs)
-        abund_inf <- c(p1, p2)
+        # Compute diversity metric for bootstrap instances
+        div_df <- boot_output %>%
+            group_by_(.dots=c(group, status)) %>%
+            do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
+            ungroup()
+        div <- div_df %>%
+            tidyr::gather(key = "N", value = "D", -one_of(c(group, status, "Q"))) %>%
+            mutate(D = as.numeric(D)) %>%
+            group_by_(.dots=c(group, status, "Q")) %>%
+            summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
+            mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
 
-        # Generate bootstrap distributions
-        sample_mat <- rmultinom(nboot, n, abund_inf)
-        
-        # Calculate diversity and coverage
-        div_boot <- apply(sample_mat, 2, calcDiversity, q=q)
-        #cover_boot <- apply(sample_mat, 2, calcCoverage, r=1)
-        
-        # Assign observed diversity and standard deviation from bootstrap realizations
-        div_obs <- apply(div_boot, 1, mean)
-        div_sd <- apply(div_boot, 1, sd)
-        # Diversity confidence intervals
-        div_error <- qnorm(ci_z) * div_sd
-        div_lower <- pmax(div_obs - div_error, 0)
-        div_upper <- div_obs + div_error
-        # Evenness
-        even_obs <- div_obs / div_obs[qi]
-        even_lower <- div_lower / div_obs[qi]
-        even_upper <- div_upper / div_obs[qi]
-        
-        # Build result matrix        
-        result_mat <- matrix(c(q, div_obs, div_sd, div_lower, div_upper,
-                               even_obs, even_lower, even_upper),
-                             nrow=length(q), ncol=8, 
-                             dimnames=list(NULL, c("Q", "D", "D_SD", "D_LOWER", "D_UPPER",
-                                                   "E", "E_LOWER", "E_UPPER")))
-        
-        # Remove q=0 if required
-        if (!q0) { result_mat <- result_mat[-qi, ] }
-        
-        # Update list with results
-        div_list[[g]] <- as.data.frame(result_mat)
-        
-        if (progress) { pb$tick() }
+        # Compute rarefied abundance curve for bootstrap instances
+        abund <- boot_output %>%
+            tidyr::gather(key = "N", value = "C", -one_of(c(clone, group, status))) %>%
+            group_by_(.dots=c(clone, group, status)) %>%
+            summarize(P_ERROR = qnorm(ci_z) * sd(C/ndepth), P = mean(C/ndepth)) %>%
+            mutate(LOWER = pmax(P - P_ERROR, 0), UPPER = P + P_ERROR) %>%
+            group_by_(.dots=c(group, status)) %>%
+            mutate(RANK = rank(P, ties.method = "first"))
+
+
+        curve <- list("AlphaAbundanceDiversity", 
+             div=div, 
+             abund=abund, 
+			 groups=unique(div[[group]]),
+             test=testDiversity(div_df, group=group, status=status, q=q),
+             q=q, copy=copy, group=group, clone=clone, ndepth=ndepth, nboot=nboot, ci=ci)
     }
     
-    # TODO: Allow dplyr::tbl class for data slot of DiversityCurve
-    # Generate return object
-    div <- new("DiversityCurve", 
-               data=as.data.frame(bind_rows(div_list, .id="GROUP")), 
-               groups=group_keep, 
-               n=nsam,
-               nboot=nboot, 
-               ci=ci)
+    # Beta diversity pairwise
+    if(generalize == "beta_pair"){
+        
+        # Compute pairwise beta diversity for bootstrap instances
+        group_pairs <- combn(unique(data[[group]]), 2, simplify=F)
+        beta_diversity_list <- list()
+
+        for(pair in group_pairs){
+            beta_diversity_list[[paste(pair, collapse = ',')]] <-  boot_output %>%
+                ungroup() %>%
+                dplyr::filter(.[[group]] %in% pair) %>%
+                do(calculateBetaDiversity_(.))
+        }
+
+        # Generate summary diversity output
+        div <- bind_rows(beta_diversity_list, .id = "COMPARISON")
+
+        curve <- list("BetaPairwiseDiversity", 
+             div=div, 
+             test=NULL,
+             groups=unique(div[["COMPARISON"]]),
+             abund=NULL,
+             q=q, copy=copy, group="COMPARISON", clone=clone, ndepth=ndepth, nboot=nboot, ci=ci)
+    }
     
-    return(div)
+    # RDI type beta diversity
+    if(generalize == "beta_rdi"){
+        
+        # Compute RDI type beta diversity for each status from bootstrap instances
+        div <- boot_output %>%
+            ungroup() %>%
+            group_by(.dots=c(status)) %>%
+            do(calculateBetaDiversity_(.))
+
+        curve <- list("BetaRDIDiversity", 
+             div=div, 
+             test=NULL,
+             groups=unique(div[[status]]),
+             abund=NULL,
+             q=q, copy=copy, group=status, clone=clone, ndepth=ndepth, nboot=nboot, ci=ci)
+    }
+    
+    return(curve)
 }
 
-#' Computes generalized alpha, beta, gamma diversity 
-#'
-#' \code{generalizeDiversity} parses a Change-O table, selects a mode for diversity calculation
-#' bootstraps the calculation, and calculates diversity using a choice of hill index, possible
-#' rarefaction and using corrections for unseen species.
 
-generalizeDiversity <- function(DF, sample, status = NULL, clone="CLONE", 
-    rarefy = FALSE, generalization = c("alpha", "beta_rdi", "beta_pair"), q = 0, nboot = 20){
-    
-    diversity <- function(DF, sample=1000, clone="CLONE", q=0){
-        #Note, setting sample does nothing
-        
-        #Abundance curve
-        abund_obs <- DF %>% 
-            group_by_(.dots=c(clone)) %>%
-            dplyr::summarize(COUNT=n()) %>%
-            select(COUNT) %>% unlist()
-        
-        #Chao estimator
-        abund_inf <- c(adjustObservedAbundance(abund_obs)
-                   ,inferUnseenAbundance(abund_obs))
-        
-        #Hill diversity
-        div <- calcDiversity(abund_inf, q=q)
-        
-        return(div)
-    }
-
-    diversity_rarefy <- function(DF, sample=1000, clone="CLONE", q=0){
-    
-        #Abundance curve
-        abund_obs <- DF %>% 
-            sample_n(sample) %>%
-            group_by_(.dots=c(clone)) %>%
-            dplyr::summarize(COUNT=n()) %>%
-            select(COUNT) %>% unlist()
-        
-        #Chao estimator
-        abund_inf <- c(adjustObservedAbundance(abund_obs)
-                   ,inferUnseenAbundance(abund_obs))
-        
-        #Hill diversity
-        div <- calcDiversity(abund_inf, q=q)
-        
-        return(div)
-    }
-
-    # check generalization arguments
-    generalization <- match.arg(generalization)
-    to_boot <- DF
-    
-    # define the diversity function if rarefaction is used
-    if(rarefy){
-        div_func <- diversity_rarefy
-    } else{
-        div_func <- diversity
-    }
-
-    if(is.null(status)){
-        # create dummy status
-        status <- "STATUS"
-        to_boot[[status]] <- factor('1', levels='1')
-    } 
-    
-    # convert to factors for boot::boot
-    to_boot[[sample]] <- factor(to_boot[[sample]], levels=unique(to_boot[[sample]]))
-    to_boot[[status]] <- factor(to_boot[[status]], levels=unique(to_boot[[status]]))
-
-    if(generalization == "alpha"){
-        if(rarefy){min_depth <- min(table(to_boot[[sample]]))}
-        
-        # diversity bootstrap function
-        boot_diversity <- function(DF, idx) {
-
-            div <- DF[idx,] %>%
-                group_by_(.dots=c(sample, status)) %>%
-                do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
-                ungroup() %>%
-                group_by_(.dots=c(status)) %>%
-                summarize(RESULT = mean(as.numeric(RESULT))) %>%
-                ungroup() %>%
-                select(RESULT) %>%
-                unlist()
-
-            return(div)
-        }
-        
-    } else if(generalization == "beta_rdi"){
-        #zeta diversity https://www.journals.uchicago.edu/doi/10.1086/678125
-        
-        if(rarefy){min_depth <- min(table(to_boot[[status]]))}
-        
-        # diversity bootstrap function
-        boot_diversity <- function(DF, idx) {
-                
-            alpha <- DF[idx,] %>%
-                mutate_(SAMPLE_CLONE=interp(~paste(x, y,sep='_'), x=as.name(sample), y=as.name(clone))) %>%
-                group_by_(.dots=c(status)) %>%
-                do(RESULT = div_func(., sample = min_depth, clone="SAMPLE_CLONE", q=q)) %>%
-                ungroup() %>%
-                group_by_(.dots=c(status)) %>%
-                summarize(RESULT = mean(as.numeric(RESULT))) %>%
-                ungroup() %>%
-                select(RESULT) %>%
-                unlist()
-
-            gamma <- DF[idx,] %>%
-                group_by_(.dots=c(status)) %>%
-                do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
-                ungroup() %>%
-                select(RESULT) %>%
-                unlist()
-
-            div <- sapply(alpha, function(a,g) g/a, gamma)
-
-            return(div)
-        }
-
-    } else if(generalization == "beta_pair"){
-        samples <- levels(to_boot[[sample]])
-        
-        # find the min sampling depth if rarefying (if not, div_func will take the argument but do nothing)
-        counts <- c()
-        colnames <- c()
-        for(s1 in samples){
-            for(s2 in samples){
-                if(s1 != s2){
-                    counts <- c(counts, dim(filter(DF, SAMPLE %in% c(s1,s2)))[1])
-                    colnames <- c(colnames, paste(s1, s2, sep = '-')) 
-                }
-            }
-        }
-        min_depth <- min(counts)
-    
-        # diversity bootstrap function
-        boot_diversity <- function(DF, idx) {
-
-            div <- c()
-            for(s1 in samples){
-                for(s2 in samples){
-                    if(s1 != s2){
-                        alpha <- DF[idx,] %>%
-                            filter(.[[sample]] %in% c(s1, s2)) %>%
-                            mutate_(SAMPLE_CLONE=interp(~paste(x, y,sep='_'), x=as.name(sample), y=as.name(clone))) %>%
-                            do(RESULT = div_func(., sample = min_depth,  clone="SAMPLE_CLONE", q=q)) %>%
-                            ungroup() %>%
-                            summarize(RESULT = mean(as.numeric(RESULT))) %>%
-                            ungroup() %>%
-                            select(RESULT) %>%
-                            unlist()
-                        gamma <- DF[idx,] %>%
-                            filter(.[[sample]] %in% c(s1, s2)) %>%
-                            do(RESULT = div_func(., sample = min_depth, clone=clone, q=q)) %>%
-                            select(RESULT) %>%
-                            unlist()
-                        div <- c(div, gamma - alpha)                        
-                    }
-                    
-                }
-            }
-            return(div)
-        }
-    }
-    
-    # compute bootstrap 
-    b_clone = boot(to_boot, boot_diversity, R=nboot, strata=to_boot[[sample]])
-    boot_df <- data.frame(b_clone$t)
-    
-    # output bootstrap dataframe
-    if(generalization != "beta_pair"){
-        colnames(boot_df) <- levels(to_boot[[status]])
-    } else {
-        colnames(boot_df) <- colnames
-    }
-
-    return(boot_df)
-}                
 
 #' Pairwise test of the diversity index
 #' 
@@ -980,115 +708,51 @@ generalizeDiversity <- function(DF, sample, status = NULL, clone="CLONE",
 #' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
-testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
-                          min_n=30, max_n=NULL, nboot=2000, progress=FALSE) {
-    #group="SAMPLE"; clone="CLONE"; copy=NULL; q=1; min_n=30; max_n=NULL; nboot=200
-    # TODO:  write plotDiversityTest function
+testDiversity <- function(div_df, group, status=NULL, q = q){
 
-    # Check input
-    if (!is.data.frame(data)) {
-        stop("Input data is not a data.frame")
-    }
-    check <- checkColumns(data, c(group, clone, copy))
-    if (check != TRUE) { stop(check) }
-    
-    # Cast grouping to columns to character
-    data[[group]] <- as.character(data[[group]])
-    data[[clone]] <- as.character(data[[clone]])
-    
-    # Tabulate clonal abundance
-    if (is.null(copy)) {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize(COUNT=n())
-    } else {
-        clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
-    }
-    
-    # Count observations per group and set sampling criteria
-    group_tab <- clone_tab %>%
-        group_by_(.dots=c(group)) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
-    group_all <- as.character(group_tab[[group]])
-    group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
-    group_keep <- as.character(group_tab[[group]])
-    
-    # Set number of samples per group
-    nsam <- min(group_tab$SEQUENCES, max_n)
-    nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
-    
-    # Warn if groups removed
-    if (length(group_keep) < length(group_all)) {
-        warning("Not all groups passed threshold min_n=", min_n, ". ", 
-                "Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
-    }
+    group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
+	
+    pvalue_list <- list()
+    for (group_pair in group_pairs) {
+        pair_list <- list()
+        for(q_i in q){
+            
+            # Currently just testing for one diversity order
+            mat1 <- div_df %>%
+                filter(.[[group]] == group_pair[1], Q == q_i) %>%
+                select(-one_of(c(group, status, "Q"))) %>% unlist()
+            mat2 <- div_df %>%
+                filter(.[[group]] == group_pair[2], Q == q_i) %>%
+                select(-one_of(c(group, status, "Q"))) %>% unlist()
 
-    # Generate diversity index and confidence intervals via resampling
-    if (progress) { 
-        pb <- progressBar(length(group_keep))
-    }
-    ngroup <- length(group_keep)
-    div_mat <- matrix(NA, nboot, ngroup, dimnames=list(NULL, group_keep))
-    for (i in 1:ngroup) {
-        g <- group_keep[i]
-        m <- nsam[g]
-        
-        # Estimate complete abundance distribution
-        #abund_inf <- iNEXT:::EstiBootComm.Ind(abund_obs)
-        abund_obs <- clone_tab$COUNT[clone_tab[[group]] == g]
-        p1 <- adjustObservedAbundance(abund_obs)
-        p2 <- inferUnseenAbundance(abund_obs)
-        abund_inf <- c(p1, p2)
+            if (mean(mat1) >= mean(mat2)) { g_delta <- mat1 - mat2
+            } else { g_delta <- mat2 - mat1 }  
 
-        # Generate bootstrap distributions
-        sample_mat <- rmultinom(nboot, m, abund_inf)
-        
-        # Calculate diversity
-        div_mat[, i] <- apply(sample_mat, 2, calcDiversity, q=q)
+            # Compute p-value from ecdf
+            p <- ecdf(g_delta)(0)
+            p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
+            
+            pair_list[[as.character(q_i)]] <- 
+                list(DELTA_MEAN = mean(g_delta), DELTA_SD = sd(g_delta), PVALUE = p)
+            
+        }
+        pvalue_list[[paste(group_pair, collapse=" != ")]] <- bind_rows(pair_list, .id="Q")
 
-        if (progress) { pb$tick() }
     }
-        
-    # Compute ECDF of bootstrap distribution shift from bootstrap deltas
-    group_pairs <- combn(group_keep, 2, simplify=F)
-    npairs <- length(group_pairs)
-    pvalue_mat <- matrix(NA, npairs, 3, 
-                         dimnames=list(NULL, c("DELTA_MEAN", "DELTA_SD", "PVALUE")))
-    test_names <- sapply(group_pairs, paste, collapse=" != ")
-    for (i in 1:npairs) {
-        g1 <- group_pairs[[i]][1]
-        g2 <- group_pairs[[i]][2]
-        # TODO:  verify this is correct. Is g1 - g2 different from g2 - g1?
-        if (mean(div_mat[, g1]) >= mean(div_mat[, g2])) {
-            g_delta <- div_mat[, g1] - div_mat[, g2]
-        } else {
-            g_delta <- div_mat[, g2] - div_mat[, g1]
-        }  
-        
-        # Determine p-value
-        g_cdf <- ecdf(g_delta)
-        p <- g_cdf(0)
-        p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
-        pvalue_mat[i, ] <- c(mean(g_delta), sd(g_delta), p)
-    }
-    
-    tests_df <- cbind(data.frame(test=test_names), as.data.frame(pvalue_mat))
-    summary_df <- data.frame(GROUP=group_keep, 
-                             MEAN=apply(div_mat, 2, mean),
-                             SD=apply(div_mat, 2, sd))
-    
-    # Generate return object
-    div <- new("DiversityTest", 
-               tests=as.data.frame(tests_df), 
-               summary=as.data.frame(summary_df),
-               groups=group_keep,
-               q=q,
-               n=nsam, 
-               nboot=nboot)
-    
-    return(div)
+    test_df <- bind_rows(pvalue_list, .id = "test_name")
+
+    summary_df <- div_df %>%
+        tidyr::gather(key = "N", value = "D", -one_of(c(group, status, "Q"))) %>%
+        mutate(D = as.numeric(D)) %>%
+        group_by_(.dots=c(group, status, "Q")) %>%
+        summarize(SD = sd(D), MEAN = mean(D))
+	
+    test_div = list(
+        tests=test_df,
+        summary=summary_df
+    )
+
+    return(test_div)
 }
 
 
@@ -1135,25 +799,29 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                                legend_title=NULL, xlim=NULL, ylim=NULL, 
                                annotate=c("none", "depth"),
                                silent=FALSE, ...) {
+    
+    # Check if abundance is in data
+    if (is.null(data$abund)) { stop("missing abundance data") }
+    
     # Check arguments
     annotate <- match.arg(annotate)
     
     # Define group label annotations
-    if (all(is.na(data@groups))) {
+    if (all(is.na(data$groups))) {
         group_labels <- NA  
     } else if (annotate == "none") {
-        group_labels <- setNames(data@groups, data@groups)
+        group_labels <- setNames(data$groups, data$groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
-                                 data@groups)
+        group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+                                 data$groups)
     }
     
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    if (any(!is.na(data@groups))) {
+    if (any(!is.na(data$groups))) {
         # Define grouped plot
-        p1 <- ggplot(data@data, aes_string(x="RANK", y="P", group="GROUP")) + 
+        p1 <- ggplot(data$abund, aes_string(x="RANK", y="P", group=data$group)) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('Rank') +
@@ -1162,8 +830,8 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                           breaks=scales::trans_breaks('log10', function(x) 10^x),
                           labels=scales::trans_format('log10', scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill="GROUP"), alpha=0.4) +
-            geom_line(aes_string(color="GROUP"))
+            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill=data$group), alpha=0.4) +
+            geom_line(aes_string(color=data$group))
         
         # Set colors and legend
         if (!is.null(colors)) {
@@ -1181,7 +849,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             line_color <- "black"
         }
         # Define plot
-        p1 <- ggplot(data@data, aes_string(x="RANK", y="P")) + 
+        p1 <- ggplot(data$data, aes_string(x="RANK", y="P")) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('Rank') +
@@ -1260,10 +928,10 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     # Define group label annotations
     if (annotate == "none") {
-        group_labels <- setNames(data@groups, data@groups)
+        group_labels <- setNames(data$groups, data$groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
-                                 data@groups)
+        group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+                                 data$groups)
     }
     
     # Define y-axis scores
@@ -1283,13 +951,13 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     .x <- NULL
     
     # Define base plot elements
-    p1 <- ggplot(data@data, aes_string(x="Q", y=y_value, group="GROUP")) + 
+    p1 <- ggplot(data$div, aes_string(x="Q", y=y_value, group=data$group)) + 
         ggtitle(main_title) + 
         baseTheme() + 
         xlab('q') +
         ylab(y_label) +
-        geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill="GROUP"), alpha=0.4) +
-        geom_line(aes_string(color="GROUP"))
+        geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill=data$group), alpha=0.4) +
+        geom_line(aes_string(color=data$group))
     
     # Set colors and legend
     if (!is.null(colors)) {
@@ -1335,6 +1003,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #'
 #' @param    data            \link{DiversityTest} object returned by 
 #'                           \link{testDiversity}.
+#' @param    q_i			 diversity index at which to display differences. 
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -1361,36 +1030,44 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' plotDiversityTest(div, legend_title="Sample")
 #' 
 #' @export
-plotDiversityTest <- function(data, colors=NULL, main_title="Diversity", 
+plotDiversityTest <- function(data, q_i, colors=NULL, main_title="Diversity", 
                               legend_title="Group", log_d=FALSE, 
                               annotate=c("none", "depth"),
                               silent=FALSE, ...) {
+    
+    # Check if abundance is in data
+    if (is.null(data$test)) { stop("missing testing from data") }
+    
+    # Check if q is in data
+    if (!(q_i %in% data$q)) { stop("hill index not assessed") }
+    
     # Check arguments
     annotate <- match.arg(annotate)
     
     # Define group label annotations
     if (annotate == "none") {
-        group_labels <- setNames(data@groups, data@groups)
+        group_labels <- setNames(data$groups, data$groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"), 
-                                 data@groups)
+        group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+                                 data$groups)
     }
     
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
 
     # Define plot values
-    df <- data@summary %>%
+    df <- data$test$summary %>%
+        dplyr::filter(Q == q_i) %>%
         dplyr::mutate_(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
     
     # Define base plot elements
-    p1 <- ggplot(df, aes_string(x="GROUP")) + 
+    p1 <- ggplot(df, aes_string(x=data$group)) + 
         ggtitle(main_title) + 
         baseTheme() + 
         xlab("") +
-        ylab(bquote("Mean " ^ .(data@q) * D %+-% "SD")) +
-        geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color="GROUP"), alpha=0.8) +
-        geom_point(aes_string(y="MEAN", color="GROUP"))
+        ylab(bquote("Mean " ^ .(data$q) * D %+-% "SD")) +
+        geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color=data$group), alpha=0.8) +
+        geom_point(aes_string(y="MEAN", color=data$group))
     
     # Set colors and legend
     if (!is.null(colors)) {
