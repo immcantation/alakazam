@@ -3,27 +3,27 @@
 Description
 --------------------
 
-`combineIgphyml` combines IgPhyML object parameters into a dataframe
+`combineIgphyml` combines IgPhyML object parameters into a data.frame.
 
 
 Usage
 --------------------
 ```
-combineIgphyml(iglist, format = "wide")
+combineIgphyml(iglist, format = c("wide", "long"))
 ```
 
 Arguments
 -------------------
 
 iglist
-:   list of igphyml objects (see readIgphyml). Each must have
-an `ID` column in its `param` attribute, which
-can be added automatically using the `id` option of 
-`readIgphyml`
+:   list of igphyml objects returned by [readIgphyml](readIgphyml.md). 
+Each must have an `ID` column in its `param` attribute, 
+which can be added automatically using the `id` option of 
+`readIgphyml`.
 
 format
-:   string specifying whether each column of the resulting data
-frame should represent a parameter (`wide`) or if 
+:   string specifying whether each column of the resulting data.frame
+hould represent a parameter (`wide`) or if 
 there should only be three columns; i.e. ID, varable, and value
 (`long`).
 
@@ -33,7 +33,7 @@ there should only be three columns; i.e. ID, varable, and value
 Value
 -------------------
 
-A dataframe containing HLP model parameter estimates for all igphyml objects.
+A data.frame containing HLP model parameter estimates for all igphyml objects.
 Only parameters shared among all objects will be returned.
 
 
@@ -68,12 +68,18 @@ Examples
 
 ```R
 ### Not run:
-#read in and combine two igphyml runs
+# Read in and combine two igphyml runs
 # s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
 # s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
-# combineIgphyml(list(s1,s2))
+# combineIgphyml(list(s1, s2))
 ```
 
+
+
+See also
+-------------------
+
+[readIgphyml](readIgphyml.md)
 
 
 

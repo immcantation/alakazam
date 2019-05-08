@@ -10,17 +10,18 @@ B cell repertoires
 Usage
 --------------------
 ```
-readIgphyml(file, id = NULL, format = "graph", collapse = TRUE)
+readIgphyml(file, id = NULL, format = c("graph", "phylo"),
+collapse = TRUE)
 ```
 
 Arguments
 -------------------
 
 file
-:   IgPhyML output file (.tab)
+:   IgPhyML output file (.tab).
 
 id
-:   ID to assign to output object
+:   ID to assign to output object.
 
 format
 :   if `"graph"` return trees as igraph `graph` objects. 
@@ -29,7 +30,7 @@ if `"phylo"` return trees as ape `phylo` objects.
 collapse
 :   if `TRUE` transform branch lengths to units of substitutions, 
 rather than substitutions per site, and collapse internal nodes
-separated by branches < 0.1 substitutions
+separated by branches < 0.1 substitutions.
 
 
 
@@ -41,7 +42,7 @@ A list containing IgPhyML model parameters and estimated lineage trees.
 
 Object attributes:
 
-+ `param`:     Dataframe of parameter estimates for each clonal 
++ `param`:     Data.frame of parameter estimates for each clonal 
 lineage. Columns include: `CLONE`, which is the 
 clone id; `NSEQ`, the total number of sequences in 
 the lineage; `NSITE`, the number of codon sites;
@@ -105,11 +106,11 @@ Examples
 
 ```R
 ### Not run:
-#read in and plot a tree from an igphyml run
-#  library(igraph)
-#  s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
-#  print(s1$param$OMEGA_CDR_MLE[1])
-#  plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+# Read in and plot a tree from an igphyml run
+# library(igraph)
+# s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+# print(s1$param$OMEGA_CDR_MLE[1])
+# plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 ```
 
 

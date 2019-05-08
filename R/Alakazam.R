@@ -115,8 +115,8 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
+#' @importFrom	ape 		read.tree di2multi reorder.phylo root
 #' @importFrom  dplyr       do n desc %>%
-#'                          data_frame data_frame_
 #'                          bind_cols bind_rows combine arrange arrange_ 
 #'                          group_by group_by_ ungroup
 #'                          filter filter_ slice slice_ select select_ 
@@ -146,7 +146,7 @@
 #'                          stri_replace_first_regex stri_split_fixed
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
-#' @importFrom	ape 		read.tree di2multi reorder.phylo root
+#' @importFrom  tibble      tibble
 #' @importFrom  tidyr       complete_ gather
 #' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE

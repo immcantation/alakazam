@@ -667,6 +667,7 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
     tree$edge.length[rootedge] <- 0
     tree$uca <- rootanc
     tree$germid <- germid
+    
     return(tree)
 }
 
@@ -675,19 +676,19 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #' \code{readIgphyml} reads output from the IgPhyML phylogenetics inference package for 
 #' B cell repertoires
 #' 
-#' @param    file          IgPhyML output file (.tab)
-#' @param    id            ID to assign to output object
+#' @param    file          IgPhyML output file (.tab).
+#' @param    id            ID to assign to output object.
 #' @param    format        if \code{"graph"} return trees as igraph \code{graph} objects. 
 #'                         if \code{"phylo"} return trees as ape \code{phylo} objects.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
 #'                         rather than substitutions per site, and collapse internal nodes
-#'                         separated by branches < 0.1 substitutions 
+#'                         separated by branches < 0.1 substitutions.
 #'                                                
 #' @return   A list containing IgPhyML model parameters and estimated lineage trees. 
 #'           
 #'           Object attributes:
 #'           \itemize{
-#'             \item  \code{param}:     Dataframe of parameter estimates for each clonal 
+#'             \item  \code{param}:     Data.frame of parameter estimates for each clonal 
 #'                                      lineage. Columns include: \code{CLONE}, which is the 
 #'                                      clone id; \code{NSEQ}, the total number of sequences in 
 #'                                      the lineage; \code{NSITE}, the number of codon sites;
@@ -740,41 +741,44 @@ rerootGermline <- function(tree, germid, resolve=TRUE){
 #'
 #' @examples
 #' \dontrun{
-#'  #read in and plot a tree from an igphyml run
-#'  library(igraph)
-#'  s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
-#'  print(s1$param$OMEGA_CDR_MLE[1])
-#'  plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+#'    # Read in and plot a tree from an igphyml run
+#'    library(igraph)
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    print(s1$param$OMEGA_CDR_MLE[1])
+#'    plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, format="graph", collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE) {
+    # Check arguments
+    format <- match.arg(format)
+    
     out <- list()
     trees <- list()
-    df <- read.table(file, sep="\t", head=TRUE, stringsAsFactors=FALSE)
+    df <- read.table(file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
     params <- df[, !names(df) %in% c("TREE")]
     out[["param"]] <- params
     out[["command"]] <- df[1, ]$TREE
-    for(i in 2:nrow(df)){
+    for (i in 2:nrow(df)) {
         tree <- ape::read.tree(text=df[i, ]$TREE)
         rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"))
-        if(collapse){
+        if (collapse) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
         }
-        if(format == "graph"){
+        if (format == "graph") {
             ig <- phyloToGraph(rtree)
             trees[[df[i, ]$CLONE]] <- ig
-        }else if(format == "phylo"){
+        } else if (format == "phylo") {
             trees[[df[i, ]$CLONE]] <- tree
-        }else{
+        } else {
             stop("Format must be either 'graph' or 'phylo'.")
         }
     }
     
     out[["trees"]] <- trees
 
-    if(!is.null(id)){
+    if (!is.null(id)) {
         out$param$ID = id
     }
     
@@ -783,18 +787,18 @@ readIgphyml <- function(file, id=NULL, format="graph", collapse=TRUE) {
 
 #' Combine IgPhyML object parameters into a dataframe
 #' 
-#' \code{combineIgphyml} combines IgPhyML object parameters into a dataframe
+#' \code{combineIgphyml} combines IgPhyML object parameters into a data.frame.
 #' 
-#' @param    iglist        list of igphyml objects (see readIgphyml). Each must have
-#'                         an \code{ID} column in its \code{param} attribute, which
-#'                         can be added automatically using the \code{id} option of 
-#'                         \code{readIgphyml}
-#' @param   format         string specifying whether each column of the resulting data
-#'                         frame should represent a parameter (\code{wide}) or if 
+#' @param   iglist         list of igphyml objects returned by \link{readIgphyml}. 
+#'                         Each must have an \code{ID} column in its \code{param} attribute, 
+#'                         which can be added automatically using the \code{id} option of 
+#'                         \code{readIgphyml}.
+#' @param   format         string specifying whether each column of the resulting data.frame
+#'                         should represent a parameter (\code{wide}) or if 
 #'                         there should only be three columns; i.e. ID, varable, and value
 #'                         (\code{long}).
 #'                                                
-#' @return   A dataframe containing HLP model parameter estimates for all igphyml objects.
+#' @return   A data.frame containing HLP model parameter estimates for all igphyml objects.
 #'           Only parameters shared among all objects will be returned.
 #'           
 #' @details
@@ -816,16 +820,21 @@ readIgphyml <- function(file, id=NULL, format="graph", collapse=TRUE) {
 #'              https://doi.org/10.1101/558825 
 #' }
 #'
+#' @seealso  \link{readIgphyml} 
+#'           
 #' @examples
 #' \dontrun{
-#'    #read in and combine two igphyml runs
+#'    # Read in and combine two igphyml runs
 #'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
 #'    s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
-#'    combineIgphyml(list(s1,s2))
+#'    combineIgphyml(list(s1, s2))
 #' }
 #' 
 #' @export
-combineIgphyml <- function(iglist, format="wide") {
+combineIgphyml <- function(iglist, format=c("wide", "long")) {
+    # Check arguments
+    format <- match.arg(format)
+    
     ordered_params <- c(
         "ID", "NSEQ", "NSITE", "LHOOD", "TREE_LENGTH", 
         "OMEGA_FWR_MLE", "OMEGA_FWR_LCI", "OMEGA_FWR_UCI", 
@@ -840,15 +849,17 @@ combineIgphyml <- function(iglist, format="wide") {
     paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
     params <- names(paramCount[paramCount == max(paramCount)])
     params <- ordered_params[ordered_params %in% params]
-    if(sum(params == "ID") == 0){
+    if (sum(params == "ID") == 0) {
         message <- "ID not specified in objects. Use 'id' flag in readIgphyml."
         stop(message)
     }
+    
     repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
-    if(format == "long"){
-        combined <- tidyr::gather(combined, variable, value,-ID)
+    if (format == "long") {
+        combined <- tidyr::gather(combined, variable, value, -ID)
         combined$variable <- factor(combined$variable, levels=params)
     }
-    combined
+    
+    return(combined)
 }

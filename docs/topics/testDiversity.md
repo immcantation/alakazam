@@ -129,12 +129,12 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 An object of class "DiversityTest"
 Slot "tests":
         test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d     477.41 14.63709      0
+1 -1h != +7d     476.48 17.24657      0
 
 Slot "summary":
     GROUP   MEAN       SD
--1h   -1h 816.27 12.33936
-+7d   +7d 338.86 11.91215
+-1h   -1h 818.02 11.38223
++7d   +7d 341.54 12.71873
 
 Slot "groups":
 [1] "-1h" "+7d"

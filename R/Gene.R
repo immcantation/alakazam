@@ -260,11 +260,11 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @rdname getSegment
 #' @export
 getGene <- function(segment_call, first=TRUE, collapse=TRUE, 
-                    strip_d=TRUE, omit_nl=FALSE, sep=",", unique=FALSE) {
+                    strip_d=TRUE, omit_nl=FALSE, sep=",") {
     gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*)'
     r <- getSegment(segment_call, gene_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
-    if (unique) { r <- unique(r) }
+    
     return(r)
 }
 
@@ -352,8 +352,8 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
     # get gene
     # gets a list
     # each list entry corresponds to a chain, and is a vector of one or more strings
-    v <- sapply(v, getGene, unique=TRUE, simplify=FALSE, USE.NAMES=FALSE)
-    j <- sapply(j, getGene, unique=TRUE, simplify=FALSE, USE.NAMES=FALSE)
+    v <- sapply(v, getGene, collapse=TRUE, simplify=FALSE, USE.NAMES=FALSE)
+    j <- sapply(j, getGene, collapse=TRUE, simplify=FALSE, USE.NAMES=FALSE)
     
     # if there is multiple chains and/or multiple annotations
     if ( multi_chain | (multi_anno_v & first) | (multi_anno_j & first) ) {
@@ -490,8 +490,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'  
 #' @export
 groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
-                       first=FALSE, 
-                       v_call_light=NULL, j_call_light=NULL, junc_len_light=NULL,
+                       first=FALSE, v_call_light=NULL, j_call_light=NULL, junc_len_light=NULL,
                        separator_within_seq=",", separator_between_seq=";") {
     
     # single-cell mode?
@@ -597,18 +596,18 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         m_j = match(data[[j_call]], j_unique)
         
         if (is.null(junc_len)) {
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v = which( v_unique == combo_unique[[v_call]][i] )
-                idx_j = which( j_unique == combo_unique[[j_call]][i] )
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i) {
+                idx_v = which (v_unique == combo_unique[[v_call]][i])
+                idx_j = which (j_unique == combo_unique[[j_call]][i])
                 idx = which(m_v==idx_v & m_j==idx_j)
             }, simplify=FALSE, USE.NAMES=FALSE) 
         } else {
             l_unique <- unique(combo_unique[[junc_len]])
             m_l = match(data[[junc_len]], l_unique)
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v = which( v_unique == combo_unique[[v_call]][i] )
-                idx_j = which( j_unique == combo_unique[[j_call]][i] )
-                idx_l = which( l_unique == combo_unique[[junc_len]][i] )
+            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i) {
+                idx_v = which(v_unique == combo_unique[[v_call]][i])
+                idx_j = which(j_unique == combo_unique[[j_call]][i])
+                idx_l = which(l_unique == combo_unique[[junc_len]][i])
                 idx = which(m_v==idx_v & m_j==idx_j & m_l==idx_l)
             }, simplify=FALSE, USE.NAMES=FALSE)
         }
@@ -977,7 +976,7 @@ sortGenes <- function(genes, method=c("name", "position")) {
     method <- match.arg(method)
 
     # Build sorting table
-    sort_tab <- data_frame(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
+    sort_tab <- tibble(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
         # Determine the gene and family
         mutate_(FAMILY=interp(~getFamily(x, first=TRUE, strip_d=FALSE), x=as.name("CALL")),
                 GENE=interp(~getGene(x, first=TRUE, strip_d=FALSE), x=as.name("CALL")),

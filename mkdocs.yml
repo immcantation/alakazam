@@ -27,6 +27,7 @@ pages:
       - topics/readChangeoDb.md
       - topics/writeChangeoDb.md
       - topics/readIgphyml.md
+      - topics/combineIgphyml.md
     - 'Sequence Cleaning and Manipulation':
       - topics/collapseDuplicates.md
       - topics/maskSeqEnds.md
@@ -89,7 +90,6 @@ pages:
     - 'Miscellaneous':
       - topics/baseTheme.md
       - topics/checkColumns.md
-      - topics/combineIgphyml.md
       - topics/cpuCount.md
       - topics/gridPlot.md
       - topics/makeTempDir.md
