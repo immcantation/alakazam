@@ -96,9 +96,58 @@ clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 head(clones, 5)
 ```
 
-While `countClones` will report observed abundances, it will not correct the
-distribution nor provide confidence intervals. A complete clonal abundance 
-distribution may be inferred using the `estimateAbundance` function with
-confidence intervals derived via bootstrapping.  This output may be visualized
-using the `plotAbundanceCurve` function.
+While `countClones` will report observed abundances, it will not provide confidence 
+intervals. A complete clonal abundance distribution may be inferred using the 
+`generalizeDiversity` function with confidence intervals derived via bootstrapping.  
+This output may be visualized using the `plotAbundanceCurve` function.
 
+```{r, eval=TRUE, results='hide', warning=FALSE, fig.width=6, fig.height=4}
+# Partitions the data on the SAMPLE column
+# Calculates a 95% confidence interval via 200 bootstrap realizations
+curve <- generalizeDiversity(ExampleDb, group="SAMPLE", ci=0.95, nboot=200, 
+      generalize="alpha")
+```
+
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+# Plots a rank abundance curve of the relative clonal abundances
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotAbundanceCurve(curve, colors = sample_colors, legend_title="Sample")
+```
+
+## Generate a diversity curve
+
+The function `generalizeDiversity` performs uniform resampling of the input 
+sequences and recalculates the clone size distribution, and diversity, with each 
+resampling realization. Diversity (D) is calculated over a range of diversity 
+orders (q) to generate a smooth curve.
+
+```{r, eval=TRUE, results='hide'}
+# Compare diversity curve across values in the "SAMPLE" column
+# q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
+# A 95% confidence interval will be calculated (ci=0.95)
+# 200 resampling realizations are performed (nboot=200)
+sample_curve <- generalizeDiversity(ExampleDb, group="SAMPLE",
+                             min_q=0, max_q=4, step_q=0.1,
+                             ci=0.95, nboot=200, generalize="alpha")
+
+# Compare diversity curve across values in the "ISOTYPE" column
+# Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
+# Excluded groups are indicated by a warning message
+isotype_curve <- generalizeDiversity(ExampleDb, group="ISOTYPE",
+                             min_q=0, max_q=4, step_q=0.1,
+                             ci=0.95, nboot=200, generalize="alpha")
+```
+
+```{r, eval=TRUE, fig.width=6, fig.height=4}
+# Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
+# Indicate number of sequences resampled from each group in the title
+sample_main <- paste0("Sample diversity (n=", sample_curve$ndepth, ")")
+sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
+plotDiversityCurve(sample_curve, colors=sample_colors, main_title=sample_main, 
+     legend_title="Sample")
+
+# Plot isotype diversity using default set of Ig isotype colors
+isotype_main <- paste0("Isotype diversity (n=", isotype_curve$ndepth, ")")
+plotDiversityCurve(isotype_curve, colors=IG_COLORS, main_title=isotype_main, 
+     legend_title="Isotype")
+```
