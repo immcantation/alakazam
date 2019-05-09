@@ -123,6 +123,7 @@ setClass("DiversityTest",
 
 #### Diversity methods ####
 
+# TODO:  currently not used, implemented as lists
 # TODO:  plot method for DiversityTest
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve

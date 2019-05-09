@@ -376,7 +376,7 @@ bootstrapAbundance <- function(data, clone="CLONE",
     
     # Infer abundance
     abund_obs <- clone_tab %>% 
-        select(one_of(c(clone, "SEQ_COUNT"))) %>% 
+        dplyr::select(one_of(c(clone, "SEQ_COUNT"))) %>% 
         tibble::deframe() %>%
         adjustObservedAbundance()
     
@@ -477,8 +477,8 @@ generalizeDiversity <- function(data, group,
 
         # Compute diversity from a column of each bootstrap
         output <- data %>% 
-            ungroup() %>%
-            select(-one_of(c(clone, group, status))) %>%
+            dplyr::ungroup() %>%
+            dplyr::select(-one_of(c(clone, group, status))) %>%
             as.matrix() %>% 
             apply(2, calcInferredDiversity, q = q) %>%
             data.frame() %>% mutate(Q = q)
@@ -490,29 +490,29 @@ generalizeDiversity <- function(data, group,
 
         # Compute gamma diversity metrics
         gamma <- boot_output %>%
-            group_by_(.dots=c(clone)) %>%
-            select(-one_of(c(group, status))) %>%
-            summarize_all(sum) %>%
-            do(calculateDiversity_(., q = q, clone=clone)) %>%
+            dplyr::group_by_(.dots=c(clone)) %>%
+            dplyr::select(-one_of(c(group, status))) %>%
+            dplyr::summarize_all(sum) %>%
+            dplyr::do(calculateDiversity_(., q = q, clone=clone)) %>%
             tidyr::gather(key = "N", value = "GAMMA", -Q) %>%
-            mutate(GAMMA = as.numeric(GAMMA))
+            dplyr::mutate(GAMMA = as.numeric(GAMMA))
 
         # Compute alpha diversity metrics
         alpha <- boot_output %>%
-            group_by_(.dots=c(group, status)) %>%
-            do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
-            group_by(Q) %>%
-            select(-one_of(c(group, status))) %>%
-            summarize_all(mean) %>%
+            dplyr::group_by_(.dots=c(group, status)) %>%
+            dplyr::do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
+            dplyr::group_by(Q) %>%
+            dplyr::select(-one_of(c(group, status))) %>%
+            dplyr::summarize_all(mean) %>%
             tidyr::gather(key = "N", value = "ALPHA", -Q) %>%
-            mutate(ALPHA = as.numeric(ALPHA))
+            dplyr::mutate(ALPHA = as.numeric(ALPHA))
 
         # Perform comparisons of alpha and gamma to extract beta
         div <- bind_cols(gamma, alpha) %>%
-            group_by(Q) %>%
-            mutate(D = GAMMA/ALPHA) %>%
-            summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
-            mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
+            dplyr::group_by(Q) %>%
+            dplyr::mutate(D = GAMMA/ALPHA) %>%
+            dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
+            dplyr::mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
 
         return(div)
     }
@@ -528,7 +528,7 @@ generalizeDiversity <- function(data, group,
     min_ndepth <- data %>% 
         countClones(copy=copy, clone=clone, group=group) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-        select(SEQUENCES) %>% unlist() %>% min()
+        dplyr::select(SEQUENCES) %>% unlist() %>% min()
     
     # Check the smallest sample is not smaller than min_n
     if(min_ndepth < min_n){stop("too few sequences in some samples")}
@@ -542,9 +542,9 @@ generalizeDiversity <- function(data, group,
 
     # Bootstrap abundance curves
     boot_output <- data %>%
-        group_by_(.dots=c(group, status)) %>%
-        do(data.frame(bootstrapAbundance(., 
-        clone=clone, copy=copy, ci=ci, nboot=nboot, ndepth=ndepth)) %>% 
+        dplyr::group_by_(.dots=c(group, status)) %>%
+        dplyr::do(data.frame(bootstrapAbundance(., 
+        	clone=clone, copy=copy, ci=ci, nboot=nboot, ndepth=ndepth)) %>% 
         tibble::rownames_to_column(clone))
     
     # Alpha diversity (also produces bootstrapped abundance curve)
@@ -552,24 +552,24 @@ generalizeDiversity <- function(data, group,
         
         # Compute diversity metric for bootstrap instances
         div_df <- boot_output %>%
-            group_by_(.dots=c(group, status)) %>%
-            do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
-            ungroup()
+            dplyr::group_by_(.dots=c(group, status)) %>%
+            dplyr::do(calculateDiversity_(., q = q, clone=clone, group=group, status=status)) %>%
+            dplyr::ungroup()
         div <- div_df %>%
             tidyr::gather(key = "N", value = "D", -one_of(c(group, status, "Q"))) %>%
-            mutate(D = as.numeric(D)) %>%
-            group_by_(.dots=c(group, status, "Q")) %>%
-            summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
-            mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
+            dplyr::mutate(D = as.numeric(D)) %>%
+            dplyr::group_by_(.dots=c(group, status, "Q")) %>%
+            dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
+            dplyr::mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
 
         # Compute rarefied abundance curve for bootstrap instances
         abund <- boot_output %>%
             tidyr::gather(key = "N", value = "C", -one_of(c(clone, group, status))) %>%
-            group_by_(.dots=c(clone, group, status)) %>%
-            summarize(P_ERROR = qnorm(ci_z) * sd(C/ndepth), P = mean(C/ndepth)) %>%
-            mutate(LOWER = pmax(P - P_ERROR, 0), UPPER = P + P_ERROR) %>%
-            group_by_(.dots=c(group, status)) %>%
-            mutate(RANK = rank(P, ties.method = "first"))
+            dplyr::group_by_(.dots=c(clone, group, status)) %>%
+            dplyr::summarize(P_ERROR = qnorm(ci_z) * sd(C/ndepth), P = mean(C/ndepth)) %>%
+            dplyr::mutate(LOWER = pmax(P - P_ERROR, 0), UPPER = P + P_ERROR) %>%
+            dplyr::group_by_(.dots=c(group, status)) %>%
+            dplyr::mutate(RANK = rank(P, ties.method = "first"))
 
 
         curve <- list("AlphaAbundanceDiversity", 
@@ -589,9 +589,9 @@ generalizeDiversity <- function(data, group,
 
         for(pair in group_pairs){
             beta_diversity_list[[paste(pair, collapse = ',')]] <-  boot_output %>%
-                ungroup() %>%
+                dplyr::ungroup() %>%
                 dplyr::filter(.[[group]] %in% pair) %>%
-                do(calculateBetaDiversity_(.))
+                dplyr::do(calculateBetaDiversity_(.))
         }
 
         # Generate summary diversity output
@@ -610,9 +610,9 @@ generalizeDiversity <- function(data, group,
         
         # Compute RDI type beta diversity for each status from bootstrap instances
         div <- boot_output %>%
-            ungroup() %>%
-            group_by(.dots=c(status)) %>%
-            do(calculateBetaDiversity_(.))
+            dplyr::ungroup() %>%
+            dplyr::group_by(.dots=c(status)) %>%
+            dplyr::do(calculateBetaDiversity_(.))
 
         curve <- list("BetaRDIDiversity", 
              div=div, 
@@ -719,11 +719,11 @@ testDiversity <- function(div_df, group, status=NULL, q = q){
             
             # Currently just testing for one diversity order
             mat1 <- div_df %>%
-                filter(.[[group]] == group_pair[1], Q == q_i) %>%
-                select(-one_of(c(group, status, "Q"))) %>% unlist()
+                dplyr::filter(.[[group]] == group_pair[1], Q == q_i) %>%
+                dplyr::select(-one_of(c(group, status, "Q"))) %>% unlist()
             mat2 <- div_df %>%
-                filter(.[[group]] == group_pair[2], Q == q_i) %>%
-                select(-one_of(c(group, status, "Q"))) %>% unlist()
+                dplyr::filter(.[[group]] == group_pair[2], Q == q_i) %>%
+                dplyr::select(-one_of(c(group, status, "Q"))) %>% unlist()
 
             if (mean(mat1) >= mean(mat2)) { g_delta <- mat1 - mat2
             } else { g_delta <- mat2 - mat1 }  
@@ -743,9 +743,9 @@ testDiversity <- function(div_df, group, status=NULL, q = q){
 
     summary_df <- div_df %>%
         tidyr::gather(key = "N", value = "D", -one_of(c(group, status, "Q"))) %>%
-        mutate(D = as.numeric(D)) %>%
-        group_by_(.dots=c(group, status, "Q")) %>%
-        summarize(SD = sd(D), MEAN = mean(D))
+        dplyr::mutate(D = as.numeric(D)) %>%
+        dplyr::group_by_(.dots=c(group, status, "Q")) %>%
+        dplyr::summarize(SD = sd(D), MEAN = mean(D))
 	
     test_div = list(
         tests=test_df,

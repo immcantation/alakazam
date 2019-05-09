@@ -53,7 +53,7 @@ test_that("countClones", {
     expect_equal(countClones(db_toy, group="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
 })
 
-#### calcDiversity ####
+#### calcInferredDiversity ####
 
 test_that("calcInferredDiversity", {
     # May define p as clonal member counts
