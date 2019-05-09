@@ -70,7 +70,7 @@ test_that("calcInferredDiversity", {
 test_that("generalizeDiversity", {
 	
     set.seed(90)
-    curve <- generalizeDiversity(db, "SAMPLE", nboot=100)
+    curve <- generalizeDiversity(db, group="SAMPLE", nboot=100)
     expect_equal(curve$abund$P[1:6], 
                  c(0.00315, 0.00255, 0.00095, 0.00105, 0.0011, 0.0011),
                  tolerance=0.001)
@@ -84,7 +84,7 @@ test_that("generalizeDiversity", {
 	
 	
 	set.seed(5)
-	curve <- generalizeDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
+	curve <- generalizeDiversity(db, group="SAMPLE", step_q=1, max_q=10, nboot=100)
 	obs <- curve$div[c(1,3,9,20),]
     
 	exp <- data.frame(
@@ -108,7 +108,7 @@ test_that("generalizeDiversity", {
     
     
     set.seed(3)
-	curve <- generalizeDiversity(db, "SAMPLE", min_n=30, nboot=100)
+	curve <- generalizeDiversity(db, group="SAMPLE", min_n=30, nboot=100)
 	expect_equal(curve$test$tests$PVALUE[1:5], 
 			c(0.42,0.56,0.76,0.82,0.40), tolerance=0.001)
 	expect_equal(curve$test$summary$MEAN[1:5], 
