@@ -51,9 +51,7 @@
 #' @section  Diversity analysis:
 #' \itemize{
 #'   \item  \link{countClones}:          Calculate clonal abundance.
-#'   \item  \link{estimateAbundance}:    Infer complete clonal abundance distribution with
-#'                                       confidence intervals.
-#'   \item  \link{rarefyDiversity}:      Generate clonal diversity curves.
+#'   \item  \link{generalizeDiversity}:  Generate clonal diversity curves.
 #'   \item  \link{testDiversity}:        Test significance of clonal diversity scores.
 #'   \item  \link{plotAbundanceCurve}:   Plot clone size distribution as a rank-abundance 
 #'                                       curve.
@@ -122,7 +120,7 @@
 #'                          filter filter_ slice slice_ select select_ 
 #'                          mutate mutate_ mutate_at
 #'                          summarize summarize_ summarize_at
-#'                          transmute transmute_ rename rename_
+#'                          transmute transmute_ rename rename_ one_of
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
 #'                          vertex_attr set_vertex_attr 
@@ -146,7 +144,8 @@
 #'                          stri_replace_first_regex stri_split_fixed
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
-#' @importFrom  tidyr       complete_
+#' @importFrom  tibble     	rownames_to_column deframe
+#' @importFrom  tidyr       complete_ gather
 #' @importFrom  Rcpp evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

@@ -51,8 +51,8 @@ Imports:
     seqinr,
     stats,
     stringi,
-    tidyr,
 	tibble,
+    tidyr,
     utils
 LinkingTo: Rcpp
 Suggests:
