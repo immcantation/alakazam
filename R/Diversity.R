@@ -356,10 +356,10 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' @return   A matrix of bootstrap iterations from rmultinom.
 createDiversityObject <- function(data, group, 
     status = NULL, clone="CLONE", copy = NULL, 
-    uniform=TRUE, ndepth = NULL, nboot = 200, min_n = 30){
+    uniform=TRUE, ndepth = NULL, nboot = 200, min_n = 30, max_n=NULL){
      
     # Private bootstrap function
-    bootstrap_ <- function(data){
+    bootstrap_ <- function(data, ndepth=ndepth){
     
         # Tabulate clones
         clone_tab <- data %>% countClones(copy=copy, clone=clone)
@@ -391,21 +391,27 @@ createDiversityObject <- function(data, group,
     if (check != TRUE) { stop(check) }
 
     # Check the smallest sample depth
-    min_ndepth <- data %>% 
+    sequence_ndepths <- data %>% 
         countClones(copy=copy, clone=clone, group=group) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-        dplyr::select(SEQUENCES) %>% unlist() %>% min()
+        dplyr::select(SEQUENCES) %>% unlist() 
     
     # Check the smallest sample is not smaller than min_n
-    if(min_ndepth < min_n){stop("too few sequences in some samples")}
-    
-    # If rarefaction is turned on, set an ndepth. Otherwise NULL ndepth.
-    if(uniform & is.null(ndepth)){ndepth <- min_ndepth} else {ndepth <- NULL}
-    
+    if(min(sequence_ndepths) < min_n){stop("too few sequences in some samples")}
+	
+	# If max_n is set
+	if(!is.null(max_n)){
+		if(max(sequence_ndepths) > max_n){stop("too many sequences in some samples")}
+		if(!is.null(ndepth)){if(uniform & ndepth > max_n){ndepth <- max_n}}
+	}
+	
+    # If rarefaction is turned on, set an ndepth. Otherwise NULL ndepth (ignore).
+    if(uniform & is.null(ndepth)){ndepth <- min(sequence_ndepths)} else {ndepth <- NULL}
+	
     # Bootstrap abundance curves
     boot_output <- data %>%
         dplyr::group_by_(.dots=c(group, status)) %>%
-        dplyr::do(data.frame(bootstrap_(.)) %>% 
+        dplyr::do(data.frame(bootstrap_(., ndepth=ndepth)) %>% 
         tibble::rownames_to_column(clone))
     
     # Groups
@@ -615,7 +621,8 @@ calculateAlphaDiversity <- function(div_obj,
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
-
+	if (!(0 %in% q)) { q <- c(0, q) }
+		
     # Compute diversity metric for bootstrap instances
     div_df <- div_obj@bootstrap %>%
         dplyr::group_by_(.dots=c(div_obj@group, div_obj@status)) %>%
@@ -631,7 +638,7 @@ calculateAlphaDiversity <- function(div_obj,
         dplyr::mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
 
     # Compute rarefied abundance curve for bootstrap instances
-    abund <- boot_output %>%
+    abund <- div_obj@bootstrap %>%
         tidyr::gather(key = "N", value = "C", -one_of(c(div_obj@clone, div_obj@group, div_obj@status))) %>%
         dplyr::group_by_(.dots=c(div_obj@clone, div_obj@group, div_obj@status)) %>%
         dplyr::summarize(P_ERROR = qnorm(ci_z) * sd(C/div_obj@ndepth), P = mean(C/div_obj@ndepth)) %>%
@@ -641,6 +648,16 @@ calculateAlphaDiversity <- function(div_obj,
     
     # Alpha groups
     div_groups <- unique(div[[div_obj@group]])
+    
+    # Compute evenness
+    div_qi <- div %>%
+        filter(Q == 0) %>%
+        select(one_of(c(div_obj@group, "D")))
+
+    div <- div %>%
+        right_join(div_qi, by = div_obj@group, suffix = c("", "_0")) %>%
+        mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
+        select(-D_0)
     
     # Test
     test <- helperTest(div_df, group=div_obj@group, status=div_obj@status, q = q)
@@ -668,7 +685,8 @@ calculateBetaDiversity <- function(div_obj,
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
-
+	if (!(0 %in% q)) { q <- c(0, q) }
+		
     # Compute pairwise beta diversity for bootstrap instances
     group_pairs <- combn(div_obj@groups, 2, simplify=F)
     beta_diversity_list <- list()
@@ -686,6 +704,16 @@ calculateBetaDiversity <- function(div_obj,
     # Beta groups
     div_groups=unique(div[["COMPARISON"]])
     
+    # Compute evenness
+    div_qi <- div %>%
+        filter(Q == 0) %>%
+        select(one_of(c("COMPARISON", "D")))
+
+    div <- div %>%
+        right_join(div_qi, by = "COMPARISON", suffix = c("", "_0")) %>%
+        mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
+        select(-D_0)
+		
     # Test
     #test <- testDiversity_(div_df, group=div_obj@group, status=div_obj@status, q = q)
     
@@ -712,7 +740,8 @@ calculateRDI <- function(div_obj,
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
-    
+    if (!(0 %in% q)) { q <- c(0, q) }
+		
     # Compute RDI type beta diversity for each status from bootstrap instances
     div <- div_obj@bootstrap %>%
         dplyr::ungroup() %>%
@@ -723,6 +752,16 @@ calculateRDI <- function(div_obj,
     if (is.null(div_obj@status)) {div_groups <- NULL} else {
         div_groups=unique(div[[div_obj@status]])
     }
+	
+    # Compute evenness
+    div_qi <- div %>%
+        filter(Q == 0) %>%
+        select(one_of(c(div_obj@status, "D")))
+
+    div <- div %>%
+        right_join(div_qi, by = div_obj@status, suffix = c("", "_0")) %>%
+        mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
+        select(-D_0)
     
     div_obj@rdi <- new("DiversityCalculation",
              div=div, 
@@ -737,6 +776,35 @@ calculateRDI <- function(div_obj,
 }    
 
 
+
+#TODO: preserve rarefyDiversity and estimateAbundance, progress not implemented
+
+estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.95, 
+                              nboot=2000, progress=FALSE) {
+	diversity_obj <- createDiversityObject(data, group=group, clone=clone, copy=copy, nboot=nboot)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj, ci=ci)
+	
+	return(diversity_obj@alpha)						  
+}
+
+rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
+                            min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
+                            ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
+
+	diversity_obj <- createDiversityObject(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, uniform=uniform)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
+	
+	return(diversity_obj@alpha)	
+}
+
+testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
+                          min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
+
+	diversity_obj <- createDiversityObject(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj, min_q=q, max_q=q, step_q=0)
+	
+	return(diversity_obj@alpha)	
+}
 
 #' Pairwise test of the diversity index
 #' 
@@ -918,7 +986,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             line_color <- "black"
         }
         # Define plot
-        p1 <- ggplot(data$data, aes_string(x="RANK", y="P")) + 
+        p1 <- ggplot(data@abund, aes_string(x="RANK", y="P")) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('Rank') +
@@ -1100,7 +1168,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' plotDiversityTest(div, legend_title="Sample")
 #' 
 #' @export
-plotDiversityTest <- function(data, q_i, colors=NULL, main_title="Diversity", 
+plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity", 
                               legend_title="Group", log_d=FALSE, 
                               annotate=c("none", "depth"),
                               silent=FALSE, ...) {
@@ -1108,6 +1176,9 @@ plotDiversityTest <- function(data, q_i, colors=NULL, main_title="Diversity",
     # Check if abundance is in data
     if (is.null(data@test$test)) { stop("missing testing from data") }
     
+	# Set q_i if NULL (when using testDiversity function)
+	if(is.null(q_i)){q_i <- unique(unlist(div_obj@alpha@test$test["Q"]))[-1]}
+	
     # Check if q is in data
     if (!(q_i %in% data@q)) { stop("hill index not assessed") }
     

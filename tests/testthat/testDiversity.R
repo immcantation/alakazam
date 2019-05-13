@@ -70,22 +70,24 @@ test_that("calcInferredDiversity", {
 test_that("generalizeDiversity", {
 	
     set.seed(90)
-    curve <- generalizeDiversity(db, group="SAMPLE", nboot=100)
-    expect_equal(curve$abund$P[1:6], 
-                 c(0.00315, 0.00255, 0.00095, 0.00105, 0.0011, 0.0011),
-                 tolerance=0.001)
-    expect_equal(curve$abund$LOWER[c(1:3,8:10)],
-                 c(0, 0, 0, 0, 0, 0),
+	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot=100)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj)
+	expect_equal(diversity_obj@alpha@abund$P[1:5], 
+	             c(0.0026, 0.0025, 0.0016, 0.0014, 9e-04),
+	             tolerance=0.001)
+	expect_equal(diversity_obj@alpha@abund$LOWER[c(1:3,8:10)],
+	             c(0, 0, 0, 0, 0, 0),
+	             tolerance = 0.001)
+    expect_equal(diversity_obj@alpha@abund$UPPER[45:50],
+                 c(0.00614, 0.01148, 0.03103, 0.00907, 0.00753, 0.01022),
                  tolerance = 0.001)
-    expect_equal(curve$abund$UPPER[45:50],
-                 c(0.00614, 0.01147, 0.03102, 0.00906, 0.00753, 0.01021),
-                 tolerance = 0.001)
-    expect_equal(curve$abund$RANK[200:203], c(44, 22, 53, 62))
+    expect_equal(diversity_obj@alpha@abund$RANK[200:203], c(80, 101, 70, 61))
 	
 	
 	set.seed(5)
-	curve <- generalizeDiversity(db, group="SAMPLE", step_q=1, max_q=10, nboot=100)
-	obs <- curve$div[c(1,3,9,20),]
+	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot= 100)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj, step_q=1, max_q=10)
+	obs <- diversity_obj@alpha@div[c(1,3,9,20),]
     
 	exp <- data.frame(
 	        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
@@ -108,10 +110,11 @@ test_that("generalizeDiversity", {
     
     
     set.seed(3)
-	curve <- generalizeDiversity(db, group="SAMPLE", min_n=30, nboot=100)
-	expect_equal(curve$test$tests$PVALUE[1:5], 
+	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot= 100, min_n=30)
+	diversity_obj <- calculateAlphaDiversity(diversity_obj)
+	expect_equal(diversity_obj@alpha@test$tests$PVALUE[1:5], 
 			c(0.42,0.56,0.76,0.82,0.40), tolerance=0.001)
-	expect_equal(curve$test$summary$MEAN[1:5], 
+	expect_equal(diversity_obj@alpha@test$summary$MEAN[1:5], 
 			c(114.59, 71.86939, 46.32797, 31.92986, 23.940736), tolerance=0.001)
 			
 })

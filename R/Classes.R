@@ -11,10 +11,6 @@
 
 #### Diversity classes ####
 
-setClassUnion("charOrNULL",members =c("character","NULL"))
-setClassUnion("dfOrNULL",members =c("data.frame","NULL"))
-setClassUnion("listOrNULL",members =c("list","NULL"))
-
 #' S4 class defining a clonal abundance curve
 #'
 #' \code{AbundanceCurve} defines clonal abundance values.
@@ -39,6 +35,11 @@ setClassUnion("listOrNULL",members =c("list","NULL"))
 #' @rdname       AbundanceCurve-class
 #' @aliases      AbundanceCurve
 #' @exportClass  AbundanceCurve
+
+setClassUnion("charOrNULL",members =c("character","NULL"))
+setClassUnion("dfOrNULL",members =c("data.frame","NULL"))
+setClassUnion("listOrNULL",members =c("list","NULL"))
+
 setClass("DiversityCalculation", 
          slots=c(
              div="data.frame", 
@@ -80,6 +81,7 @@ setClass("DiversityCalculation",
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
 setClassUnion("dcOrNULL",members =c("DiversityCalculation","NULL"))
+
 setClass("DiversityObject", 
          slots=c(
              data="data.frame",
