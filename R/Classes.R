@@ -152,7 +152,7 @@ setClass("DiversityTest",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@data) })
+# setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@abund) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -168,7 +168,7 @@ setMethod("plot", c(x="DiversityCalculation", y="missing"),
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@data) })
+setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@div) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -184,7 +184,7 @@ setMethod("plot", c(x="DiversityCalculation", y="missing"),
 #' @rdname   DiversityTest-class
 #' @aliases  DiversityTest-method
 #' @export
-setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@tests) })
+setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@test$test) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityTest}.
