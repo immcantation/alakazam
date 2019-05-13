@@ -11,6 +11,10 @@
 
 #### Diversity classes ####
 
+setClassUnion("charOrNULL",members =c("character","NULL"))
+setClassUnion("dfOrNULL",members =c("data.frame","NULL"))
+setClassUnion("listOrNULL",members =c("list","NULL"))
+
 #' S4 class defining a clonal abundance curve
 #'
 #' \code{AbundanceCurve} defines clonal abundance values.
@@ -35,13 +39,15 @@
 #' @rdname       AbundanceCurve-class
 #' @aliases      AbundanceCurve
 #' @exportClass  AbundanceCurve
-setClass("AbundanceCurve", 
-         slots=c(data="data.frame", 
-                 groups="character", 
-                 n="numeric", 
-                 nboot="numeric", 
-                 ci="numeric"))
-
+setClass("DiversityCalculation", 
+         slots=c(
+             div="data.frame", 
+             abund="dfOrNULL", 
+             test="listOrNULL",
+             div_group="charOrNULL",
+			 div_groups="charOrNULL",
+             q="numeric",  
+             ci="numeric"))
 
 #' S4 class defining a diversity curve 
 #'
@@ -73,12 +79,23 @@ setClass("AbundanceCurve",
 #' @rdname       DiversityCurve-class
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
-setClass("DiversityCurve", 
-         slots=c(data="data.frame", 
-                 groups="character", 
-                 n="numeric", 
-                 nboot="numeric", 
-                 ci="numeric"))
+setClassUnion("dcOrNULL",members =c("DiversityCalculation","NULL"))
+setClass("DiversityObject", 
+         slots=c(
+             data="data.frame",
+             bootstrap="data.frame", 
+             alpha="dcOrNULL", 
+             beta="dcOrNULL", 
+             rdi="dcOrNULL", 
+             group="character",
+             groups="character",
+             clone="character",
+             status="charOrNULL",
+			 copy="charOrNULL", 
+             uniform="logical",
+             ndepth="numeric", 
+			 nboot="numeric", 
+             min_n="numeric"))
 
 
 #' S4 class defining diversity significance
@@ -133,7 +150,7 @@ setClass("DiversityTest",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@data) })
+setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@data) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -141,7 +158,7 @@ setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@data) })
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("plot", c(x="AbundanceCurve", y="missing"),
+setMethod("plot", c(x="DiversityCalculation", y="missing"),
           function(x, y, ...) { plotAbundanceCurve(x, ...) })
 
 #' @param    x    DiversityCurve object
@@ -149,7 +166,7 @@ setMethod("plot", c(x="AbundanceCurve", y="missing"),
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
+setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@data) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -157,7 +174,7 @@ setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("plot", c(x="DiversityCurve", y="missing"),
+setMethod("plot", c(x="DiversityCalculation", y="missing"),
           function(x, y, ...) { plotDiversityCurve(x, ...) })
 
 #' @param    x    DiversityTest object.
@@ -165,7 +182,7 @@ setMethod("plot", c(x="DiversityCurve", y="missing"),
 #' @rdname   DiversityTest-class
 #' @aliases  DiversityTest-method
 #' @export
-setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
+setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@tests) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityTest}.
@@ -173,7 +190,7 @@ setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
 #' @rdname   DiversityTest-class
 #' @aliases  DiversityTest-method
 #' @export
-setMethod("plot", c(x="DiversityTest", y="missing"),
+setMethod("plot", c(x="DiversityCalculation", y="missing"),
           function(x, y, ...) { plotDiversityTest(x, ...) })
 
 
