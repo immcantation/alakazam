@@ -65,29 +65,33 @@ test_that("calcInferredDiversity", {
   
 })
 
-#### generalizeDiversity ####
+#### bootstrapDiversity ####
 
-test_that("generalizeDiversity", {
+test_that("bootstrapDiversity", {
 	
-    set.seed(90)
-	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot=100)
-	diversity_obj <- calculateAlphaDiversity(diversity_obj)
-	expect_equal(diversity_obj@alpha@abund$P[1:5], 
+	set.seed(90)
+	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
+	expect_equal(bootstrap_obj@abund$P[1:5], 
 	             c(0.0026, 0.0025, 0.0016, 0.0014, 9e-04),
 	             tolerance=0.001)
-	expect_equal(diversity_obj@alpha@abund$LOWER[c(1:3,8:10)],
+	expect_equal(bootstrap_obj@abund$LOWER[c(1:3,8:10)],
 	             c(0, 0, 0, 0, 0, 0),
 	             tolerance = 0.001)
-    expect_equal(diversity_obj@alpha@abund$UPPER[45:50],
-                 c(0.00614, 0.01148, 0.03103, 0.00907, 0.00753, 0.01022),
-                 tolerance = 0.001)
-    expect_equal(diversity_obj@alpha@abund$RANK[200:203], c(80, 101, 70, 61))
+	expect_equal(bootstrap_obj@abund$UPPER[45:50],
+	             c(0.00614, 0.01148, 0.03103, 0.00907, 0.00753, 0.01022),
+	             tolerance = 0.001)
+	expect_equal(bootstrap_obj@abund$RANK[200:203], c(80, 101, 70, 61))
+
+})
+
 	
-	
+#### calculateAlphaDiversity ####
+
+test_that("calculateAlphaDiversity", {	
 	set.seed(5)
-	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot= 100)
-	diversity_obj <- calculateAlphaDiversity(diversity_obj, step_q=1, max_q=10)
-	obs <- diversity_obj@alpha@div[c(1,3,9,20),]
+	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
+	diversity_obj <- calculateAlphaDiversity(bootstrap_obj, step_q=1, max_q=10)
+	obs <- diversity_obj@div[c(1,3,9,20),]
     
 	exp <- data.frame(
 	        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
@@ -96,6 +100,9 @@ test_that("generalizeDiversity", {
 	        "D" = c(103.230000, 6.579179, 4.289926, 4.336549),
 	        "D_LOWER" = c(0.000000, 4.838821, 3.095485, 2.777339),
 	        "D_UPPER" = c(210.995026, 8.319536, 5.484366, 5.895759),
+	        "E" = c(1.00000000, 0.06373320, 0.04155697, 0.07837609),
+	        "E_LOWER" = c(0.000000, 0.04687418, 0.02998629, 0.05019589),
+	        "E_UPPER" = c(2.04393128, 0.08059223, 0.05312764, 0.10655628),
 	        stringsAsFactors = F
 	    )
 
@@ -110,11 +117,11 @@ test_that("generalizeDiversity", {
     
     
     set.seed(3)
-	diversity_obj <- createDiversityObject(db, group="SAMPLE", nboot= 100, min_n=30)
-	diversity_obj <- calculateAlphaDiversity(diversity_obj)
-	expect_equal(diversity_obj@alpha@test$tests$PVALUE[1:5], 
+    bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
+    diversity_obj <- calculateAlphaDiversity(bootstrap_obj)
+	expect_equal(diversity_obj@test$tests$PVALUE[1:5], 
 			c(0.42,0.56,0.76,0.82,0.40), tolerance=0.001)
-	expect_equal(diversity_obj@alpha@test$summary$MEAN[1:5], 
+	expect_equal(diversity_obj@test$summary$MEAN[1:5], 
 			c(114.59, 71.86939, 46.32797, 31.92986, 23.940736), tolerance=0.001)
 			
 })

@@ -36,19 +36,18 @@
 #' @aliases      AbundanceCurve
 #' @exportClass  AbundanceCurve
 
-setClassUnion("charOrNULL",members =c("character","NULL"))
-setClassUnion("dfOrNULL",members =c("data.frame","NULL"))
-setClassUnion("listOrNULL",members =c("list","NULL"))
-
-setClass("DiversityCalculation", 
+setClass("AbundanceCurve", 
          slots=c(
-             div="data.frame", 
-             abund="dfOrNULL", 
-             test="listOrNULL",
-             div_group="charOrNULL",
-			 div_groups="charOrNULL",
-             q="numeric",  
-             ci="numeric"))
+			 abund="data.frame",
+             bootstrap="data.frame",
+             group="character",
+             groups="character",
+             clone="character",
+             uniform="logical",
+             ndepth="numeric", 
+			 ci="numeric",
+			 nboot="numeric", 
+             min_n="numeric"))
 
 #' S4 class defining a diversity curve 
 #'
@@ -80,69 +79,21 @@ setClass("DiversityCalculation",
 #' @rdname       DiversityCurve-class
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
-setClassUnion("dcOrNULL",members =c("DiversityCalculation","NULL"))
 
-setClass("DiversityObject", 
-         slots=c(
-             data="data.frame",
-             bootstrap="data.frame", 
-             alpha="dcOrNULL", 
-             beta="dcOrNULL", 
-             rdi="dcOrNULL", 
-             group="character",
-             groups="character",
-             clone="character",
-             status="charOrNULL",
-			 copy="charOrNULL", 
-             uniform="logical",
-             ndepth="numeric", 
-			 nboot="numeric", 
-             min_n="numeric"))
+setClassUnion("listOrNULL",members =c("list","NULL"))
 
-
-#' S4 class defining diversity significance
-#'
-#' \code{DiversityTest} defines the signifance of diversity (\eqn{D}) differences at a 
-#' fixed diversity order (\eqn{q}).
-#' 
-#' @slot  tests    data.frame describing the significance test results with columns:
-#'                 \itemize{
-#'                   \item  \code{TEST}:        string listing the two groups tested.
-#'                   \item  \code{DELTA_MEAN}:  mean of the \eqn{D} bootstrap delta 
-#'                                              distribution for the test.
-#'                   \item  \code{DELTA_SD}:    standard deviation of the \eqn{D} 
-#'                                              bootstrap delta distribution for the test.
-#'                   \item  \code{PVALUE}:      p-value for the test.
-#'                 }
-#' @slot  summary  data.frame containing summary statistics for the diversity index 
-#'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
-#'                 \itemize{
-#'                   \item  \code{GROUP}:   the name of the group.
-#'                   \item  \code{MEAN}:    mean of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{SD}:      standard deviation of the \eqn{D} bootstrap 
-#'                                          distribution.
-#'                 }
-#' @slot  groups   character vector of groups retained in diversity calculation.
-#' @slot  q        diversity order tested (\eqn{q}).
-#' @slot  n        numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot    number of bootstrap realizations.
-#' 
-#' @name         DiversityTest-class
-#' @rdname       DiversityTest-class
-#' @aliases      DiversityTest
-#' @exportClass  DiversityTest
-setClass("DiversityTest", 
-         slots=c(tests="data.frame",
-                 summary="data.frame",
-                 groups="character", 
-                 q="numeric",
-                 n="numeric", 
-                 nboot="numeric"))
-
-
+setClass("DiversityCurve", 
+          slots=c(
+             div="data.frame", 
+             test="listOrNULL",
+ 			 method="character",
+             div_group="character",
+ 			 div_groups="character",
+             q="numeric",  
+             ci="numeric"))
+			  
 #### Diversity methods ####
 
-# TODO:  currently not used, implemented as lists
 # TODO:  plot method for DiversityTest
 # TODO:  summary method for DiversityTest
 # TODO:  summary method for DiversityCurve
@@ -152,7 +103,7 @@ setClass("DiversityTest",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-# setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@abund) })
+setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@abund) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -160,7 +111,7 @@ setClass("DiversityTest",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("plot", c(x="DiversityCalculation", y="missing"),
+setMethod("plot", c(x="AbundanceCurve", y="missing"),
           function(x, y, ...) { plotAbundanceCurve(x, ...) })
 
 #' @param    x    DiversityCurve object
@@ -168,7 +119,7 @@ setMethod("plot", c(x="DiversityCalculation", y="missing"),
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@div) })
+setMethod("print", c(x="DiversityCurve"), function(x) { print(x@method) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -176,24 +127,8 @@ setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@div) })
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("plot", c(x="DiversityCalculation", y="missing"),
+setMethod("plot", c(x="DiversityCurve", y="missing"),
           function(x, y, ...) { plotDiversityCurve(x, ...) })
-
-#' @param    x    DiversityTest object.
-#' 
-#' @rdname   DiversityTest-class
-#' @aliases  DiversityTest-method
-#' @export
-setMethod("print", c(x="DiversityCalculation"), function(x) { print(x@test$test) })
-
-#' @param    y    ignored.
-#' @param    ...  arguments to pass to \link{plotDiversityTest}.
-#' 
-#' @rdname   DiversityTest-class
-#' @aliases  DiversityTest-method
-#' @export
-setMethod("plot", c(x="DiversityCalculation", y="missing"),
-          function(x, y, ...) { plotDiversityTest(x, ...) })
 
 
 #### Lineage classes ####
