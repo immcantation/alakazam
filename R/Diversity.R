@@ -690,7 +690,7 @@ calculateAlphaDiversity <- function(boot_obj,
         select(one_of(c(boot_obj@group, "D")))
 
     div <- div %>%
-        right_join(div_qi, by = boot_obj@group, suffix = c("", "_0")) %>%
+        dplyr::right_join(div_qi, by = boot_obj@group, suffix = c("", "_0")) %>%
         mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
         select(-D_0)
     

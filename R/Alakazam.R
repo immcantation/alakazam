@@ -113,12 +113,13 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
-#' @importFrom  dplyr       do n desc %>%
+#' @importFrom  dplyr       do n desc %>% 
 #'                          data_frame data_frame_
 #'                          bind_cols bind_rows combine arrange arrange_ 
 #'                          group_by group_by_ ungroup
 #'                          filter filter_ slice slice_ select select_ 
-#'                          mutate mutate_ mutate_at
+#'                          mutate mutate_ mutate_at 
+#'							right_join
 #'                          summarize summarize_ summarize_at
 #'                          transmute transmute_ rename rename_ one_of
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
