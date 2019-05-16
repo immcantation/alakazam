@@ -335,9 +335,9 @@ inferRarefiedDiversity <- function(x, q, m) {
     return(D)
 }
 
-# Bootstraps clonal distributions under rarefaction
-#
-#' \code{bootstrapAbundance} divides a set of clones by a group annotation,
+#' Creates diversity object by bootstrapping clonal distributions under rarefaction
+#'
+#' \code{createDiversityObject} divides a set of clones by a group annotation,
 #' and resamples the sequences from each group, returning distributions of clone sizes.
 #'
 #' @param    data      data.frame with Change-O style columns containing clonal assignments.
@@ -517,7 +517,19 @@ createDiversityObject <- function(data, group,
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
+
+
 # Define helper functions
+
+
+
+
+#' Helper function for computing alpha diversity from bootrstrap outputs
+#'
+#' \code{helperAlpha} divides a set of bootstrapped clones by group and status annotation,
+#' and computes the diversity of each set. 
+#'
+#' @param
 helperAlpha <- function(boot_output, q, clone=NULL, group=NULL, status=NULL){
 
     # Compute diversity from a column of each bootstrap
@@ -530,6 +542,14 @@ helperAlpha <- function(boot_output, q, clone=NULL, group=NULL, status=NULL){
 
     return(output)
 }
+
+
+#' Helper function for computing beta diversity from bootrstrap outputs
+#'
+#' \code{helperBeta} divides a set of bootstrapped clones by group and status annotation,
+#' and computes the alpha diversity. Group and status annotation are then ignored and 
+#' gamma diversity is then computed. A multiplicative beta diversity is used corresponding
+#' to the ratio of the gamma diversity divided by theaverage alpha diversity of each set.
 
 helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL, status=NULL){
 
@@ -561,6 +581,14 @@ helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL, status=NULL
 
     return(div)
 }
+
+#' Helper function for computing statistical significance
+#'
+#' \code{helperTest} computes the pairwise statistical significance of differences
+#' in bootstrapped diversity values between two sets defined by the group column. 
+#' A p-value is computed using the ECDF distribution as the frequency of bootstrap iterations
+#' for which no difference is observed. 
+
 
 helperTest <- function(div_df, group, status=NULL, q = q){
 
@@ -609,6 +637,13 @@ helperTest <- function(div_df, group, status=NULL, q = q){
     return(test_div)
 }
 
+
+#' Function for computing the alpha diversity of bootstrap iterations
+#'
+#' \code{calculateAlphaDiversity} takes in a diversity object containing bootstrapped 
+#' and potentially rarefied samples of clones and computes an alpha diversity metric (Hill) 
+#' across a range of values (Hill values). An abundance curve is also provided along with 
+#' statistical testing for significant pairwise differences in diversity. 
 
 
 calculateAlphaDiversity <- function(div_obj, 
@@ -674,6 +709,13 @@ calculateAlphaDiversity <- function(div_obj,
    return(div_obj) 
 }
 
+#' Function for computing the pairwise beta diversity of bootstrap iterations
+#'
+#' \code{calculateBetaDiversity} takes in a diversity object containing bootstrapped 
+#' and potentially rarefied samples of clones and computes pairwise beta diversity metrics (Hill) 
+#' across a range of values (Hill values). This is performed by using the \code{helperBeta} function
+#' for pairs of groups of clones. Currently, an abundance curve is not provided as an output.  
+#' Statistical testing for significant pairwise differences in diversity is also not implemented. 
 
 calculateBetaDiversity <- function(div_obj, 
             min_q=0, max_q=4, step_q=0.1, 
@@ -729,6 +771,13 @@ calculateBetaDiversity <- function(div_obj,
 	return(div_obj)
 }
 
+#' Function for computing beta diversity of multiple groups from bootstrap iterations
+#'
+#' \code{calculateRDI} takes in a diversity object containing bootstrapped and potentially rarefied 
+#' samples of clones and computes beta diversity metrics (Hill) across a range of values (Hill values)
+#' for multiple groups (more than 2) grouped by statis.  This is performed by using the 
+#' \code{helperBeta} function. Currently, an abundance curve is not provided as an output.  
+#' Statistical testing for significant pairwise differences in diversity is also not implemented. 
 
 calculateRDI <- function(div_obj, 
             min_q=0, max_q=4, step_q=0.1, 
@@ -777,7 +826,64 @@ calculateRDI <- function(div_obj,
 
 
 
-#TODO: preserve rarefyDiversity and estimateAbundance, progress not implemented
+#' Estimates the complete clonal relative abundance distribution
+#' 
+#' \code{estimateAbundance} estimates the complete clonal relative abundance distribution 
+#' and confidence intervals on clone sizes using bootstrapping.
+#' 
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    group     name of the \code{data} column containing group identifiers. 
+#'                     If \code{NULL} then no grouping is performed and the \code{GROUP} 
+#'                     column of the output will contain the value \code{NA} for each row.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
+#' @param    progress  if \code{TRUE} show a progress bar. 
+#' 
+#' @return   A data.frame with relative clonal abundance data and confidence intervals,
+#'           containing the following columns:
+#'           \itemize{
+#'             \item  \code{GROUP}:  group identifier. Will be code{NA} if \code{group=NULL}.
+#'             \item  \code{CLONE}:  clone identifier.
+#'             \item  \code{P}:      relative abundance of the clone.
+#'             \item  \code{LOWER}:  lower confidence inverval bound.
+#'             \item  \code{UPPER}:  upper confidence interval bound.
+#'             \item  \code{RANK}:   the rank of the clone abundance.
+#'           }
+#'           
+#' @details
+#' The complete clonal abundance distribution determined inferred by using the Chao1 
+#' estimator to estimate the number of seen clones, and then applying the relative abundance 
+#' correction and unseen clone frequencies described in Chao et al, 2015.
+#'
+#' Confidence intervals are derived using the standard deviation of the resampling 
+#' realizations, as described in Chao et al, 2015.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45-67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
+#' }
+#' 
+#' @seealso  
+#' See \link{plotAbundanceCurve} for plotting of the abundance distribution.
+#' See \link{rarefyDiversity} for a similar application to clonal diversity.
+#'           
+#' @examples
+#' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
+#'
+#' @export
 
 estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.95, 
                               nboot=2000, progress=FALSE) {
@@ -786,6 +892,87 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
 	
 	return(diversity_obj@alpha)						  
 }
+
+
+#' Generate a clonal diversity index curve
+#'
+#' \code{rarefyDiversity} divides a set of clones by a group annotation,
+#' resamples the sequences from each group, and calculates diversity
+#' scores (\eqn{D}) over an interval of diversity orders (\eqn{q}).
+#' 
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    min_q     minimum value of \eqn{q}.
+#' @param    max_q     maximum value of \eqn{q}.
+#' @param    step_q    value by which to increment \eqn{q}.
+#' @param    min_n     minimum number of observations to sample.
+#'                     A group with less observations than the minimum is excluded.
+#' @param    max_n     maximum number of observations to sample. If \code{NULL} then no 
+#'                     maximum is set.
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
+#' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
+#'                     number of observations. If \code{FALSE} then allow each group to
+#'                     be resampled to its original size or, if specified, \code{max_size}.
+#' @param    progress  if \code{TRUE} show a progress bar.
+#' 
+#' @return   A \link{DiversityCurve} object summarizing the diversity scores.
+#' 
+#' @details
+#' Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
+#' proposed by Hill (Hill, 1973). See \link{calcDiversity} for further details.
+#'
+#' Diversity is calculated on the estimated complete clonal abundance distribution.
+#' This distribution is inferred by using the Chao1 estimator to estimate the number
+#' of seen clones, and applying the relative abundance correction and unseen clone
+#' frequency described in Chao et al, 2015.
+#'
+#' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
+#' \code{min_q} to \code{max_q} incremented by \code{step_q}.  When \code{uniform=TRUE}
+#' variability in total sequence counts across unique values in the \code{group} column 
+#' is corrected by repeated resampling from the estimated complete clonal distribution to a 
+#' common number of sequences.
+#' 
+#' The diversity index (\eqn{D}) for each group is the mean value of over all resampling 
+#' realizations. Confidence intervals are derived using the standard deviation of the 
+#' resampling realizations, as described in Chao et al, 2015.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427-32.
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45-67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
+#' }
+#'  
+#' @seealso  See \link{calcDiversity} for the basic calculation and 
+#'           \link{DiversityCurve} for the return object. 
+#'           See \link{testDiversity} for significance testing.
+#'           See \link{plotDiversityCurve} for plotting the return object.
+#' 
+#' @examples
+#' # Group by sample identifier
+#' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
+#' plotDiversityCurve(div, legend_title="Sample")
+#'                    
+#' # Grouping by isotype rather than sample identifier
+#' div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+#'                        nboot=100)
+#' plotDiversityCurve(div, legend_title="Isotype")
+#'
+#' @export
 
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
@@ -796,6 +983,88 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 	
 	return(diversity_obj@alpha)	
 }
+
+#' Pairwise test of the diversity index
+#' 
+#' \code{testDiversity} performs pairwise significance tests of the diversity index 
+#' (\eqn{D}) at a given diversity order (\eqn{q}) for a set of annotation groups via
+#' rarefaction and bootstrapping.
+#'
+#' @param    data      data.frame with Change-O style columns containing clonal assignments.
+#' @param    q         diversity order to test.
+#' @param    group     name of the \code{data} column containing group identifiers.
+#' @param    clone     name of the \code{data} column containing clone identifiers.
+#' @param    copy      name of the \code{data} column containing copy numbers for each 
+#'                     sequence. If \code{copy=NULL} (the default), then clone abundance
+#'                     is determined by the number of sequences. If a \code{copy} column
+#'                     is specified, then clone abundances is determined by the sum of 
+#'                     copy numbers within each clonal group.
+#' @param    min_n     minimum number of observations to sample.
+#'                     A group with less observations than the minimum is excluded.
+#' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
+#'                     if automatically determined from the size of the largest group.
+#' @param    nboot     number of bootstrap realizations to perform.
+#' @param    progress  if \code{TRUE} show a progress bar.
+#' 
+#' @return   A \link{DiversityTest} object containing p-values and summary statistics.
+#' 
+#' @details
+#' Clonal diversity is calculated using the generalized diversity index proposed by 
+#' Hill (Hill, 1973). See \link{calcDiversity} for further details.
+#' 
+#' Diversity is calculated on the estimated complete clonal abundance distribution.
+#' This distribution is inferred by using the Chao1 estimator to estimate the number
+#' of seen clones, and applying the relative abundance correction and unseen clone
+#' frequency described in Chao et al, 2014.
+#'
+#' Variability in total sequence counts across unique values in the \code{group} column is 
+#' corrected by repeated resampling from the estimated complete clonal distribution to 
+#' a common number of sequences. The diversity index estimate (\eqn{D}) for each group is 
+#' the mean value of over all bootstrap realizations. 
+#' 
+#' Significance of the difference in diversity index (\eqn{D}) between groups is tested by 
+#' constructing a bootstrap delta distribution for each pair of unique values in the 
+#' \code{group} column. The bootstrap delta distribution is built by subtracting the diversity 
+#' index \eqn{Da} in \eqn{group-a} from the corresponding value \eqn{Db} in \eqn{group-b}, 
+#' for all bootstrap realizations, yeilding a distribution of \code{nboot} total deltas; where 
+#' \eqn{group-a} is the group with the greater mean \eqn{D}. The p-value for hypothesis 
+#' \eqn{Da  !=  Db} is the value of \eqn{P(0)} from the empirical cumulative distribution 
+#' function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.
+#' 
+#' @note
+#' This method may inflate statistical significance when clone sizes are uniformly small,
+#' such as when most clones sizes are 1, sample size is small, and \code{max_n} is near
+#' the total count of the smallest data group. Use caution when interpreting the results 
+#' in such cases. We are currently investigating this potential problem.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427-32.
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Wu Y-CB, et al. Influence of seasonal exposure to grass pollen on local and 
+#'            peripheral blood IgE repertoires in patients with allergic rhinitis. 
+#'            J Allergy Clin Immunol. 2014 134(3):604-12.
+#'   \item  Chao A, et al. Rarefaction and extrapolation with Hill numbers: 
+#'            A framework for sampling and estimation in species diversity studies. 
+#'            Ecol Monogr. 2014 84:45-67.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
+#' }
+#' 
+#' @seealso  See \link{calcDiversity} for the basic calculation and 
+#'           \link{DiversityTest} for the return object. 
+#'           See \link{rarefyDiversity} for curve generation.
+#'           See \link{ecdf} for computation of the empirical cumulative 
+#'           distribution function.
+#' 
+#' @examples  
+#' # Groups under the size threshold are excluded and a warning message is issued.
+#' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
+#' 
+#' @export
 
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
                           min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
