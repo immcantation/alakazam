@@ -44,7 +44,7 @@ setClass("AbundanceCurve",
              groups="character",
              clone="character",
              uniform="logical",
-             nax_n="numeric", 
+             max_n="numeric", 
 			 ci="numeric",
 			 nboot="numeric", 
              min_n="numeric"))
