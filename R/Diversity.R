@@ -348,7 +348,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'                     is determined by the number of sequences. If a \code{copy} column
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
-#' @param    ndepth    number of observations to sample. If \code{NULL} then 
+#' @param    max_n    number of observations to sample. If \code{NULL} then 
 #'                     no rarefaction is performed. 
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
@@ -359,22 +359,22 @@ inferRarefiedDiversity <- function(x, q, m) {
 
 estimateAbundance <- function(data, group, 
     clone="CLONE", copy = NULL, 
-    uniform=TRUE, ndepth = NULL, nboot = 200, min_n = 30, max_n=NULL, ci=0.95){
+    uniform=TRUE, nboot = 200, min_n = 30, max_n=NULL, ci=0.95){
      
 	# Set confidence interval for plotting
 	ci_z <- ci + (1 - ci) / 2
 		
     # Private bootstrap function
-    bootstrap_ <- function(data, ndepth=ndepth){
+    bootstrap_ <- function(data, max_n=max_n){
     
         # Tabulate clones
         clone_tab <- data %>% countClones(copy=copy, clone=clone)
 
-        # Set ndepth
-        ndepth_check <- clone_tab %>%
+        # Set max_n
+        max_n_check <- clone_tab %>%
             dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
             min(.$SEQUENCES)
-        if(is.null(ndepth)){ndepth <- ndepth_check}
+        if(is.null(max_n)){max_n <- max_n_check}
 
         # Infer Abundance
         abund_obs <- clone_tab %>% 
@@ -383,7 +383,7 @@ estimateAbundance <- function(data, group,
             adjustObservedAbundance()
 
         # Generate bootstrap distributions
-        sample_mat <- rmultinom(n=nboot, size=ndepth, abund_obs)
+        sample_mat <- rmultinom(n=nboot, size=max_n, abund_obs)
 
         return(sample_mat)
     }
@@ -397,27 +397,21 @@ estimateAbundance <- function(data, group,
     if (check != TRUE) { stop(check) }
 
     # Check the smallest sample depth
-    sequence_ndepths <- data %>% 
+    sequence_max_ns <- data %>% 
         countClones(copy=copy, clone=clone, group=group) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
         dplyr::select(SEQUENCES) %>% unlist() 
     
     # Check the smallest sample is not smaller than min_n
-    if(min(sequence_ndepths) < min_n){stop("too few sequences in some samples")}
+    if(min(sequence_max_ns) < min_n){stop("too few sequences in some samples")}
 	
-	# If max_n is set
-	if(!is.null(max_n)){
-		if(max(sequence_ndepths) > max_n){stop("too many sequences in some samples")}
-		if(!is.null(ndepth)){if(uniform & ndepth > max_n){ndepth <- max_n}}
-	}
-	
-    # If rarefaction is turned on, set an ndepth. Otherwise NULL ndepth (ignore).
-    if(uniform & is.null(ndepth)){ndepth <- min(sequence_ndepths)} else {ndepth <- NULL}
+    # If rarefaction is turned on, set an max_n. Otherwise NULL max_n (ignore).
+    if(uniform & is.null(max_n)){max_n <- min(sequence_max_ns)} else {max_n <- NULL}
 	
     # Bootstrap abundance curves
     boot_output <- data %>%
         dplyr::group_by_(.dots=c(group)) %>%
-        dplyr::do(data.frame(bootstrap_(., ndepth=ndepth)) %>% 
+        dplyr::do(data.frame(bootstrap_(., max_n=max_n)) %>% 
         tibble::rownames_to_column(clone))
     
     # Groups
@@ -427,7 +421,7 @@ estimateAbundance <- function(data, group,
     abund <- boot_output %>%
         tidyr::gather(key = "N", value = "C", -one_of(c(clone, group))) %>%
         dplyr::group_by_(.dots=c(clone, group)) %>%
-        dplyr::summarize(P_ERROR = qnorm(ci_z) * sd(C/ndepth), P = mean(C/ndepth)) %>%
+        dplyr::summarize(P_ERROR = qnorm(ci_z) * sd(C/max_n), P = mean(C/max_n)) %>%
         dplyr::mutate(LOWER = pmax(P - P_ERROR, 0), UPPER = P + P_ERROR) %>%
         dplyr::group_by_(.dots=c(group)) %>%
         dplyr::mutate(RANK = rank(-P, ties.method = "first"))
@@ -440,7 +434,7 @@ estimateAbundance <- function(data, group,
              groups=groups,
              clone=clone,
              uniform=uniform,
-             ndepth=ndepth, 
+             max_n=max_n, 
 			 nboot=nboot, 
 			 ci=ci,
              min_n=min_n
@@ -721,7 +715,7 @@ calculateAlphaDiversity <- function(boot_obj,
 calculateBetaDiversity <- function(boot_obj, comparisons,
             min_q=0, max_q=4, step_q=0.1, 
             ci = 0.95){
-    boot_obj
+				
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
@@ -1152,7 +1146,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
         group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
         stop("option not implemented")
-#         group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+#         group_labels <- setNames(paste0(data$groups, " (N=", data$max_n, ")"), 
 #                                  data$groups)
     }
     
@@ -1271,7 +1265,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
         group_labels <- setNames(data@div_groups, data@div_groups)
     } else if (annotate == "depth") {
         stop("option not implemented")
-#         group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+#         group_labels <- setNames(paste0(data$groups, " (N=", data$max_n, ")"), 
 #                                  data$groups)
     }
     
@@ -1393,7 +1387,7 @@ plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity
         group_labels <- setNames(data@div_groups, data@div_groups)
     } else if (annotate == "depth") {
         stop("option not implemented")
-#         group_labels <- setNames(paste0(data$groups, " (N=", data$ndepth, ")"), 
+#         group_labels <- setNames(paste0(data$groups, " (N=", data$max_n, ")"), 
 #                                  data$groups)
     }
     
