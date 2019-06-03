@@ -278,7 +278,7 @@ bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
     p_upper <- p + boot_err
     
     # Assemble and sort abundance data.frame
-    abund_df <- dplyr::data_frame(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
+    abund_df <- tibble(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
     abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
     abund_df$RANK <- 1:nrow(abund_df)
     

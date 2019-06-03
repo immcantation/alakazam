@@ -1,5 +1,14 @@
-Version 0.2.11.999:  March 22, 2019
+Version 0.2.11.999:  May 8, 2019
 -------------------------------------------------------------------------------
+
+General:
+
++ Added `ape` and `tibble` dependencies.
+
+Lineage:
+
++ Added `readIgphyml` to read in IgPhyML output and `combineIgphyml` to 
+  combine parameter estimates across samples.
 
 Diversity:
 

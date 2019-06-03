@@ -16,7 +16,8 @@ Arguments
 -------------------
 
 seq
-:   character vector containing a DNA sequences.
+:   character vector containing a DNA sequences. The sequence vector needs to
+be named.
 
 indx
 :   numeric vector contating the indices (a subset of indices of `seq`).
@@ -39,8 +40,10 @@ Value
 
 A matrix of numerical distance between each entry in `seq` and 
 sequences specified by `indx` indices. 
-If `seq` is a named vector, row and columns names will be added 
-accordingly.
+
+Note that the input subsampled indices will be ordered ascendingly. Therefore, 
+it is necassary to assign unique names to the input sequences, `seq`, 
+to recover the input order later. Row and columns names will be added accordingly.
 
 Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md). 
 Uses [seqDist](seqDist.md) for calculating distances between pairs.

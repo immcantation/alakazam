@@ -33,7 +33,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 # Dependencies
 
 **Depends:** ggplot2  
-**Imports:** dplyr, graphics, grid, igraph, lazyeval, methods, progress, Rcpp, readr, scales, seqinr, stats, stringi, tidyr, utils  
+**Imports:** ape, dplyr, graphics, grid, igraph, lazyeval, Matrix, methods, progress, Rcpp, readr, scales, seqinr, stats, stringi, tibble, tidyr, utils  
 **Suggests:** knitr, rmarkdown, testthat
 
 
@@ -45,6 +45,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
 [Nima Nouri](mailto:nima.nouri@yale.edu) (ctb)  
+[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
@@ -59,10 +60,10 @@ analyzing large-scale B cell immunoglobulin repertoire sequencing data.” _Bioi
 
 To cite the Ig-specific lineage reconstruction and diversity methods, please use:
 
-Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D,
-Ramanan S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells populating the multiple
-sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107.
-doi: 10.1126/scitranslmed.3008879 (URL: http://doi.org/10.1126/scitranslmed.3008879).
+Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A,
+Pitt D, Ramanan S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells populating
+the multiple sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_,
+*6*(248), 248ra107. doi: 10.1126/scitranslmed.3008879 (URL: http://doi.org/10.1126/scitranslmed.3008879).
 
 To see these entries in BibTeX format, use 'print(<citation>, bibtex=TRUE)', 'toBibtex(.)', or set
 'options(citation.bibtex.max=999)'.

@@ -1,3 +1,19 @@
+Version 0.2.11.999:  May 3, 2019
+-------------------------------------------------------------------------------
+
+General:
+
+Lineage:
+
++ Added `readIgphyml` to read in IgPhyML output, and `combineIgphyml` to 
+  combine parameter estimates across samples.
+
+Diversity:
+
++ Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
+  non-default value produced an error.
+
+
 Version 0.2.11:  September 12, 2018
 -------------------------------------------------------------------------------
 

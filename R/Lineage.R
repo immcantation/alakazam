@@ -612,3 +612,254 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     
     return(graph)
 }
+
+# Convert from rooted phylo to igraph object Requires uca 
+# and germid from rerootGermline. Places \code{germid} as the direct ancestor
+# of the true UCA of the tree by removing the node specified as the \code{uca}
+# attribute from rerootGermline.
+#
+# @param   phylo  An ape \code{phylo} object which has been processed through 
+#                 rerootGermine.
+phyloToGraph <- function(phylo) {
+    names <- 1:length(unique(c(phylo$edge[, 1],phylo$edge[, 2])))
+    for(i in 1:length(phylo$tip.label)){
+        names[i] <- phylo$tip.label[i]
+    }
+    d <- data.frame(cbind(phylo$edge,phylo$edge.length))
+    names(d)=c("from", "to", "weight")
+
+    germnode <- which(phylo$tip.label == phylo$germid)
+    d[d$from == phylo$uca, ]$from <- germnode
+    d <- d[!(d$from == germnode & d$to == germnode),] 
+
+    d$to <- as.character(d$to)
+    d$from <- as.character(d$from)
+    g <- igraph::graph_from_data_frame(d)
+    igraph::V(g)$name <- names[as.numeric(igraph::V(g)$name)]
+    
+    return(g)
+}
+
+# Reroot phylogenetic tree to have its germline sequence at a zero-length branch 
+# to a node which is the direct ancestor of the tree's UCA. Assigns \code{uca}
+# to be the ancestral node to the tree's germline sequence, as \code{germid} as
+# the tree's germline sequence ID. 
+#
+# @param   tree     An ape \code{phylo} object
+# @param   germid   ID of the tree's predicted germline sequence
+# @param   resolve  If \code{TRUE} reroots tree to specified germline sequnece.
+#                   usually not necessary with IgPhyML trees analyzed with HLP model.
+rerootGermline <- function(tree, germid, resolve=TRUE){
+    if(resolve) {
+        tree <- ape::root(phy=tree, outgroup=germid, resolve.root=T, edge.label=TRUE)
+    }
+    tree <- ape::reorder.phylo(tree, "postorder")  
+    edges <- tree$edge
+    rootnode <- which(tree$tip.label==germid)
+    rootedge <- which(edges[, 2] == rootnode)
+    rootanc <- edges[edges[, 2] == rootnode, 1]
+    mrcaedge <- which(edges[, 1] == rootanc & edges[, 2] != rootnode)
+    if(length(mrcaedge) > 1){
+            print("POLYTOMY AT ROOT?!")
+            quit(save="no", status=1, runLast=FALSE)
+    }
+    tree$edge.length[mrcaedge] <- tree$edge.length[mrcaedge] + tree$edge.length[rootedge]
+    tree$edge.length[rootedge] <- 0
+    tree$uca <- rootanc
+    tree$germid <- germid
+    
+    return(tree)
+}
+
+#' Read in output from IgPhyML
+#' 
+#' \code{readIgphyml} reads output from the IgPhyML phylogenetics inference package for 
+#' B cell repertoires
+#' 
+#' @param    file          IgPhyML output file (.tab).
+#' @param    id            ID to assign to output object.
+#' @param    format        if \code{"graph"} return trees as igraph \code{graph} objects. 
+#'                         if \code{"phylo"} return trees as ape \code{phylo} objects.
+#' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
+#'                         rather than substitutions per site, and collapse internal nodes
+#'                         separated by branches < 0.1 substitutions.
+#'                                                
+#' @return   A list containing IgPhyML model parameters and estimated lineage trees. 
+#'           
+#'           Object attributes:
+#'           \itemize{
+#'             \item  \code{param}:     Data.frame of parameter estimates for each clonal 
+#'                                      lineage. Columns include: \code{CLONE}, which is the 
+#'                                      clone id; \code{NSEQ}, the total number of sequences in 
+#'                                      the lineage; \code{NSITE}, the number of codon sites;
+#'                                      \code{TREE_LENGTH}, the sum of all branch lengths in 
+#'                                      the estimated lineage tree; and \code{LHOOD}, the log 
+#'                                      likelihood of the clone's sequences given the tree and
+#'                                      parameters. Subsequent columns are parameter estimates 
+#'                                      from IgPhyML, which will depend on the model used. 
+#'                                      Parameter columns ending with \code{_MLE} are maximum 
+#'                                      likelihood estimates; those ending with \code{_LCI} are 
+#'                                      the lower 95%% confidence interval estimate; those ending 
+#'                                      with \code{_UCI} are the upper 95%% confidence interval 
+#'                                      estimate. The first line of \code{param} is for clone 
+#'                                      \code{REPERTOIRE}, 
+#'                                      which is a summary of all lineages within the repertoire.
+#'                                      For this row, \code{NSEQ} is the total number of sequences, 
+#'                                      \code{NSITE} is the average number of sites, and
+#'                                      \code{TREE_LENGTH} is the mean tree length. For most 
+#'                                      applications, parameter values will be the same for all 
+#'                                      lineages within the repertoire, so access them simply by:
+#'                                      \code{<object>$param$OMEGA_CDR_MLE[1]} to, for instance,
+#'                                      get the estimate of dN/dS on the CDRs at the repertoire level.
+#'             \item  \code{trees}:     List of tree objects estimated by IgPhyML. If 
+#'                                      \code{format="graph"} these are igraph \code{graph} objects. 
+#'                                      If \code{format="phylo"}, these are ape \code{phylo} objects.
+#'             \item  \code{command}:   Command used to run IgPhyML.
+#'           }
+#'           
+#' @details
+#' \code{readIgphyml} reads output from the IgPhyML repertoire phylogenetics inference package. 
+#' The resulting object is divded between parameter estimates (usually under the HLP19 model),
+#' which provide information about mutation and selection pressure operating on the sequences.
+#' 
+#' Trees returned from this function are either igraph objects or phylo objects, and each may be 
+#' visualized accordingly. Futher, branch lengths in tree may represent either the expected number of
+#' substitutions per site (codon, if estimated under HLP or GY94 models), or the total number of 
+#' expected substitutions per site. If the latter, internal nodes - but not tips - separated by branch
+#' lengths less than 0.1 are collapsed to simplify viewing.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hoehn KB, Lunter G, Pybus OG - A Phylogenetic Codon Substitution Model for Antibody 
+#'              Lineages. Genetics 2017 206(1):417-427
+#'              https://doi.org/10.1534/genetics.116.196303 
+#'  \item  Hoehn KB, Vander Heiden JA, Zhou JQ, Lunter G, Pybus OG, Kleinstein SHK - 
+#'              Repertoire-wide phylogenetic models of B cell molecular evolution reveal 
+#'              evolutionary signatures of aging and vaccination. bioRxiv 2019  
+#'              https://doi.org/10.1101/558825 
+#' }
+#'
+#' @examples
+#' \dontrun{
+#'    # Read in and plot a tree from an igphyml run
+#'    library(igraph)
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    print(s1$param$OMEGA_CDR_MLE[1])
+#'    plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+#' }
+#' 
+#' @export
+readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE) {
+    # Check arguments
+    format <- match.arg(format)
+    
+    out <- list()
+    trees <- list()
+    df <- read.table(file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+    params <- df[, !names(df) %in% c("TREE")]
+    out[["param"]] <- params
+    out[["command"]] <- df[1, ]$TREE
+    for (i in 2:nrow(df)) {
+        tree <- ape::read.tree(text=df[i, ]$TREE)
+        rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"))
+        if (collapse) {
+            rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
+            rtree <- ape::di2multi(rtree, tol=0.1)
+        }
+        if (format == "graph") {
+            ig <- phyloToGraph(rtree)
+            trees[[df[i, ]$CLONE]] <- ig
+        } else if (format == "phylo") {
+            trees[[df[i, ]$CLONE]] <- tree
+        } else {
+            stop("Format must be either 'graph' or 'phylo'.")
+        }
+    }
+    
+    out[["trees"]] <- trees
+
+    if (!is.null(id)) {
+        out$param$ID = id
+    }
+    
+    return(out)
+}
+
+#' Combine IgPhyML object parameters into a dataframe
+#' 
+#' \code{combineIgphyml} combines IgPhyML object parameters into a data.frame.
+#' 
+#' @param   iglist         list of igphyml objects returned by \link{readIgphyml}. 
+#'                         Each must have an \code{ID} column in its \code{param} attribute, 
+#'                         which can be added automatically using the \code{id} option of 
+#'                         \code{readIgphyml}.
+#' @param   format         string specifying whether each column of the resulting data.frame
+#'                         should represent a parameter (\code{wide}) or if 
+#'                         there should only be three columns; i.e. ID, varable, and value
+#'                         (\code{long}).
+#'                                                
+#' @return   A data.frame containing HLP model parameter estimates for all igphyml objects.
+#'           Only parameters shared among all objects will be returned.
+#'           
+#' @details
+#' \code{combineIgphyml} combines repertoire-wide parameter estimates from mutliple igphyml
+#' objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
+#' other hypothesis testing analyses.
+#' 
+#' All igphyml objects used must have an "ID" column in their \code{param} attribute, which
+#' can be added automatically from the \code{id} flag of \code{readIgphyml}. 
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hoehn KB, Lunter G, Pybus OG - A Phylogenetic Codon Substitution Model for Antibody 
+#'              Lineages. Genetics 2017 206(1):417-427
+#'              https://doi.org/10.1534/genetics.116.196303 
+#'  \item  Hoehn KB, Vander Heiden JA, Zhou JQ, Lunter G, Pybus OG, Kleinstein SHK - 
+#'              Repertoire-wide phylogenetic models of B cell molecular evolution reveal 
+#'              evolutionary signatures of aging and vaccination. bioRxiv 2019  
+#'              https://doi.org/10.1101/558825 
+#' }
+#'
+#' @seealso  \link{readIgphyml} 
+#'           
+#' @examples
+#' \dontrun{
+#'    # Read in and combine two igphyml runs
+#'    s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
+#'    s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
+#'    combineIgphyml(list(s1, s2))
+#' }
+#' 
+#' @export
+combineIgphyml <- function(iglist, format=c("wide", "long")) {
+    # Check arguments
+    format <- match.arg(format)
+    
+    ordered_params <- c(
+        "ID", "NSEQ", "NSITE", "LHOOD", "TREE_LENGTH", 
+        "OMEGA_FWR_MLE", "OMEGA_FWR_LCI", "OMEGA_FWR_UCI", 
+        "OMEGA_CDR_MLE", "OMEGA_CDR_LCI", "OMEGA_CDR_UCI", 
+        "KAPPA_MLE", "KAPPA_LCI", "KAPPA_UCI", 
+        "WRC_2_MLE", "WRC_2_LCI", "WRC_2_UCI", 
+        "GYW_0_MLE", "GYW_0_LCI", "GYW_0_UCI", 
+        "WA_1_MLE", "WA_1_LCI", "WA_1_UCI", 
+        "TW_0_MLE", "TW_0_LCI", "TW_0_UCI", 
+        "SYC_2_MLE", "SYC_2_LCI", "SYC_2_UCI", 
+        "GRS_0_MLE", "GRS_0_LCI", "GRS_0_UCI")
+    paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
+    params <- names(paramCount[paramCount == max(paramCount)])
+    params <- ordered_params[ordered_params %in% params]
+    if (sum(params == "ID") == 0) {
+        message <- "ID not specified in objects. Use 'id' flag in readIgphyml."
+        stop(message)
+    }
+    
+    repertoires <- lapply(iglist, function(x) x$param[1, params])
+    combined <- dplyr::bind_rows(repertoires)
+    if (format == "long") {
+        combined <- tidyr::gather(combined, variable, value, -ID)
+        combined$variable <- factor(combined$variable, levels=params)
+    }
+    
+    return(combined)
+}

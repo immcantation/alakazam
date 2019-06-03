@@ -115,8 +115,8 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
+#' @importFrom	ape 		read.tree di2multi reorder.phylo root
 #' @importFrom  dplyr       do n desc %>%
-#'                          data_frame data_frame_
 #'                          bind_cols bind_rows combine arrange arrange_ 
 #'                          group_by group_by_ ungroup
 #'                          filter filter_ slice slice_ select select_ 
@@ -125,7 +125,7 @@
 #'                          transmute transmute_ rename rename_
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
-#'                          vertex_attr set_vertex_attr 
+#'                          vertex_attr set_vertex_attr
 #'                          degree shortest_paths all_shortest_paths distances
 #'                          graph_from_adjacency_matrix components groups
 #' @importFrom  lazyeval    interp
@@ -146,7 +146,8 @@
 #'                          stri_replace_first_regex stri_split_fixed
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
-#' @importFrom  tidyr       complete_
-#' @importFrom  Rcpp evalCpp
+#' @importFrom  tibble      tibble
+#' @importFrom  tidyr       complete_ gather
+#' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL
