@@ -129,8 +129,9 @@ groupings will be perform by unique sample and isotype pairs
 (`groups=c("SAMPLE", "ISOTYPE")`). Furthermore, instead of quantifying abundance
 by sequence count we will quantify it by clone count. Meaning, each clone will
 be counted only once regardless of how many sequences the clone represents.  
-Clonal citeria are adding by passing a value to the `clone` argument of `countGenes`
-(`clone="CLONE"`).
+Clonal citeria are added by passing a value to the `clone` argument of `countGenes`
+(`clone="CLONE"`). For each clonal group, only the most common family/gene/allele will
+be considered for counting.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Quantify V family clonal usage by sample and isotype

@@ -17,8 +17,8 @@
 #'                   is determined by the sum of copy numbers within each gene.
 #'                   This argument is ignored if \code{clone} is specified.
 #' @param    clone   name of the \code{data} column containing clone identifiers for each 
-#'                   sequence. If this value is specified, then genes will be counted only
-#'                   once for each clone. Note, this is accomplished by using the most 
+#'                   sequence. If this value is specified, then one gene will be considered 
+#'                   for each clone. Note, this is accomplished by using the most 
 #'                   common gene within each \code{clone} identifier. As such,
 #'                   ambiguous alleles within a clone will not be accurately represented.
 #' @param    mode    one of \code{c("gene", "family", "allele", "asis")} defining
