@@ -14,6 +14,8 @@ Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"),
                     email="ruoyi.jiang@yale.edu"),
              person("Nima", "Nouri", role=c("ctb"), 
                     email="nima.nouri@yale.edu"),
+             person("Kenneth", "Hoehn", role=c("ctb"), 
+                    email="kenneth.hoehn@yale.edu"),                     
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
@@ -37,6 +39,7 @@ Depends:
     R (>= 3.1.2),
     ggplot2 (>= 2.0.0)
 Imports:
+    ape,
     dplyr (>= 0.5.0),
     graphics,
     grid,
@@ -51,6 +54,7 @@ Imports:
     seqinr,
     stats,
     stringi,
+    tibble,
     tidyr,
     utils
 LinkingTo: Rcpp
