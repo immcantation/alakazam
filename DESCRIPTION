@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.2.11.999
-Date: 2019-06-03
+Date: 2019-06-04
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -40,7 +40,7 @@ Depends:
     ggplot2 (>= 2.0.0)
 Imports:
     ape,
-    dplyr (>= 0.5.0),
+    dplyr (>= 0.8.1),
     graphics,
     grid,
     igraph (>= 1.0.0),

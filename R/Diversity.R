@@ -225,20 +225,20 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(groups, clone)) %>%
+            group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
-            dplyr::rename_(.dots=c("CLONE"=clone))
+            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(SEQ_COUNT)) %>%
+            dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(groups, clone)) %>%
+            group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(clone)),
                               COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
-                           COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(COPY_COUNT)") %>%
-            dplyr::rename_(.dots=c("CLONE"=clone))
+            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
+                           COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
+            dplyr::arrange(desc(COPY_COUNT)) %>%
+            dplyr::rename("CLONE"=clone)
     }
     
     return(clone_tab)
@@ -279,7 +279,7 @@ bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
     
     # Assemble and sort abundance data.frame
     abund_df <- tibble(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
-    abund_df <- dplyr::arrange_(abund_df, .dots="desc(P)")
+    abund_df <- dplyr::arrange(abund_df, desc(P))
     abund_df$RANK <- 1:nrow(abund_df)
     
     return(abund_df)
@@ -360,12 +360,12 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize(COUNT=n())
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
+            group_by(.dots=c(group, clone)) %>%
+            dplyr::summarize(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
     }
     
     # Set confidence interval
@@ -374,8 +374,8 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
     if (!is.null(group)) {
         # Summarize groups
         group_tab <- clone_tab %>%
-            group_by_(.dots=c(group)) %>%
-            dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
+            group_by(.dots=c(group)) %>%
+            dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
         group_set <- as.character(group_tab[[group]])
         nsam <- setNames(group_tab$SEQUENCES, group_set)
 
@@ -612,17 +612,17 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # TODO: Can this be replaced by countClones?
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize(COUNT=n())
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
     }
     
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
-        group_by_(.dots=c(group)) %>%
+        group_by(.dots=c(group)) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
@@ -822,17 +822,17 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize(COUNT=n())
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
     }
     
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
-        group_by_(.dots=c(group)) %>%
+        group_by(.dots=c(group)) %>%
         dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
@@ -1204,7 +1204,7 @@ plotDiversityTest <- function(data, colors=NULL, main_title="Diversity",
 
     # Define plot values
     df <- data@summary %>%
-        dplyr::mutate_(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
+        dplyr::mutate(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x="GROUP")) + 

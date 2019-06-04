@@ -117,12 +117,12 @@
 #' @import      utils
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root
 #' @importFrom  dplyr       do n desc %>%
-#'                          bind_cols bind_rows combine arrange arrange_ 
-#'                          group_by group_by_ ungroup
-#'                          filter filter_ slice slice_ select select_ 
-#'                          mutate mutate_ mutate_at
-#'                          summarize summarize_ summarize_at
-#'                          transmute transmute_ rename rename_
+#'                          bind_cols bind_rows combine arrange 
+#'                          group_by ungroup
+#'                          filter slice select 
+#'                          mutate mutate_at
+#'                          summarize summarize_at
+#'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
 #'                          vertex_attr set_vertex_attr
@@ -147,7 +147,7 @@
 #'                          stri_pad_left stri_pad_right
 #'                          stri_detect_fixed stri_paste
 #' @importFrom  tibble      tibble
-#' @importFrom  tidyr       complete_ gather
+#' @importFrom  tidyr       complete gather
 #' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL

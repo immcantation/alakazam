@@ -257,5 +257,3 @@ test_that("groupGenes heavy and light", {
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     expect_equal(gg2[["VJ_GROUP"]], gg2_expect)
 })
-
-

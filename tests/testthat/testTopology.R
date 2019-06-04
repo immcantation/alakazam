@@ -51,9 +51,9 @@ test_that("Test tableEdges",{
     
     # Count direct edges between isotypes including inferred nodes
     tab <- tableEdges(graph, "ISOTYPE")
-    expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG", NA))
-    expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG", "IgA"))
-    expect_equal(tab$COUNT, c( 1, 1, 3, 1))
+    expect_equal(tab$PARENT, c( NA, "IgA", "IgA,IgG", "IgA,IgG"))
+    expect_equal(tab$CHILD, c( "IgA", "IgA,IgG", "IgA", "IgG"))
+    expect_equal(tab$COUNT, c( 1, 1, 1, 3))
     
     # Count direct edges excluding edges to and from germline and inferred nodes
     tab <- tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
@@ -90,7 +90,7 @@ test_that("Test testEdges", {
     expect_equal(x$PARENT[1:5], c("IgA", "IgA", "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(x$CHILD[5:10], c("IgA,IgG", "IgG", "IgG", "IgA", "IgD,IgG", "IgG"))
     expect_equal(x$COUNT[1:5], c(39, 3, 2, 29, 1))
-    expect_equal(x$EXPECTED[5:10], c(2.00, 6.25, 1.33, 7.00, 1.00, 133.70), tolerance=0.01)
+    expect_equal(x$EXPECTED[5:10], c(2, 6.25, 1.33, 7, 1.00, 133.7), tolerance=0.01)
     expect_equal(x$PVALUE[3:8], c(0.7, 0.0, 0.5, 0.0, 0.0, 1.0), tolerance=0.01)
     
 })

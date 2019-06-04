@@ -94,23 +94,23 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     if (is.null(copy) & is.null(clone)) {
         # Tabulate sequence abundance
         gene_tab <- data %>% 
-            group_by_(.dots=c(groups, gene)) %>%
+            group_by(.dots=c(groups, gene)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-            arrange_(.dots="desc(SEQ_COUNT)")
+            mutate(., SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
+            arrange(desc(SEQ_COUNT))
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
-            group_by_(.dots=c(groups, clone, gene)) %>%
+            group_by(.dots=c(groups, clone, gene)) %>%
             dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
             ungroup() %>%
-            group_by_(.dots=c(groups, clone)) %>%
-            slice_(interp(~which.max(x), x=as.name("CLONE_GENE_COUNT"))) %>%
+            group_by(.dots=c(groups, clone)) %>%
+            slice_(which.max(CLONE_GENE_COUNT)) %>%
             ungroup() %>%
-            group_by_(.dots=c(groups, gene)) %>%
+            group_by(.dots=c(groups, gene)) %>%
             dplyr::summarize(CLONE_COUNT=n()) %>%
-            mutate_(CLONE_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("CLONE_COUNT"))) %>%
-            arrange_(.dots="desc(CLONE_COUNT)")
+            mutate(CLONE_FREQ=CLONE_COUNT/sum(CLONE_COUNT, na.rm=TRUE)) %>%
+            arrange(CLONE_COUNT)
     } else {
         if (!is.null(clone) & !is.null(copy)) {
             warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
@@ -118,24 +118,24 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         }
         # Tabulate copy abundance
         gene_tab <- data %>% 
-            group_by_(.dots=c(groups, gene)) %>%
-            summarize_(SEQ_COUNT=interp(~length(x), x=as.name(gene)),
-                       COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
-                    COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
-            arrange_(.dots="desc(COPY_COUNT)")
+            group_by(.dots=c(groups, gene)) %>%
+            summarize(SEQ_COUNT=length(.data[[gene]]),
+                       COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
+            mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
+                    COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
+            arrange(desc(COPY_COUNT))
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
     if (fill) {
         gene_tab <- gene_tab %>%
             ungroup() %>%
-            complete_(as.list(c(groups, gene))) %>%
+            tidyr::complete_(as.list(c(groups, gene))) %>%
             replace(is.na(.), 0)
     }
 
     # Rename gene column
-    gene_tab <- rename_(gene_tab, .dots=c("GENE"=gene))
+    gene_tab <- rename(gene_tab, "GENE"=gene)
     
     return(gene_tab)
 }
@@ -978,24 +978,25 @@ sortGenes <- function(genes, method=c("name", "position")) {
     # Build sorting table
     sort_tab <- tibble(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
         # Determine the gene and family
-        mutate_(FAMILY=interp(~getFamily(x, first=TRUE, strip_d=FALSE), x=as.name("CALL")),
-                GENE=interp(~getGene(x, first=TRUE, strip_d=FALSE), x=as.name("CALL")),
-                ALLELE=interp(~getAllele(x, first=TRUE, strip_d=FALSE), x=as.name("CALL"))) %>%
+        mutate(FAMILY=getFamily(CALL, first=TRUE, strip_d=FALSE),
+                GENE=getGene(CALL, first=TRUE, strip_d=FALSE),
+                ALLELE=getAllele(CALL, first=TRUE, strip_d=FALSE)) %>%
         # Identify first gene number, second gene number and allele number
-        mutate_(G1=interp(~gsub("[^-]+-([^-\\*D]+).*", "\\1", x), x=as.name("GENE")),
-                G1=interp(~as.numeric(gsub("[^0-9]+", "99", x)), x=as.name("G1")),
-                G2=interp(~gsub("[^-]+-[^-]+-?", "", x), x=as.name("GENE")),
-                G2=interp(~as.numeric(gsub("[^0-9]+", "99", x)), x=as.name("G2")),
-                A1=interp(~as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", x)), x=as.name("ALLELE")))
+        mutate(G1=gsub("[^-]+-([^-\\*D]+).*", "\\1", GENE),
+                G1=as.numeric(gsub("[^0-9]+", "99", G1)),
+                G2=gsub("[^-]+-[^-]+-?", "", GENE),
+                G2=as.numeric(gsub("[^0-9]+", "99", G2)),
+                A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", ALLELE))
+        )
 
     # Convert missing values to 0
     sort_tab[is.na(sort_tab)] <- 0
     
     # Sort
     if (method == "name") {  
-        sorted_genes <- arrange_(sort_tab, ~FAMILY, ~G1, ~G2, ~A1)[["CALL"]]
+        sorted_genes <- arrange(sort_tab, FAMILY, G1, G2, A1)[["CALL"]]
     } else if (method == "position") {
-        sorted_genes <- arrange_(sort_tab, ~desc(G1), ~desc(G2), ~FAMILY, ~A1)[["CALL"]]
+        sorted_genes <- arrange(sort_tab, desc(G1), desc(G2), FAMILY, A1)[["CALL"]]
     }
     
     return(sorted_genes)

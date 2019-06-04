@@ -152,3 +152,4 @@ test_that("testDiversity", {
     expect_equal(div@tests$PVALUE, 0.88)
     expect_equal(div@summary$MEAN, c(78.63, 79.58), tolerance=0.001)
 })
+
