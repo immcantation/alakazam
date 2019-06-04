@@ -227,17 +227,17 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
         clone_tab <- data %>% 
             group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(SEQ_COUNT)) %>%
+            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
             dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
             group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
                               COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
-            dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
-                           COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
-            dplyr::arrange(desc(COPY_COUNT)) %>%
+            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
+                           COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) %>%
             dplyr::rename("CLONE"=clone)
     }
     
@@ -279,7 +279,7 @@ bootstrapAbundance <- function(x, n, z=0.975, nboot=2000) {
     
     # Assemble and sort abundance data.frame
     abund_df <- tibble(CLONE=names(p), P=p, LOWER=p_lower, UPPER=p_upper)
-    abund_df <- dplyr::arrange(abund_df, desc(P))
+    abund_df <- dplyr::arrange(abund_df, desc(!!!rlang::sym("P")))
     abund_df$RANK <- 1:nrow(abund_df)
     
     return(abund_df)
@@ -375,7 +375,7 @@ estimateAbundance <- function(data, group=NULL, clone="CLONE", copy=NULL, ci=0.9
         # Summarize groups
         group_tab <- clone_tab %>%
             group_by(.dots=c(group)) %>%
-            dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+            dplyr::summarize(SEQUENCES=sum(!!rlang::sym("COUNT"), na.rm=TRUE))
         group_set <- as.character(group_tab[[group]])
         nsam <- setNames(group_tab$SEQUENCES, group_set)
 
@@ -623,7 +623,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by(.dots=c(group)) %>%
-        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+        dplyr::summarize(SEQUENCES=sum(!!rlang::sym("COUNT"), na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
@@ -833,7 +833,7 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by(.dots=c(group)) %>%
-        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
+        dplyr::summarize(SEQUENCES=sum(!!!rlang::sym("COUNT"), na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
@@ -1204,7 +1204,8 @@ plotDiversityTest <- function(data, colors=NULL, main_title="Diversity",
 
     # Define plot values
     df <- data@summary %>%
-        dplyr::mutate(LOWER=MEAN-SD, UPPER=MEAN+SD)
+        dplyr::mutate(LOWER=!!rlang::sym("MEAN")-!!rlang::sym("SD"), 
+                      UPPER=!!rlang::sym("MEAN")+!!rlang::sym("SD"))
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x="GROUP")) + 

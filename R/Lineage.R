@@ -857,7 +857,7 @@ combineIgphyml <- function(iglist, format=c("wide", "long")) {
     repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
     if (format == "long") {
-        combined <- tidyr::gather(combined, variable, value, -ID)
+        combined <- tidyr::gather(combined, variable, value, -!!rlang::sym("ID"))
         combined$variable <- factor(combined$variable, levels=params)
     }
     

@@ -79,10 +79,11 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
     
     # Normalize
     node_df <- node_df %>%
-        dplyr::mutate(OUTDEGREE_NORM=OUTDEGREE/sum(OUTDEGREE, na.rm=TRUE),
-                       SIZE_NORM=SIZE/max(SIZE, na.rm=TRUE),
-                       DEPTH_NORM=DEPTH/max(DEPTH, na.rm=TRUE),
-                       PATHLENGTH_NORM=PATHLENGTH/max(PATHLENGTH, na.rm=TRUE))
+        dplyr::mutate(
+            OUTDEGREE_NORM=!!rlang::sym("OUTDEGREE")/sum(!!rlang::sym("OUTDEGREE"), na.rm=TRUE),
+            SIZE_NORM=!!rlang::sym("SIZE")/max(!!rlang::sym("SIZE"), na.rm=TRUE),
+            DEPTH_NORM=!!rlang::sym("DEPTH")/max(!!rlang::sym("DEPTH"), na.rm=TRUE),
+            PATHLENGTH_NORM=!!rlang::sym("PATHLENGTH")/max(!!rlang::sym("PATHLENGTH"), na.rm=TRUE))
 
     return(node_df)
 }
@@ -314,7 +315,7 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
     
     # Count edges
     edge_tab <- edge_df %>%
-        group_by(PARENT, CHILD) %>%
+        group_by(!!!rlang::syms(c("PARENT", "CHILD"))) %>%
         dplyr::summarize(COUNT=n())
 
     return(edge_tab)
@@ -423,9 +424,9 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         mrca_list <- lapply(mrca_list, .resolveMRCA, field=field)
         # Summarize MRCA counts
         mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
-            select(GRAPH, field) %>%
+            select(!!!rlang::syms(c("GRAPH", field))) %>%
             rename("ANNOTATION"=field) %>%
-            group_by(ANNOTATION) %>%
+            group_by(!!!rlang::sym("ANNOTATION")) %>%
             dplyr::summarize(COUNT=n())
         
         return(mrca_sum)
@@ -526,8 +527,8 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
     .countEdges <- function(x, field, exclude) {
         edge_list <- lapply(x, tableEdges, field=field, indirect=indirect, exclude=exclude)
         edge_sum <- bind_rows(edge_list) %>%
-            group_by(PARENT, CHILD) %>%
-            dplyr::summarize(COUNT=sum(COUNT, na.rm=TRUE))
+            group_by(!!!rlang::syms(c("PARENT", "CHILD"))) %>%
+            dplyr::summarize(COUNT=sum(!!!rlang::sym("COUNT"), na.rm=TRUE))
         return(edge_sum)
     }
     

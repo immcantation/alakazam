@@ -96,8 +96,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         gene_tab <- data %>% 
             group_by(.dots=c(groups, gene)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            mutate(., SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE)) %>%
-            arrange(desc(SEQ_COUNT))
+            mutate(., SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("SEQ_COUNT")))
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
@@ -105,12 +105,12 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
             ungroup() %>%
             group_by(.dots=c(groups, clone)) %>%
-            slice(which.max(CLONE_GENE_COUNT)) %>%
+            slice(which.max(!!rlang::sym("CLONE_GENE_COUNT"))) %>%
             ungroup() %>%
             group_by(.dots=c(groups, gene)) %>%
             dplyr::summarize(CLONE_COUNT=n()) %>%
-            mutate(CLONE_FREQ=CLONE_COUNT/sum(CLONE_COUNT, na.rm=TRUE)) %>%
-            arrange(CLONE_COUNT)
+            mutate(CLONE_FREQ=!!rlang::sym("CLONE_COUNT")/sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
+            arrange(!!rlang::sym("CLONE_COUNT"))
     } else {
         if (!is.null(clone) & !is.null(copy)) {
             warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
@@ -121,9 +121,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             group_by(.dots=c(groups, gene)) %>%
             summarize(SEQ_COUNT=length(.data[[gene]]),
                        COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
-            mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
-                    COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
-            arrange(desc(COPY_COUNT))
+            mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
+                    COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("COPY_COUNT")))
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
@@ -978,15 +978,15 @@ sortGenes <- function(genes, method=c("name", "position")) {
     # Build sorting table
     sort_tab <- tibble(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
         # Determine the gene and family
-        mutate(FAMILY=getFamily(CALL, first=TRUE, strip_d=FALSE),
-                GENE=getGene(CALL, first=TRUE, strip_d=FALSE),
-                ALLELE=getAllele(CALL, first=TRUE, strip_d=FALSE)) %>%
+        mutate(FAMILY=getFamily(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE),
+                GENE=getGene(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE),
+                ALLELE=getAllele(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE)) %>%
         # Identify first gene number, second gene number and allele number
-        mutate(G1=gsub("[^-]+-([^-\\*D]+).*", "\\1", GENE),
-                G1=as.numeric(gsub("[^0-9]+", "99", G1)),
-                G2=gsub("[^-]+-[^-]+-?", "", GENE),
-                G2=as.numeric(gsub("[^0-9]+", "99", G2)),
-                A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", ALLELE))
+        mutate( G1=gsub("[^-]+-([^-\\*D]+).*", "\\1", !!rlang::sym("GENE")),
+                G1=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G1"))),
+                G2=gsub("[^-]+-[^-]+-?", "", !!rlang::sym("GENE")),
+                G2=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G2"))),
+                A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", !!rlang::sym("ALLELE")))
         )
 
     # Convert missing values to 0
@@ -994,9 +994,13 @@ sortGenes <- function(genes, method=c("name", "position")) {
     
     # Sort
     if (method == "name") {  
-        sorted_genes <- arrange(sort_tab, FAMILY, G1, G2, A1)[["CALL"]]
+        sorted_genes <- arrange(sort_tab, !!rlang::syms(c("FAMILY", "G1", "G2", "A1")))[["CALL"]]
     } else if (method == "position") {
-        sorted_genes <- arrange(sort_tab, desc(G1), desc(G2), FAMILY, A1)[["CALL"]]
+        sorted_genes <- arrange(sort_tab, 
+                                desc(!!rlang::sym("G1")), 
+                                desc(!!rlang::sym("G2")), 
+                                !!rlang::sym("FAMILY"), 
+                                !!rlang::sym("A1"))[["CALL"]]
     }
     
     return(sorted_genes)
