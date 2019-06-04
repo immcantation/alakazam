@@ -994,13 +994,13 @@ sortGenes <- function(genes, method=c("name", "position")) {
     
     # Sort
     if (method == "name") {  
-        sorted_genes <- arrange(sort_tab, !!rlang::syms(c("FAMILY", "G1", "G2", "A1")))[["CALL"]]
+        sorted_genes <- arrange(sort_tab, !!!rlang::syms(c("FAMILY", "G1", "G2", "A1")))[["CALL"]]
     } else if (method == "position") {
         sorted_genes <- arrange(sort_tab, 
                                 desc(!!rlang::sym("G1")), 
                                 desc(!!rlang::sym("G2")), 
-                                !!rlang::sym("FAMILY"), 
-                                !!rlang::sym("A1"))[["CALL"]]
+                                !!!rlang::sym("FAMILY"), 
+                                !!!rlang::sym("A1"))[["CALL"]]
     }
     
     return(sorted_genes)
