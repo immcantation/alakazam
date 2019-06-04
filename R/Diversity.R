@@ -233,8 +233,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     } else {
         clone_tab <- data %>% 
             group_by(.dots=c(groups, clone)) %>%
-            dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(clone)),
-                              COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
+            dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
+                              COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(SEQ_FREQ=SEQ_COUNT/sum(SEQ_COUNT, na.rm=TRUE),
                            COPY_FREQ=COPY_COUNT/sum(COPY_COUNT, na.rm=TRUE)) %>%
             dplyr::arrange(desc(COPY_COUNT)) %>%
@@ -617,13 +617,13 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
     } else {
         clone_tab <- data %>% 
             group_by(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
+            dplyr::summarize(COUNT=sum(.data[[copy]], na.rm=TRUE))
     }
     
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by(.dots=c(group)) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
+        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
@@ -827,13 +827,13 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
     } else {
         clone_tab <- data %>% 
             group_by(.dots=c(group, clone)) %>%
-            dplyr::summarize_(COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy)))
+            dplyr::summarize(COUNT=sum(.data[[copy]], na.rm=TRUE))
     }
     
     # Count observations per group and set sampling criteria
     group_tab <- clone_tab %>%
         group_by(.dots=c(group)) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("COUNT")))
+        dplyr::summarize(SEQUENCES=sum(COUNT, na.rm=TRUE))
     group_all <- as.character(group_tab[[group]])
     group_tab <- group_tab[group_tab$SEQUENCES >= min_n, ]
     group_keep <- as.character(group_tab[[group]])
@@ -1204,7 +1204,7 @@ plotDiversityTest <- function(data, colors=NULL, main_title="Diversity",
 
     # Define plot values
     df <- data@summary %>%
-        dplyr::mutate(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
+        dplyr::mutate(LOWER=MEAN-SD, UPPER=MEAN+SD)
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x="GROUP")) + 

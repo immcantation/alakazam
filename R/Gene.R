@@ -105,7 +105,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
             ungroup() %>%
             group_by(.dots=c(groups, clone)) %>%
-            slice_(which.max(CLONE_GENE_COUNT)) %>%
+            slice(which.max(CLONE_GENE_COUNT)) %>%
             ungroup() %>%
             group_by(.dots=c(groups, gene)) %>%
             dplyr::summarize(CLONE_COUNT=n()) %>%
