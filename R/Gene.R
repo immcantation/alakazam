@@ -370,6 +370,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
                                              rep(j[[i]], each=n_v),
                                              rep.int(l[i], times=n_v*n_j),
                                              sep="@")
+                return(eg_vec)
             }, simplify=FALSE, USE.NAMES=FALSE)
         } else {
             exp <- sapply(1:length(v), function(i){
@@ -380,6 +381,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
                 eg_vec = stringi::stri_paste(rep.int(v[[i]], times=n_j),
                                              rep(j[[i]], each=n_v),
                                              sep="@")
+                return(eg_vec)
             }, simplify=FALSE, USE.NAMES=FALSE)
         }
         
@@ -600,6 +602,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_v = which (v_unique == combo_unique[[v_call]][i])
                 idx_j = which (j_unique == combo_unique[[j_call]][i])
                 idx = which(m_v==idx_v & m_j==idx_j)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE) 
         } else {
             l_unique <- unique(combo_unique[[junc_len]])
@@ -609,6 +612,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_j = which(j_unique == combo_unique[[j_call]][i])
                 idx_l = which(l_unique == combo_unique[[junc_len]][i])
                 idx = which(m_v==idx_v & m_j==idx_j & m_l==idx_l)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE)
         }
         
@@ -663,6 +667,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_v_l = which( v_unique_l == combo_unique[[v_call_light]][i] )
                 idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
                 idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_v_l==idx_v_l & m_j_l==idx_j_l)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE) 
             
             # heavy
@@ -691,6 +696,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_l_l = which( l_unique_l == combo_unique[[junc_len_light]][i] )
                 idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
                             m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE) 
             
             # heavy
@@ -717,6 +723,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_l_l = which( l_unique_l == combo_unique[[junc_len_light]][i] )
                 idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & 
                             m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE) 
             
             # heavy
@@ -743,6 +750,7 @@ groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                 idx_j_l = which( j_unique_l == combo_unique[[j_call_light]][i] )
                 idx = which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
                             m_v_l==idx_v_l & m_j_l==idx_j_l)
+                return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE) 
             
             # heavy
