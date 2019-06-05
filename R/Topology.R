@@ -816,7 +816,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
                          colors=NULL, main_title="Subtrees", legend_title="Annotation", 
                          style=c("box", "violin"), silent=FALSE, ...) {
     # Hack for visibility of special ggplot variables
-    ..x.. <- ..y.. <- NULL
+    ..x.. <- NULL
     
     ## DEBUG
     # graphs=ExampleTrees; field="ISOTYPE"; colors=IG_COLORS; main_title="Outdegree"; root="Germline"; exclude=c("Germline", NA); style="box"
