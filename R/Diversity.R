@@ -1365,6 +1365,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' plotDiversityTest(div, legend_title="Sample")
 #' 
 #' @export
+
 plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity", 
                               legend_title="Group", log_d=FALSE, 
                               annotate=c("none", "depth"),
@@ -1373,8 +1374,10 @@ plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity
     # Check if abundance is in data
     if (is.null(data@test)) { stop("missing testing from data") }
     
-	# Set q_i if NULL (when using testDiversity function)
-	if(is.null(q_i)){q_i <- unique(unlist(data@test$test["Q"]))[-1]}
+	# Set q_i, if NULL, use the maximum Q (when using testDiversity function)
+	if(is.null(q_i)){
+		q_i <- tail(unique(unlist(isotype_curve@test$test["Q"]))[-1], n = 1)
+	}
 	
     # Check if q is in data
     if (!(q_i %in% data@q)) { stop("hill index not assessed") }
