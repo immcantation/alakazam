@@ -15,7 +15,7 @@
 #'
 #' \code{AbundanceCurve} defines clonal abundance values.
 #' 
-#' @slot  data    data.frame with relative clonal abundance data and confidence intervals,
+#' @slot  abund   data.frame with relative clonal abundance data and confidence intervals,
 #'                containing the following columns:
 #'                \itemize{
 #'                  \item  \code{GROUP}:  group identifier.
@@ -25,11 +25,16 @@
 #'                  \item  \code{UPPER}:  upper confidence interval bound.
 #'                  \item  \code{RANK}:   the rank of the clone abundance.
 #'                }
-#' @slot  groups  character vector of group values.
-#' @slot  n       numeric vector indication the number of sequences in each group.
-#' @slot  nboot   number of bootstrap realizations performed.
-#' @slot  ci      confidence interval defining the upper and lower bounds 
-#'                (a value between 0 and 1).
+#' @slot  bootstrap data.frame of bootstrapped clonal distributions. 
+#' @slot  group     string specifying the name of the group column. 
+#' @slot  groups    vector specifying the names of unique groups in group column. 
+#' @slot  clone     string specifying the name of the clone column. 
+#' @slot  nboot     numeric specifying the number of bootstrap iterations to use.  
+#' @slot  uniform   TRUE/FALSE specifying whether or not bootstraps were calculated under rarefaction.
+#' @slot  max_n		numeric specifying the number of species used for rarefaction if rarefaction is used. 
+#' @slot  min_n		numeric specifying the minumim tolerated number of species in calculation.
+#' @slot  ci        confidence interval defining the upper and lower bounds 
+#'                  (a value between 0 and 1).
 #' 
 #' @name         AbundanceCurve-class
 #' @rdname       AbundanceCurve-class
@@ -54,7 +59,7 @@ setClass("AbundanceCurve",
 #' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
 #' orders (\eqn{Q}).
 #' 
-#' @slot  data      data.frame defining the diversity curve with the following columns:
+#' @slot  div      data.frame defining the diversity curve with the following columns:
 #'                  \itemize{
 #'                    \item  \code{GROUP}:    group label.
 #'                    \item  \code{Q}:        diversity order.
@@ -69,9 +74,15 @@ setClass("AbundanceCurve",
 #'                    \item  \code{E_LOWER}:  evenness lower confidence inverval bound.
 #'                    \item  \code{E_UPPER}:  eveness upper confidence interval bound.
 #'                  }
-#' @slot  groups    character vector of groups retained in the diversity calculation.
-#' @slot  n         numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot     number of bootstrap realizations performed.
+#' @slot  test      list containing information concerning the result of testing diversity:
+#'                  \itemize{
+#'                    \item  \code{test}:    data.frame of p-values from testing.
+#'                    \item  \code{summary}: data.frame of diversity value means and standard deviations for plotting.
+#'                  }
+#' @slot  div_group     string specifying the name of the group column in diversity calculation.
+#' @slot  div_groups    vector specifying the names of unique groups in group column in diversity calculation.
+#' @slot  method         string specifying the type of diversity calculated. 
+#' @slot  q         vector of diversity hill diversity indices used for computing diversity.  
 #' @slot  ci        confidence interval defining the upper and lower bounds 
 #'                  (a value between 0 and 1).
 #' 
