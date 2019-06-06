@@ -225,20 +225,20 @@ countClones <- function(data, group=NULL, copy=NULL, clone="CLONE") {
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
+            group_by(.dots=c(group, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(SEQ_COUNT)") %>%
-            dplyr::rename_(.dots=c("CLONE"=clone))
+            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
+            dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
-            group_by_(.dots=c(group, clone)) %>%
-            dplyr::summarize_(SEQ_COUNT=interp(~length(x), x=as.name(clone)),
-                              COPY_COUNT=interp(~sum(x, na.rm=TRUE), x=as.name(copy))) %>%
-            dplyr::mutate_(SEQ_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT")),
-                           COPY_FREQ=interp(~x/sum(x, na.rm=TRUE), x=as.name("COPY_COUNT"))) %>%
-            dplyr::arrange_(.dots="desc(COPY_COUNT)") %>%
-            dplyr::rename_(.dots=c("CLONE"=clone))
+            group_by(.dots=c(group, clone)) %>%
+            dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
+                              COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
+            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
+                           COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) %>%
+            dplyr::rename("CLONE"=clone)
     }
     
     return(clone_tab)
@@ -286,7 +286,6 @@ countClones <- function(data, group=NULL, copy=NULL, clone="CLONE") {
 #' q <- c(0, 1, 2)
 #' calcInferredDiversity(p, q)
 #'
-#' 
 #' @export
 calcInferredDiversity <- function(p, q) {
     # Use Chao estimators for unseen abundance correction
@@ -393,7 +392,6 @@ inferRarefiedDiversity <- function(x, q, m) {
     return(D)
 }
 
-
 #' Estimates the complete clonal relative abundance distribution
 #' 
 #' \code{estimateAbundance} estimates the complete clonal relative abundance distribution 
@@ -409,7 +407,6 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'                     is determined by the number of sequences. If a \code{copy} column
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
-
 #' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
 #'                     number of observations. If \code{FALSE} then allow each group to
 #'                     be resampled to its original size or, if specified, \code{max_size}.
@@ -443,11 +440,13 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 #'
 #' @export
-
 estimateAbundance <- function(data, group, 
     clone="CLONE", copy = NULL, 
     uniform=TRUE, nboot = 200, min_n = 30, max_n=NULL, ci=0.95){
-     
+    
+	# Hack for visibility of dplyr variables
+	. <- NULL
+			
 	# Set confidence interval for plotting
 	ci_z <- ci + (1 - ci) / 2
 		
@@ -459,7 +458,7 @@ estimateAbundance <- function(data, group,
 
         # Set max_n
         max_n_check <- clone_tab %>%
-            dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
+            dplyr::summarize(SEQUENCES=sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
             min(.$SEQUENCES)
         if(is.null(max_n)){max_n <- max_n_check}
 
@@ -486,8 +485,8 @@ estimateAbundance <- function(data, group,
     # Check the smallest sample depth
     sequence_max_ns <- data %>% 
         countClones(copy=copy, clone=clone, group=group) %>%
-        dplyr::summarize_(SEQUENCES=interp(~sum(x, na.rm=TRUE), x=as.name("SEQ_COUNT"))) %>%
-        dplyr::select(SEQUENCES) %>% unlist() 
+        dplyr::summarize(SEQUENCES=sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
+        dplyr::select(!!rlang::sym("SEQUENCES")) %>% unlist() 
     
     # Check the smallest sample is not smaller than min_n
     if(min(sequence_max_ns) < min_n){stop("too few sequences in some samples")}
@@ -497,7 +496,7 @@ estimateAbundance <- function(data, group,
 	
     # Bootstrap abundance curves
     boot_output <- data %>%
-        dplyr::group_by_(.dots=c(group)) %>%
+        dplyr::group_by(.dots=c(group)) %>%
         dplyr::do(data.frame(bootstrap_(., max_n=max_n)) %>% 
         tibble::rownames_to_column(clone))
     
@@ -507,11 +506,13 @@ estimateAbundance <- function(data, group,
 	# Create abundance slot
     abund <- boot_output %>%
         tidyr::gather(key = "N", value = "C", -one_of(c(clone, group))) %>%
-        dplyr::group_by_(.dots=c(clone, group)) %>%
-        dplyr::summarize(P_ERROR = qnorm(ci_z) * sd(C/max_n), P = mean(C/max_n)) %>%
-        dplyr::mutate(LOWER = pmax(P - P_ERROR, 0), UPPER = P + P_ERROR) %>%
-        dplyr::group_by_(.dots=c(group)) %>%
-        dplyr::mutate(RANK = rank(-P, ties.method = "first"))
+        dplyr::group_by(.dots=c(clone, group)) %>%
+        dplyr::summarize(
+			P_ERROR = qnorm(ci_z) * sd(!!rlang::sym("C")/max_n), 
+			P = mean(!!rlang::sym("C")/max_n)) %>%
+        dplyr::mutate(LOWER = pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), UPPER = !!rlang::sym("P") + !!rlang::sym("P_ERROR")) %>%
+        dplyr::group_by(.dots=c(group)) %>%
+        dplyr::mutate(RANK = rank(-!!rlang::sym("P"), ties.method = "first"))
 
     # Create a new diversity object with bootstrap
     boot_obj <- new("AbundanceCurve",
@@ -575,32 +576,36 @@ helperAlpha <- function(boot_output, q, clone=NULL, group=NULL){
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
 
 helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
-
+	# Hack for visibility of dplyr variables
+	. <- NULL
+		
     # Compute gamma diversity metrics
     gamma <- boot_output %>%
-        dplyr::group_by_(.dots=c(clone)) %>%
+        dplyr::group_by(.dots=c(clone)) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(sum) %>%
         dplyr::do(helperAlpha(., q = q, clone=clone)) %>%
-        tidyr::gather(key = "N", value = "GAMMA", -Q) %>%
-        dplyr::mutate(GAMMA = as.numeric(GAMMA))
+        tidyr::gather(key = "N", value = "GAMMA", -!!rlang::sym("Q")) %>%
+        dplyr::mutate(GAMMA = as.numeric(!!rlang::sym("GAMMA")))
 
     # Compute alpha diversity metrics
     alpha <- boot_output %>%
-        dplyr::group_by_(.dots=c(group)) %>%
+        dplyr::group_by(.dots=c(group)) %>%
         dplyr::do(helperAlpha(., q = q, clone=clone, group=group)) %>%
-        dplyr::group_by(Q) %>%
+        dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(mean) %>%
-        tidyr::gather(key = "N", value = "ALPHA", -Q) %>%
-        dplyr::mutate(ALPHA = as.numeric(ALPHA))
+        tidyr::gather(key = "N", value = "ALPHA", -!!rlang::sym("Q")) %>%
+        dplyr::mutate(ALPHA = as.numeric(!!rlang::sym("ALPHA")))
 
     # Perform comparisons of alpha and gamma to extract beta
     div <- bind_cols(gamma, alpha) %>%
-        dplyr::group_by(Q) %>%
-        dplyr::mutate(D = GAMMA/ALPHA) %>%
-        dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
-        dplyr::mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
+        dplyr::group_by(!!rlang::sym("Q")) %>%
+        dplyr::mutate(D = !!rlang::sym("GAMMA")/!!rlang::sym("ALPHA")) %>%
+        dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
+					D = mean(!!rlang::sym("D"))) %>%
+        dplyr::mutate(D_LOWER = pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
+					D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
 
     return(div)
 }
@@ -618,10 +623,10 @@ helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
 #' @param    q       		vector of Hill Diversity indices to test for diversity calculations.
 #'
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-
-
 helperTest <- function(div_df, group, q = q){
-
+	# Hack for visibility of dplyr variables
+	. <- NULL
+		
     group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
 	
     pvalue_list <- list()
@@ -631,10 +636,10 @@ helperTest <- function(div_df, group, q = q){
             
             # Currently just testing for one diversity order
             mat1 <- div_df %>%
-                dplyr::filter(.[[group]] == group_pair[1], Q == q_i) %>%
+                dplyr::filter(.[[group]] == group_pair[1], !!rlang::sym("Q") == q_i) %>%
                 dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
             mat2 <- div_df %>%
-                dplyr::filter(.[[group]] == group_pair[2], Q == q_i) %>%
+                dplyr::filter(.[[group]] == group_pair[2], !!rlang::sym("Q") == q_i) %>%
                 dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
 
             if (mean(mat1) >= mean(mat2)) { g_delta <- mat1 - mat2
@@ -655,9 +660,9 @@ helperTest <- function(div_df, group, q = q){
 
     summary_df <- div_df %>%
         tidyr::gather(key = "N", value = "D", -one_of(c(group, "Q"))) %>%
-        dplyr::mutate(D = as.numeric(D)) %>%
-        dplyr::group_by_(.dots=c(group, "Q")) %>%
-        dplyr::summarize(SD = sd(D), MEAN = mean(D))
+        dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
+        dplyr::group_by(.dots=c(group, "Q")) %>%
+        dplyr::summarize(SD = sd(!!rlang::sym("D")), MEAN = mean(!!rlang::sym("D")))
 	
     test_div = list(
         tests=test_df,
@@ -735,11 +740,13 @@ helperTest <- function(div_df, group, q = q){
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
-
 calculateAlphaDiversity <- function(boot_obj, 
             min_q=0, max_q=4, step_q=0.1, 
             ci = 0.95){
     
+	# Hack for visibility of dplyr variables
+	    . <- NULL
+					
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
@@ -747,30 +754,36 @@ calculateAlphaDiversity <- function(boot_obj,
 		
     # Compute diversity metric for bootstrap instances
     div_df <- boot_obj@bootstrap %>%
-        dplyr::group_by_(.dots=c(boot_obj@group)) %>%
+        dplyr::group_by(.dots=c(boot_obj@group)) %>%
         dplyr::do(helperAlpha(., q = q, clone=boot_obj@clone, group=boot_obj@group)) %>%
         dplyr::ungroup()
     
     # Summarize diversity
     div <- div_df %>%
         tidyr::gather(key = "N", value = "D", -one_of(c(boot_obj@group, "Q"))) %>%
-        dplyr::mutate(D = as.numeric(D)) %>%
-        dplyr::group_by_(.dots=c(boot_obj@group, "Q")) %>%
-        dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(D), D = mean(D)) %>%
-        dplyr::mutate(D_LOWER = pmax(D - D_ERROR, 0), D_UPPER = D + D_ERROR)
-
+        dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
+        dplyr::group_by(.dots=c(boot_obj@group, "Q")) %>%
+        dplyr::summarize(
+					D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
+					D = mean(!!rlang::sym("D"))) %>%
+        dplyr::mutate(
+					D_LOWER = pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
+					D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
+        
     # Alpha groups
     div_groups <- unique(div[[boot_obj@group]])
     
     # Compute evenness
     div_qi <- div %>%
-        filter(Q == 0) %>%
+        filter(!!rlang::sym("Q") == 0) %>%
         select(one_of(c(boot_obj@group, "D")))
 
     div <- div %>%
         dplyr::right_join(div_qi, by = boot_obj@group, suffix = c("", "_0")) %>%
-        mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
-        select(-D_0)
+        mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
+			E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
+			E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
+        select(-!!rlang::sym("D_0"))
     
     # Test
     test <- helperTest(div_df, group=boot_obj@group, q = q)
@@ -801,15 +814,17 @@ calculateAlphaDiversity <- function(boot_obj,
 #' @param    max_q     		maximum value of \eqn{q}.
 #' @param    step_q    		value by which to increment \eqn{q}.
 #' @param    ci        		confidence interval to calculate; the value must be between 0 and 1.
-#' 
+#'
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
 #' 
 #' @export
-
 calculateBetaDiversity <- function(boot_obj, comparisons,
             min_q=0, max_q=4, step_q=0.1, 
             ci = 0.95){
-				
+	
+	# Hack for visibility of dplyr variables
+	    . <- NULL
+			
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
@@ -833,13 +848,15 @@ calculateBetaDiversity <- function(boot_obj, comparisons,
     
     # Compute evenness
     div_qi <- div %>%
-        filter(Q == 0) %>%
+        filter(!!rlang::sym("Q") == 0) %>%
         select(one_of(c("COMPARISON", "D")))
 
     div <- div %>%
         right_join(div_qi, by = "COMPARISON", suffix = c("", "_0")) %>%
-        mutate(E = D/D_0, E_LOWER = D_LOWER/D_0, E_UPPER = D_UPPER/D_0) %>%
-        select(-D_0)
+        mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
+			E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
+			E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
+        select(-!!rlang::sym("D_0"))
 		
     # Test
     #test <- testDiversity_(div_df, group=boot_obj@group, q = q)
@@ -935,7 +952,6 @@ calculateBetaDiversity <- function(boot_obj, comparisons,
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
-
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
                             ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
@@ -1028,7 +1044,6 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 #' 
 #' @export
-
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
                           min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
 
@@ -1078,7 +1093,6 @@ testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
 #' plotAbundanceCurve(abund, legend_title="Sample")
 #' 
 #' @export
-
 plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance", 
                                legend_title=NULL, xlim=NULL, ylim=NULL, 
                                annotate=c("none", "depth"),
@@ -1316,7 +1330,6 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' plotDiversityTest(div, legend_title="Sample")
 #' 
 #' @export
-
 plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity", 
                               legend_title="Group", log_d=FALSE, 
                               annotate=c("none", "depth"),
@@ -1350,8 +1363,8 @@ plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity
 
     # Define plot values
     df <- data@test$summary %>%
-        dplyr::filter(Q == q_i) %>%
-        dplyr::mutate_(LOWER=~MEAN-SD, UPPER=~MEAN+SD)
+        dplyr::filter(!!rlang::sym("Q") == q_i) %>%
+        dplyr::mutate(LOWER=!!rlang::sym("MEAN")-!!rlang::sym("SD"), UPPER=!!rlang::sym("MEAN")+!!rlang::sym("SD"))
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x=data@div_group)) + 
