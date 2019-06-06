@@ -211,10 +211,10 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     # Set platform specific options
     if (.Platform$OS.type == "windows") { 
         quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
-        invoke <- shell
+        invoke <- base::shell
     } else { 
         quiet_params <- list(stdout=FALSE, stderr=FALSE)
-        invoke <- system2
+        invoke <- base::system2
     } 
     
     # Set dnapars options
