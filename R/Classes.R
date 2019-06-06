@@ -103,7 +103,7 @@ setClass("DiversityCurve",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@abund) })
+setMethod("print", c(x="AbundanceCurve"), function(x) { print("Abundance Curve") })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
