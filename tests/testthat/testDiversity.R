@@ -30,16 +30,16 @@ test_that("countClones", {
                  tolerance=0.01)
     
     # Toy database
-    db_toy <- tibble::data_frame(SEQUENCE_ID=1:10, 
+    db_toy <- tibble::tibble(SEQUENCE_ID=1:10, 
                                  GROUP=c(rep("A", 3), rep("B", 7)),
                                  CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
                                  COPY=10:1)
-    ungrouped_toy <- tibble::data_frame(CLONE=as.character(1:5), 
+    ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
                                         SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
                                         COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
                                         SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
                                         COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
-    grouped_toy <- tibble::data_frame(GROUP=c("A", rep("B", 5)),
+    grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
                                       CLONE=as.character(c(1, 1:5)), 
                                       SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
                                       COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
