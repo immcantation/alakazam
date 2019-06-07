@@ -205,3 +205,67 @@ graphs[sapply(graphs, is.null)] <- NULL
 # analysis, if desired.
 graphs <- graphs[sapply(graphs, vcount) >= 5]
 ```
+
+## Converting between graph, phylo, and newick formats
+
+While much of analysis in `alakazam` focuses on using `igraph` `graph` objects,
+R `phylo` objects are capable of being used by a rich set of phylogenetic analysis
+tools in R. Further, stand-alone phylogenetics programs typically import and export
+trees in Newick format. 
+
+To convert to trees in `graph` format to `phylo` format, use `graphToPhylo`. These
+objects can now be used by functions detailed in other R phylogenetics packages such
+as `ape`. To export lineage trees as a Newick file, use the `write.tree` function provided
+in `ape`.
+
+
+```r
+# Modify graph and plot attributes
+V(graph)$color <- categorical_pal(8)[1]
+V(graph)$label <- V(graph)$name
+E(graph)$label <- E(graph)$weight
+```
+
+
+```r
+##plot lineage tree using igraph
+plot(graph, layout=layout_as_tree)
+```
+
+![plot of chunk Lineage-Vignette-13](figure/Lineage-Vignette-13-1.png)
+
+```r
+# convert to phylo
+phylo <- graphToPhylo(graph)
+
+#plot using ape
+plot(phylo, show.node.label=TRUE)
+```
+
+![plot of chunk Lineage-Vignette-13](figure/Lineage-Vignette-13-2.png)
+
+```r
+#write tree file in Newick format
+ape::write.tree(phylo, file="example.tree")
+```
+
+To import lineage trees as `phylo` objects from Newick files, use the `read.tree` function 
+provided in the `ape` package. To convert this `phylo` object to a `graph` object, use the
+`phyloToGraph` function with the germline sequence ID specified using the `germline` option.
+Note that while some of the nodes in more complex trees may rotate during this process, their 
+topological relationships will remain the same.
+
+
+```r
+#read in tree as phylo object
+phylo_r <- ape::read.tree("example.tree")
+
+#convert to graph object
+graph_r <- phyloToGraph(phylo_r, germline="Germline")
+
+#plot converted form using igraph - it's the same as before
+plot(graph_r,layout=layout_as_tree)
+```
+
+![plot of chunk Lineage-Vignette-14](figure/Lineage-Vignette-14-1.png)
+
