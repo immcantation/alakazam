@@ -165,6 +165,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #'                            Only applies at the gene or allele level.
 #' @param     sep             character defining both the input and output segment call 
 #'                            delimiter.
+#' @param     unique          TRUE/FALSE specifying whether or not to use unique gene names.
 #' 
 #' @return    A character vector containing allele, gene or family names.
 #' 

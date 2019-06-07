@@ -51,13 +51,15 @@
 #' @section  Diversity analysis:
 #' \itemize{
 #'   \item  \link{countClones}:          Calculate clonal abundance.
-#'   \item  \link{estimateAbundance}:    Infer complete clonal abundance distribution with
-#'                                       confidence intervals.
-#'   \item  \link{rarefyDiversity}:      Generate clonal diversity curves.
-#'   \item  \link{testDiversity}:        Test significance of clonal diversity scores.
+#'   \item  \link{estimateAbundance}:  	 Bootstrap clonal abundance curves.
+#'   \item  \link{rarefyDiversity}:  	 Generate clonal diversity curves (deprecated).
+#'   \item  \link{testDiversity}:  	     testsDiversity at given diversity hill indicex. 
 #'   \item  \link{plotAbundanceCurve}:   Plot clone size distribution as a rank-abundance 
-#'                                       curve.
+#'   \item  \link{rarefyDiversity}:  	 Generate clonal diversity curves (deprecated).                                       curve.
+#'   \item  \link{calculateAlphaDiversity}:  	 Generate clonal alpha diversity curves.
+#'   \item  \link{calculateBetaDiversity}:  	 Generate clonal beta diversity curves.
 #'   \item  \link{plotDiversityCurve}:   Plot clonal diversity curves.
+#'   \item  \link{plotDiversityTest}:    Plot testing at given diversity hill indicex. 
 #' }
 #' 
 #' @section  Ig and TCR sequence annotation:

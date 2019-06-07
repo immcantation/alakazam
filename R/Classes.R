@@ -15,7 +15,7 @@
 #'
 #' \code{AbundanceCurve} defines clonal abundance values.
 #' 
-#' @slot  data    data.frame with relative clonal abundance data and confidence intervals,
+#' @slot  abund   data.frame with relative clonal abundance data and confidence intervals,
 #'                containing the following columns:
 #'                \itemize{
 #'                  \item  \code{GROUP}:  group identifier.
@@ -25,30 +25,41 @@
 #'                  \item  \code{UPPER}:  upper confidence interval bound.
 #'                  \item  \code{RANK}:   the rank of the clone abundance.
 #'                }
-#' @slot  groups  character vector of group values.
-#' @slot  n       numeric vector indication the number of sequences in each group.
-#' @slot  nboot   number of bootstrap realizations performed.
-#' @slot  ci      confidence interval defining the upper and lower bounds 
-#'                (a value between 0 and 1).
+#' @slot  bootstrap data.frame of bootstrapped clonal distributions. 
+#' @slot  group     string specifying the name of the group column. 
+#' @slot  groups    vector specifying the names of unique groups in group column. 
+#' @slot  clone     string specifying the name of the clone column. 
+#' @slot  nboot     numeric specifying the number of bootstrap iterations to use.  
+#' @slot  uniform   TRUE/FALSE specifying whether or not bootstraps were calculated under rarefaction.
+#' @slot  max_n		numeric specifying the number of species used for rarefaction if rarefaction is used. 
+#' @slot  min_n		numeric specifying the minumim tolerated number of species in calculation.
+#' @slot  ci        confidence interval defining the upper and lower bounds 
+#'                  (a value between 0 and 1).
 #' 
 #' @name         AbundanceCurve-class
 #' @rdname       AbundanceCurve-class
 #' @aliases      AbundanceCurve
 #' @exportClass  AbundanceCurve
-setClass("AbundanceCurve", 
-         slots=c(data="data.frame", 
-                 groups="character", 
-                 n="numeric", 
-                 nboot="numeric", 
-                 ci="numeric"))
 
+setClass("AbundanceCurve", 
+         slots=c(
+			 abund="data.frame",
+             bootstrap="data.frame",
+             group="character",
+             groups="character",
+             clone="character",
+             uniform="logical",
+             max_n="numeric", 
+			 ci="numeric",
+			 nboot="numeric", 
+             min_n="numeric"))
 
 #' S4 class defining a diversity curve 
 #'
 #' \code{DiversityCurve} defines diversity (\eqn{D}) scores over multiple diversity 
 #' orders (\eqn{Q}).
 #' 
-#' @slot  data      data.frame defining the diversity curve with the following columns:
+#' @slot  div      data.frame defining the diversity curve with the following columns:
 #'                  \itemize{
 #'                    \item  \code{GROUP}:    group label.
 #'                    \item  \code{Q}:        diversity order.
@@ -63,9 +74,15 @@ setClass("AbundanceCurve",
 #'                    \item  \code{E_LOWER}:  evenness lower confidence inverval bound.
 #'                    \item  \code{E_UPPER}:  eveness upper confidence interval bound.
 #'                  }
-#' @slot  groups    character vector of groups retained in the diversity calculation.
-#' @slot  n         numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot     number of bootstrap realizations performed.
+#' @slot  test      list containing information concerning the result of testing diversity:
+#'                  \itemize{
+#'                    \item  \code{test}:    data.frame of p-values from testing.
+#'                    \item  \code{summary}: data.frame of diversity value means and standard deviations for plotting.
+#'                  }
+#' @slot  div_group     string specifying the name of the group column in diversity calculation.
+#' @slot  div_groups    vector specifying the names of unique groups in group column in diversity calculation.
+#' @slot  method         string specifying the type of diversity calculated. 
+#' @slot  q         vector of diversity hill diversity indices used for computing diversity.  
 #' @slot  ci        confidence interval defining the upper and lower bounds 
 #'                  (a value between 0 and 1).
 #' 
@@ -73,54 +90,19 @@ setClass("AbundanceCurve",
 #' @rdname       DiversityCurve-class
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
+
+setClassUnion("listOrNULL",members =c("list","NULL"))
+
 setClass("DiversityCurve", 
-         slots=c(data="data.frame", 
-                 groups="character", 
-                 n="numeric", 
-                 nboot="numeric", 
-                 ci="numeric"))
-
-
-#' S4 class defining diversity significance
-#'
-#' \code{DiversityTest} defines the signifance of diversity (\eqn{D}) differences at a 
-#' fixed diversity order (\eqn{q}).
-#' 
-#' @slot  tests    data.frame describing the significance test results with columns:
-#'                 \itemize{
-#'                   \item  \code{TEST}:        string listing the two groups tested.
-#'                   \item  \code{DELTA_MEAN}:  mean of the \eqn{D} bootstrap delta 
-#'                                              distribution for the test.
-#'                   \item  \code{DELTA_SD}:    standard deviation of the \eqn{D} 
-#'                                              bootstrap delta distribution for the test.
-#'                   \item  \code{PVALUE}:      p-value for the test.
-#'                 }
-#' @slot  summary  data.frame containing summary statistics for the diversity index 
-#'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
-#'                 \itemize{
-#'                   \item  \code{GROUP}:   the name of the group.
-#'                   \item  \code{MEAN}:    mean of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{SD}:      standard deviation of the \eqn{D} bootstrap 
-#'                                          distribution.
-#'                 }
-#' @slot  groups   character vector of groups retained in diversity calculation.
-#' @slot  q        diversity order tested (\eqn{q}).
-#' @slot  n        numeric vector indication the number of sequences sampled from each group.
-#' @slot  nboot    number of bootstrap realizations.
-#' 
-#' @name         DiversityTest-class
-#' @rdname       DiversityTest-class
-#' @aliases      DiversityTest
-#' @exportClass  DiversityTest
-setClass("DiversityTest", 
-         slots=c(tests="data.frame",
-                 summary="data.frame",
-                 groups="character", 
-                 q="numeric",
-                 n="numeric", 
-                 nboot="numeric"))
-
-
+          slots=c(
+             div="data.frame", 
+             test="listOrNULL",
+ 			 method="character",
+             div_group="character",
+ 			 div_groups="character",
+             q="numeric",  
+             ci="numeric"))
+			  
 #### Diversity methods ####
 
 # TODO:  plot method for DiversityTest
@@ -132,7 +114,7 @@ setClass("DiversityTest",
 #' @rdname   AbundanceCurve-class
 #' @aliases  AbundanceCurve-method
 #' @export
-setMethod("print", c(x="AbundanceCurve"), function(x) { print(x@data) })
+setMethod("print", c(x="AbundanceCurve"), function(x) { print("Abundance Curve") })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -148,7 +130,7 @@ setMethod("plot", c(x="AbundanceCurve", y="missing"),
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
+setMethod("print", c(x="DiversityCurve"), function(x) { print(x@method) })
 
 #' @param    y    ignored.
 #' @param    ...  arguments to pass to \link{plotDiversityCurve}.
@@ -158,22 +140,6 @@ setMethod("print", c(x="DiversityCurve"), function(x) { print(x@data) })
 #' @export
 setMethod("plot", c(x="DiversityCurve", y="missing"),
           function(x, y, ...) { plotDiversityCurve(x, ...) })
-
-#' @param    x    DiversityTest object.
-#' 
-#' @rdname   DiversityTest-class
-#' @aliases  DiversityTest-method
-#' @export
-setMethod("print", c(x="DiversityTest"), function(x) { print(x@tests) })
-
-#' @param    y    ignored.
-#' @param    ...  arguments to pass to \link{plotDiversityTest}.
-#' 
-#' @rdname   DiversityTest-class
-#' @aliases  DiversityTest-method
-#' @export
-setMethod("plot", c(x="DiversityTest", y="missing"),
-          function(x, y, ...) { plotDiversityTest(x, ...) })
 
 
 #### Lineage classes ####
