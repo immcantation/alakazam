@@ -225,14 +225,14 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by(.dots=c(groups, clone)) %>%
+            group_by(!!!rlang::syms(c(groups, clone))) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
             dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
             dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
-            group_by(.dots=c(groups, clone)) %>%
+            group_by(!!!rlang::syms(c(groups, clone))) %>%
             dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
                               COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
@@ -514,7 +514,7 @@ estimateAbundance <- function(data, group,
 	
     # Bootstrap abundance curves
     boot_output <- data %>%
-        dplyr::group_by(.dots=c(group)) %>%
+        dplyr::group_by(!!!rlang::syms(c(group))) %>%
         dplyr::do(data.frame(bootstrap_(., max_n=max_n)) %>% 
         tibble::rownames_to_column(clone))
     
@@ -524,12 +524,12 @@ estimateAbundance <- function(data, group,
 	# Create abundance slot
     abund <- boot_output %>%
         tidyr::gather(key = "N", value = "C", -one_of(c(clone, group))) %>%
-        dplyr::group_by(.dots=c(clone, group)) %>%
+        dplyr::group_by(!!!rlang::syms(c(clone, group))) %>%
         dplyr::summarize(
 			P_ERROR = qnorm(ci_z) * sd(!!rlang::sym("C")/max_n), 
 			P = mean(!!rlang::sym("C")/max_n)) %>%
         dplyr::mutate(LOWER = pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), UPPER = !!rlang::sym("P") + !!rlang::sym("P_ERROR")) %>%
-        dplyr::group_by(.dots=c(group)) %>%
+        dplyr::group_by(!!!rlang::syms(c(group))) %>%
         dplyr::mutate(RANK = rank(-!!rlang::sym("P"), ties.method = "first"))
 
     # Create a new diversity object with bootstrap
@@ -599,7 +599,7 @@ helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
 		
     # Compute gamma diversity metrics
     gamma <- boot_output %>%
-        dplyr::group_by(.dots=c(clone)) %>%
+        dplyr::group_by(!!!rlang::syms(c(clone))) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(sum) %>%
         dplyr::do(helperAlpha(., q = q, clone=clone)) %>%
@@ -608,7 +608,7 @@ helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
 
     # Compute alpha diversity metrics
     alpha <- boot_output %>%
-        dplyr::group_by(.dots=c(group)) %>%
+        dplyr::group_by(!!!rlang::syms(c(group))) %>%
         dplyr::do(helperAlpha(., q = q, clone=clone, group=group)) %>%
         dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::select(-one_of(c(group))) %>%
@@ -679,7 +679,7 @@ helperTest <- function(div_df, group, q = q){
     summary_df <- div_df %>%
         tidyr::gather(key = "N", value = "D", -one_of(c(group, "Q"))) %>%
         dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
-        dplyr::group_by(.dots=c(group, "Q")) %>%
+        dplyr::group_by(!!!rlang::syms(c(group, "Q"))) %>%
         dplyr::summarize(SD = sd(!!rlang::sym("D")), MEAN = mean(!!rlang::sym("D")))
 	
     test_div = list(
@@ -772,7 +772,7 @@ calculateAlphaDiversity <- function(boot_obj,
 		
     # Compute diversity metric for bootstrap instances
     div_df <- boot_obj@bootstrap %>%
-        dplyr::group_by(.dots=c(boot_obj@group)) %>%
+        dplyr::group_by(!!!rlang::syms(c(boot_obj@group))) %>%
         dplyr::do(helperAlpha(., q = q, clone=boot_obj@clone, group=boot_obj@group)) %>%
         dplyr::ungroup()
     
@@ -780,7 +780,7 @@ calculateAlphaDiversity <- function(boot_obj,
     div <- div_df %>%
         tidyr::gather(key = "N", value = "D", -one_of(c(boot_obj@group, "Q"))) %>%
         dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
-        dplyr::group_by(.dots=c(boot_obj@group, "Q")) %>%
+        dplyr::group_by(!!!rlang::syms(c(boot_obj@group, "Q"))) %>%
         dplyr::summarize(
 					D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
 					D = mean(!!rlang::sym("D"))) %>%

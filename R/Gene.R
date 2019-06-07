@@ -94,20 +94,20 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     if (is.null(copy) & is.null(clone)) {
         # Tabulate sequence abundance
         gene_tab <- data %>% 
-            group_by(.dots=c(groups, gene)) %>%
+            group_by(!!!rlang::syms(c(groups, gene))) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             mutate(., SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
             arrange(desc(!!rlang::sym("SEQ_COUNT")))
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
-            group_by(.dots=c(groups, clone, gene)) %>%
+            group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
             dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
             ungroup() %>%
-            group_by(.dots=c(groups, clone)) %>%
+            group_by(!!!rlang::syms(c(groups, clone))) %>%
             slice(which.max(!!rlang::sym("CLONE_GENE_COUNT"))) %>%
             ungroup() %>%
-            group_by(.dots=c(groups, gene)) %>%
+            group_by(!!!rlang::syms(c(groups, gene))) %>%
             dplyr::summarize(CLONE_COUNT=n()) %>%
             mutate(CLONE_FREQ=!!rlang::sym("CLONE_COUNT")/sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
             arrange(!!rlang::sym("CLONE_COUNT"))
@@ -118,7 +118,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         }
         # Tabulate copy abundance
         gene_tab <- data %>% 
-            group_by(.dots=c(groups, gene)) %>%
+            group_by(!!!rlang::syms(c(groups, gene))) %>%
             summarize(SEQ_COUNT=length(.data[[gene]]),
                        COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
