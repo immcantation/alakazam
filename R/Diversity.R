@@ -31,7 +31,7 @@ NULL
 #'           
 #' @examples
 #' # Calculate clone sizes
-#' clones <- countClones(ExampleDb, group="SAMPLE")
+#' clones <- countClones(ExampleDb, groups="SAMPLE")
 #' 
 #' # Calculate 1first order coverage for a single sample
 #' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
@@ -187,8 +187,8 @@ adjustObservedAbundance <- function(x) {
 #' clonal groups.
 #'
 #' @param    data    data.frame with Change-O style columns containing clonal assignments.
-#' @param    group  character vector defining \code{data} columns containing grouping 
-#'                   variables. If \code{group=NULL}, then do not group data.
+#' @param    groups  character vector defining \code{data} columns containing grouping 
+#'                   variables. If \code{groups=NULL}, then do not group data.
 #' @param    copy    name of the \code{data} column containing copy numbers for each 
 #'                   sequence. If this value is specified, then total copy abundance
 #'                   is determined by the sum of copy numbers within each clonal group.
@@ -211,28 +211,28 @@ adjustObservedAbundance <- function(x) {
 #' 
 #' @examples
 #' # Without copy numbers
-#' clones <- countClones(ExampleDb, group="SAMPLE")
+#' clones <- countClones(ExampleDb, groups="SAMPLE")
 #'
 #' # With copy numbers and multiple groups
-#' clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 #' 
 #' @export
-countClones <- function(data, group=NULL, copy=NULL, clone="CLONE") {
+countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
     # Check input
-    check <- checkColumns(data, c(clone, copy, group))
+    check <- checkColumns(data, c(clone, copy, groups))
     if (check != TRUE) { stop(check) }
     
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
-            group_by(.dots=c(group, clone)) %>%
+            group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
             dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
             dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
-            group_by(.dots=c(group, clone)) %>%
+            group_by(.dots=c(groups, clone)) %>%
             dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
                               COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
@@ -502,15 +502,15 @@ estimateAbundance <- function(data, group,
 
     # Check the smallest sample depth
     sequence_max_ns <- data %>% 
-        countClones(copy=copy, clone=clone, group=group) %>%
+        countClones(copy=copy, clone=clone, groups=group) %>%
         dplyr::summarize(SEQUENCES=sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
         dplyr::select(!!rlang::sym("SEQUENCES")) %>% unlist() 
     
     # Check the smallest sample is not smaller than min_n
-    if(min(sequence_max_ns) < min_n){stop("too few sequences in some samples")}
+    if (min(sequence_max_ns) < min_n) { stop("too few sequences in some samples") }
 	
     # If rarefaction is turned on, set an max_n. Otherwise NULL max_n (ignore).
-    if(uniform & is.null(max_n)){max_n <- min(sequence_max_ns)} else {max_n <- NULL}
+    if (uniform & is.null(max_n)) { max_n <- min(sequence_max_ns) } else { max_n <- NULL }
 	
     # Bootstrap abundance curves
     boot_output <- data %>%

@@ -426,7 +426,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
             select(!!!rlang::syms(c("GRAPH", field))) %>%
             rename("ANNOTATION"=field) %>%
-            group_by(!!!rlang::sym("ANNOTATION")) %>%
+            group_by(!!rlang::sym("ANNOTATION")) %>%
             dplyr::summarize(COUNT=n())
         
         return(mrca_sum)
@@ -528,7 +528,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
         edge_list <- lapply(x, tableEdges, field=field, indirect=indirect, exclude=exclude)
         edge_sum <- bind_rows(edge_list) %>%
             group_by(!!!rlang::syms(c("PARENT", "CHILD"))) %>%
-            dplyr::summarize(COUNT=sum(!!!rlang::sym("COUNT"), na.rm=TRUE))
+            dplyr::summarize(COUNT=sum(!!rlang::sym("COUNT"), na.rm=TRUE))
         return(edge_sum)
     }
     

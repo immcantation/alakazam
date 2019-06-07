@@ -508,10 +508,10 @@ collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         inform_len$clusters <- igraph::components(g)$membership[data[[id]]]
         inform_len$select_id <- 1:nrow(inform_len)
         selected <- inform_len %>%
-            dplyr::group_by(!!!rlang::sym("clusters")) %>%
-            dplyr::slice(which.max(!!!rlang::sym("inform_len"))) %>%
+            dplyr::group_by(!!rlang::sym("clusters")) %>%
+            dplyr::slice(which.max(!!rlang::sym("inform_len"))) %>%
             dplyr::ungroup() %>%
-            dplyr::select(!!!rlang::sym("select_id")) %>% unlist() 
+            dplyr::select(!!rlang::sym("select_id")) %>% unlist() 
         
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {

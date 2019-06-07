@@ -5,7 +5,7 @@ db <- readChangeoDb(ExampleDb)
 
 test_that("calcCoverage", {
     # Calculate clone sizes
-    clones <- countClones(db, group="SAMPLE")
+    clones <- countClones(db, groups="SAMPLE")
     # Calculate 1st order coverage for a single sample
     obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
@@ -15,13 +15,13 @@ test_that("calcCoverage", {
 
 test_that("countClones", {
     # Without copy numbers
-    clones <- countClones(db, group="SAMPLE")
+    clones <- countClones(db, groups="SAMPLE")
     expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
     expect_equal(clones$SEQ_FREQ[1:6], 
                  c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), tolerance=0.01)
     
     # With copy numbers and multiple groups
-    clones <- countClones(db, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+    clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
     
     expect_equal(clones$SEQ_COUNT[1:6], c(23, 15, 5, 3, 4, 1))
     expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
@@ -50,7 +50,7 @@ test_that("countClones", {
     expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), ungrouped_toy, tolerance=0.01)
     
     # Check toy grouped
-    expect_equal(countClones(db_toy, group="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
+    expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
 })
 
 #### calcInferredDiversity ####

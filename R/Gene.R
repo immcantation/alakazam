@@ -987,14 +987,14 @@ sortGenes <- function(genes, method=c("name", "position")) {
     sort_tab <- tibble(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
         # Determine the gene and family
         mutate(FAMILY=getFamily(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE),
-                GENE=getGene(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE),
-                ALLELE=getAllele(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE)) %>%
+               GENE=getGene(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE),
+               ALLELE=getAllele(!!rlang::sym("CALL"), first=TRUE, strip_d=FALSE)) %>%
         # Identify first gene number, second gene number and allele number
-        mutate( G1=gsub("[^-]+-([^-\\*D]+).*", "\\1", !!rlang::sym("GENE")),
-                G1=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G1"))),
-                G2=gsub("[^-]+-[^-]+-?", "", !!rlang::sym("GENE")),
-                G2=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G2"))),
-                A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", !!rlang::sym("ALLELE")))
+        mutate(G1=gsub("[^-]+-([^-\\*D]+).*", "\\1", !!rlang::sym("GENE")),
+               G1=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G1"))),
+               G2=gsub("[^-]+-[^-]+-?", "", !!rlang::sym("GENE")),
+               G2=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G2"))),
+               A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", !!rlang::sym("ALLELE")))
         )
 
     # Convert missing values to 0
@@ -1007,8 +1007,8 @@ sortGenes <- function(genes, method=c("name", "position")) {
         sorted_genes <- arrange(sort_tab, 
                                 desc(!!rlang::sym("G1")), 
                                 desc(!!rlang::sym("G2")), 
-                                !!!rlang::sym("FAMILY"), 
-                                !!!rlang::sym("A1"))[["CALL"]]
+                                !!rlang::sym("FAMILY"), 
+                                !!rlang::sym("A1"))[["CALL"]]
     }
     
     return(sorted_genes)
