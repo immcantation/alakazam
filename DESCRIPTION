@@ -50,6 +50,7 @@ Imports:
     progress,
     Rcpp (>= 0.12.12),
     readr,
+    rlang,
     scales,
     seqinr,
     stats,
