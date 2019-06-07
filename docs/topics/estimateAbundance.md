@@ -10,8 +10,9 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, group = NULL, clone = "CLONE", copy = NULL,
-ci = 0.95, nboot = 2000, progress = FALSE)
+estimateAbundance(data, group, clone = "CLONE", copy = NULL,
+uniform = TRUE, nboot = 200, min_n = 30, max_n = NULL,
+ci = 0.95)
 ```
 
 Arguments
@@ -35,14 +36,24 @@ is determined by the number of sequences. If a `copy` column
 is specified, then clone abundances is determined by the sum of 
 copy numbers within each clonal group.
 
-ci
-:   confidence interval to calculate; the value must be between 0 and 1.
+uniform
+:   if `TRUE` then uniformly resample each group to the same 
+number of observations. If `FALSE` then allow each group to
+be resampled to its original size or, if specified, `max_size`.
 
 nboot
 :   number of bootstrap realizations to generate.
 
-progress
-:   if `TRUE` show a progress bar.
+min_n
+:   minimum number of observations to sample.
+A group with less observations than the minimum is excluded.
+
+max_n
+:   maximum number of observations to sample. If `NULL` then no 
+maximum is set.
+
+ci
+:   confidence interval to calculate; the value must be between 0 and 1.
 
 
 
@@ -50,27 +61,7 @@ progress
 Value
 -------------------
 
-A data.frame with relative clonal abundance data and confidence intervals,
-containing the following columns:
-
-+ `GROUP`:  group identifier. Will be codeNA if `group=NULL`.
-+ `CLONE`:  clone identifier.
-+ `P`:      relative abundance of the clone.
-+ `LOWER`:  lower confidence inverval bound.
-+ `UPPER`:  upper confidence interval bound.
-+ `RANK`:   the rank of the clone abundance.
-
-
-
-Details
--------------------
-
-The complete clonal abundance distribution determined inferred by using the Chao1 
-estimator to estimate the number of seen clones, and then applying the relative abundance 
-correction and unseen clone frequencies described in Chao et al, 2015.
-
-Confidence intervals are derived using the standard deviation of the resampling 
-realizations, as described in Chao et al, 2015.
+A [AbundanceCurve](AbundanceCurve-class.md) object summarizing the abundances.
 
 
 References

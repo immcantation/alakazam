@@ -23,7 +23,7 @@ which can be added automatically using the `id` option of
 
 format
 :   string specifying whether each column of the resulting data.frame
-hould represent a parameter (`wide`) or if 
+should represent a parameter (`wide`) or if 
 there should only be three columns; i.e. ID, varable, and value
 (`long`).
 

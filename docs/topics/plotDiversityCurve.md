@@ -1,4 +1,4 @@
-**plotDiversityCurve** - *Plot the results of rarefyDiversity*
+**plotDiversityCurve** - *Plot the results of rarefyDiversity, calculateAlphaDiversity or calculateBetaDiversity*
 
 Description
 --------------------

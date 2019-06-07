@@ -39,6 +39,8 @@ pages:
       - topics/buildPhylipLineage.md
       - topics/makeChangeoClone.md
       - topics/ChangeoClone-class.md
+      - topics/phyloToGraph.md
+      - topics/graphToPhylo.md
     - 'Lineage Topology Analysis':
       - topics/getMRCA.md
       - topics/getPathLengths.md

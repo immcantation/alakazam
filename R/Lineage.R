@@ -613,31 +613,189 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     return(graph)
 }
 
-# Convert from rooted phylo to igraph object Requires uca 
-# and germid from rerootGermline. Places \code{germid} as the direct ancestor
-# of the true UCA of the tree by removing the node specified as the \code{uca}
-# attribute from rerootGermline.
-#
-# @param   phylo  An ape \code{phylo} object which has been processed through 
-#                 rerootGermine.
-phyloToGraph <- function(phylo) {
+
+#' Convert a tree in ape \code{phylo} format to igraph \code{graph} format.
+#' 
+#' \code{phyloToGraph} converts a tree in \code{phylo} format to and 
+#' \code{graph} format.
+#' 
+#' @param   phylo  An ape \code{phylo} object.
+#' @param   germline  If specified, places specified tip sequence as the direct 
+#'                    ancestor of the tree
+#'                                                 
+#' @return   A \code{graph} object representing the input tree. 
+#'           
+#' @details
+#' Convert from phylo to graph object. Uses the node.label vector to label internal nodes. Nodes 
+#' may rotate but overall topology will remain constant.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hoehn KB, Lunter G, Pybus OG - A Phylogenetic Codon Substitution Model for Antibody 
+#'              Lineages. Genetics 2017 206(1):417-427
+#'              https://doi.org/10.1534/genetics.116.196303 
+#'  \item  Hoehn KB, Vander Heiden JA, Zhou JQ, Lunter G, Pybus OG, Kleinstein SHK - 
+#'              Repertoire-wide phylogenetic models of B cell molecular evolution reveal 
+#'              evolutionary signatures of aging and vaccination. bioRxiv 2019  
+#'              https://doi.org/10.1101/558825 
+#' }
+#'
+#' @examples
+#' \dontrun{
+#'    library(igraph)
+#'    library(ape)
+#' 
+#'    #convert to phylo
+#'    phylo = graphToPhylo(graph)
+#'    
+#'    #plot tree using ape
+#'    plot(phylo,show.node.label=TRUE)
+#'    
+#'    #store as newick tree
+#'    write.tree(phylo,file="tree.newick")
+#'    
+#'    #read in tree from newick file
+#'    phylo_r = read.tree("tree.newick")
+#'    
+#'    #convert to igraph
+#'    graph_r = phyloToGraph(phylo_r,germline="Germline")
+#'    
+#'    #plot graph - same as before, possibly rotated
+#'    plot(graph_r,layout=layout_as_tree)
+#' }
+#' 
+#' @export
+phyloToGraph <- function(phylo, germline=NULL) {
     names <- 1:length(unique(c(phylo$edge[, 1],phylo$edge[, 2])))
     for(i in 1:length(phylo$tip.label)){
         names[i] <- phylo$tip.label[i]
     }
+    if(!is.null(phylo$node.label)){
+        for(j in 1:length(phylo$node.label)){
+            i <- i + 1
+            names[i] <- phylo$node.label[j]
+        }
+    }
     d <- data.frame(cbind(phylo$edge,phylo$edge.length))
     names(d)=c("from", "to", "weight")
 
-    germnode <- which(phylo$tip.label == phylo$germid)
-    d[d$from == phylo$uca, ]$from <- germnode
-    d <- d[!(d$from == germnode & d$to == germnode),] 
+    if(!is.null(germline)){
+        germnode <- which(phylo$tip.label == germline)
+        phylo$uca = phylo$edge[phylo$edge[,2] == germnode,1]
+        if(sum(d$from == phylo$uca) == 2){
+            d[d$from == phylo$uca, ]$from <- germnode
+            d <- d[!(d$from == germnode & d$to == germnode),] 
+        }else{
+            row <- which(d$from == phylo$uca & d$to == germnode)
+            d[row,]$to <- phylo$uca
+            d[row,]$from <- germnode
+        }
+    }
 
     d$to <- as.character(d$to)
     d$from <- as.character(d$from)
     g <- igraph::graph_from_data_frame(d)
     igraph::V(g)$name <- names[as.numeric(igraph::V(g)$name)]
-    
+    igraph::E(g)$label <- igraph::E(g)$weight
     return(g)
+}
+
+
+#' Convert a tree in igraph \code{graph} format to ape \code{phylo} format.
+#' 
+#' \code{graphToPhylo} a tree in igraph \code{graph} format to ape \code{phylo} 
+#' format.
+#' 
+#' @param   graph  An igraph \code{graph} object.
+#'
+#' @return   A \code{phylo} object representing the input tree. Tip and internal node names are 
+#'           stored in the \code{tip.label} and \code{node.label} vectors, respectively.
+#'           
+#' @details
+#' Convert from igraph \code{graph} object to ape \code{phylo} object. If \code{graph} object
+#' was previously rooted with the germline as the direct ancestor, this will re-attach the 
+#' germline as a descendant node with a zero branch length to a new universal common ancestor (UCA) 
+#' node and store the germline node ID in the \code{germid} attribute and UCA node number in 
+#' the \code{uca} attribute. Otherwise these attributes will not be specified in the \code{phylo} object. 
+#' Using \code{phyloToGraph(phylo, germline=phylo$germid)} creates a \code{graph} object with the germline 
+#' back as the direct ancestor. Tip and internal node names are 
+#' stored in the \code{tip.label} and \code{node.label} vectors, respectively.
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Hoehn KB, Lunter G, Pybus OG - A Phylogenetic Codon Substitution Model for Antibody 
+#'              Lineages. Genetics 2017 206(1):417-427
+#'              https://doi.org/10.1534/genetics.116.196303 
+#'  \item  Hoehn KB, Vander Heiden JA, Zhou JQ, Lunter G, Pybus OG, Kleinstein SHK - 
+#'              Repertoire-wide phylogenetic models of B cell molecular evolution reveal 
+#'              evolutionary signatures of aging and vaccination. bioRxiv 2019  
+#'              https://doi.org/10.1101/558825 
+#' }
+#'
+#' @examples
+#' \dontrun{
+#'    library(igraph)
+#'    library(ape)
+#' 
+#'    #convert to phylo
+#'    phylo = graphToPhylo(graph)
+#'    
+#'    #plot tree using ape
+#'    plot(phylo,show.node.label=TRUE)
+#'    
+#'    #store as newick tree
+#'    write.tree(phylo,file="tree.newick")
+#'    
+#'    #read in tree from newick file
+#'    phylo_r = read.tree("tree.newick")
+#'    
+#'    #convert to igraph
+#'    graph_r = phyloToGraph(phylo_r,germline="Germline")
+#'    
+#'    #plot graph - same as before, possibly rotated
+#'    plot(graph_r,layout=layout_as_tree)
+#' }
+#' 
+#' @export
+graphToPhylo <- function(graph) {
+    df  <- igraph::as_data_frame(graph)
+    node_counts <- table(c(df$to,df$from))
+    tips <- names(node_counts)[node_counts == 1]
+    nodes <- names(node_counts)[node_counts > 1]
+
+    germline <- tips[tips %in% df$from]
+    if(length(germline) > 0){
+        ucanode <- paste0(germline,"_UCA")#max(as.numeric(nodes))+1
+        nodes <- c(ucanode,nodes)
+        df[df$from == germline,]$from <- ucanode
+        row <- c(ucanode,germline,0.0)
+        names(row) <- c("from","to","weight")
+        df <- rbind(df, row)
+    }
+    tipn <- 1:length(tips)
+    names(tipn) <- tips
+    noden <- (length(tips)+1):(length(tips)+length(nodes))
+    names(noden) <- nodes
+    renumber <- c(tipn,noden)
+
+    df$from <- as.numeric(renumber[df$from])
+    df$to <- as.numeric(renumber[df$to])    
+    
+    phylo <- list()
+    phylo$edge <- matrix(cbind(df$from,df$to),ncol=2)
+    phylo$edge.length <- as.numeric(df$weight)
+    phylo$tip.label <- tips
+    phylo$Nnode <- length(nodes)
+    phylo$node.label <- nodes
+    class(phylo) <- "phylo"
+
+    if(length(germline) > 0){
+        phylo <- rerootGermline(phylo, germline)
+    }
+
+    phylo = ape::ladderize(phylo, right=FALSE)
+    
+    return(phylo)
 }
 
 # Reroot phylogenetic tree to have its germline sequence at a zero-length branch 
@@ -649,7 +807,7 @@ phyloToGraph <- function(phylo) {
 # @param   germid   ID of the tree's predicted germline sequence
 # @param   resolve  If \code{TRUE} reroots tree to specified germline sequnece.
 #                   usually not necessary with IgPhyML trees analyzed with HLP model.
-rerootGermline <- function(tree, germid, resolve=TRUE){
+rerootGermline <- function(tree, germid, resolve=FALSE){
     if(resolve) {
         tree <- ape::root(phy=tree, outgroup=germid, resolve.root=T, edge.label=TRUE)
     }
@@ -761,13 +919,13 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["command"]] <- df[1, ]$TREE
     for (i in 2:nrow(df)) {
         tree <- ape::read.tree(text=df[i, ]$TREE)
-        rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"))
+        rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"),resolve=TRUE)
         if (collapse) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
         }
         if (format == "graph") {
-            ig <- phyloToGraph(rtree)
+            ig <- phyloToGraph(rtree, germline=rtree$germid)
             trees[[df[i, ]$CLONE]] <- ig
         } else if (format == "phylo") {
             trees[[df[i, ]$CLONE]] <- tree
@@ -779,7 +937,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["trees"]] <- trees
 
     if (!is.null(id)) {
-        out$param$ID = id
+        out$param$ID <- id
     }
     
     return(out)

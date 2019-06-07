@@ -21,7 +21,7 @@ data
 
 groups
 :   character vector defining `data` columns containing grouping 
-variables. If `group=NULL`, then do not group data.
+variables. If `groups=NULL`, then do not group data.
 
 copy
 :   name of the `data` column containing copy numbers for each 

@@ -36,7 +36,7 @@ Slots
 
 
 
-`data`
+`div`
 :   data.frame defining the diversity curve with the following columns:
 
 + `GROUP`:    group label.
@@ -53,14 +53,24 @@ divided by `D` at `Q=0`.
 + `E_UPPER`:  eveness upper confidence interval bound.
 
 
-`groups`
-:   character vector of groups retained in the diversity calculation.
+`test`
+:   list containing information concerning the result of testing diversity:
 
-`n`
-:   numeric vector indication the number of sequences sampled from each group.
++ `test`:    data.frame of p-values from testing.
++ `summary`: data.frame of diversity value means and standard deviations for plotting.
 
-`nboot`
-:   number of bootstrap realizations performed.
+
+`div_group`
+:   string specifying the name of the group column in diversity calculation.
+
+`div_groups`
+:   vector specifying the names of unique groups in group column in diversity calculation.
+
+`method`
+:   string specifying the type of diversity calculated.
+
+`q`
+:   vector of diversity hill diversity indices used for computing diversity.
 
 `ci`
 :   confidence interval defining the upper and lower bounds 

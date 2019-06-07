@@ -120,8 +120,9 @@ groupings will be perform by unique sample and isotype pairs
 (`groups=c("SAMPLE", "ISOTYPE")`). Furthermore, instead of quantifying abundance
 by sequence count we will quantify it by clone count. Meaning, each clone will
 be counted only once regardless of how many sequences the clone represents.  
-Clonal citeria are adding by passing a value to the `clone` argument of `countGenes`
-(`clone="CLONE"`).
+Clonal citeria are added by passing a value to the `clone` argument of `countGenes`
+(`clone="CLONE"`). For each clonal group, only the most common family/gene/allele will
+be considered for counting.
 
 
 ```r
@@ -133,13 +134,13 @@ head(family, n=4)
 
 ```
 ## # A tibble: 4 x 5
-## # Groups:   SAMPLE, ISOTYPE [2]
+## # Groups:   SAMPLE, ISOTYPE [3]
 ##   SAMPLE ISOTYPE GENE  CLONE_COUNT CLONE_FREQ
 ##   <chr>  <chr>   <chr>       <int>      <dbl>
-## 1 -1h    IgM     IGHV3         222      0.417
-## 2 -1h    IgM     IGHV1         110      0.207
-## 3 -1h    IgM     IGHV4         102      0.192
-## 4 +7d    IgG     IGHV3          94      0.913
+## 1 -1h    IgA     IGHV2           1     0.0149
+## 2 -1h    IgG     IGHV6           1     0.0156
+## 3 +7d    IgA     IGHV5           1     0.0172
+## 4 +7d    IgA     IGHV6           1     0.0172
 ```
 
 The output `data.frame` contains the additional grouping column (`ISOTYPE`) along with the 

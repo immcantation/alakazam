@@ -10,6 +10,8 @@ Lineage:
 
 + Added `readIgphyml` to read in IgPhyML output and `combineIgphyml` to 
   combine parameter estimates across samples.
++ Added `graphToPhylo` and `phyloToGraph` to allow conversion between 
+  graph and phylo formats.
 
 Diversity:
 

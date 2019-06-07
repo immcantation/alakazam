@@ -74,13 +74,15 @@ Diversity analysis
 
 
 + [countClones](countClones.md):          Calculate clonal abundance.
-+ [estimateAbundance](estimateAbundance.md):    Infer complete clonal abundance distribution with
-confidence intervals.
-+ [rarefyDiversity](rarefyDiversity.md):      Generate clonal diversity curves.
-+ [testDiversity](testDiversity.md):        Test significance of clonal diversity scores.
++ [estimateAbundance](estimateAbundance.md):  	 Bootstrap clonal abundance curves.
++ [rarefyDiversity](rarefyDiversity.md):  	 Generate clonal diversity curves (deprecated).
++ [testDiversity](testDiversity.md):  	     testsDiversity at given diversity hill indicex. 
 + [plotAbundanceCurve](plotAbundanceCurve.md):   Plot clone size distribution as a rank-abundance 
-curve.
++ [rarefyDiversity](rarefyDiversity.md):  	 Generate clonal diversity curves (deprecated).                                       curve.
++ [calculateAlphaDiversity](calculateAlphaDiversity.md):  	 Generate clonal alpha diversity curves.
++ [calculateBetaDiversity](calculateBetaDiversity.md):  	 Generate clonal beta diversity curves.
 + [plotDiversityCurve](plotDiversityCurve.md):   Plot clonal diversity curves.
++ [plotDiversityTest](plotDiversityTest.md):    Plot testing at given diversity hill indicex. 
 
 
 

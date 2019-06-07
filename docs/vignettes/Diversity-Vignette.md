@@ -52,7 +52,7 @@ the size of each clone is determined by the number of sequence members:
 
 ```r
 # Partitions the data based on the SAMPLE column
-clones <- countClones(ExampleDb, groups="SAMPLE")
+clones <- countClones(ExampleDb, group="SAMPLE")
 head(clones, 5)
 ```
 
@@ -79,7 +79,7 @@ normalized to within multiple group data partitions.
 ```r
 # Partitions the data based on both the SAMPLE and ISOTYPE columns
 # Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
 head(clones, 5)
 ```
 
@@ -95,24 +95,23 @@ head(clones, 5)
 ## 5 +7d    IgG     3177         29        130   0.0549    0.0806
 ```
 
-While `countClones` will report observed abundances, it will not correct the
-distribution nor provide confidence intervals. A complete clonal abundance 
-distribution may be inferred using the `estimateAbundance` function with
-confidence intervals derived via bootstrapping.  This output may be visualized
-using the `plotAbundanceCurve` function.
+While `countClones` will report observed abundances, it will not provide confidence 
+intervals. A complete clonal abundance distribution may be inferred using the 
+`estimateAbundance` function with confidence intervals derived via bootstrapping.  
+This output may be visualized using the `plotAbundanceCurve` function.
 
 
 ```r
 # Partitions the data on the SAMPLE column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-clones <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
+curve <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
 ```
 
 
 ```r
 # Plots a rank abundance curve of the relative clonal abundances
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
-plot(clones, colors=sample_colors, legend_title="Sample")
+plot(curve, colors = sample_colors, legend_title="Sample")
 ```
 
 ![plot of chunk Diversity-Vignette-5](figure/Diversity-Vignette-5-1.png)
@@ -130,23 +129,25 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 200 resampling realizations are performed (nboot=200)
-sample_div <- rarefyDiversity(ExampleDb, "SAMPLE", min_q=0, max_q=4, step_q=0.05,
-                              ci=0.95, nboot=200)
+sample_curve <- rarefyDiversity(ExampleDb, group="SAMPLE",
+                             min_q=0, max_q=4, step_q=0.1,
+                             ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=30, min_q=0, max_q=4, 
-                               step_q=0.05, ci=0.95, nboot=200)
+isotype_curve <- rarefyDiversity(ExampleDb, group="ISOTYPE",
+                             min_q=0, max_q=4, step_q=0.1,
+                             ci=0.95, nboot=200)
 ```
 
 
 ```r
 # Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
 # Indicate number of sequences resampled from each group in the title
-sample_main <- paste0("Sample diversity (n=", sample_div@n, ")")
+sample_main <- paste0("Sample diversity")
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
-plot(sample_div, colors=sample_colors, main_title=sample_main, 
+plot(sample_curve, colors=sample_colors, main_title=sample_main, 
      legend_title="Sample")
 ```
 
@@ -154,60 +155,9 @@ plot(sample_div, colors=sample_colors, main_title=sample_main,
 
 ```r
 # Plot isotype diversity using default set of Ig isotype colors
-isotype_main <- paste0("Isotype diversity (n=", isotype_div@n, ")")
-plot(isotype_div, colors=IG_COLORS, main_title=isotype_main, 
+isotype_main <- paste0("Isotype diversity")
+plot(isotype_curve, colors=IG_COLORS, main_title=isotype_main, 
      legend_title="Isotype")
 ```
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
-
-## Test diversity at a fixed diversity order
-
-The function `testDiversity` performs resampling and diversity calculation in 
-the same manner as `rarefyDiversity`, but only for a single diversity order. 
-Significance testing across groups is performed using the delta of the bootstrap
-distributions between groups.
-
-
-```r
-# Test diversity at q=2 (equivalent to Simpson's index) across values in the "SAMPLE" column
-# 200 bootstrap realizations are performed (nboot=200)
-sample_test <- testDiversity(ExampleDb, 2, "SAMPLE", nboot=200)
-
-# Print p-value table
-print(sample_test)
-```
-
-```
-##         test DELTA_MEAN DELTA_SD PVALUE
-## 1 -1h != +7d    515.072  40.1447      0
-```
-
-
-```r
-# Test diversity across values in the "ISOTYPE" column
-# Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
-# Excluded groups are indicated by a warning message
-isotype_test <- testDiversity(ExampleDb, 2, "ISOTYPE", min_n=30, nboot=200)
-
-# Print p-value table
-print(isotype_test)
-```
-
-```
-##         test DELTA_MEAN  DELTA_SD PVALUE
-## 1 IgA != IgD  190.09969 11.134799      0
-## 2 IgA != IgG   27.03974  4.555775      0
-## 3 IgA != IgM  229.57131  6.049322      0
-## 4 IgD != IgG  163.05995 12.055100      0
-## 5 IgD != IgM   39.47162 12.274715      0
-## 6 IgG != IgM  202.53157  7.178220      0
-```
-
-```r
-# Plot the mean and standard deviations from the test
-plot(isotype_test, colors=IG_COLORS, main_title=isotype_main, 
-     legend_title="Isotype")
-```
-
-![plot of chunk Diversity-Vignette-9](figure/Diversity-Vignette-9-1.png)

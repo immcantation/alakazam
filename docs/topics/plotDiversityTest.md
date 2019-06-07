@@ -1,4 +1,4 @@
-**plotDiversityTest** - *Plot the results of TestDiversity*
+**plotDiversityTest** - *Plot the results of diversity testing*
 
 Description
 --------------------
@@ -10,17 +10,20 @@ with a line range indicating plus/minus one standard deviation.
 Usage
 --------------------
 ```
-plotDiversityTest(data, colors = NULL, main_title = "Diversity",
-legend_title = "Group", log_d = FALSE, annotate = c("none",
-"depth"), silent = FALSE, ...)
+plotDiversityTest(data, q_i = NULL, colors = NULL,
+main_title = "Diversity", legend_title = "Group", log_d = FALSE,
+annotate = c("none", "depth"), silent = FALSE, ...)
 ```
 
 Arguments
 -------------------
 
 data
-:   [DiversityTest](DiversityTest-class.md) object returned by 
+:   [DiversityCurve](DiversityCurve-class.md) object returned by 
 [testDiversity](testDiversity.md).
+
+q_i
+:   numeric for hill index to plot for TestDiversity
 
 colors
 :   named character vector whose names are values in the 
@@ -65,7 +68,7 @@ Examples
 
 ```R
 # All groups pass default minimum sampling threshold of 10 sequences
-div <- testDiversity(ExampleDb, "SAMPLE", q=0, nboot=100)
+div <- testDiversity(ExampleDb, group="SAMPLE", q=2, nboot=100)
 plotDiversityTest(div, legend_title="Sample")
 ```
 
@@ -75,8 +78,8 @@ plotDiversityTest(div, legend_title="Sample")
 See also
 -------------------
 
-See [testDiversity](testDiversity.md) for generating [DiversityTest](DiversityTest-class.md)
-objects for input. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+See [testDiversity](testDiversity.md) for generating input directly. 
+Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

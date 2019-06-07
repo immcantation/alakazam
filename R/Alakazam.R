@@ -117,7 +117,7 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
-#' @importFrom	ape 		read.tree di2multi reorder.phylo root
+#' @importFrom	ape 		read.tree di2multi reorder.phylo root ladderize
 #' @importFrom  dplyr       do n desc %>%
 #'                          bind_cols bind_rows combine arrange 
 #'                          group_by ungroup

@@ -1,4 +1,4 @@
-**rarefyDiversity** - *Generate a clonal diversity index curve*
+**rarefyDiversity** - *Generate a clonal diversity index curve (wrapper for calculateAlphaDiversity)*
 
 Description
 --------------------
@@ -79,7 +79,7 @@ Details
 -------------------
 
 Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
-proposed by Hill (Hill, 1973). See [calcDiversity](calcDiversity.md) for further details.
+proposed by Hill (Hill, 1973). See [calcInferredDiversity](calcInferredDiversity.md) for further details.
 
 Diversity is calculated on the estimated complete clonal abundance distribution.
 This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -141,7 +141,7 @@ plotDiversityCurve(div, legend_title="Isotype")
 See also
 -------------------
 
-See [calcDiversity](calcDiversity.md) for the basic calculation and 
+See [calcInferredDiversity](calcInferredDiversity.md) for the basic calculation and 
 [DiversityCurve](DiversityCurve-class.md) for the return object. 
 See [testDiversity](testDiversity.md) for significance testing.
 See [plotDiversityCurve](plotDiversityCurve.md) for plotting the return object.

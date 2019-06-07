@@ -56,9 +56,10 @@ sortGenes(genes)
 
 
 ```
- [1] "IGHV1-2"               "IGHV1-2*01,IGHV1-2*05" "IGHV1-2*02"            "IGHV1-69*01"          
- [5] "IGHV1-69D*01"          "IGHV1-69*02"           "IGHV1-69-2*01"         "IGHV1-NL1*01"         
- [9] "IGHV2-5*01"            "IGHV4-38-2*01"        
+ [1] "IGHV1-2"               "IGHV1-2*01,IGHV1-2*05" "IGHV1-2*02"           
+ [4] "IGHV1-69*01"           "IGHV1-69D*01"          "IGHV1-69*02"          
+ [7] "IGHV1-69-2*01"         "IGHV1-NL1*01"          "IGHV2-5*01"           
+[10] "IGHV4-38-2*01"        
 
 ```
 
@@ -71,9 +72,10 @@ sortGenes(genes, method="pos")
 
 
 ```
- [1] "IGHV1-NL1*01"          "IGHV1-69-2*01"         "IGHV1-69*01"           "IGHV1-69D*01"         
- [5] "IGHV1-69*02"           "IGHV4-38-2*01"         "IGHV2-5*01"            "IGHV1-2"              
- [9] "IGHV1-2*01,IGHV1-2*05" "IGHV1-2*02"           
+ [1] "IGHV1-NL1*01"          "IGHV1-69-2*01"         "IGHV1-69*01"          
+ [4] "IGHV1-69D*01"          "IGHV1-69*02"           "IGHV4-38-2*01"        
+ [7] "IGHV2-5*01"            "IGHV1-2"               "IGHV1-2*01,IGHV1-2*05"
+[10] "IGHV1-2*02"           
 
 ```
 

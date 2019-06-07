@@ -1,17 +1,25 @@
-Version 0.2.11.999:  May 3, 2019
+Version 0.2.11.999:  June 6, 2019
 -------------------------------------------------------------------------------
 
 General:
 
++ Added `ape` and `tibble` dependencies.
++ Added `one_of` and `right_join` from dplyr.
+
 Lineage:
 
-+ Added `readIgphyml` to read in IgPhyML output, and `combineIgphyml` to 
++ Added `readIgphyml` to read in IgPhyML output and `combineIgphyml` to 
   combine parameter estimates across samples.
++ Added `graphToPhylo` and `phyloToGraph` to allow conversion between 
+  graph and phylo formats.
 
 Diversity:
 
 + Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
   non-default value produced an error.
++ Added `calculateAlphaDiversity` and `calculateBetaDiversity`. Reorganized 
+  overall class structure for DiversityCurve and AbundanceCurve with new
+  documentation. 
 
 
 Version 0.2.11:  September 12, 2018

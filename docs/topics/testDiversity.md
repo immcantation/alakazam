@@ -12,7 +12,8 @@ Usage
 --------------------
 ```
 testDiversity(data, q, group, clone = "CLONE", copy = NULL,
-min_n = 30, max_n = NULL, nboot = 2000, progress = FALSE)
+min_n = 30, max_n = NULL, nboot = 2000, progress = FALSE,
+ci = 0.95)
 ```
 
 Arguments
@@ -51,20 +52,24 @@ nboot
 progress
 :   if `TRUE` show a progress bar.
 
+ci
+:   confidence interval to calculate; the value must be between 0 and 1.
+
 
 
 
 Value
 -------------------
 
-A [DiversityTest](DiversityTest-class.md) object containing p-values and summary statistics.
+A [DiversityCurve](DiversityCurve-class.md) object containing slot test with p-values and summary 
+		 statistics.
 
 
 Details
 -------------------
 
 Clonal diversity is calculated using the generalized diversity index proposed by 
-Hill (Hill, 1973). See [calcDiversity](calcDiversity.md) for further details.
+Hill (Hill, 1973). See [calcInferredDiversity](calcInferredDiversity.md) for further details.
 
 Diversity is calculated on the estimated complete clonal abundance distribution.
 This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -126,28 +131,50 @@ testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 
 
 ```
-An object of class "DiversityTest"
-Slot "tests":
-        test DELTA_MEAN DELTA_SD PVALUE
-1 -1h != +7d     476.48 17.24657      0
+An object of class "DiversityCurve"
+Slot "div":
+# A tibble: 4 x 9
+# Groups:   SAMPLE [2]
+  SAMPLE     Q D_ERROR      D D_LOWER D_UPPER     E E_LOWER E_UPPER
+  <chr>  <dbl>   <dbl>  <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
+1 -1h       -1 18816.  39983.  21168.  58799.  49.7  26.3     73.0 
+2 -1h        0   273.    805.    531.   1078.   1     0.660    1.34
+3 +7d       -1  7100.  10945.   3845.  18045.  55.8  19.6     92.0 
+4 +7d        0    57.2   196.    139.    253.   1     0.708    1.29
 
-Slot "summary":
-    GROUP   MEAN       SD
--1h   -1h 818.02 11.38223
-+7d   +7d 341.54 12.71873
+Slot "test":
+$tests
+# A tibble: 2 x 5
+  test_name  Q     DELTA_MEAN DELTA_SD PVALUE
+  <chr>      <chr>      <dbl>    <dbl>  <dbl>
+1 -1h != +7d -1        29038.    9914.      0
+2 -1h != +7d 0           609.     139.      0
 
-Slot "groups":
+$summary
+# A tibble: 4 x 4
+# Groups:   SAMPLE [2]
+  SAMPLE     Q     SD   MEAN
+  <chr>  <dbl>  <dbl>  <dbl>
+1 -1h       -1 9600.  39983.
+2 -1h        0  140.    805.
+3 +7d       -1 3622.  10945.
+4 +7d        0   29.2   196.
+
+
+Slot "method":
+[1] "alpha"
+
+Slot "div_group":
+[1] "SAMPLE"
+
+Slot "div_groups":
 [1] "-1h" "+7d"
 
 Slot "q":
-[1] 0
+[1] -1  0
 
-Slot "n":
- -1h  +7d 
-1000 1000 
-
-Slot "nboot":
-[1] 100
+Slot "ci":
+[1] 0.95
 
 
 ```
@@ -157,8 +184,7 @@ Slot "nboot":
 See also
 -------------------
 
-See [calcDiversity](calcDiversity.md) for the basic calculation and 
-[DiversityTest](DiversityTest-class.md) for the return object. 
+See [calcInferredDiversity](calcInferredDiversity.md) for the basic calculation.
 See [rarefyDiversity](rarefyDiversity.md) for curve generation.
 See [ecdf](http://www.rdocumentation.org/packages/stats/topics/ecdf) for computation of the empirical cumulative 
 distribution function.

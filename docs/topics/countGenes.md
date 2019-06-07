@@ -36,8 +36,8 @@ This argument is ignored if `clone` is specified.
 
 clone
 :   name of the `data` column containing clone identifiers for each 
-sequence. If this value is specified, then genes will be counted only
-once for each clone. Note, this is accomplished by using the most 
+sequence. If this value is specified, then one gene will be considered 
+for each clone. Note, this is accomplished by using the most 
 common gene within each `clone` identifier. As such,
 ambiguous alleles within a clone will not be accurately represented.
 
