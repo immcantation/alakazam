@@ -214,7 +214,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #'
 #' @export
 getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE, 
-                       strip_d=TRUE, omit_nl=FALSE, sep=",") {
+                       strip_d=TRUE, omit_nl=FALSE, sep=",", unique=TRUE) {
     # Define boundaries of individual segment calls
     edge_regex <- paste0("[^", sep, "]*")
     

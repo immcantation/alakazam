@@ -67,7 +67,7 @@ test_that("calcInferredDiversity", {
 
 #### bootstrapDiversity ####
 
-test_that("bootstrapDiversity", {
+test_that("estimateAbundance", {
 	
 	set.seed(90)
 	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)

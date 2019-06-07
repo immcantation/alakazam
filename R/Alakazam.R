@@ -122,7 +122,9 @@
 #'                          bind_cols bind_rows combine arrange 
 #'                          group_by ungroup
 #'                          filter slice select 
-#'                          mutate mutate_at
+#'                          mutate mutate_at 
+#' 							one_of
+#'							right_join
 #'                          summarize summarize_at
 #'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 

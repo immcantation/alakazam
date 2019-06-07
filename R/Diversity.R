@@ -1316,13 +1316,14 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 }
 
 
-#' Plot the results of TestDiversity
+#' Plot the results of diversity testing
 #' 
 #' \code{plotDiversityTest} plots a \code{DiversityTest} object as the mean
 #' with a line range indicating plus/minus one standard deviation.
 #'
-#' @param    data            \link{DiversityTest} object returned by 
+#' @param    data            \link{DiversityCurve} object returned by 
 #'                           \link{testDiversity}.
+#' @param    q_i      		 numeric for hill index to plot for TestDiversity
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -1361,6 +1362,9 @@ plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity
 	if(is.null(q_i)){
 		q_i <- tail(unique(unlist(data@test$test["Q"]))[-1], n = 1)
 	}
+	
+	# q_i cannot be zero
+	if(q_i == 0) {q_i <- 0.01}
 	
     # Check if q is in data
     if (!(q_i %in% data@q)) { stop("hill index not assessed") }
