@@ -255,17 +255,6 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' @param    q  numeric vector of diversity orders.
 #' 
 #' @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-#' 
-#' @return   A data.frame with relative clonal abundance data and confidence intervals,
-#'           containing the following columns:
-#'           \itemize{
-#'             \item  \code{GROUP}:  group identifier. Will be code{NA} if \code{group=NULL}.
-#'             \item  \code{CLONE}:  clone identifier.
-#'             \item  \code{P}:      relative abundance of the clone.
-#'             \item  \code{LOWER}:  lower confidence inverval bound.
-#'             \item  \code{UPPER}:  upper confidence interval bound.
-#'             \item  \code{RANK}:   the rank of the clone abundance.
-#'           }
 #'           
 #' @details
 #' This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
@@ -281,7 +270,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
 #' at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
 #' 
-#' An adjusted detected species relative abundance distribution is applied before calculating diversity.
+#' An adjusted detected species relative abundance distribution is applied before calculating 
+#' diversity.
 #'
 #' Confidence intervals are derived using the standard deviation of the resampling 
 #' realizations, as described in Chao et al, 2015.
@@ -290,6 +280,11 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 #' \enumerate{
 #'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
 #'            Ecology. 1973 54(2):427-32.
+#'   \item  Chao A. Nonparametric Estimation of the Number of Classes in a Population. 
+#'            Scand J Stat. 1984 11, 265270.
+#'   \item  Chao A, et al. Unveiling the species-rank abundance distribution by 
+#'            generalizing the Good-Turing sample coverage theory. 
+#'            Ecology. 2015 96, 11891201.
 #' }
 #' 
 #' @seealso  Used by \link{rarefyDiversity} and \link{testDiversity}.
@@ -304,7 +299,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 calcInferredDiversity <- function(p, q) {
     # Use Chao estimators for unseen abundance correction
     p <- c(p, inferUnseenAbundance(p))
-	
+    
     # Add jitter to q=1
     q[q == 1] <- 0.9999
     # Remove zeros
@@ -316,9 +311,6 @@ calcInferredDiversity <- function(p, q) {
     
     return(D)
 }
-
-
-#### Diversity functions ####
 
 #' Calculate the diversity index
 #' 
@@ -366,7 +358,6 @@ calcInferredDiversity <- function(p, q) {
 #' 
 #' @export
 calcDiversity <- function(p, q) {
-
     # Add jitter to q=1
     q[q == 1] <- 0.9999
     # Remove zeros
@@ -425,18 +416,17 @@ inferRarefiedDiversity <- function(x, q, m) {
 #'                     is determined by the number of sequences. If a \code{copy} column
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
-#' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
-#'                     number of observations. If \code{FALSE} then allow each group to
-#'                     be resampled to its original size or, if specified, \code{max_size}.
-#' @param    nboot     number of bootstrap realizations to generate.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} then no 
 #'                     maximum is set.
+#' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
+#'                     number of observations. If \code{FALSE} then allow each group to
+#'                     be resampled to its original size or, if specified, \code{max_size}.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
+#' @param    nboot     number of bootstrap realizations to generate.
 #' 
 #' @return   A \link{AbundanceCurve} object summarizing the abundances.
-#' 
 #'           
 #' @references
 #' \enumerate{
@@ -458,19 +448,16 @@ inferRarefiedDiversity <- function(x, q, m) {
 #' abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
 #'
 #' @export
-estimateAbundance <- function(data, group, 
-    clone="CLONE", copy = NULL, 
-    uniform=TRUE, nboot = 200, min_n = 30, max_n=NULL, ci=0.95){
-    
-	# Hack for visibility of dplyr variables
-	. <- NULL
-			
-	# Set confidence interval for plotting
-	ci_z <- ci + (1 - ci) / 2
-		
+estimateAbundance <- function(data, group, clone="CLONE", copy=NULL, 
+                              min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200) {
+    # Hack for visibility of dplyr variables
+    . <- NULL
+            
+    # Set confidence interval for plotting
+    ci_z <- ci + (1 - ci) / 2
+        
     # Private bootstrap function
-    bootstrap_ <- function(data, max_n=max_n){
-    
+    .bootstrap <- function(data, max_n=max_n){
         # Tabulate clones
         clone_tab <- data %>% countClones(copy=copy, clone=clone)
 
@@ -508,26 +495,26 @@ estimateAbundance <- function(data, group,
     
     # Check the smallest sample is not smaller than min_n
     if (min(sequence_max_ns) < min_n) { stop("too few sequences in some samples") }
-	
+    
     # If rarefaction is turned on, set an max_n. Otherwise NULL max_n (ignore).
     if (uniform & is.null(max_n)) { max_n <- min(sequence_max_ns) } else { max_n <- NULL }
-	
+    
     # Bootstrap abundance curves
     boot_output <- data %>%
         dplyr::group_by(!!!rlang::syms(c(group))) %>%
-        dplyr::do(data.frame(bootstrap_(., max_n=max_n)) %>% 
+        dplyr::do(data.frame(.bootstrap(., max_n=max_n)) %>% 
         tibble::rownames_to_column(clone))
     
     # Groups
     groups <- unique(data[[group]])
-	
-	# Create abundance slot
+    
+    # Create abundance slot
     abund <- boot_output %>%
         tidyr::gather(key = "N", value = "C", -one_of(c(clone, group))) %>%
         dplyr::group_by(!!!rlang::syms(c(clone, group))) %>%
         dplyr::summarize(
-			P_ERROR = qnorm(ci_z) * sd(!!rlang::sym("C")/max_n), 
-			P = mean(!!rlang::sym("C")/max_n)) %>%
+            P_ERROR = qnorm(ci_z) * sd(!!rlang::sym("C")/max_n), 
+            P = mean(!!rlang::sym("C")/max_n)) %>%
         dplyr::mutate(LOWER = pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), UPPER = !!rlang::sym("P") + !!rlang::sym("P_ERROR")) %>%
         dplyr::group_by(!!!rlang::syms(c(group))) %>%
         dplyr::mutate(RANK = rank(-!!rlang::sym("P"), ties.method = "first"))
@@ -535,14 +522,14 @@ estimateAbundance <- function(data, group,
     # Create a new diversity object with bootstrap
     boot_obj <- new("AbundanceCurve",
              bootstrap=boot_output, 
-			 abund=abund,
+             abund=abund,
              group=group,
              groups=groups,
              clone=clone,
              uniform=uniform,
              max_n=max_n, 
-			 nboot=nboot, 
-			 ci=ci,
+             nboot=nboot, 
+             ci=ci,
              min_n=min_n
     )
     
@@ -550,19 +537,19 @@ estimateAbundance <- function(data, group,
 }
 
 
-#' Helper function for computing alpha diversity from bootrstrap outputs
-#'
-#' \code{helperAlpha} divides a set of bootstrapped clones by group annotation,
-#' and computes the diversity of each set. 
-#'
-#' @param    boot_output    data.frame from\link{AbundanceCurve} object containing bootstrapped clonal abundance curves.
-#' @param    q       		vector of Hill Diversity indices to test for diversity calculations.
-#' @param    clone     		name of the \code{boot_output} column containing clone identifiers.
-#' @param    group      	name of the \code{boot_output} column containing grouping information for diversity 
-#' 							calculation.
-#'
+# Helper function for computing alpha diversity from bootrstrap outputs
+#
+# \code{helperAlpha} divides a set of bootstrapped clones by group annotation,
+# and computes the diversity of each set. 
+#
+# @param    boot_output  data.frame from\link{AbundanceCurve} object containing bootstrapped clonal 
+#                        abundance curves.
+# @param    q            vector of Hill Diversity indices to test for diversity calculations.
+# @param    clone          name of the \code{boot_output} column containing clone identifiers.
+# @param    group           name of the \code{boot_output} column containing grouping information for 
+#                        diversity  calculation.
+#
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-
 helperAlpha <- function(boot_output, q, clone=NULL, group=NULL){
 
     # Compute diversity from a column of each bootstrap
@@ -577,26 +564,25 @@ helperAlpha <- function(boot_output, q, clone=NULL, group=NULL){
 }
 
 
-#' Helper function for computing beta diversity from bootrstrap outputs
-#'
-#' \code{helperBeta} divides a set of bootstrapped clones by group annotation,
-#' and computes the alpha diversity. Group annotations are then ignored and 
-#' gamma diversity is computed. A multiplicative beta diversity is used corresponding
-#' to the gamma diversity divided by the average alpha diversity of each group.
-#'
-#' @param    boot_output    data.frame from\link{AbundanceCurve} object containing bootstrapped clonal abundance curves.
-#' @param    q       		vector of Hill Diversity indices to test for diversity calculations.
-#' @param	 ci_z			numeric value corresponding to confidence interval for calculating beta diversity.
-#' @param    clone     		name of the \code{boot_output} column containing clone identifiers.
-#' @param    group      	name of the \code{boot_output} column containing grouping information for diversity 
-#' 							calculation.
-#'
+# Helper function for computing beta diversity from bootrstrap outputs
+#
+# \code{helperBeta} divides a set of bootstrapped clones by group annotation,
+# and computes the alpha diversity. Group annotations are then ignored and 
+# gamma diversity is computed. A multiplicative beta diversity is used corresponding
+# to the gamma diversity divided by the average alpha diversity of each group.
+#
+# @param    boot_output   data.frame from\link{AbundanceCurve} object containing bootstrapped clonal abundance curves.
+# @param    q             vector of Hill Diversity indices to test for diversity calculations.
+# @param    ci_z          numeric value corresponding to confidence interval for calculating beta diversity.
+# @param    clone         name of the \code{boot_output} column containing clone identifiers.
+# @param    group         name of the \code{boot_output} column containing grouping information for diversity 
+#                         calculation.
+#
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-
-helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
-	# Hack for visibility of dplyr variables
-	. <- NULL
-		
+helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){ 
+    # Hack for visibility of dplyr variables
+    . <- NULL
+        
     # Compute gamma diversity metrics
     gamma <- boot_output %>%
         dplyr::group_by(!!!rlang::syms(c(clone))) %>%
@@ -621,32 +607,33 @@ helperBeta <- function(boot_output, q, ci_z, clone=NULL, group=NULL){
         dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::mutate(D = !!rlang::sym("GAMMA")/!!rlang::sym("ALPHA")) %>%
         dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
-					D = mean(!!rlang::sym("D"))) %>%
+                    D = mean(!!rlang::sym("D"))) %>%
         dplyr::mutate(D_LOWER = pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
-					D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
+                    D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
 
     return(div)
 }
 
-#' Helper function for computing statistical significance
-#'
-#' \code{helperTest} computes the pairwise statistical significance of differences
-#' in bootstrapped diversity values between two sets defined by the group column. 
-#' A p-value is computed using the ECDF distribution as the frequency of bootstrap iterations
-#' for which no difference is observed. 
-#'
-#' @param    div_df    		data.frame from\link{DiversityCurve} object containing bootstrapped diversity curves.
-#' @param    group      	name of the \code{boot_output} column containing grouping information for diversity 
-#' 							calculation.
-#' @param    q       		vector of Hill Diversity indices to test for diversity calculations.
-#'
+# Helper function for computing statistical significance
+#
+# \code{helperTest} computes the pairwise statistical significance of differences
+# in bootstrapped diversity values between two sets defined by the group column. 
+# A p-value is computed using the ECDF distribution as the frequency of bootstrap iterations
+# for which no difference is observed. 
+#
+# @param    div_df        data.frame from\link{DiversityCurve} object containing bootstrapped 
+#                       diversity curves.
+# @param    group          name of the \code{boot_output} column containing grouping information 
+#                       for diversity calculation.
+# @param    q           vector of Hill Diversity indices to test for diversity calculations.
+#
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperTest <- function(div_df, group, q = q){
-	# Hack for visibility of dplyr variables
-	. <- NULL
-		
+helperTest <- function(div_df, group, q) {
+    # Hack for visibility of dplyr variables
+    . <- NULL
+        
     group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
-	
+    
     pvalue_list <- list()
     for (group_pair in group_pairs) {
         pair_list <- list()
@@ -681,7 +668,7 @@ helperTest <- function(div_df, group, q = q){
         dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
         dplyr::group_by(!!!rlang::syms(c(group, "Q"))) %>%
         dplyr::summarize(SD = sd(!!rlang::sym("D")), MEAN = mean(!!rlang::sym("D")))
-	
+    
     test_div = list(
         tests=test_df,
         summary=summary_df
@@ -758,18 +745,15 @@ helperTest <- function(div_df, group, q = q){
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
 #' @export
-calculateAlphaDiversity <- function(boot_obj, 
-            min_q=0, max_q=4, step_q=0.1, 
-            ci = 0.95){
-    
-	# Hack for visibility of dplyr variables
-	    . <- NULL
-					
+calculateAlphaDiversity <- function(boot_obj, min_q=0, max_q=4, step_q=0.1, ci=0.95) {
+    # Hack for visibility of dplyr variables
+        . <- NULL
+                    
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
-	if (!(0 %in% q)) { q <- c(0, q) }
-		
+    if (!(0 %in% q)) { q <- c(0, q) }
+        
     # Compute diversity metric for bootstrap instances
     div_df <- boot_obj@bootstrap %>%
         dplyr::group_by(!!!rlang::syms(c(boot_obj@group))) %>%
@@ -782,11 +766,11 @@ calculateAlphaDiversity <- function(boot_obj,
         dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
         dplyr::group_by(!!!rlang::syms(c(boot_obj@group, "Q"))) %>%
         dplyr::summarize(
-					D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
-					D = mean(!!rlang::sym("D"))) %>%
+                    D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
+                    D = mean(!!rlang::sym("D"))) %>%
         dplyr::mutate(
-					D_LOWER = pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
-					D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
+                    D_LOWER = pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
+                    D_UPPER = !!rlang::sym("D") + !!rlang::sym("D_ERROR"))
         
     # Alpha groups
     div_groups <- unique(div[[boot_obj@group]])
@@ -799,21 +783,21 @@ calculateAlphaDiversity <- function(boot_obj,
     div <- div %>%
         dplyr::right_join(div_qi, by = boot_obj@group, suffix = c("", "_0")) %>%
         mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
-			E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
-			E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
+            E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
+            E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
         select(-!!rlang::sym("D_0"))
     
     # Test
     test <- helperTest(div_df, group=boot_obj@group, q = q)
     
     div_obj <- new("DiversityCurve",
-             div=div, 
-			 method="alpha",
-             test=test,
-             div_group=boot_obj@group,
-			 div_groups=div_groups,
-             q=q,  
-             ci=ci)
+                   div=div, 
+                   method="alpha",
+                   test=test,
+                   div_group=boot_obj@group,
+                   div_groups=div_groups,
+                   q=q,  
+                   ci=ci)
         
    return(div_obj) 
 }
@@ -823,31 +807,29 @@ calculateAlphaDiversity <- function(boot_obj,
 #' \code{calculateAlphaDiversity} takes in an \code{AbundanceCurve} object containing bootstrapped 
 #' and potentially rarefied samples of clones and computes an alpha diversity metric (Hill) 
 #' across a range of values (Hill values). This is performed by using the \code{helperBeta} function
-#' for pairs of groups of clones.  Statistical testing for significant pairwise differences in diversity 
+#' for pairs of groups of clones. Statistical testing for significant pairwise differences in diversity 
 #' is also not currently implemented. 
 #' 
-#' @param    boot_obj  		\link{AbundanceCurve} object containing bootstrapped clonal distributions.
-#' @param	 comparisons	list of comparisons between group members for computing beta diversity. 
-#' @param    min_q     		minimum value of \eqn{q}.
-#' @param    max_q     		maximum value of \eqn{q}.
-#' @param    step_q    		value by which to increment \eqn{q}.
-#' @param    ci        		confidence interval to calculate; the value must be between 0 and 1.
+#' @param    boot_obj          \link{AbundanceCurve} object containing bootstrapped clonal distributions.
+#' @param    comparisons       list of comparisons between group members for computing beta diversity. 
+#' @param    min_q             minimum value of \eqn{q}.
+#' @param    max_q             maximum value of \eqn{q}.
+#' @param    step_q            value by which to increment \eqn{q}.
+#' @param    ci                confidence interval to calculate; the value must be between 0 and 1.
 #'
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
 #' 
 #' @export
-calculateBetaDiversity <- function(boot_obj, comparisons,
-            min_q=0, max_q=4, step_q=0.1, 
-            ci = 0.95){
-	
-	# Hack for visibility of dplyr variables
-	    . <- NULL
-			
+calculateBetaDiversity <- function(boot_obj, comparisons, min_q=0, max_q=4, step_q=0.1, 
+                                   ci=0.95) {
+    # Hack for visibility of dplyr variables
+        . <- NULL
+            
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
     q <- seq(min_q, max_q, step_q)
-	if (!(0 %in% q)) { q <- c(0, q) }
-		
+    if (!(0 %in% q)) { q <- c(0, q) }
+        
     # Compute pairwise beta diversity for bootstrap instances
     beta_diversity_list <- list()
 
@@ -872,26 +854,27 @@ calculateBetaDiversity <- function(boot_obj, comparisons,
     div <- div %>%
         right_join(div_qi, by = "COMPARISON", suffix = c("", "_0")) %>%
         mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
-			E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
-			E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
+            E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
+            E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
         select(-!!rlang::sym("D_0"))
-		
+        
     # Test
     #test <- testDiversity_(div_df, group=boot_obj@group, q = q)
     
     div_obj <- new("DiversityCurve",
              div=div, 
-			 method="beta",
+             method="beta",
              test=NULL,
              div_group="COMPARISON",
-			 div_groups=div_groups,
+             div_groups=div_groups,
              q=q,  
              ci=ci)
         
-	return(div_obj)
+    return(div_obj)
 }
 
-#' Generate a clonal diversity index curve (wrapper for calculateAlphaDiversity)
+
+#' Generate a clonal diversity index curve
 #'
 #' \code{rarefyDiversity} divides a set of clones by a group annotation,
 #' resamples the sequences from each group, and calculates diversity
@@ -975,10 +958,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
                             ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
     #group="SAMPLE"; clone="CLONE"; copy=NULL; min_q=0; max_q=4; step_q=1; min_n=30; max_n=NULL; ci=0.95; nboot=200
 
-	bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
-	diversity_obj <- calculateAlphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
-	
-	return(diversity_obj)	
+    bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
+    diversity_obj <- calculateAlphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
+    
+    return(diversity_obj)    
 }
 
 
@@ -1002,11 +985,11 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
 #' @param    nboot     number of bootstrap realizations to perform.
-#' @param    ci        		confidence interval to calculate; the value must be between 0 and 1.
+#' @param    ci                confidence interval to calculate; the value must be between 0 and 1.
 #' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object containing slot test with p-values and summary 
-#'			 statistics.
+#'             statistics.
 #' 
 #' @details
 #' Clonal diversity is calculated using the generalized diversity index proposed by 
@@ -1067,10 +1050,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
                           min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
 
-	abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci)
-	diversity_obj <- calculateAlphaDiversity(abundance_obj, min_q=q-1, max_q=q, step_q=1, ci=ci)
-	
-	return(diversity_obj)	
+    abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci)
+    diversity_obj <- calculateAlphaDiversity(abundance_obj, min_q=q-1, max_q=q, step_q=1, ci=ci)
+    
+    return(diversity_obj)    
 }
 
 
@@ -1323,7 +1306,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #'
 #' @param    data            \link{DiversityCurve} object returned by 
 #'                           \link{testDiversity}.
-#' @param    q_i      		 numeric for hill index to plot for TestDiversity
+#' @param    q_i               numeric for hill index to plot for TestDiversity
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.
@@ -1358,14 +1341,14 @@ plotDiversityTest <- function(data, q_i=NULL, colors=NULL, main_title="Diversity
     # Check if abundance is in data
     if (is.null(data@test)) { stop("missing testing from data") }
     
-	# Set q_i, if NULL, use the maximum Q (when using testDiversity function)
-	if(is.null(q_i)){
-		q_i <- tail(unique(unlist(data@test$test["Q"]))[-1], n = 1)
-	}
-	
-	# q_i cannot be zero
-	if(q_i == 0) {q_i <- 0.01}
-	
+    # Set q_i, if NULL, use the maximum Q (when using testDiversity function)
+    if(is.null(q_i)){
+        q_i <- tail(unique(unlist(data@test$test["Q"]))[-1], n = 1)
+    }
+    
+    # q_i cannot be zero
+    if(q_i == 0) {q_i <- 0.01}
+    
     # Check if q is in data
     if (!(q_i %in% data@q)) { stop("hill index not assessed") }
     

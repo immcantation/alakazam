@@ -8,6 +8,7 @@
 # @exportMethod plot
 #setGeneric("plot")
 
+setClassUnion("listOrNULL", members=c("list","NULL"))
 
 #### Diversity classes ####
 
@@ -40,19 +41,17 @@
 #' @rdname       AbundanceCurve-class
 #' @aliases      AbundanceCurve
 #' @exportClass  AbundanceCurve
-
 setClass("AbundanceCurve", 
-         slots=c(
-			 abund="data.frame",
-             bootstrap="data.frame",
-             group="character",
-             groups="character",
-             clone="character",
-             uniform="logical",
-             max_n="numeric", 
-			 ci="numeric",
-			 nboot="numeric", 
-             min_n="numeric"))
+         slots=c(abund="data.frame",
+                 bootstrap="data.frame",
+                 group="character",
+                 groups="character",
+                 clone="character",
+                 uniform="logical",
+                 max_n="numeric", 
+    			 ci="numeric",
+    			 nboot="numeric", 
+                 min_n="numeric"))
 
 #' S4 class defining a diversity curve 
 #'
@@ -79,9 +78,9 @@ setClass("AbundanceCurve",
 #'                    \item  \code{test}:    data.frame of p-values from testing.
 #'                    \item  \code{summary}: data.frame of diversity value means and standard deviations for plotting.
 #'                  }
-#' @slot  div_group     string specifying the name of the group column in diversity calculation.
-#' @slot  div_groups    vector specifying the names of unique groups in group column in diversity calculation.
-#' @slot  method         string specifying the type of diversity calculated. 
+#' @slot  div_group   string specifying the name of the group column in diversity calculation.
+#' @slot  div_groups  vector specifying the names of unique groups in group column in diversity calculation.
+#' @slot  method      string specifying the type of diversity calculated. 
 #' @slot  q         vector of diversity hill diversity indices used for computing diversity.  
 #' @slot  ci        confidence interval defining the upper and lower bounds 
 #'                  (a value between 0 and 1).
@@ -90,18 +89,14 @@ setClass("AbundanceCurve",
 #' @rdname       DiversityCurve-class
 #' @aliases      DiversityCurve
 #' @exportClass  DiversityCurve
-
-setClassUnion("listOrNULL",members =c("list","NULL"))
-
 setClass("DiversityCurve", 
-          slots=c(
-             div="data.frame", 
-             test="listOrNULL",
- 			 method="character",
-             div_group="character",
- 			 div_groups="character",
-             q="numeric",  
-             ci="numeric"))
+         slots=c(div="data.frame", 
+                 test="listOrNULL",
+     			 method="character",
+                 div_group="character",
+     			 div_groups="character",
+                 q="numeric",  
+                 ci="numeric"))
 			  
 #### Diversity methods ####
 
