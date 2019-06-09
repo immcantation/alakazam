@@ -32,8 +32,8 @@ setClassUnion("listOrNULL", members=c("list","NULL"))
 #' @slot  clone     string specifying the name of the clone column. 
 #' @slot  nboot     numeric specifying the number of bootstrap iterations to use.  
 #' @slot  uniform   TRUE/FALSE specifying whether or not bootstraps were calculated under rarefaction.
-#' @slot  max_n		numeric specifying the number of species used for rarefaction if rarefaction is used. 
-#' @slot  min_n		numeric specifying the minumim tolerated number of species in calculation.
+#' @slot  max_n     numeric specifying the number of species used for rarefaction if rarefaction is used. 
+#' @slot  min_n     numeric specifying the minumim tolerated number of species in calculation.
 #' @slot  ci        confidence interval defining the upper and lower bounds 
 #'                  (a value between 0 and 1).
 #' 
@@ -49,8 +49,8 @@ setClass("AbundanceCurve",
                  clone="character",
                  uniform="logical",
                  max_n="numeric", 
-    			 ci="numeric",
-    			 nboot="numeric", 
+                 ci="numeric",
+                 nboot="numeric", 
                  min_n="numeric"))
 
 #' S4 class defining a diversity curve 
@@ -92,12 +92,12 @@ setClass("AbundanceCurve",
 setClass("DiversityCurve", 
          slots=c(div="data.frame", 
                  test="listOrNULL",
-     			 method="character",
+                 method="character",
                  div_group="character",
-     			 div_groups="character",
+                 div_groups="character",
                  q="numeric",  
                  ci="numeric"))
-			  
+              
 #### Diversity methods ####
 
 # TODO:  plot method for DiversityTest
