@@ -86,7 +86,7 @@ NULL
 # rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
 #                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
 #                             ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
-#     .Deprecated("alphDiversity")
+#     .Deprecated("alphaDiversity")
 #     bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
 #     diversity_obj <- calculateAlphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
 # 
@@ -177,7 +177,7 @@ NULL
 #' @export
 # testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 
 #                           min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
-#     .Deprecated("alphDiversity")
+#     .Deprecated("alphaDiversity")
 #     
 #     abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci)
 #     diversity_obj <- alphaDiversity(abundance_obj, min_q=q, max_q=q, step_q=1, ci=ci)
