@@ -8,7 +8,8 @@
 # @exportMethod plot
 #setGeneric("plot")
 
-setClassUnion("DFNULL", members=c("data.frame", "NULL"))
+setClassUnion("DfNULL", members=c("data.frame", "NULL"))
+setClassUnion("CharNULL", members=c("character", "NULL"))
 
 #### Diversity classes ####
 
@@ -43,7 +44,7 @@ setClass("AbundanceCurve",
          slots=c(abundance="data.frame",
                  bootstrap="data.frame",
                  clone_by="character",
-                 group_by="character",
+                 group_by="CharNULL",
                  groups="character",
                  n="numeric", 
                  ci="numeric",
@@ -100,10 +101,10 @@ setClass("AbundanceCurve",
 #' @exportClass  DiversityCurve
 setClass("DiversityCurve", 
          slots=c(diversity="data.frame", 
-                 tests="DFNULL",
-                 summary="DFNULL",
+                 tests="DfNULL",
+                 summary="DfNULL",
                  method="character",
-                 group_by="character",
+                 group_by="CharNULL",
                  groups="character",
                  q="numeric",
                  n="numeric", 
