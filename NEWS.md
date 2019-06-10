@@ -1,5 +1,12 @@
-Version 0.2.11.999:  June 9, 2019
+Version 0.2.11.999:  June 10, 2019
 -------------------------------------------------------------------------------
+
+Deprecated:
+
++ `rarefyDiversity` is deprecated in favor of `alphaDiversity`, which includes
+  the same functionality
++ `testDiversity` is deprecated. The test calculation have been added to the 
+   normal output of `alphaDiversity`.
 
 General:
 
@@ -18,9 +25,10 @@ Diversity:
   non-default value produced an error.
 + Added rarefaction options to `estimateAbundance` through the `min_n`, 
   `max_n`, and `uniform` arguments.
-+ Renamed `rarefyDiversity` to `alphaDiversity` and moved the rarefaction arguments
-  and calculation into `estimateAbundance`.
-+ Removed `testDiversity` in favor of adding the calculation to `alphaDiversity`
++ Moved the rarefaction calculation for the diversity functions into 
+  `estimateAbundance`. `alphaDiversity` and `betaDiversity` will call 
+  `estimateAbundance` for bootstrapping if not provided an existing 
+  `AbundanceCurve` object.
 + Added the `betaDiversity` function to calculating pairwise beta diversity scores.
 + Restructured to the `DiversityCurve` and `AbundanceCurve` objects to accomodate
   the new diversity methods.
