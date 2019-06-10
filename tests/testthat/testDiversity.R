@@ -177,7 +177,9 @@ test_that("betaDiversity", {
 	expect_equal(obs$D_LOWER, exp$D_LOWER, tolerance=0.001, check.attributes=F)
 	expect_equal(obs$D_UPPER, exp$D_UPPER, tolerance=0.001, check.attributes=F)
 	expect_equal(obs$Q, exp$Q, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$SAMPLE, exp$SAMPLE, tolerance=0.001, check.attributes=F)
+	
+	# TODO: fix me. This test isn't right, SAMPLE doen'st exist is exp or obs
+	# expect_equal(obs$SAMPLE, exp$SAMPLE, tolerance=0.001, check.attributes=F)
 
 	set.seed(3)
 	beta_db <- db %>% 
@@ -259,7 +261,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
                                     step_q=1, min_q=0, max_q=0, min_n=30, max_n=NULL,
                                     ci=0.95)
     
-    p_q0 <- diversity_obj@tests %>% filter(Q == 0) %>% select(PVALUE) %>% as.numeric()
+    p_q0 <- diversity_obj@tests[["PVALUE"]]
     expect_equal(p_q0, 0)
     expect_equal(diversity_obj@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
 })
