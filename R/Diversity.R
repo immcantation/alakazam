@@ -1072,7 +1072,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    if (!is.null(data@group_by)) {
+    if (!is.na(data@group_by)) {
         # Define grouped plot
         p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P", group=data@group_by)) + 
             ggtitle(main_title) + 
@@ -1105,11 +1105,11 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
         p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P")) + 
             ggtitle(main_title) + 
             baseTheme() + 
-            xlab('Rank') +
-            ylab('Abundance') +
+            xlab("Rank") +
+            ylab("Abundance") +
             scale_x_log10(limits=xlim,
-                          breaks=scales::trans_breaks('log10', function(x) 10^x),
-                          labels=scales::trans_format('log10', scales::math_format(10^.x))) +
+                          breaks=scales::trans_breaks("log10", function(x) 10^x),
+                          labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
             geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER"), fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
