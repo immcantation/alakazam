@@ -22,9 +22,8 @@ abundance distribution, using the `estimateAbundance` function, along with
 two approaches to assess diversity of these distributions: 
 
 1. Generation of a smooth diversity (D) curve over a range of diversity orders (q) 
-using `rarefyDiversity`.
-2. A significance test of the diversity (D) at a fixed diversity order (q) using 
-`testDiversity`.
+using `alphaDiversity`.
+2. A significance test of the diversity (D) at a fixed diversity order (q).
 
 
 ## Example data
@@ -118,7 +117,7 @@ plot(curve, colors = sample_colors, legend_title="Sample")
 
 ## Generate a diversity curve
 
-The function `rarefyDiversity` performs uniform resampling of the input 
+The function `alphaDiversity` performs uniform resampling of the input 
 sequences and recalculates the clone size distribution, and diversity, with each 
 resampling realization. Diversity (D) is calculated over a range of diversity 
 orders (q) to generate a smooth curve.
@@ -129,16 +128,16 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 200 resampling realizations are performed (nboot=200)
-sample_curve <- rarefyDiversity(ExampleDb, group="SAMPLE",
-                             min_q=0, max_q=4, step_q=0.1,
-                             ci=0.95, nboot=200)
+sample_curve <- alphaDiversity(ExampleDb, group="SAMPLE",
+                               min_q=0, max_q=4, step_q=0.1,
+                               ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_curve <- rarefyDiversity(ExampleDb, group="ISOTYPE",
-                             min_q=0, max_q=4, step_q=0.1,
-                             ci=0.95, nboot=200)
+isotype_curve <- alphaDiversity(ExampleDb, group="ISOTYPE",
+                                min_q=0, max_q=4, step_q=0.1,
+                                ci=0.95, nboot=200)
 ```
 
 
@@ -161,3 +160,61 @@ plot(isotype_curve, colors=IG_COLORS, main_title=isotype_main,
 ```
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-2.png)
+
+
+## View diversity tests at a fixed diversity order
+
+Significance testing across groups is performed using the delta of the bootstrap
+distributions between groups when running `alphaDiversity` for all values of `q` 
+specified.
+
+
+```r
+# Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
+# Simpson's index) across values in the "SAMPLE" column
+# 200 bootstrap realizations are performed (nboot=200)
+isotype_test <- alphaDiversity(ExampleDb, group="ISOTYPE", min_q=0, max_q=2, step_q=1, nboot=200)
+
+# Print P-value table
+print(isotype_test)
+```
+
+```
+## # A tibble: 18 x 5
+##    TEST       Q     DELTA_MEAN DELTA_SD PVALUE
+##    <chr>      <chr>      <dbl>    <dbl>  <dbl>
+##  1 IgA != IgD 0         139.       7.66   0   
+##  2 IgA != IgD 1         184.       8.37   0   
+##  3 IgA != IgD 2         189.      11.7    0   
+##  4 IgA != IgG 0           4.54     8.18   0.68
+##  5 IgA != IgG 1          24.8      6.54   0   
+##  6 IgA != IgG 2          26.9      4.60   0   
+##  7 IgA != IgM 0         159.       6.71   0   
+##  8 IgA != IgM 1         211.       6.05   0   
+##  9 IgA != IgM 2         229.       6.27   0   
+## 10 IgD != IgG 0         135.       7.79   0   
+## 11 IgD != IgG 1         159.       8.97   0   
+## 12 IgD != IgG 2         162.      12.6    0   
+## 13 IgD != IgM 0          19.7      5.78   0   
+## 14 IgD != IgM 1          27.8      8.27   0   
+## 15 IgD != IgM 2          39.8     12.9    0   
+## 16 IgG != IgM 0         154.       6.26   0   
+## 17 IgG != IgM 1         187.       6.28   0   
+## 18 IgG != IgM 2         202.       7.17   0
+```
+
+```r
+# Plot results at q=0 and q=2
+# Plot the mean and standard deviations at q=0 and q=2
+plot(isotype_test, 0, colors=IG_COLORS, main_title=isotype_main, 
+     legend_title="Isotype")
+```
+
+![plot of chunk Diversity-Vignette-8](figure/Diversity-Vignette-8-1.png)
+
+```r
+plot(isotype_test, 2, colors=IG_COLORS, main_title=isotype_main, 
+     legend_title="Isotype")
+```
+
+![plot of chunk Diversity-Vignette-8](figure/Diversity-Vignette-8-2.png)

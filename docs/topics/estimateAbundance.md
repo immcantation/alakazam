@@ -10,9 +10,9 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, group, clone = "CLONE", copy = NULL,
-uniform = TRUE, nboot = 200, min_n = 30, max_n = NULL,
-ci = 0.95)
+estimateAbundance(data, clone = "CLONE", copy = NULL, group = NULL,
+min_n = 30, max_n = NULL, uniform = TRUE, ci = 0.95,
+nboot = 200, progress = FALSE)
 ```
 
 Arguments
@@ -20,11 +20,6 @@ Arguments
 
 data
 :   data.frame with Change-O style columns containing clonal assignments.
-
-group
-:   name of the `data` column containing group identifiers. 
-If `NULL` then no grouping is performed and the `GROUP` 
-column of the output will contain the value `NA` for each row.
 
 clone
 :   name of the `data` column containing clone identifiers.
@@ -36,13 +31,10 @@ is determined by the number of sequences. If a `copy` column
 is specified, then clone abundances is determined by the sum of 
 copy numbers within each clonal group.
 
-uniform
-:   if `TRUE` then uniformly resample each group to the same 
-number of observations. If `FALSE` then allow each group to
-be resampled to its original size or, if specified, `max_size`.
-
-nboot
-:   number of bootstrap realizations to generate.
+group
+:   name of the `data` column containing group identifiers. 
+If `NULL` then no grouping is performed and the `GROUP` 
+column of the output will contain the value `NA` for each row.
 
 min_n
 :   minimum number of observations to sample.
@@ -52,8 +44,19 @@ max_n
 :   maximum number of observations to sample. If `NULL` then no 
 maximum is set.
 
+uniform
+:   if `TRUE` then uniformly resample each group to the same 
+number of observations. If `FALSE` then allow each group to
+be resampled to its original size or, if specified, `max_size`.
+
 ci
 :   confidence interval to calculate; the value must be between 0 and 1.
+
+nboot
+:   number of bootstrap realizations to generate.
+
+progress
+:   if `TRUE` show a progress bar.
 
 
 
@@ -84,7 +87,7 @@ Examples
 -------------------
 
 ```R
-abund <- estimateAbundance(ExampleDb, "SAMPLE", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
 ```
 
 
@@ -93,7 +96,7 @@ See also
 -------------------
 
 See [plotAbundanceCurve](plotAbundanceCurve.md) for plotting of the abundance distribution.
-See [rarefyDiversity](rarefyDiversity.md) for a similar application to clonal diversity.
+See [alphaDiversity](alphaDiversity.md) for a similar application to clonal diversity.
 
 
 

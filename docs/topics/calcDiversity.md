@@ -96,7 +96,7 @@ calcDiversity(p, q)
 See also
 -------------------
 
-Used by [rarefyDiversity](rarefyDiversity.md) and [testDiversity](testDiversity.md).
+Used by [alphaDiversity](alphaDiversity.md) and [betaDiversity](betaDiversity.md).
 
 
 

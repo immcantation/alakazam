@@ -3,16 +3,16 @@
 Description
 --------------------
 
-`plotDiversityTest` plots a `DiversityTest` object as the mean
-with a line range indicating plus/minus one standard deviation.
+`plotDiversityTest` plots summary data for a `DiversityCurve` object 
+with mean and a line range indicating plus/minus one standard deviation.
 
 
 Usage
 --------------------
 ```
-plotDiversityTest(data, q_i = NULL, colors = NULL,
-main_title = "Diversity", legend_title = "Group", log_d = FALSE,
-annotate = c("none", "depth"), silent = FALSE, ...)
+plotDiversityTest(data, q, colors = NULL, main_title = "Diversity",
+legend_title = "Group", log_d = FALSE, annotate = c("none",
+"depth"), silent = FALSE, ...)
 ```
 
 Arguments
@@ -20,10 +20,10 @@ Arguments
 
 data
 :   [DiversityCurve](DiversityCurve-class.md) object returned by 
-[testDiversity](testDiversity.md).
+[alphaDiversity](alphaDiversity.md).
 
-q_i
-:   numeric for hill index to plot for TestDiversity
+q
+:   diversity order to plot the test for.
 
 colors
 :   named character vector whose names are values in the 
@@ -67,18 +67,29 @@ Examples
 -------------------
 
 ```R
-# All groups pass default minimum sampling threshold of 10 sequences
-div <- testDiversity(ExampleDb, group="SAMPLE", q=2, nboot=100)
-plotDiversityTest(div, legend_title="Sample")
+# Calculate diversity
+div <- alphaDiversity(ExampleDb, group="SAMPLE", min_q=0, max_q=2, step_q=1, nboot=100)
+
+# Plot results at q=0 (equivalent to species richness)
+plotDiversityTest(div, 0, legend_title="Sample")
+
 ```
 
 ![2](plotDiversityTest-2.png)
+
+```R
+
+# Plot results at q=2 (equivalent to Simpson's index)
+plotDiversityTest(div, q=2, legend_title="Sample")
+```
+
+![4](plotDiversityTest-4.png)
 
 
 See also
 -------------------
 
-See [testDiversity](testDiversity.md) for generating input directly. 
+See [alphaDiversity](alphaDiversity.md) for generating input.
 Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 

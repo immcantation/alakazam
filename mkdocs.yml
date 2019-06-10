@@ -59,8 +59,8 @@ pages:
       - topics/calcDiversity.md
       - topics/countClones.md
       - topics/estimateAbundance.md
-      - topics/rarefyDiversity.md
-      - topics/testDiversity.md
+      - topics/alphaDiversity.md
+      - topics/betaDiversity.md
       - topics/plotAbundanceCurve.md
       - topics/plotDiversityCurve.md
       - topics/plotDiversityTest.md

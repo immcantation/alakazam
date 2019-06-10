@@ -50,9 +50,8 @@ abundance distribution, using the `estimateAbundance` function, along with
 two approaches to assess diversity of these distributions: 
 
 1. Generation of a smooth diversity (D) curve over a range of diversity orders (q) 
-using `rarefyDiversity`.
-2. A significance test of the diversity (D) at a fixed diversity order (q) using 
-`testDiversity`.
+using `alphaDiversity`.
+2. A significance test of the diversity (D) at a fixed diversity order (q).
 
 
 ## Example data
@@ -115,7 +114,7 @@ plot(curve, colors = sample_colors, legend_title="Sample")
 
 ## Generate a diversity curve
 
-The function `rarefyDiversity` performs uniform resampling of the input 
+The function `alphaDiversity` performs uniform resampling of the input 
 sequences and recalculates the clone size distribution, and diversity, with each 
 resampling realization. Diversity (D) is calculated over a range of diversity 
 orders (q) to generate a smooth curve.
@@ -125,16 +124,16 @@ orders (q) to generate a smooth curve.
 # q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 200 resampling realizations are performed (nboot=200)
-sample_curve <- rarefyDiversity(ExampleDb, group="SAMPLE",
-                             min_q=0, max_q=4, step_q=0.1,
-                             ci=0.95, nboot=200)
+sample_curve <- alphaDiversity(ExampleDb, group="SAMPLE",
+                               min_q=0, max_q=4, step_q=0.1,
+                               ci=0.95, nboot=200)
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_curve <- rarefyDiversity(ExampleDb, group="ISOTYPE",
-                             min_q=0, max_q=4, step_q=0.1,
-                             ci=0.95, nboot=200)
+isotype_curve <- alphaDiversity(ExampleDb, group="ISOTYPE",
+                                min_q=0, max_q=4, step_q=0.1,
+                                ci=0.95, nboot=200)
 ```
 
 ```{r, eval=TRUE, fig.width=6, fig.height=4}
@@ -148,5 +147,29 @@ plot(sample_curve, colors=sample_colors, main_title=sample_main,
 # Plot isotype diversity using default set of Ig isotype colors
 isotype_main <- paste0("Isotype diversity")
 plot(isotype_curve, colors=IG_COLORS, main_title=isotype_main, 
+     legend_title="Isotype")
+```
+
+
+## View diversity tests at a fixed diversity order
+
+Significance testing across groups is performed using the delta of the bootstrap
+distributions between groups when running `alphaDiversity` for all values of `q` 
+specified.
+
+```{r, eval=TRUE}
+# Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
+# Simpson's index) across values in the "SAMPLE" column
+# 200 bootstrap realizations are performed (nboot=200)
+isotype_test <- alphaDiversity(ExampleDb, group="ISOTYPE", min_q=0, max_q=2, step_q=1, nboot=200)
+
+# Print P-value table
+print(isotype_test)
+
+# Plot results at q=0 and q=2
+# Plot the mean and standard deviations at q=0 and q=2
+plot(isotype_test, 0, colors=IG_COLORS, main_title=isotype_main, 
+     legend_title="Isotype")
+plot(isotype_test, 2, colors=IG_COLORS, main_title=isotype_main, 
      legend_title="Isotype")
 ```

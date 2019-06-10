@@ -1,4 +1,4 @@
-**plotDiversityCurve** - *Plot the results of rarefyDiversity, calculateAlphaDiversity or calculateBetaDiversity*
+**plotDiversityCurve** - *Plot the results of alphaDiversity or betaDiversity*
 
 Description
 --------------------
@@ -20,7 +20,7 @@ Arguments
 
 data
 :   [DiversityCurve](DiversityCurve-class.md) object returned by 
-[rarefyDiversity](rarefyDiversity.md).
+[alphaDiversity](alphaDiversity.md) or [betaDiversity](betaDiversity.md).
 
 colors
 :   named character vector whose names are values in the 
@@ -81,7 +81,7 @@ Examples
 
 ```R
 # Calculate diversity
-div <- rarefyDiversity(ExampleDb, "SAMPLE", nboot=100)
+div <- alphaDiversity(ExampleDb, group="SAMPLE", nboot=100)
 
 # Plot diversity
 plotDiversityCurve(div, legend_title="Sample")
@@ -102,8 +102,8 @@ plotDiversityCurve(div, legend_title="Sample", score="evenness")
 See also
 -------------------
 
-See [rarefyDiversity](rarefyDiversity.md) for generating [DiversityCurve](DiversityCurve-class.md)
-objects for input. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+See [alphaDiversity](alphaDiversity.md) and [alphaDiversity](alphaDiversity.md) for generating 
+[DiversityCurve](DiversityCurve-class.md) objects for input. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

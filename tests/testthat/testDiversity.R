@@ -55,20 +55,23 @@ test_that("countClones", {
 
 #### calcInferredDiversity ####
 
-test_that("calcInferredDiversity", {
+test_that("calcDiversity", {
     # May define p as clonal member counts
     p <- c(1, 1, 3, 10)
     q <- c(0, 1, 2)
-    obs <- calcInferredDiversity(p, q)
-    exp <- c(5,2.69442045025014,2.05842877124677)
-    expect_equal(obs, exp, tolerance = 0.001)
-  
+    obs <- calcDiversity(p, q)
+    exp <- c(4.000000, 2.594272, 2.027027)
+    expect_equal(obs, exp, tolerance=0.001)
+    
+    # Or proportional abundance
+    p <- c(1/15, 1/15, 1/5, 2/3)
+    obs <- calcDiversity(p, q)
+    expect_equal(obs, exp, tolerance=0.001)  
 })
 
 #### bootstrapDiversity ####
 
 test_that("estimateAbundance", {
-	
 	set.seed(90)
 	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
 	expect_equal(bootstrap_obj@abund$P[1:5], 
@@ -85,13 +88,13 @@ test_that("estimateAbundance", {
 })
 
 	
-#### calculateAlphaDiversity ####
+#### alphaDiversity ####
 
-test_that("calculateAlphaDiversity", {	
+test_that("alphaDiversity", {	
 	set.seed(5)
 	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
-	diversity_obj <- calculateAlphaDiversity(bootstrap_obj, step_q=1, max_q=10)
-	obs <- diversity_obj@div[c(1,3,9,20),]
+	diversity_obj <- alphaDiversity(bootstrap_obj, step_q=1, max_q=10)
+	obs <- diversity_obj@diversity[c(1,3,9,20),]
     
 	exp <- data.frame(
 	        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
@@ -118,10 +121,10 @@ test_that("calculateAlphaDiversity", {
     
     set.seed(3)
     bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
-    diversity_obj <- calculateAlphaDiversity(bootstrap_obj)
-	expect_equal(diversity_obj@test$tests$PVALUE[1:5], 
+    diversity_obj <- alphaDiversity(bootstrap_obj)
+	expect_equal(diversity_obj@tests$PVALUE[1:5], 
 			c(0.42,0.56,0.76,0.82,0.40), tolerance=0.001)
-	expect_equal(diversity_obj@test$summary$MEAN[1:5], 
+	expect_equal(diversity_obj@summary$MEAN[1:5], 
 			c(114.59, 71.86939, 46.32797, 31.92986, 23.940736), tolerance=0.001)
 			
 })

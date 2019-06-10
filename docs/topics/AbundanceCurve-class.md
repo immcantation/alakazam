@@ -35,7 +35,7 @@ Slots
 
 
 
-`abund`
+`abundance`
 :   data.frame with relative clonal abundance data and confidence intervals,
 containing the following columns:
 
@@ -50,26 +50,20 @@ containing the following columns:
 `bootstrap`
 :   data.frame of bootstrapped clonal distributions.
 
-`group`
-:   string specifying the name of the group column.
+`clone_by`
+:   string specifying the name of the clone column.
+
+`group_by`
+:   string specifying the name of the grouping column.
 
 `groups`
 :   vector specifying the names of unique groups in group column.
 
-`clone`
-:   string specifying the name of the clone column.
+`n`
+:   numeric vector indication the number of sequences sampled in each group.
 
 `nboot`
 :   numeric specifying the number of bootstrap iterations to use.
-
-`uniform`
-:   TRUE/FALSE specifying whether or not bootstraps were calculated under rarefaction.
-
-`max_n`
-:   numeric specifying the number of species used for rarefaction if rarefaction is used.
-
-`min_n`
-:   numeric specifying the minumim tolerated number of species in calculation.
 
 `ci`
 :   confidence interval defining the upper and lower bounds 

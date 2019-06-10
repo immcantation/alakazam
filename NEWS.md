@@ -1,10 +1,9 @@
-Version 0.2.11.999:  June 6, 2019
+Version 0.2.11.999:  June 9, 2019
 -------------------------------------------------------------------------------
 
 General:
 
 + Added `ape` and `tibble` dependencies.
-+ Added `one_of` and `right_join` from dplyr.
 
 Lineage:
 
@@ -17,9 +16,14 @@ Diversity:
 
 + Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
   non-default value produced an error.
-+ Added `calculateAlphaDiversity` and `calculateBetaDiversity`. Reorganized 
-  overall class structure for DiversityCurve and AbundanceCurve with new
-  documentation. 
++ Added rarefaction options to `estimateAbundance` through the `min_n`, 
+  `max_n`, and `uniform` arguments.
++ Renamed `rarefyDiversity` to `alphaDiversity` and moved the rarefaction arguments
+  and calculation into `estimateAbundance`.
++ Removed `testDiversity` in favor of adding the calculation to `alphaDiversity`
++ Added the `betaDiversity` function to calculating pairwise beta diversity scores.
++ Restructured to the `DiversityCurve` and `AbundanceCurve` objects to accomodate
+  the new diversity methods.
 
 
 Version 0.2.11:  September 12, 2018

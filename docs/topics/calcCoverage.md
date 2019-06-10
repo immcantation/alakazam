@@ -67,7 +67,7 @@ calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
 See also
 -------------------
 
-Used by [rarefyDiversity](rarefyDiversity.md).
+Used by [alphaDiversity](alphaDiversity.md).
 
 
 
