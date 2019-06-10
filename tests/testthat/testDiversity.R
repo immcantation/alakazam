@@ -195,20 +195,22 @@ test_that("alphaDiversity reproduces rarefyDiversity", {
     #                 max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,
     #                 nboot = 2000, uniform = TRUE, progress = FALSE)
     
-    # Reproduce old test with alphaDiversity, and expect same results
-    set.seed(5)
-    diversity_obj <- alphaDiversity(db %>% data.frame, 
-                                    group="SAMPLE", clone="CLONE", copy=NULL, 
-                                    nboot = 2000,
-                                    step_q=0.05, min_q=0, max_q=4, min_n=30, max_n=NULL,
-                                    ci=0.95)
-    
-    obs <- diversity_obj@diversity[c(1,3,9,20),]
-    
+    # The old test
     # set.seed(5)
     # # Group by sample identifier
     # div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
     # obs <- div@data[c(1,3,9,20),]
+    
+    # Reproduce old test with alphaDiversity, and expect same results
+    set.seed(5)
+    diversity_obj <- alphaDiversity(db %>% data.frame, 
+                                    group="SAMPLE", clone="CLONE", copy=NULL, 
+                                    nboot = 100,
+                                    step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
+                                    ci=0.95)
+    
+    obs <- diversity_obj@diversity[c(1,3,9,20),]
+
     
     # expected, from old rarefyDiversity test
     exp <- data.frame(
