@@ -38,7 +38,7 @@ NULL
 #' 
 #' @details
 #' Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
-#' proposed by Hill (Hill, 1973). See \link{calcInferredDiversity} for further details.
+#' proposed by Hill (Hill, 1973). See \link{calcDiversity} for further details.
 #'
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -69,12 +69,10 @@ NULL
 #'            Ecology. 2015 96, 11891201.
 #' }
 #'  
-#' @seealso  See \link{calcInferredDiversity} for the basic calculation and 
-#'           \link{DiversityCurve} for the return object. 
-#'           See \link{testDiversity} for significance testing.
-#'           See \link{plotDiversityCurve} for plotting the return object.
+#' @seealso  \link{alphaDiversity}
 #' 
 #' @examples
+#' dontrun{
 #' # Group by sample identifier
 #' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
@@ -83,17 +81,17 @@ NULL
 #' div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
 #'                        nboot=100)
 #' plotDiversityCurve(div, legend_title="Isotype")
-#'
+#' }
 #' @export
-rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
-                            min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
-                            ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
-    # .Deprecated("alphDiversity")
-    # bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
-    # diversity_obj <- calculateAlphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
-    # 
-    # return(diversity_obj)    
-}
+# rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL, 
+#                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL, 
+#                             ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
+#     .Deprecated("alphDiversity")
+#     bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
+#     diversity_obj <- calculateAlphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
+# 
+#     return(diversity_obj)
+# }
 
 
 #' Pairwise test of the diversity index
@@ -116,7 +114,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @param    max_n     maximum number of observations to sample. If \code{NULL} the maximum
 #'                     if automatically determined from the size of the largest group.
 #' @param    nboot     number of bootstrap realizations to perform.
-#' @param    ci                confidence interval to calculate; the value must be between 0 and 1.
+#' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object containing slot test with p-values and summary 
@@ -124,7 +122,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' @details
 #' Clonal diversity is calculated using the generalized diversity index proposed by 
-#' Hill (Hill, 1973). See \link{calcInferredDiversity} for further details.
+#' Hill (Hill, 1973). See \link{calcDiversity} for further details.
 #' 
 #' Diversity is calculated on the estimated complete clonal abundance distribution.
 #' This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -168,14 +166,13 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #'            Ecology. 2015 96, 11891201.
 #' }
 #' 
-#' @seealso  See \link{calcInferredDiversity} for the basic calculation.
-#'           See \link{rarefyDiversity} for curve generation.
-#'           See \link{ecdf} for computation of the empirical cumulative 
-#'           distribution function.
+#' @seealso  \link{alphaDiversity}
 #' 
 #' @examples  
+#' dontrun{
 #' # Groups under the size threshold are excluded and a warning message is issued.
 #' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
+#' }
 #' 
 #' @export
 # testDiversity <- function(data, q, group, clone="CLONE", copy=NULL, 

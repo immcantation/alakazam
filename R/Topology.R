@@ -848,7 +848,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
     # Get subtree summarizes and filter excluded annotations
     sum_list <- lapply(graphs, summarizeSubtrees, fields=field, root=root)
     sum_df <- bind_rows(sum_list, .id="GRAPH") %>%
-        filter(! !!rlang::sym(field) %in% exclude,
+        filter(!(!!rlang::sym(field) %in% exclude),
                 is.finite(!!rlang::sym(stat_col)))
     
     # Set ordering based on color names

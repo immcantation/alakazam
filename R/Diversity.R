@@ -273,10 +273,10 @@ bootstrapAbundance <- function(x, n, nboot=200, fast=TRUE) {
         # Bootstrap abundance
         boot_mat <- rmultinom(nboot, n, p) / n
     } else {
-		# Do not calculate estimated complete abundance distribution
-		p <- x
-		# Bootstrap abundance
-		boot_mat <- rmultinom(nboot, n, p) 
+      # Do not calculate estimated complete abundance distribution
+      p <- x
+      # Bootstrap abundance
+      boot_mat <- rmultinom(nboot, n, p) 
         # # Calculate estimated complete abundance distribution
         # p <- x / sum(x, na.rm=TRUE)
         # boot_sam <- rmultinom(nboot, n, p)
@@ -421,7 +421,7 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         }  
         # Infer complete abundance distribution
         abund_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=TRUE) %>%
-        	as.data.frame() %>%
+           as.data.frame() %>%
             tibble::rownames_to_column(clone) %>%
             tidyr::gather(key="N", value="C", -clone) %>%
             dplyr::group_by(!!rlang::sym(clone)) %>%
@@ -432,10 +432,10 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
             dplyr::mutate(RANK=rank(-!!rlang::sym("P"), ties.method="first")) %>%
             dplyr::arrange(!!rlang::sym("RANK")) %>%
             dplyr::ungroup()
-		
-		# Repeat bootstrap without abundance correction, necessary for diversity calculation
-		boot_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=FALSE) %>%
-        	as.data.frame() %>%
+      
+      # Repeat bootstrap without abundance correction, necessary for diversity calculation
+      boot_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=FALSE) %>%
+           as.data.frame() %>%
             tibble::rownames_to_column(clone)
         
         # Save bootstrap
@@ -562,7 +562,7 @@ calcDiversity <- function(p, q) {
 #' 
 #' @export
 calcInferredDiversity <- function(p, q) {
-	# Correct abundance
+   # Correct abundance
     .infer <- function(y) {
         # Infer complete abundance distribution
         p1 <- adjustObservedAbundance(y)
@@ -570,9 +570,9 @@ calcInferredDiversity <- function(p, q) {
         names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
         return(c(p1, p2))
     }
-	
-	# Correct abundance
-	p <- .infer(p)
+   
+   # Correct abundance
+   p <- .infer(p)
     # Add jitter to q=1
     q[q == 1] <- 0.9999
     # Remove zeros
@@ -817,7 +817,7 @@ helperTest <- function(div_df, q, group="GROUP") {
 #' @examples
 #' # Group by sample identifier in two steps
 #' abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
-#' div <- alphaDiversity(abund, group="SAMPLE", step_q=1, max_q=10)
+#' div <- alphaDiversity(abund, step_q=1, max_q=10)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier in one step
@@ -935,7 +935,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' 
 #' @examples
 #' div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE", 
-#'						min_n=40, step_q=1, max_q=10, nboot=100)
+#'                  min_n=40, step_q=1, max_q=10, nboot=100)
 #'                       
 #' plotDiversityCurve(div, legend_title="Isotype")
 #' 
@@ -987,11 +987,11 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         select(-!!rlang::sym("D_0"))
         
     # Test
-	if(length(group_set) > 1){
-		div_test <- helperTest(div_df, q=q, group="COMPARISON")
-	} else {
-		div_test <- list( 'test'= NULL, 'summary'= NULL)
-	}
+   if(length(group_set) > 1){
+      div_test <- helperTest(div_df, q=q, group="COMPARISON")
+   } else {
+      div_test <- list( 'test'= NULL, 'summary'= NULL)
+   }
     
     div_obj <- new("DiversityCurve",
                    diversity=div, 
