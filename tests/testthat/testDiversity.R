@@ -185,7 +185,7 @@ test_that("betaDiversity", {
 ## Reproducibility tests
 ####
 
-test_that("alphaDiversity reproduces rarefyDiversity", {
+test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     
     # Default params for test in now deprecated rearefyDiversity
     #
@@ -228,4 +228,27 @@ test_that("alphaDiversity reproduces rarefyDiversity", {
     
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs %>% data.frame, exp, tolerance=0.001, check.attributes=F)
+    
+    # Check reprod. old tetsDiversity
+    # Defaults:
+    # testDiversity(data, q, group, clone = "CLONE", copy = NULL,
+    #               min_n = 30, max_n = NULL, nboot = 2000, progress = FALSE)
+    # 
+    
+    # The old test:
+    # set.seed(3)
+    # div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
+    # expect_equal(div@tests$PVALUE, 0)
+    # expect_equal(div@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
+    # 
+    set.seed(3)
+    diversity_obj <- alphaDiversity(db %>% data.frame, 
+                                    group="SAMPLE", clone="CLONE", copy=NULL, 
+                                    nboot = 100,
+                                    step_q=1, min_q=0, max_q=0, min_n=30, max_n=NULL,
+                                    ci=0.95)
+    
+    p_q0 <- diversity_obj@tests %>% filter(Q == 0) %>% select(PVALUE) %>% as.numeric()
+    expect_equal(p_q0, 0)
+    expect_equal(diversity_obj@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
 })
