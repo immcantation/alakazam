@@ -134,6 +134,11 @@ test_that("alphaDiversity", {
 	        c(0.46,0.48,0.52,0.58,0.74), tolerance=0.001)
 	expect_equal(diversity_obj@summary$MEAN[1:5], 
 	        c(94, 91.2, 88.5, 85.9, 83.3), tolerance=0.001)
+	
+	# verify two-steps == one-step
+	set.seed(3)
+	div <- alphaDiversity(db, group="SAMPLE", nboot=100)
+	expect_equal(diversity_obj, div)
 			
 })
 
