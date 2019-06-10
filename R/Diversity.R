@@ -900,7 +900,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' @param    data         data.frame with Change-O style columns containing clonal assignments or
 #'                        a \link{AbundanceCurve} generate by \link{estimateAbundance} object 
 #'                        containing a previously calculated bootstrap distributions of clonal abundance.
-#' @param    comparisons  list of comparisons between group members for computing beta diversity. 
+#' @param    comparisons  named list of comparisons between group members for computing beta diversity. 
 #' @param    min_q        minimum value of \eqn{q}.
 #' @param    max_q        maximum value of \eqn{q}.
 #' @param    step_q       value by which to increment \eqn{q}.
@@ -943,6 +943,10 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     # Hack for visibility of dplyr variables
     . <- NULL
+    
+    if (!is.list(comparisons) || is.null(names(comparisons))) {
+      stop("`comparisons` must be a named list")
+    }
     
     # Check input object and call estimateAbundance if required
     if (is(data, "AbundanceCurve")) {
