@@ -97,7 +97,7 @@ test_that("alphaDiversity", {
 	obs <- diversity_obj@diversity[c(1,3,9,20),]
     
 	exp <- data.frame(
-	        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
+	        "GROUP" = c("RL01", "RL01", "RL01", "RL02"),
 	        "Q" = c(0, 2, 8, 8),
 	        "D_ERROR" = c(107.765026, 1.740357, 1.194441, 1.559210),
 	        "D" = c(103.230000, 6.579179, 4.289926, 4.336549),
