@@ -121,7 +121,7 @@
 #'                          filter slice select 
 #'                          mutate mutate_at 
 #' 							one_of
-#'							right_join
+#'							right_join rowwise
 #'                          summarize summarize_at
 #'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 

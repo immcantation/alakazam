@@ -273,18 +273,22 @@ bootstrapAbundance <- function(x, n, nboot=200, fast=TRUE) {
         # Bootstrap abundance
         boot_mat <- rmultinom(nboot, n, p) / n
     } else {
-        # Calculate estimated complete abundance distribution
-        p <- x / sum(x, na.rm=TRUE)
-        boot_sam <- rmultinom(nboot, n, p)
-        boot_list <- apply(boot_sam, 2, .infer)
-        
-        # Convert to matrix
-        boot_names <- unique(unlist(sapply(boot_list, names)))
-        boot_mat <- matrix(0, nrow=length(boot_names), ncol=nboot)
-        rownames(boot_mat) <- boot_names
-        for (i in 1:nboot) {
-            boot_mat[names(boot_list[[i]]), i] <- boot_list[[i]]
-        }
+		# Do not calculate estimated complete abundance distribution
+		p <- x
+		# Bootstrap abundance
+		boot_mat <- rmultinom(nboot, n, p) 
+        # # Calculate estimated complete abundance distribution
+        # p <- x / sum(x, na.rm=TRUE)
+        # boot_sam <- rmultinom(nboot, n, p)
+        # boot_list <- apply(boot_sam, 2, .infer)
+        #
+        # # Convert to matrix
+        # boot_names <- unique(unlist(sapply(boot_list, names)))
+        # boot_mat <- matrix(0, nrow=length(boot_names), ncol=nboot)
+        # rownames(boot_mat) <- boot_names
+        # for (i in 1:nboot) {
+        #     boot_mat[names(boot_list[[i]]), i] <- boot_list[[i]]
+        # }
     }
     
     return(boot_mat)
@@ -415,14 +419,11 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
             names(abund_obs) <- clone_tab[[clone]]
         }  
         # Infer complete abundance distribution
-        boot_mat <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=TRUE)
-        boot_df <- as.data.frame(boot_mat) %>%
-            tibble::rownames_to_column("CLONE")
-        
-        # Create abundance summary
-        abund_df <- boot_df %>%
-            tidyr::gather(key="N", value="C", -"CLONE") %>%
-            dplyr::group_by(!!rlang::sym("CLONE")) %>%
+        abund_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=TRUE) %>%
+        	as.data.frame() %>%
+            tibble::rownames_to_column(clone) %>%
+            tidyr::gather(key="N", value="C", -clone) %>%
+            dplyr::group_by(!!rlang::sym(clone)) %>%
             dplyr::summarize(P_ERROR=qnorm(ci_z) * sd(!!rlang::sym("C")), 
                              P=mean(!!rlang::sym("C"))) %>%
             dplyr::mutate(LOWER=pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), 
@@ -430,6 +431,11 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
             dplyr::mutate(RANK=rank(-!!rlang::sym("P"), ties.method="first")) %>%
             dplyr::arrange(!!rlang::sym("RANK")) %>%
             dplyr::ungroup()
+		
+		# Repeat bootstrap without abundance correction, necessary for diversity calculation
+		boot_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=FALSE) %>%
+        	as.data.frame() %>%
+            tibble::rownames_to_column(clone)
         
         # Save bootstrap
         boot_list[[g]] <- boot_df
@@ -437,15 +443,15 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         
         if (progress) { pb$tick() }
     }
-    curve_df <- as.data.frame(bind_rows(abund_list, .id="GROUP"))
-    boot_df <- as.data.frame(bind_rows(boot_list, .id="GROUP"))
+    curve_df <- as.data.frame(bind_rows(abund_list, .id=group))
+    boot_df <- as.data.frame(bind_rows(boot_list, .id=group))
     
     # Create a new diversity object with bootstrap
     abund_obj <- new("AbundanceCurve",
                      bootstrap=boot_df, 
                      abundance=curve_df,
-                     clone_by="CLONE",
-                     group_by="GROUP",
+                     clone_by=clone,
+                     group_by=group,
                      groups=group_keep,
                      n=nsam, 
                      nboot=nboot, 
@@ -459,7 +465,7 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
 #' Calculate the diversity index
 #' 
 #' \code{calcDiversity} calculates the clonal diversity index for a vector of diversity 
-#' orders with a correction for the presence of unseen species. 
+#' orders. 
 #'
 #' @param    p  numeric vector of clone (species) counts or proportions.
 #' @param    q  numeric vector of diversity orders.
@@ -479,8 +485,6 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
 #' 
 #' Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
 #' at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
-#' 
-#' An adjusted detected species relative abundance distribution is applied before calculating diversity.
 #'
 #' @references
 #' \enumerate{
@@ -513,6 +517,73 @@ calcDiversity <- function(p, q) {
     
     return(D)
 }
+
+#' Calculate the inferred diversity index
+#' 
+#' \code{calcInferredDiversity} calculates the clonal diversity index for a vector of diversity 
+#' orders with a correction for the presence of unseen species. Does not take proportional abundance.
+#'
+#' @param    p  numeric vector of clone (species) counts.
+#' @param    q  numeric vector of diversity orders.
+#' 
+#' @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
+#' 
+#' @details
+#' This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
+#' (\eqn{D}) of a single parameter \eqn{q}. Special cases of the generalized diversity 
+#' index correspond to the most popular diversity measures in ecology: species richness 
+#' (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q} approaches \eqn{1}), the 
+#' inverse of the Simpson index (\eqn{q = 2}), and the reciprocal abundance of the largest 
+#' clone (\eqn{q} approaches \eqn{+\infty}). At \eqn{q = 0} different clones weight equally, 
+#' regardless of their size. As the parameter \eqn{q} increase from \eqn{0} to \eqn{+\infty} 
+#' the diversity index (\eqn{D}) depends less on rare clones and more on common (abundant) 
+#' ones, thus encompassing a range of definitions that can be visualized as a single curve. 
+#' 
+#' Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
+#' at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
+#' 
+#' An adjusted detected species relative abundance distribution is applied before calculating diversity.
+#'
+#' @references
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427-32.
+#' }
+#' 
+#' @seealso  Used by \link{alphaDiversity} and \link{betaDiversity}.
+#' 
+#' @examples
+#' # May define p as clonal member counts
+#' p <- c(1, 1, 3, 10)
+#' q <- c(0, 1, 2)
+#' calcInferredDiversity(p, q)
+#'
+#' 
+#' @export
+calcInferredDiversity <- function(p, q) {
+	# Correct abundance
+    .infer <- function(y) {
+        # Infer complete abundance distribution
+        p1 <- adjustObservedAbundance(y)
+        p2 <- inferUnseenAbundance(y)
+        names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
+        return(c(p1, p2))
+    }
+	
+	# Correct abundance
+	p <- .infer(p)
+    # Add jitter to q=1
+    q[q == 1] <- 0.9999
+    # Remove zeros
+    p <- p[p > 0]
+    # Convert p to proportional abundance
+    p <- p / sum(p)
+    # Calculate D for each q
+    D <- sapply(q, function(x) sum(p^x)^(1 / (1 - x)))
+    
+    return(D)
+}
+
 
 # Calculates diversity under rarefaction
 # 
@@ -559,13 +630,13 @@ inferRarefiedDiversity <- function(x, q, m) {
 #                        diversity  calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperAlpha <- function(boot_output, q, clone="CLONE", group="GROUP"){
+helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL){
     # Compute diversity from a column of each bootstrap
     output <- boot_output %>% 
         dplyr::ungroup() %>%
         dplyr::select(-one_of(c(clone, group))) %>%
         as.matrix() %>% 
-        apply(2, calcDiversity, q=q) %>%
+        apply(2, calcInferredDiversity, q=q) %>%
         data.frame() %>% mutate(Q = q)
 
     return(output)
@@ -602,7 +673,7 @@ helperBeta <- function(boot_output, q, ci_z, clone="CLONE", group="GROUP") {
 
     # Compute alpha diversity metrics
     alpha <- boot_output %>%
-        dplyr::group_by(!!rlang::syms(group)) %>%
+        dplyr::group_by(!!rlang::sym(group)) %>%
         dplyr::do(helperAlpha(., q = q, clone=clone, group=group)) %>%
         dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::select(-one_of(c(group))) %>%
@@ -823,9 +894,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' Calculates the pairwise beta diversity
 #'
 #' \code{betaDiversity} takes in a data.frame or \link{AbundanceCurve} and computes 
-#' SOMETHING.
-#' Statistical testing for significant pairwise differences in diversity 
-#' is also not currently implemented. 
+#' the multiplicative beta diversity across a range of Hill diversity indices. 
 #' 
 #' @param    data         data.frame with Change-O style columns containing clonal assignments or
 #'                        a \link{AbundanceCurve} generate by \link{estimateAbundance} object 
@@ -841,15 +910,38 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
 #' 
 #' @details 
-#' TODO
+#' Beta diversity or the comparative difference between two samples as quantified using Hill
+#' diversity indices proposed by Jost (Jost, 2007). 
+#' 
+#' Briefly, the alpha and gamma diversity components are calculated for each comparison. 
+#' Alpha diversity is calculated as the average hill diversity across each independent sample
+#' while Gamma diversity is calculated as the total diversity without distinguishing between
+#' samples. Beta diversity is computed as Gamma/Alpha. 
+#' 
+#' Diversity is calculated on the estimated clonal abundance distribution with a correction
+#' for unseen species much like the calculation for alpha diversity \link{alphaDiversity}.
+#' A smooth curve is generated in the same manner as in \link{alphaDiversity}.
+#' Confidence intervals are derived using the standard deviation of the resampling realizations. 
+#'
+#' \enumerate{
+#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#'            Ecology. 1973 54(2):427-32.
+#'   \item  Jost L. Partitioning Diversity Into Independent Alpha and Beta Components. 
+#'            Ecology. 2007 88(10):2427–2439.
+#'   \item  Jost L, et al. Partitioning diversity for conservation analyses. 
+#'            Diversity Distrib. 2010 16(1):65–76
+#' }
 #' 
 #' @examples
-#' # TODO
+#' div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE", 
+#'						min_n=40, step_q=1, max_q=10, nboot=100)
+#'                       
+#' plotDiversityCurve(div, legend_title="Isotype")
 #' 
 #' @export
 betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     # Hack for visibility of dplyr variables
-        . <- NULL
+    . <- NULL
     
     # Check input object and call estimateAbundance if required
     if (is(data, "AbundanceCurve")) {
@@ -871,22 +963,22 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
     for(comparison in names(comparisons)){
         beta_diversity_list[[comparison]] <- abundance@bootstrap %>%
             dplyr::ungroup() %>%
-            dplyr::filter(.[[abundance@group]] %in% comparisons[[comparison]]) %>%
-            dplyr::do(helperBeta(., q = q, clone=abundance@clone_by, group=abundance@group, ci_z=ci_z))
+            dplyr::filter(.[[abundance@group_by]] %in% comparisons[[comparison]]) %>%
+            dplyr::do(helperBeta(., q = q, clone=abundance@clone_by, group=abundance@group_by, ci_z=ci_z))
     }
 
     # Generate summary diversity output
-    div <- bind_rows(beta_diversity_list, .id = "COMPARISON")
+    div_df <- bind_rows(beta_diversity_list, .id = "COMPARISON")
     
     # Beta groups
-    group_set <- unique(div[["COMPARISON"]])
+    group_set <- unique(div_df[["COMPARISON"]])
     
     # Compute evenness
-    div_qi <- div %>%
+    div_qi <- div_df %>%
         filter(!!rlang::sym("Q") == 0) %>%
         select(one_of(c("COMPARISON", "D")))
 
-    div <- div %>%
+    div <- div_df %>%
         right_join(div_qi, by = "COMPARISON", suffix = c("", "_0")) %>%
         mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
             E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
@@ -894,13 +986,17 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         select(-!!rlang::sym("D_0"))
         
     # Test
-    #div_test <- helperTest(div_df, q=q, group=abundance@group_by)
+	if(length(group_set) > 1){
+		div_test <- helperTest(div_df, q=q, group="COMPARISON")
+	} else {
+		div_test <- list( 'test'= NULL, 'summary'= NULL)
+	}
     
     div_obj <- new("DiversityCurve",
                    diversity=div, 
                    method="beta",
-                   tests=NULL,
-                   summary=NULL,
+                   tests=div_test[["tests"]],
+                   summary=div_test[["summary"]],
                    group_by="COMPARISON",
                    groups=group_set,
                    n=abundance@n,
