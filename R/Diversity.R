@@ -448,12 +448,11 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     boot_df <- as.data.frame(bind_rows(boot_list, .id=group))
     
     # Create a new diversity object with bootstrap
-    g <- if (is.null(group)) { as.character(NA) } else { group_keep }
     abund_obj <- new("AbundanceCurve",
                      bootstrap=boot_df, 
                      abundance=curve_df,
                      clone_by=clone,
-                     group_by=g,
+                     group_by=if_else(is.null(group), as.character(NA), group),
                      groups=group_keep,
                      n=nsam, 
                      nboot=nboot, 
@@ -1054,7 +1053,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                                silent=FALSE, ...) {
     
     # Check if abundance is in data
-    if (is.null(data@abundance)) { stop("missing abundance data") }
+    if (is.null(data@abundance)) { stop("Missing abundance data.") }
     
     # Check arguments
     annotate <- match.arg(annotate)

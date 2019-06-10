@@ -120,7 +120,7 @@
 #'                          group_by ungroup
 #'                          filter slice select 
 #'                          mutate mutate_at 
-#' 							one_of
+#' 							one_of if_else
 #'							right_join rowwise
 #'                          summarize summarize_at
 #'                          transmute rename
