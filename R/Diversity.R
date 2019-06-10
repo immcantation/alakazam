@@ -376,14 +376,15 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         # Summarize groups
         group_tab <- clone_tab %>%
             group_by(!!rlang::sym(group)) %>%
-            dplyr::summarize(COUNT=sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE))
+            dplyr::summarize(COUNT=sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
+            rename(GROUP=!!rlang::sym(group))
     } else {
         group_tab <- data.frame(V="All", COUNT=sum(clone_tab$CLONE_COUNT, na.rm=T))
-        names(group_tab)[1] <- group
+        names(group_tab)[1] <- "GROUP"
     }
-    group_all <- as.character(group_tab[[group]])
+    group_all <- as.character(group_tab$GROUP)
     group_min <- group_tab[group_tab$COUNT >= min_n, ]
-    group_keep <- as.character(group_min[[group]])
+    group_keep <- as.character(group_min$GROUP)
     
     # Set number of samples sequence
     if (uniform) {
@@ -447,11 +448,12 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     boot_df <- as.data.frame(bind_rows(boot_list, .id=group))
     
     # Create a new diversity object with bootstrap
+    g <- if (is.null(group)) { as.character(NA) } else { group_keep }
     abund_obj <- new("AbundanceCurve",
                      bootstrap=boot_df, 
                      abundance=curve_df,
                      clone_by=clone,
-                     group_by=group,
+                     group_by=g,
                      groups=group_keep,
                      n=nsam, 
                      nboot=nboot, 
@@ -1070,16 +1072,16 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    if (any(!is.na(data@groups))) {
+    if (!is.null(data@group_by)) {
         # Define grouped plot
         p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P", group=data@group_by)) + 
             ggtitle(main_title) + 
             baseTheme() + 
-            xlab('Rank') +
-            ylab('Abundance') +
+            xlab("Rank") +
+            ylab("Abundance") +
             scale_x_log10(limits=xlim,
-                          breaks=scales::trans_breaks('log10', function(x) 10^x),
-                          labels=scales::trans_format('log10', scales::math_format(10^.x))) +
+                          breaks=scales::trans_breaks("log10", function(x) 10^x),
+                          labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
             geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill=data@group_by), alpha=0.4) +
             geom_line(aes_string(color=data@group_by))
