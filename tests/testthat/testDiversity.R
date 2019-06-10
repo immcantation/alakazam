@@ -148,7 +148,10 @@ test_that("alphaDiversity", {
 test_that("betaDiversity", {	
 
 	set.seed(3)
-	beta_db <- db %>% dplyr::rowwise() %>% dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE))
+	beta_db <- db %>% 
+	    dplyr::rowwise() %>% 
+	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
+	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, 
 		comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
 
@@ -177,7 +180,10 @@ test_that("betaDiversity", {
 	expect_equal(obs$SAMPLE, exp$SAMPLE, tolerance=0.001, check.attributes=F)
 
 	set.seed(3)
-	beta_db <- db %>% dplyr::rowwise() %>% dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE))
+	beta_db <- db %>% 
+	    dplyr::rowwise() %>% 
+	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
+	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
 	expect_equal(diversity_obj@tests$PVALUE[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
