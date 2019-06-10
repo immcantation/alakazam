@@ -719,10 +719,10 @@ helperTest <- function(div_df, q, group="GROUP") {
             
             # Currently just testing for one diversity order
             mat1 <- div_df %>%
-                dplyr::filter(.[[group]] == group_pair[1], !!rlang::sym("Q") == q_i) %>%
+                dplyr::filter(!!rlang::sym(group) == group_pair[1], !!rlang::sym("Q") == q_i) %>%
                 dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
             mat2 <- div_df %>%
-                dplyr::filter(.[[group]] == group_pair[2], !!rlang::sym("Q") == q_i) %>%
+                dplyr::filter(!!rlang::sym(group) == group_pair[2], !!rlang::sym("Q") == q_i) %>%
                 dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
 
             if (mean(mat1) >= mean(mat2)) { 
