@@ -119,8 +119,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Tabulate copy abundance
         gene_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            summarize(SEQ_COUNT=length(.data[[gene]]),
-                       COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
+            summarize(SEQ_COUNT=length(!!rlang::sym(gene)),
+                       COPY_COUNT=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
             mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
                     COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
             arrange(desc(!!rlang::sym("COPY_COUNT")))
