@@ -408,8 +408,8 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
     # @param  x      data.frame from getMRCA
     # @param  field  annotation field
     .resolveMRCA <- function(x, field) {
-        x %>% filter(!duplicated(.data[[field]])) %>%
-            filter(length(.data[[field]]) == 1)
+        x %>% filter(!duplicated(!!rlang::sym(field))) %>%
+            filter(length(!!rlang::sym(field)) == 1)
     }
     
     # Function to count MRCAs
@@ -848,8 +848,8 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
     # Get subtree summarizes and filter excluded annotations
     sum_list <- lapply(graphs, summarizeSubtrees, fields=field, root=root)
     sum_df <- bind_rows(sum_list, .id="GRAPH") %>%
-        filter(!.data[[field]] %in% exclude,
-                is.finite(.data[[stat_col]]))
+        filter(! !!rlang::sym(field) %in% exclude,
+                is.finite(!!rlang::sym(stat_col)))
     
     # Set ordering based on color names
     if (!is.null(colors)) {
