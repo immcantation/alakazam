@@ -90,6 +90,10 @@ test_that("estimateAbundance", {
 	             tolerance = 0.001)
 	expect_equal(bootstrap_obj@abundance$RANK[200:203], c(200, 201, 202, 203))
 	
+	# Grouping by isotype rather than sample identifier should raise warning
+	set.seed(90)
+	expect_warning(bootstrap_obj <- estimateAbundance(db, group="ISOTYPE", nboot=100),
+	               "Not all groups passed threshold")
 })
 
 	
@@ -175,4 +179,51 @@ test_that("betaDiversity", {
 	expect_equal(diversity_obj@summary$MEAN[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
 		
+})
+
+####
+## Reproducibility tests
+####
+
+test_that("alphaDiversity reproduces rarefyDiversity", {
+    
+    # Default params for test in now deprecated rearefyDiversity
+    #
+    # estimateAbundance(data, group = NULL, clone = "CLONE", copy = NULL,
+    #                   ci = 0.95, nboot = 2000, progress = FALSE)
+    # rarefyDiversity(data, group, clone = "CLONE", copy = NULL, min_q = 0,
+    #                 max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,
+    #                 nboot = 2000, uniform = TRUE, progress = FALSE)
+    
+    # Reproduce old test with alphaDiversity, and expect same results
+    set.seed(5)
+    diversity_obj <- alphaDiversity(db %>% data.frame, 
+                                    group="SAMPLE", clone="CLONE", copy=NULL, 
+                                    nboot = 2000,
+                                    step_q=0.05, min_q=0, max_q=4, min_n=30, max_n=NULL,
+                                    ci=0.95)
+    
+    obs <- diversity_obj@diversity[c(1,3,9,20),]
+    
+    # set.seed(5)
+    # # Group by sample identifier
+    # div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
+    # obs <- div@data[c(1,3,9,20),]
+    
+    # expected, from old rarefyDiversity test
+    exp <- data.frame(
+        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
+        "Q" = c(0, 2, 8, 8),
+        "D_ERROR" = c(3.160936, 8.132310, 10.110378, 2.197165),
+        "D" = c(88.22000, 71.51465, 32.51328, 8.94750),
+        "D_LOWER" = c(82.024680, 55.575615, 12.697307, 4.641136),
+        "D_UPPER" = c(94.41532, 87.45369, 52.32926, 13.25386),
+        "E" = c(1.0000000, 0.8106399, 0.3685478, 0.1404852),
+        "E_LOWER" = c(0.92977420, 0.62996616, 0.14392776, 0.07287072),
+        "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
+        stringsAsFactors = F
+    )
+    
+    expect_equal(colnames(obs), colnames(exp))
+    expect_equal(obs %>% data.frame, exp, tolerance=0.001, check.attributes=F)
 })
