@@ -223,7 +223,19 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
                                     ci=0.95)
     
     obs <- diversity_obj@diversity[c(1,3,9,20),]
-
+    
+    # test the deprecated function
+    set.seed(5)
+    expect_warning(
+        rarefy_obj <- rarefyDiversity(db %>% data.frame, 
+                                  group="SAMPLE", clone="CLONE", copy=NULL, 
+                                  nboot = 100,
+                                  step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
+                                  ci=0.95),
+        "is deprecated"
+    )
+    # should match same code run outside the function
+    expect_equal(diversity_obj, rarefy_obj)
     
     # expected, from old rarefyDiversity test
     exp <- data.frame(
@@ -264,4 +276,17 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     p_q0 <- diversity_obj@tests[["PVALUE"]]
     expect_equal(p_q0, 0)
     expect_equal(diversity_obj@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
+    
+    # test the deprecated function
+    set.seed(3)
+    expect_warning(
+        testdiv_obj <- testDiversity(db %>% data.frame, 
+                                     group="SAMPLE", clone="CLONE", copy=NULL, 
+                                     nboot = 100, q=0, min_n=30, max_n=NULL,
+                                     ci=0.95),
+        "is deprecated"
+    )
+    
+    # should be the same as the code run outside the function
+    expect_equal(diversity_obj, testdiv_obj)
 })
