@@ -3,7 +3,6 @@
 #' @include Classes.R
 NULL
 
-
 #### Coverage functions ####
 
 #' Calculate sample coverage
@@ -247,16 +246,19 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 
 # Perform boostrap abundance calculation
 # 
-# @param    x      named vector of observed abundance values.
-# @param    n      number of samples to draw from the estimate complete abundance distribution.
-# @param    nboot  number of bootstrap realizations.
-# @param    fast   if \code{TRUE} correct \code{x} before sampling. 
-#                  if \code{FALSE}, then correct after sampling.
+# @param    x       named vector of observed abundance values.
+# @param    n       number of samples to draw from the estimate complete abundance distribution.
+# @param    nboot   number of bootstrap realizations.
+# @param    method  complete abundance inferrence method. 
+#                   One of "before", "after" or "none" for complete abundance distribution
+#                   inferrence before sampling, after sampling, or uncorrected, respectively.
 # 
 # @return   A matrix of bootstrap results.
-bootstrapAbundance <- function(x, n, nboot=200, fast=TRUE) {
+bootstrapAbundance <- function(x, n, nboot=200, method="before") {
     ## DEBUG
     # x=abund_obs; fast=TRUE
+    # Check argumets
+    method <- match.arg(method)
     
     # Correct abundance
     .infer <- function(y) {
@@ -266,31 +268,33 @@ bootstrapAbundance <- function(x, n, nboot=200, fast=TRUE) {
         names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
         return(c(p1, p2))
     }
-    
-    if (fast) {
+  
+    if (method == "before") {
         # Calculate estimated complete abundance distribution
         p <- .infer(x)
         # Bootstrap abundance
         boot_mat <- rmultinom(nboot, n, p) / n
+    } else if (method == "after") {
+        # Calculate estimated complete abundance distribution
+        p <- x / sum(x, na.rm=TRUE)
+        boot_sam <- rmultinom(nboot, n, p)
+        boot_list <- apply(boot_sam, 2, .infer)
+        
+        # Convert to matrix
+        boot_names <- unique(unlist(sapply(boot_list, names)))
+        boot_mat <- matrix(0, nrow=length(boot_names), ncol=nboot)
+        rownames(boot_mat) <- boot_names
+        for (i in 1:nboot) {
+            boot_mat[names(boot_list[[i]]), i] <- boot_list[[i]]
+        } 
+    } else if (method == "none") {
+        # Raw sampling of input
+        p <- x / sum(x, na.rm=TRUE)
+        boot_sam <- rmultinom(nboot, n, p)
     } else {
-      # Do not calculate estimated complete abundance distribution
-      p <- x
-      # Bootstrap abundance
-      boot_mat <- rmultinom(nboot, n, p) 
-        # # Calculate estimated complete abundance distribution
-        # p <- x / sum(x, na.rm=TRUE)
-        # boot_sam <- rmultinom(nboot, n, p)
-        # boot_list <- apply(boot_sam, 2, .infer)
-        #
-        # # Convert to matrix
-        # boot_names <- unique(unlist(sapply(boot_list, names)))
-        # boot_mat <- matrix(0, nrow=length(boot_names), ncol=nboot)
-        # rownames(boot_mat) <- boot_names
-        # for (i in 1:nboot) {
-        #     boot_mat[names(boot_list[[i]]), i] <- boot_list[[i]]
-        # }
+        stop("Invalid method ", method)
     }
-    
+      
     return(boot_mat)
 }
 
@@ -383,10 +387,10 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         names(group_tab)[1] <- "GROUP"
     }
     group_all <- as.character(group_tab$GROUP)
-    group_min <- group_tab[group_tab$COUNT >= min_n, ]
-    group_keep <- as.character(group_min$GROUP)
+    group_tab <- group_tab[group_tab$COUNT >= min_n, ]
+    group_keep <- as.character(group_tab$GROUP)
     
-    # Set number of samples sequence
+    # Set number of sampled sequence
     if (uniform) {
         nsam <- min(group_tab$COUNT, max_n)
         nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
@@ -398,7 +402,7 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     # Warn if groups removed
     if (length(group_keep) < length(group_all)) {
         warning("Not all groups passed threshold min_n=", min_n, ".", 
-                "Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
+                " Excluded: ", paste(setdiff(group_all, group_keep), collapse=", "))
     }
     
     # Generate abundance bootstrap
@@ -420,23 +424,21 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
             names(abund_obs) <- clone_tab[[clone]]
         }  
         # Infer complete abundance distribution
-        abund_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=TRUE) %>%
-           as.data.frame() %>%
-            tibble::rownames_to_column(clone) %>%
-            tidyr::gather(key="N", value="C", -clone) %>%
-            dplyr::group_by(!!rlang::sym(clone)) %>%
+        boot_mat <- bootstrapAbundance(abund_obs, n, nboot=nboot, method="before")
+        boot_df <- as.data.frame(boot_mat) %>%
+            tibble::rownames_to_column("CLONE")
+        
+        # Create abundance summary
+        abund_df <- boot_df %>%
+            tidyr::gather(key="N", value="C", -"CLONE") %>%
+            dplyr::group_by(!!rlang::sym("CLONE")) %>%
             dplyr::summarize(P_ERROR=qnorm(ci_z) * sd(!!rlang::sym("C")), 
-                             P=mean(!!rlang::sym("C"))) %>%
+                            P=mean(!!rlang::sym("C"))) %>%
             dplyr::mutate(LOWER=pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), 
                           UPPER = !!rlang::sym("P") + !!rlang::sym("P_ERROR")) %>%
             dplyr::mutate(RANK=rank(-!!rlang::sym("P"), ties.method="first")) %>%
             dplyr::arrange(!!rlang::sym("RANK")) %>%
             dplyr::ungroup()
-      
-      # Repeat bootstrap without abundance correction, necessary for diversity calculation
-      boot_df <- bootstrapAbundance(abund_obs, n, nboot=nboot, fast=FALSE) %>%
-           as.data.frame() %>%
-            tibble::rownames_to_column(clone)
         
         # Save bootstrap
         boot_list[[g]] <- boot_df
@@ -444,8 +446,9 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         
         if (progress) { pb$tick() }
     }
-    curve_df <- as.data.frame(bind_rows(abund_list, .id=group))
-    boot_df <- as.data.frame(bind_rows(boot_list, .id=group))
+    id_col <- if_else(is.null(group), "GROUP", group)
+    curve_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
+    boot_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
     # Create a new diversity object with bootstrap
     abund_obj <- new("AbundanceCurve",
@@ -519,71 +522,71 @@ calcDiversity <- function(p, q) {
     return(D)
 }
 
-#' Calculate the inferred diversity index
-#' 
-#' \code{calcInferredDiversity} calculates the clonal diversity index for a vector of diversity 
-#' orders with a correction for the presence of unseen species. Does not take proportional abundance.
-#'
-#' @param    p  numeric vector of clone (species) counts.
-#' @param    q  numeric vector of diversity orders.
-#' 
-#' @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
-#' 
-#' @details
-#' This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
-#' (\eqn{D}) of a single parameter \eqn{q}. Special cases of the generalized diversity 
-#' index correspond to the most popular diversity measures in ecology: species richness 
-#' (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q} approaches \eqn{1}), the 
-#' inverse of the Simpson index (\eqn{q = 2}), and the reciprocal abundance of the largest 
-#' clone (\eqn{q} approaches \eqn{+\infty}). At \eqn{q = 0} different clones weight equally, 
-#' regardless of their size. As the parameter \eqn{q} increase from \eqn{0} to \eqn{+\infty} 
-#' the diversity index (\eqn{D}) depends less on rare clones and more on common (abundant) 
-#' ones, thus encompassing a range of definitions that can be visualized as a single curve. 
-#' 
-#' Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
-#' at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
-#' 
-#' An adjusted detected species relative abundance distribution is applied before calculating diversity.
-#'
-#' @references
-#' \enumerate{
-#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
-#'            Ecology. 1973 54(2):427-32.
-#' }
-#' 
-#' @seealso  Used by \link{alphaDiversity} and \link{betaDiversity}.
-#' 
-#' @examples
-#' # May define p as clonal member counts
-#' p <- c(1, 1, 3, 10)
-#' q <- c(0, 1, 2)
-#' calcInferredDiversity(p, q)
-#'
-#' 
-#' @export
-calcInferredDiversity <- function(p, q) {
-   # Correct abundance
-    .infer <- function(y) {
-        # Infer complete abundance distribution
-        p1 <- adjustObservedAbundance(y)
-        p2 <- inferUnseenAbundance(y)
-        names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
-        return(c(p1, p2))
-    }
-   
-   # Correct abundance
-   p <- .infer(p)
-    # Add jitter to q=1
-    q[q == 1] <- 0.9999
-    # Remove zeros
-    p <- p[p > 0]
-    # Convert p to proportional abundance
-    p <- p / sum(p)
-    # Calculate D for each q
-    D <- sapply(q, function(x) sum(p^x)^(1 / (1 - x)))
-    
-    return(D)
-}
+# Calculate the inferred diversity index
+# 
+# \code{calcInferredDiversity} calculates the clonal diversity index for a vector of diversity 
+# orders with a correction for the presence of unseen species. Does not take proportional abundance.
+#
+# @param    p  numeric vector of clone (species) counts.
+# @param    q  numeric vector of diversity orders.
+# 
+# @return   A vector of diversity scores \eqn{D} for each \eqn{q}.
+# 
+# @details
+# This method, proposed by Hill (Hill, 1973), quantifies diversity as a smooth function 
+# (\eqn{D}) of a single parameter \eqn{q}. Special cases of the generalized diversity 
+# index correspond to the most popular diversity measures in ecology: species richness 
+# (\eqn{q = 0}), the exponential of the Shannon-Weiner index (\eqn{q} approaches \eqn{1}), the 
+# inverse of the Simpson index (\eqn{q = 2}), and the reciprocal abundance of the largest 
+# clone (\eqn{q} approaches \eqn{+\infty}). At \eqn{q = 0} different clones weight equally, 
+# regardless of their size. As the parameter \eqn{q} increase from \eqn{0} to \eqn{+\infty} 
+# the diversity index (\eqn{D}) depends less on rare clones and more on common (abundant) 
+# ones, thus encompassing a range of definitions that can be visualized as a single curve. 
+# 
+# Values of \eqn{q < 0} are valid, but are generally not meaningful. The value of \eqn{D} 
+# at \eqn{q=1} is estimated by \eqn{D} at \eqn{q=0.9999}. 
+# 
+# An adjusted detected species relative abundance distribution is applied before calculating diversity.
+#
+# @references
+# \enumerate{
+#   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
+#            Ecology. 1973 54(2):427-32.
+# }
+# 
+# @seealso  Used by \link{alphaDiversity} and \link{betaDiversity}.
+# 
+# @examples
+# # May define p as clonal member counts
+# p <- c(1, 1, 3, 10)
+# q <- c(0, 1, 2)
+# calcInferredDiversity(p, q)
+#
+# 
+# @export
+# calcInferredDiversity <- function(p, q) {
+#    # Correct abundance
+#     .infer <- function(y) {
+#         # Infer complete abundance distribution
+#         p1 <- adjustObservedAbundance(y)
+#         p2 <- inferUnseenAbundance(y)
+#         names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
+#         return(c(p1, p2))
+#     }
+#    
+#    # Correct abundance
+#    p <- .infer(p)
+#     # Add jitter to q=1
+#     q[q == 1] <- 0.9999
+#     # Remove zeros
+#     p <- p[p > 0]
+#     # Convert p to proportional abundance
+#     p <- p / sum(p)
+#     # Calculate D for each q
+#     D <- sapply(q, function(x) sum(p^x)^(1 / (1 - x)))
+#     
+#     return(D)
+# }
 
 
 # Calculates diversity under rarefaction
@@ -637,7 +640,7 @@ helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL){
         dplyr::ungroup() %>%
         dplyr::select(-one_of(c(clone, group))) %>%
         as.matrix() %>% 
-        apply(2, calcInferredDiversity, q=q) %>%
+        apply(2, calcDiversity, q=q) %>%
         data.frame() %>% mutate(Q = q)
 
     return(output)
@@ -1063,19 +1066,19 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     annotate <- match.arg(annotate)
     
     # Define group label annotations
-    if (all(is.na(data@groups))) {
+    if (all(is.na(data@group_by))) {
         group_labels <- NA  
     } else if (annotate == "none") {
         group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data$groups, " (N=", data$n, ")"),
-                                 data$groups)
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+                                 data@groups)
     }
-    
+
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    if (!is.na(data@group_by)) {
+    if (!all(is.na(group_labels))) {
         # Define grouped plot
         p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P", group=data@group_by)) + 
             ggtitle(main_title) + 
@@ -1183,11 +1186,13 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     score <- match.arg(score)
     
     # Define group label annotations
-    if (annotate == "none") {
-        group_labels <- setNames(data@groups, data@groups)
+    if (all(is.na(data@group_by))) {
+      group_labels <- NA  
+    } else if (annotate == "none") {
+      group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data$groups, " (N=", data$n, ")"),
-                                 data$groups)
+      group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+                               data@groups)
     }
     
     # Define y-axis scores
@@ -1310,13 +1315,14 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     }
 
     # Define group label annotations
-    if (annotate == "none") {
-        group_labels <- setNames(data@groups, data@groups)
+    if (all(is.na(data@group_by))) {
+      group_labels <- NA  
+    } else if (annotate == "none") {
+      group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data$groups, " (N=", data$n, ")"),
-                                 data$groups)
+      group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+                               data@groups)
     }
-
     # Define plot values
     df <- data@summary %>%
         dplyr::filter(!!rlang::sym("Q") == q) %>%

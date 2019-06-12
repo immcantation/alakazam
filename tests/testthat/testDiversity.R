@@ -1,5 +1,6 @@
-ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
-db <- readChangeoDb(ExampleDb)
+# example_file <- file.path("tests", "data-tests", "ExampleDb.gz")
+example_file <- file.path("..", "data-tests", "ExampleDb.gz")
+db <- readChangeoDb(example_file)
 
 #### calcCoverage ####
 
@@ -71,12 +72,12 @@ test_that("calcDiversity", {
 	# Or proportional abundance
 	p <- c(1/15, 1/15, 1/5, 2/3)
 	obs <- calcDiversity(p, q)
-	expect_equal(obs, exp, tolerance=0.001)  
+	expect_equal(obs, exp, tolerance=0.001)
 })
 
-#### bootstrapDiversity ####
+#### estimateAbundance ####
 
-test_that("estimateAbundance", {
+test_that("estimateAbundance-current", {
 	set.seed(90)
 	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
 	expect_equal(bootstrap_obj@abundance$P[1:5], 
@@ -194,9 +195,29 @@ test_that("betaDiversity", {
 		
 })
 
-####
-## Reproducibility tests
-####
+
+#### Reproducibility tests ####
+
+test_that("estimateAbundance reproduces v0.2.11 results", {
+    set.seed(90)
+    abund <- estimateAbundance(db, group="SAMPLE", min_n=1, uniform=FALSE, nboot=100)
+    expect_equal(abund@abundance$P[1:6], 
+                 c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
+                 tolerance=0.001)
+    expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+                 c(0.001102, 0.000786, 0, 0, 0, 0),
+                 tolerance = 0.001)
+    expect_equal(abund@abundance$UPPER[45:50],
+                 c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
+                 tolerance = 0.001)
+    expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    
+    set.seed(90)
+    abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100)
+    expect_equal(abund@abundance$LOWER, c(1, 1))
+    expect_equal(abund@abundance$UPPER, c(1, 1))
+    expect_equal(abund@abundance$RANK, c(1, 1))
+})
 
 test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     
@@ -250,9 +271,10 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
         "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
         stringsAsFactors = F
     )
-    
+    obs <- as.data.frame(rarefy_obj@diversity[c(1,3,9,20), ])
     expect_equal(colnames(obs), colnames(exp))
-    expect_equal(obs %>% data.frame, exp, tolerance=0.001, check.attributes=F)
+    expect_equal(obs, exp, tolerance=0.001, 
+                 check.attributes=F)
     
     # Check reprod. old tetsDiversity
     # Defaults:

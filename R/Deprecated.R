@@ -72,7 +72,7 @@ NULL
 #' @seealso  \link{alphaDiversity}
 #' 
 #' @examples
-#' dontrun{
+#' \dontrun{
 #' # Group by sample identifier
 #' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
@@ -169,7 +169,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @seealso  \link{alphaDiversity}
 #' 
 #' @examples  
-#' dontrun{
+#' \dontrun{
 #' # Groups under the size threshold are excluded and a warning message is issued.
 #' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 #' }
