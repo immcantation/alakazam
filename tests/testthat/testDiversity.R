@@ -217,7 +217,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     
     # Reproduce old test with alphaDiversity, and expect same results
     set.seed(5)
-    diversity_obj <- alphaDiversity(db %>% data.frame, 
+    diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
                                     nboot = 100,
                                     step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
@@ -227,7 +227,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     # test the deprecated function
     set.seed(5)
     expect_warning(
-        rarefy_obj <- rarefyDiversity(db %>% data.frame, 
+        rarefy_obj <- rarefyDiversity(as.data.frame(db), 
                                   group="SAMPLE", clone="CLONE", copy=NULL, 
                                   nboot = 100,
                                   step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
@@ -267,7 +267,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     # expect_equal(div@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
 
     set.seed(3)
-    diversity_obj <- alphaDiversity(db %>% data.frame, 
+    diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
                                     nboot = 100,
                                     step_q=1, min_q=0, max_q=0, min_n=30, max_n=NULL,
@@ -280,7 +280,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     # test the deprecated function
     set.seed(3)
     expect_warning(
-        testdiv_obj <- testDiversity(db %>% data.frame, 
+        testdiv_obj <- testDiversity(as.data.frame(db), 
                                      group="SAMPLE", clone="CLONE", copy=NULL, 
                                      nboot = 100, q=0, min_n=30, max_n=NULL,
                                      ci=0.95),
