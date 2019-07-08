@@ -362,10 +362,10 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
         # do if/else outside sapply so it only gets evaluated once
         if (!l_NULL) {
             exp <- sapply(1:length(v), function(i){
-                #eg_df = expand.grid(v[[i]], j[[i]], l[i])
-                #eg_vec = apply(eg_df, 1, stringi::stri_paste, collapse="@")
-                n_v = length(v[[i]])
-                n_j = length(j[[i]])
+                #eg_df <- expand.grid(v[[i]], j[[i]], l[i])
+                #eg_vec <- apply(eg_df, 1, stringi::stri_paste, collapse="@")
+                n_v <- length(v[[i]])
+                n_j <- length(j[[i]])
                 eg_vec = stringi::stri_paste(rep.int(v[[i]], times=n_j),
                                              rep(j[[i]], each=n_v),
                                              rep.int(l[i], times=n_v*n_j),
@@ -376,11 +376,11 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
             exp <- sapply(1:length(v), function(i){
                 #eg_df = expand.grid(v[[i]], j[[i]])
                 #eg_vec = apply(eg_df, 1, stringi::stri_paste, collapse="@")
-                n_v = length(v[[i]])
-                n_j = length(j[[i]])
-                eg_vec = stringi::stri_paste(rep.int(v[[i]], times=n_j),
-                                             rep(j[[i]], each=n_v),
-                                             sep="@")
+                n_v <- length(v[[i]])
+                n_j <- length(j[[i]])
+                eg_vec <- stringi::stri_paste(rep.int(v[[i]], times=n_j),
+                                              rep(j[[i]], each=n_v),
+                                              sep="@")
                 return(eg_vec)
             }, simplify=FALSE, USE.NAMES=FALSE)
         }
@@ -388,11 +388,21 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
         # concat and convert to vector; keep distinct values
         exp <- unique(unlist(exp, use.names=FALSE))
     } else {
+        
+        n_v <- length(v[[1]])
+        n_j <- length(j[[1]])
+        
         if (!l_NULL) {
-            exp <- stringi::stri_paste(v[[1]], j[[1]], l[1], sep="@")
+            exp <- stringi::stri_paste(rep.int(v[[1]], times=n_j),
+                                       rep(j[[1]], each=n_v),
+                                       rep.int(l[1], times=n_v*n_j),
+                                       sep="@")
         } else {
-            exp <- stringi::stri_paste(v[[1]], j[[1]], sep="@")
+            exp <- stringi::stri_paste(rep.int(v[[1]], times=n_j),
+                                       rep(j[[1]], each=n_v),
+                                       sep="@")
         }
+        
     }
     
     return(exp)
