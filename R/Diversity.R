@@ -358,10 +358,6 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     # Hack for visibility of dplyr variables
     . <- NULL
     
-    # Set confidence interval
-    ci_z <- ci + (1 - ci) / 2
-    ci_x <- qnorm(ci_z)
-    
     # Check input
     if (!is.data.frame(data)) {
         stop("Input data is not a data.frame")
@@ -370,6 +366,10 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     # Check columns that are reported are real columns (can be NULL)
     check <- checkColumns(data, c(clone, copy, group))
     if (check != TRUE) { stop(check) }
+    
+    # Set confidence interval
+    ci_z <- ci + (1 - ci) / 2
+    ci_x <- qnorm(ci_z)
     
     # Tabulate clonal abundance
     count_col <- if (!is.null(copy)) { "COPY_COUNT" } else { "SEQ_COUNT" }
