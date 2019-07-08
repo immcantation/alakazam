@@ -358,8 +358,9 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
     # Hack for visibility of dplyr variables
     . <- NULL
     
-    # Set confidence interval for plotting
+    # Set confidence interval
     ci_z <- ci + (1 - ci) / 2
+    ci_x <- qnorm(ci_z)
     
     # Check input
     if (!is.data.frame(data)) {
@@ -432,10 +433,10 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
         abund_df <- boot_df %>%
             tidyr::gather(key="N", value="C", -"CLONE") %>%
             dplyr::group_by(!!rlang::sym("CLONE")) %>%
-            dplyr::summarize(P_ERROR=qnorm(ci_z) * sd(!!rlang::sym("C")), 
-                            P=mean(!!rlang::sym("C"))) %>%
-            dplyr::mutate(LOWER=pmax(!!rlang::sym("P") - !!rlang::sym("P_ERROR"), 0), 
-                          UPPER = !!rlang::sym("P") + !!rlang::sym("P_ERROR")) %>%
+            dplyr::summarize(P=mean(!!rlang::sym("C"), na.rm=TRUE),
+                             P_SD=sd(!!rlang::sym("C"), na.rm=TRUE)) %>%
+            dplyr::mutate(LOWER=pmax(!!rlang::sym("P") - !!rlang::sym("P_SD") * ci_x, 0), 
+                          UPPER=!!rlang::sym("P") + !!rlang::sym("P_SD") * ci_x) %>%
             dplyr::mutate(RANK=rank(-!!rlang::sym("P"), ties.method="first")) %>%
             dplyr::arrange(!!rlang::sym("RANK")) %>%
             dplyr::ungroup()
@@ -662,7 +663,7 @@ helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL){
 #                         calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperBeta <- function(boot_output, q, ci_z, clone="CLONE", group="GROUP") { 
+helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") { 
     # Hack for visibility of dplyr variables
     . <- NULL
         
@@ -688,11 +689,11 @@ helperBeta <- function(boot_output, q, ci_z, clone="CLONE", group="GROUP") {
     # Perform comparisons of alpha and gamma to extract beta
     div <- bind_cols(gamma, alpha) %>%
         dplyr::group_by(!!rlang::sym("Q")) %>%
-        dplyr::mutate(D=!!rlang::sym("GAMMA") / !!rlang::sym("ALPHA")) %>%
-        dplyr::summarize(D_ERROR=qnorm(ci_z) * sd(!!rlang::sym("D")), 
-                         D=mean(!!rlang::sym("D"))) %>%
-        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
-                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_ERROR"))
+        dplyr::mutate(X=!!rlang::sym("GAMMA") / !!rlang::sym("ALPHA")) %>%
+        dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
+                         D_SD=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
+        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
+                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
 
     return(div)
 }
@@ -844,6 +845,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
+    ci_x <- qnorm(ci_z)
     q <- seq(min_q, max_q, step_q)
     if (!(0 %in% q)) { q <- c(0, q) }
         
@@ -855,13 +857,13 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     
     # Summarize diversity
     div <- div_df %>%
-        tidyr::gather(key="N", value="D", -one_of(c(abundance@group_by, "Q"))) %>%
-        dplyr::mutate(D=as.numeric(!!rlang::sym("D"))) %>%
+        tidyr::gather(key="N", value="X", -one_of(c(abundance@group_by, "Q"))) %>%
+        dplyr::mutate(X=as.numeric(!!rlang::sym("X"))) %>%
         dplyr::group_by(!!!rlang::syms(c(abundance@group_by, "Q"))) %>%
-        dplyr::summarize(D_ERROR=qnorm(ci_z) * sd(!!rlang::sym("D")), 
-                         D=mean(!!rlang::sym("D"))) %>%
-        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
-                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_ERROR"))
+        dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
+                         D_SD=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
+        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
+                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
         
     # Alpha groups
     group_set <- unique(div[[abundance@group_by]])
@@ -962,6 +964,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         
     # Set diversity orders and confidence interval
     ci_z <- ci + (1 - ci) / 2
+    ci_x <- qnorm(ci_z)
     q <- seq(min_q, max_q, step_q)
     if (!(0 %in% q)) { q <- c(0, q) }
         
@@ -972,7 +975,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         beta_diversity_list[[comparison]] <- abundance@bootstrap %>%
             dplyr::ungroup() %>%
             dplyr::filter(.[[abundance@group_by]] %in% comparisons[[comparison]]) %>%
-            dplyr::do(helperBeta(., q = q, clone=abundance@clone_by, group=abundance@group_by, ci_z=ci_z))
+            dplyr::do(helperBeta(., q = q, clone=abundance@clone_by, group=abundance@group_by, ci_x=ci_x))
     }
 
     # Generate summary diversity output
