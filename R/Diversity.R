@@ -292,7 +292,7 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
         p <- x / sum(x, na.rm=TRUE)
         boot_sam <- rmultinom(nboot, n, p)
     } else {
-        stop("Invalid method ", method)
+        stop("Invalid method: ", method)
     }
       
     return(boot_mat)

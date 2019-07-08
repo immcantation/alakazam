@@ -18,14 +18,10 @@ test_that("calcCoverage", {
 test_that("countClones", {
 	# Calculate clone sizes
 	clones <- countClones(db, groups="SAMPLE")
-	# Calculate 1st order coverage for a single sample
-	obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
-	expect_equal(obs, 0.1608073, tolerance=0.001)
-
-	clones <- countClones(db, groups="SAMPLE")
 	expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
 	expect_equal(clones$SEQ_FREQ[1:6], 
-	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), tolerance=0.01)
+	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
+	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
 	clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
@@ -54,10 +50,14 @@ test_that("countClones", {
 	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
-	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), ungrouped_toy, tolerance=0.01)
+	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
+	             ungrouped_toy, 
+	             tolerance=0.01)
 
 	# Check toy grouped
-	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY"), grouped_toy, tolerance=0.01)
+	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY"), 
+	             grouped_toy, 
+	             tolerance=0.01)
 })
 
 
