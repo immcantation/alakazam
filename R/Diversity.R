@@ -855,10 +855,10 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     
     # Summarize diversity
     div <- div_df %>%
-        tidyr::gather(key = "N", value = "D", -one_of(c(abundance@group_by, "Q"))) %>%
-        dplyr::mutate(D = as.numeric(!!rlang::sym("D"))) %>%
+        tidyr::gather(key="N", value="D", -one_of(c(abundance@group_by, "Q"))) %>%
+        dplyr::mutate(D=as.numeric(!!rlang::sym("D"))) %>%
         dplyr::group_by(!!!rlang::syms(c(abundance@group_by, "Q"))) %>%
-        dplyr::summarize(D_ERROR = qnorm(ci_z) * sd(!!rlang::sym("D")), 
+        dplyr::summarize(D_ERROR=qnorm(ci_z) * sd(!!rlang::sym("D")), 
                          D=mean(!!rlang::sym("D"))) %>%
         dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_ERROR"), 0), 
                       D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_ERROR"))

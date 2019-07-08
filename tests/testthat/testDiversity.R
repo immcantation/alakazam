@@ -222,34 +222,30 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
                                     nboot = 100,
                                     step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
                                     ci=0.95)
-    obs <- diversity_obj@diversity[c(1, 3, 9, 20),]
+    obs <- diversity_obj@diversity[c(1, 3, 9, 20), ]
     
     # test the deprecated function
     set.seed(5)
-    expect_warning(
-        rarefy_obj <- rarefyDiversity(as.data.frame(db), 
-                                  group="SAMPLE", clone="CLONE", copy=NULL, 
-                                  nboot = 100,
-                                  step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
-                                  ci=0.95),
-        "is deprecated"
-    )
+    expect_warning(rarefy_obj <- rarefyDiversity(as.data.frame(db), 
+                                                 group="SAMPLE", clone="CLONE", copy=NULL, 
+                                                 nboot = 100,
+                                                 step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
+                                                 ci=0.95),
+                  "is deprecated")
     # should match same code run outside the function
     expect_equal(diversity_obj, rarefy_obj)
     
     # expected, from old rarefyDiversity test
-    exp <- data.frame(
-        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
-        "Q" = c(0, 2, 8, 8),
-        "D_ERROR" = c(3.160936, 8.132310, 10.110378, 2.197165),
-        "D" = c(88.22000, 71.51465, 32.51328, 8.94750),
-        "D_LOWER" = c(82.024680, 55.575615, 12.697307, 4.641136),
-        "D_UPPER" = c(94.41532, 87.45369, 52.32926, 13.25386),
-        "E" = c(1.0000000, 0.8106399, 0.3685478, 0.1404852),
-        "E_LOWER" = c(0.92977420, 0.62996616, 0.14392776, 0.07287072),
-        "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
-        stringsAsFactors = F
-    )
+    exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
+                      "Q" = c(0, 2, 8, 8),
+                      "D_ERROR" = c(3.160936, 8.132310, 10.110378, 2.197165),
+                      "D" = c(88.22000, 71.51465, 32.51328, 8.94750),
+                      "D_LOWER" = c(82.024680, 55.575615, 12.697307, 4.641136),
+                      "D_UPPER" = c(94.41532, 87.45369, 52.32926, 13.25386),
+                      "E" = c(1.0000000, 0.8106399, 0.3685478, 0.1404852),
+                      "E_LOWER" = c(0.92977420, 0.62996616, 0.14392776, 0.07287072),
+                      "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
+                      stringsAsFactors = FALSE)
     obs <- as.data.frame(rarefy_obj@diversity[c(1,3,9,20), ])
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.001, 
@@ -313,52 +309,44 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
-    skip("TODO")
     set.seed(5)
     # Group by sample identifier
     div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=100)
-    obs <- div@data[c(1, 3, 9, 20),]
-    exp <- data.frame(
-        "GROUP" = c("RL01", "RL01", "RL01", "RL02"),
-        "Q" = c(0, 2, 8, 8),
-        "D" = c(88.22000, 71.51465, 32.51328, 8.94750),
-        "D_SD" = c(3.160936, 8.132310, 10.110378, 2.197165),
-        "D_LOWER" = c(82.024680, 55.575615, 12.697307, 4.641136),
-        "D_UPPER" = c(94.41532, 87.45369, 52.32926, 13.25386),
-        "E" = c(1.0000000, 0.8106399, 0.3685478, 0.1404852),
-        "E_LOWER" = c(0.92977420, 0.62996616, 0.14392776, 0.07287072),
-        "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
-        stringsAsFactors = F
-    )
-    
+    obs <- div@diversity[c(1, 3, 9, 20), ]
+    exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
+                      "Q" = c(0, 2, 8, 8),
+                      "D_SD" = c(3.160936, 8.132310, 10.110378, 2.197165),
+                      "D" = c(88.22000, 71.51465, 32.51328, 8.94750),
+                      "D_LOWER" = c(82.024680, 55.575615, 12.697307, 4.641136),
+                      "D_UPPER" = c(94.41532, 87.45369, 52.32926, 13.25386),
+                      "E" = c(1.0000000, 0.8106399, 0.3685478, 0.1404852),
+                      "E_LOWER" = c(0.92977420, 0.62996616, 0.14392776, 0.07287072),
+                      "E_UPPER" = c(1.0702258, 0.9913136, 0.5931678, 0.2080996),
+                      stringsAsFactors = FALSE)
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
     
-    set.seed <- 25
     # Grouping by isotype rather than sample identifier
-    expect_warning(
-        div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
-                               nboot=100),
-        "Not all groups passed threshold")
+    set.seed <- 25
+    expect_warning(div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=100),
+                   "Not all groups passed threshold")
     
-    obs <- div@data[c(5, 13, 19, 30),]
-    exp <- data.frame(
-        "GROUP" = c("IgA", "IgG", "IgG", "IgM"),
-        "Q" = c(4, 1, 7, 7),
-        "D" = c(10.377177, 7.071540, 2.497792, 40.500567),
-        "D_SD" = c(3.1856002, 1.3429885, 0.5335591, 7.1375712),
-        "D_LOWER" = c(4.133516, 4.439331, 1.452036, 26.511184),
-        "D_UPPER" = c(16.620839, 9.703749, 3.543549, 54.489949),
-        "E" = c(0.4008180, 0.5087439, 0.1796973, 0.8343751),
-        "E_LOWER" = c(0.1596568, 0.3193763, 0.1044630, 0.5461719),
-        "E_UPPER" = c(0.6419791, 0.6981115, 0.2549316, 1.1225783),
-        stringsAsFactors = F
-    )
+    obs <- div@diversity[c(5, 13, 19, 30), ]
+    exp <- data.frame("ISOTYPE" = c("IgA", "IgG", "IgG", "IgM"),
+                      "Q" = c(4, 1, 7, 7),
+                      "D_SD" = c(3.1856002, 1.3429885, 0.5335591, 7.1375712),
+                      "D" = c(10.377177, 7.071540, 2.497792, 40.500567),
+                      "D_LOWER" = c(4.133516, 4.439331, 1.452036, 26.511184),
+                      "D_UPPER" = c(16.620839, 9.703749, 3.543549, 54.489949),
+                      "E" = c(0.4008180, 0.5087439, 0.1796973, 0.8343751),
+                      "E_LOWER" = c(0.1596568, 0.3193763, 0.1044630, 0.5461719),
+                      "E_UPPER" = c(0.6419791, 0.6981115, 0.2549316, 1.1225783),
+                      stringsAsFactors = FALSE)
     expect_equal(colnames(obs), colnames(exp))
+    expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
 })
 
 test_that("testDiversity reproduces v0.2.11 results", {
-    skip("TODO")
     set.seed(3)
     # Groups under the size threshold are excluded and a warning message is issued.
     div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=100)
