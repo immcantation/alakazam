@@ -180,6 +180,21 @@ adjustObservedAbundance <- function(x) {
 }
 
 
+# Combined unseen inferrence and observed abundance adjustment
+#
+# @param    x  named vector of observed abundance counts by clone.
+#
+# @return   A vector containing the complete inferred abundance distribution.
+#           Unseen species will be denote by a clone name starting with "U".
+inferCompleteAbundance <- function(x) {
+    # Infer complete abundance distribution
+    p1 <- adjustObservedAbundance(x)
+    p2 <- inferUnseenAbundance(x)
+    names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
+    
+    return(c(p1, p2))
+}
+
 #' Tabulates clones sizes
 #' 
 #' \code{countClones} determines the number of sequences and total copy number of 
@@ -256,29 +271,20 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="CLONE") {
 # @return   A matrix of bootstrap results.
 bootstrapAbundance <- function(x, n, nboot=200, method="before") {
     ## DEBUG
-    # x=abund_obs; fast=TRUE
+    # x=abund_obs; method="before"
     # Check argumets
     method <- match.arg(method)
-    
-    # Correct abundance
-    .infer <- function(y) {
-        # Infer complete abundance distribution
-        p1 <- adjustObservedAbundance(y)
-        p2 <- inferUnseenAbundance(y)
-        names(p2) <- if (length(p2) > 0) { paste0("U", 1:length(p2)) } else { NULL }
-        return(c(p1, p2))
-    }
   
     if (method == "before") {
         # Calculate estimated complete abundance distribution
-        p <- .infer(x)
+        p <- inferCompleteAbundance(x)
         # Bootstrap abundance
         boot_mat <- rmultinom(nboot, n, p) / n
     } else if (method == "after") {
         # Calculate estimated complete abundance distribution
         p <- x / sum(x, na.rm=TRUE)
         boot_sam <- rmultinom(nboot, n, p)
-        boot_list <- apply(boot_sam, 2, .infer)
+        boot_list <- apply(boot_sam, 2, inferCompleteAbundance)
         
         # Convert to matrix
         boot_names <- unique(unlist(sapply(boot_list, names)))
@@ -350,8 +356,7 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
                               progress=FALSE) {
     ## DEBUG
-    # data=ExampleDb; group="SAMPLE"; clone="CLONE"; copy=NULL; min_n=30; max_n=NULL; uniform=T; 
-    # ci=0.95; nboot=200;
+    # data=ExampleDb; group="SAMPLE"; clone="CLONE"; copy=NULL; min_n=1; max_n=NULL; ci=0.95; uniform=F; nboot=100
     # copy="DUPCOUNT"
     # group=NULL
 
