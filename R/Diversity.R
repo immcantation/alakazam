@@ -428,38 +428,41 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
             # Extract abundance vector
             abund_obs <- clone_tab$CLONE_COUNT
             names(abund_obs) <- clone_tab[[clone]]
-        }  
+        } 
+        
         # Infer complete abundance distribution
         boot_mat <- bootstrapAbundance(abund_obs, n, nboot=nboot, method="before")
-        boot_df <- as.data.frame(boot_mat) %>%
-            tibble::rownames_to_column("CLONE")
         
-        # Create abundance summary
-        abund_df <- boot_df %>%
-            tidyr::gather(key="N", value="C", -"CLONE") %>%
-            dplyr::group_by(!!rlang::sym("CLONE")) %>%
-            dplyr::summarize(P=mean(!!rlang::sym("C"), na.rm=TRUE),
-                             P_SD=sd(!!rlang::sym("C"), na.rm=TRUE)) %>%
-            dplyr::mutate(LOWER=pmax(!!rlang::sym("P") - !!rlang::sym("P_SD") * ci_x, 0), 
-                          UPPER=!!rlang::sym("P") + !!rlang::sym("P_SD") * ci_x) %>%
-            dplyr::mutate(RANK=rank(-!!rlang::sym("P"), ties.method="first")) %>%
-            dplyr::arrange(!!rlang::sym("RANK")) %>%
-            dplyr::ungroup()
+        # Assign confidence intervals based on variance of bootstrap realizations
+        p_mean <- apply(boot_mat, 1, mean)
+        p_sd <- apply(boot_mat, 1, sd)
+        p_err <- ci_x * p_sd
+        p_lower <- pmax(p_mean - p_err, 0)
+        p_upper <- p_mean + p_err
+        
+        # Assemble and sort abundance data.frame
+        abund_df <- tibble::tibble(CLONE=rownames(boot_mat), P=p_mean, P_SD=p_sd,
+                               LOWER=p_lower, UPPER=p_upper) %>%
+            dplyr::arrange(desc(!!rlang::sym("P"))) %>%
+            dplyr::mutate(RANK=1:n())
+        
+        # Save summary
+        abund_list[[g]] <- abund_df
         
         # Save bootstrap
-        boot_list[[g]] <- boot_df
-        abund_list[[g]] <- abund_df
+        boot_list[[g]] <- as.data.frame(boot_mat) %>%
+          tibble::rownames_to_column("CLONE")
         
         if (progress) { pb$tick() }
     }
     id_col <- if_else(is.null(group), "GROUP", group)
-    curve_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
-    boot_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
+    abundance_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
+    bootstrap_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
     # Create a new diversity object with bootstrap
     abund_obj <- new("AbundanceCurve",
-                     bootstrap=boot_df, 
-                     abundance=curve_df,
+                     bootstrap=bootstrap_df, 
+                     abundance=abundance_df,
                      clone_by=clone,
                      group_by=if_else(is.null(group), as.character(NA), group),
                      groups=group_keep,
