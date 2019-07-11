@@ -640,7 +640,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 # @param    q            vector of Hill Diversity indices to test for diversity calculations.
 # @param    clone        name of the \code{boot_output} column containing clone identifiers.
 # @param    group        name of the \code{boot_output} column containing grouping information for 
-#                        diversity  calculation.
+#                        diversity calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
 helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL){

@@ -219,18 +219,16 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     set.seed(5)
     diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
-                                    nboot = 100,
                                     step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
-                                    ci=0.95)
+                                    ci=0.95, nboot=100)
     obs <- diversity_obj@diversity[c(1, 3, 9, 20), ]
     
     # test the deprecated function
     set.seed(5)
     expect_warning(rarefy_obj <- rarefyDiversity(as.data.frame(db), 
                                                  group="SAMPLE", clone="CLONE", copy=NULL, 
-                                                 nboot = 100,
                                                  step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
-                                                 ci=0.95),
+                                                 ci=0.95, nboot=100),
                   "is deprecated")
     # should match same code run outside the function
     expect_equal(diversity_obj, rarefy_obj)
@@ -265,9 +263,8 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     set.seed(3)
     diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
-                                    nboot = 100,
                                     step_q=1, min_q=0, max_q=0, min_n=30, max_n=NULL,
-                                    ci=0.95)
+                                    ci=0.95, nboot=100)
     
     p_q0 <- diversity_obj@tests[["PVALUE"]]
     expect_equal(p_q0, 0)
@@ -278,8 +275,8 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     expect_warning(
         testdiv_obj <- testDiversity(as.data.frame(db), 
                                      group="SAMPLE", clone="CLONE", copy=NULL, 
-                                     nboot = 100, q=0, min_n=30, max_n=NULL,
-                                     ci=0.95),
+                                     q=0, min_n=30, max_n=NULL,
+                                     ci=0.95, nboot=100),
         "is deprecated"
     )
     
@@ -289,16 +286,27 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
 
 test_that("estimateAbundance reproduces v0.2.11 results", {
     set.seed(90)
-    abund <- estimateAbundance(db, group="SAMPLE", min_n=1, uniform=FALSE, nboot=100)
-    expect_equal(abund@abundance$P[1:6], 
-                 c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
-                 tolerance=0.001)
+    abund <- estimateAbundance(db, group="SAMPLE", min_n=1, uniform=FALSE, nboot=1000)
+    # Exact v0.2.11 test results with nboot=100
+    # expect_equal(abund@abundance$P[1:6], 
+    #              c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
+    #              tolerance=0.001)
+    # expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+    #              c(0.001102, 0.000786, 0, 0, 0, 0),
+    #              tolerance = 0.001)
+    # expect_equal(abund@abundance$UPPER[45:50],
+    #              c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
+    #              tolerance = 0.001)
+    # v0.2.11 test results with nboot=1000
+    expect_equal(abund@abundance$P[1:6],
+                 c(0.03808654, 0.03808654, 0.01293068, 0.01293068, 0.01293068, 0.01293068),
+                 tolerance=0.005)
     expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
-                 c(0.001102, 0.000786, 0, 0, 0, 0),
-                 tolerance = 0.001)
+                 c(0.0004917821, 0, 0, 0, 0, 0),
+                 tolerance = 0.005)
     expect_equal(abund@abundance$UPPER[45:50],
-                 c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
-                 tolerance = 0.001)
+                 c(0.007397780, 0.007578182, 0.007035148, 0.007111293,0.006629984, 0.007098120),
+                 tolerance = 0.005)
     expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
