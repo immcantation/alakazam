@@ -370,12 +370,12 @@ test_that("testDiversity reproduces v0.2.11 results", {
     expect_equal(div@summary$MEAN, c(88.127, 63.498), tolerance=0.005)
     
     set.seed(3)
-    expect_warning(testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000),
+    expect_warning(div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000),
                    "is deprecated")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(div@tests$PVALUE, 0.88)
     # expect_equal(div@summary$MEAN, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=1000
     expect_equal(div@tests$PVALUE, 0.93)
-    expect_equal(div@summary$MEAN, c(78.63, 79.58), tolerance=0.005)
+    expect_equal(div@summary$MEAN, c(78.633, 79.876), tolerance=0.005)
 })
