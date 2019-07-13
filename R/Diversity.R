@@ -464,7 +464,8 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
                      bootstrap=bootstrap_df, 
                      abundance=abundance_df,
                      clone_by=clone,
-                     group_by=if_else(is.null(group), as.character(NA), group),
+                     group_by=id_col,
+                     #groups=if_else(is.null(group), as.character(NA), group_keep),
                      groups=group_keep,
                      n=nsam, 
                      nboot=nboot, 
@@ -643,14 +644,20 @@ inferRarefiedDiversity <- function(x, q, m) {
 #                        diversity calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL){
+helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL) {
+    ## DEBUG
+    # abundance <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+    # clone <- abundance@clone_by
+    # group <- abundance@group_by
+  
     # Compute diversity from a column of each bootstrap
     output <- boot_output %>% 
         dplyr::ungroup() %>%
         dplyr::select(-one_of(c(clone, group))) %>%
         as.matrix() %>% 
         apply(2, calcDiversity, q=q) %>%
-        data.frame() %>% mutate(Q = q)
+        data.frame() %>% 
+        mutate(Q=q)
 
     return(output)
 }
@@ -687,7 +694,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
     # Compute alpha diversity metrics
     alpha <- boot_output %>%
         dplyr::group_by(!!rlang::sym(group)) %>%
-        dplyr::do(helperAlpha(., q = q, clone=clone, group=group)) %>%
+        dplyr::do(helperAlpha(., q=q, clone=clone, group=group)) %>%
         dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(mean) %>%
@@ -695,7 +702,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
         dplyr::mutate(ALPHA=as.numeric(!!rlang::sym("ALPHA")))
 
     # Perform comparisons of alpha and gamma to extract beta
-    div <- bind_cols(gamma, alpha) %>%
+    beta <- bind_cols(gamma, alpha) %>%
         dplyr::group_by(!!rlang::sym("Q")) %>%
         dplyr::mutate(X=!!rlang::sym("GAMMA") / !!rlang::sym("ALPHA")) %>%
         dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
@@ -703,7 +710,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
         dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
                       D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
 
-    return(div)
+    return(beta)
 }
 
 # Helper function for computing statistical significance
@@ -719,11 +726,12 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
 #                   for diversity calculation.
 # @param    q       vector of Hill Diversity indices to test for diversity calculations.
 #
-# @return   data.frame containing diversity calculations for each bootstrap iteration.
+# @return   data.frame containing test results for each value of q.
 helperTest <- function(div_df, q, group="GROUP") {
     # Hack for visibility of dplyr variables
     . <- NULL
-        
+    
+    # Pairwise test
     group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
     pvalue_list <- list()
     for (group_pair in group_pairs) {
@@ -748,22 +756,16 @@ helperTest <- function(div_df, q, group="GROUP") {
             p <- ecdf(g_delta)(0)
             p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
             
-            pair_list[[as.character(q_i)]] <- list(DELTA_MEAN = mean(g_delta), DELTA_SD=sd(g_delta), PVALUE = p)
+            pair_list[[as.character(q_i)]] <- list(DELTA_MEAN=mean(g_delta), 
+                                                   DELTA_SD=sd(g_delta), 
+                                                   PVALUE=p)
         }
         pvalue_list[[paste(group_pair, collapse=" != ")]] <- bind_rows(pair_list, .id="Q")
 
     }
     test_df <- bind_rows(pvalue_list, .id="TEST")
 
-    summary_df <- div_df %>%
-        tidyr::gather(key="N", value="D", -one_of(c(group, "Q"))) %>%
-        dplyr::mutate(D=as.numeric(!!rlang::sym("D"))) %>%
-        dplyr::group_by(!!!rlang::syms(c(group, "Q"))) %>%
-        dplyr::summarize(SD = sd(!!rlang::sym("D")), MEAN = mean(!!rlang::sym("D")))
-    
-    test_div <- list(tests=test_df, summary=summary_df)
-
-    return(test_div)
+    return(test_df)
 }
 
 
@@ -856,47 +858,52 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     ci_x <- qnorm(ci_z)
     q <- seq(min_q, max_q, step_q)
     if (!(0 %in% q)) { q <- c(0, q) }
+    
+    # Set grouping variables
+    clone <- abundance@clone_by
+    group <- abundance@group_by
         
     # Compute diversity metric for bootstrap instances
-    div_df <- abundance@bootstrap %>%
-        dplyr::group_by(!!rlang::sym(abundance@group_by)) %>%
-        dplyr::do(helperAlpha(., q=q, clone=abundance@clone_by, group=abundance@group_by)) %>%
+    boot_df <- abundance@bootstrap %>%
+        dplyr::group_by(!!rlang::sym(group)) %>%
+        dplyr::do(helperAlpha(., q=q, clone=clone, group=group)) %>%
         dplyr::ungroup()
     
     # Summarize diversity
-    div <- div_df %>%
-        tidyr::gather(key="N", value="X", -one_of(c(abundance@group_by, "Q"))) %>%
+    div_df <- boot_df %>%
+        tidyr::gather(key="N", value="X", -one_of(c(group, "Q"))) %>%
         dplyr::mutate(X=as.numeric(!!rlang::sym("X"))) %>%
-        dplyr::group_by(!!!rlang::syms(c(abundance@group_by, "Q"))) %>%
+        dplyr::group_by(!!!rlang::syms(c(group, "Q"))) %>%
         dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
                          D_SD=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
         dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
                       D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
-        
-    # Alpha groups
-    group_set <- unique(div[[abundance@group_by]])
     
     # Compute evenness
-    div_qi <- div %>%
+    div_qi <- div_df %>%
         filter(!!rlang::sym("Q") == 0) %>%
-        select(one_of(c(abundance@group_by, "D")))
-
-    div <- div %>%
-        dplyr::right_join(div_qi, by=abundance@group_by, suffix = c("", "_0")) %>%
+        select(one_of(c(group, "D")))
+    div_df <- div_df %>%
+        dplyr::right_join(div_qi, by=group, suffix=c("", "_0")) %>%
         mutate(E=!!rlang::sym("D")/!!rlang::sym("D_0"), 
-               E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
-               E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
+               E_LOWER=!!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
+               E_UPPER=!!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
         select(-!!rlang::sym("D_0"))
     
     # Test
-    div_test <- helperTest(div_df, q=q, group=abundance@group_by)
-    
+    if (length(abundance@groups) > 1) {
+        test_df <- helperTest(boot_df, q=q, group=group)
+    } else {
+        test_df <- NULL
+    }
+
+    # Build return object
+    group_set <- unique(div_df[[group]])
     div_obj <- new("DiversityCurve",
-                   diversity=div, 
+                   diversity=div_df, 
+                   tests=test_df,
                    method="alpha",
-                   tests=div_test[["tests"]],
-                   summary=div_test[["summary"]],
-                   group_by=abundance@group_by,
+                   group_by=group,
                    groups=group_set,
                    q=q,  
                    n=abundance@n,
@@ -911,7 +918,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' the multiplicative beta diversity across a range of Hill diversity indices. 
 #' 
 #' @param    data         data.frame with Change-O style columns containing clonal assignments or
-#'                        a \link{AbundanceCurve} generate by \link{estimateAbundance} object 
+#'                        an \link{AbundanceCurve} object generate by \link{estimateAbundance}.
 #'                        containing a previously calculated bootstrap distributions of clonal abundance.
 #' @param    comparisons  named list of comparisons between group members for computing beta diversity. 
 #' @param    min_q        minimum value of \eqn{q}.
@@ -948,7 +955,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 #' 
 #' @examples
 #' div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE", 
-#'                  min_n=40, step_q=1, max_q=10, nboot=100)
+#'                      min_n=40, step_q=1, max_q=10, nboot=100)
 #'                       
 #' plotDiversityCurve(div, legend_title="Isotype")
 #' 
@@ -958,7 +965,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
     . <- NULL
     
     if (!is.list(comparisons) || is.null(names(comparisons))) {
-      stop("`comparisons` must be a named list")
+      stop("'comparisons' must be a named list")
     }
     
     # Check input object and call estimateAbundance if required
@@ -979,7 +986,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
     # Compute pairwise beta diversity for bootstrap instances
     beta_diversity_list <- list()
 
-    for(comparison in names(comparisons)){
+    for (comparison in names(comparisons)) {
         beta_diversity_list[[comparison]] <- abundance@bootstrap %>%
             dplyr::ungroup() %>%
             dplyr::filter(.[[abundance@group_by]] %in% comparisons[[comparison]]) %>%
@@ -1005,17 +1012,17 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         select(-!!rlang::sym("D_0"))
         
     # Test
-   if(length(group_set) > 1){
-      div_test <- helperTest(div_df, q=q, group="COMPARISON")
-   } else {
-      div_test <- list( 'test'= NULL, 'summary'= NULL)
-   }
+    if (length(group_set) > 1) {
+       test_df <- helperTest(div_df, q=q, group="COMPARISON")
+    } else {
+       test_df <- NULL
+    }
     
+    # Build return object
     div_obj <- new("DiversityCurve",
                    diversity=div, 
+                   tests=test_df,
                    method="beta",
-                   tests=div_test[["tests"]],
-                   summary=div_test[["summary"]],
                    group_by="COMPARISON",
                    groups=group_set,
                    n=abundance@n,
@@ -1077,7 +1084,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     annotate <- match.arg(annotate)
     
     # Define group label annotations
-    if (all(is.na(data@group_by))) {
+    if (all(is.na(data@groups)) || length(data@groups) == 1) {
         group_labels <- NA  
     } else if (annotate == "none") {
         group_labels <- setNames(data@groups, data@groups)
@@ -1197,13 +1204,13 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     score <- match.arg(score)
     
     # Define group label annotations
-    if (all(is.na(data@group_by))) {
-      group_labels <- NA  
+    if (all(is.na(data@groups)) || length(data@groups) == 1) {
+        group_labels <- NA  
     } else if (annotate == "none") {
-      group_labels <- setNames(data@groups, data@groups)
+        group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-      group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
-                               data@groups)
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+                                 data@groups)
     }
     
     # Define y-axis scores
@@ -1222,22 +1229,40 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     # Stupid hack for check NOTE about `.x` in math_format
     .x <- NULL
     
-    # Define base plot elements
-    p1 <- ggplot(data@diversity, aes_string(x="Q", y=y_value, group=data@group_by)) + 
-        ggtitle(main_title) + 
-        baseTheme() + 
-        xlab('q') +
-        ylab(y_label) +
-        geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill=data@group_by), alpha=0.4) +
-        geom_line(aes_string(color=data@group_by))
+    if (!all(is.na(group_labels))) {
+        # Define grouped plot
+        p1 <- ggplot(data@diversity, aes_string(x="Q", y=y_value, group=data@group_by)) + 
+            ggtitle(main_title) + 
+            baseTheme() + 
+            xlab('q') +
+            ylab(y_label) +
+            geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill=data@group_by), alpha=0.4) +
+            geom_line(aes_string(color=data@group_by))
     
-    # Set colors and legend
-    if (!is.null(colors)) {
-        p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
-            scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
+        # Set colors and legend
+        if (!is.null(colors)) {
+            p1 <- p1 + scale_color_manual(name=legend_title, labels=group_labels, values=colors) +
+                scale_fill_manual(name=legend_title, labels=group_labels, values=colors)
+        } else {
+            p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
+                scale_fill_discrete(name=legend_title, labels=group_labels)
+        }
     } else {
-        p1 <- p1 + scale_color_discrete(name=legend_title, labels=group_labels) +
-            scale_fill_discrete(name=legend_title, labels=group_labels)
+        # Set color
+        if (!is.null(colors) & length(colors) == 1) {
+          line_color <- colors
+        } else {
+          line_color <- "black"
+        }
+      
+        # Define ungrouped plot
+        p1 <- ggplot(data@diversity, aes_string(x="Q", y=y_value)) + 
+            ggtitle(main_title) + 
+            baseTheme() + 
+            xlab('q') +
+            ylab(y_label) +
+            geom_ribbon(aes_string(ymin=y_min, ymax=y_max), fill=line_color, alpha=0.4) +
+            geom_line(color=line_color)
     }
     
     # Set x-axis style
@@ -1316,7 +1341,7 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     annotate <- match.arg(annotate)
     
     # Check if abundance is in data
-    if (is.null(data@tests) | is.null(data@summary)) { 
+    if (is.null(data@tests)) { 
         stop("Test data missing from input object.")
     }
 
@@ -1326,19 +1351,17 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     }
 
     # Define group label annotations
-    if (all(is.na(data@group_by))) {
-      group_labels <- NA  
-    } else if (annotate == "none") {
-      group_labels <- setNames(data@groups, data@groups)
+    if (annotate == "none") {
+        group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-      group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
-                               data@groups)
+        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+                                 data@groups)
     }
     # Define plot values
-    df <- data@summary %>%
+    df <- data@diversity %>%
         dplyr::filter(!!rlang::sym("Q") == q) %>%
-        dplyr::mutate(LOWER=!!rlang::sym("MEAN") - !!rlang::sym("SD"), 
-                      UPPER=!!rlang::sym("MEAN") + !!rlang::sym("SD"))
+        dplyr::mutate(LOWER=!!rlang::sym("D") - !!rlang::sym("D_SD"), 
+                      UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD"))
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x=data@group_by)) + 
@@ -1347,7 +1370,7 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
         xlab("") +
         ylab(bquote("Mean " ^ .(q) * D %+-% "SD")) +
         geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color=data@group_by), alpha=0.8) +
-        geom_point(aes_string(y="MEAN", color=data@group_by))
+        geom_point(aes_string(y="D", color=data@group_by))
     
     # Set colors and legend
     if (!is.null(colors)) {

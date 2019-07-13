@@ -138,7 +138,7 @@ test_that("alphaDiversity-current", {
 	diversity_obj <- alphaDiversity(bootstrap_obj)
 	expect_equal(diversity_obj@tests$PVALUE[1:5], 
 	        c(0.46,0.48,0.52,0.58,0.74), tolerance=0.001)
-	expect_equal(diversity_obj@summary$MEAN[1:5], 
+	expect_equal(diversity_obj@diversity$D[1:5], 
 	        c(94, 91.2, 88.5, 85.9, 83.3), tolerance=0.001)
 	
 	# verify two-steps == one-step
@@ -194,7 +194,7 @@ test_that("betaDiversity-current", {
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
 	expect_equal(diversity_obj@tests$PVALUE[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
-	expect_equal(diversity_obj@summary$MEAN[1:5], 
+	expect_equal(diversity_obj@diversity$D[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
 })
 
@@ -319,8 +319,8 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
                       "D_LOWER" = c(81.75810, 52.71405, 11.49806, 4.12744),
                       "D_UPPER" = c(94.52390, 89.68393, 54.68402, 13.25386),
                       "E" = c(1.00000, 0.810640, 0.36855, 13.70837),
-                      "E_LOWER" = c(0.92758304, 0.59806502, 0.13045074, 0.06478276),
-                      "E_UPPER" = c(1.0724170, 1.0175053, 0.6204152, 0.2151615),
+                      "E_LOWER" = c(0.92758, 0.59806, 0.13045, 0.06478),
+                      "E_UPPER" = c(1.07242, 1.01750, 0.62041, 0.21516),
                       stringsAsFactors = FALSE)
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.005, check.attributes=F)
@@ -364,18 +364,18 @@ test_that("testDiversity reproduces v0.2.11 results", {
                    "is deprecated")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(div@tests$PVALUE, 0)
-    # expect_equal(div@summary$MEAN, c(88.10, 63.11), tolerance=0.001)
+    # expect_equal(div@diversity$D, c(88.10, 63.11), tolerance=0.001)
     # v0.2.11 test results with nboot=1000
     expect_equal(div@tests$PVALUE, 0)
-    expect_equal(div@summary$MEAN, c(88.127, 63.498), tolerance=0.005)
+    expect_equal(div@diversity$D, c(88.127, 63.498), tolerance=0.005)
     
     set.seed(3)
     expect_warning(div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000),
                    "is deprecated")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(div@tests$PVALUE, 0.88)
-    # expect_equal(div@summary$MEAN, c(78.63, 79.58), tolerance=0.001)
+    # expect_equal(div@diversity$D, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=1000
     expect_equal(div@tests$PVALUE, 0.93)
-    expect_equal(div@summary$MEAN, c(78.633, 79.876), tolerance=0.005)
+    expect_equal(div@diversity$D, c(78.633, 79.876), tolerance=0.005)
 })

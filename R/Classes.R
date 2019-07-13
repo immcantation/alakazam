@@ -44,7 +44,7 @@ setClass("AbundanceCurve",
          slots=c(abundance="data.frame",
                  bootstrap="data.frame",
                  clone_by="character",
-                 group_by="CharNULL",
+                 group_by="character",
                  groups="character",
                  n="numeric", 
                  ci="numeric",
@@ -79,14 +79,6 @@ setClass("AbundanceCurve",
 #'                                              bootstrap delta distribution for the test.
 #'                   \item  \code{PVALUE}:      p-value for the test.
 #'                 }
-#' @slot  summary  data.frame containing summary statistics for the diversity index 
-#'                 bootstrap distributions, at the given value of \eqn{q}, with columns:
-#'                 \itemize{
-#'                   \item  \code{GROUP}:   the name of the group.
-#'                   \item  \code{MEAN}:    mean of the \eqn{D} bootstrap distribution.
-#'                   \item  \code{SD}:      standard deviation of the \eqn{D} bootstrap 
-#'                                          distribution.
-#'                 }
 #' @slot  group_by   string specifying the name of the grouping column in diversity calculation.
 #' @slot  groups     vector specifying the names of unique groups in group column in diversity calculation.
 #' @slot  method     string specifying the type of diversity calculated. 
@@ -102,19 +94,14 @@ setClass("AbundanceCurve",
 setClass("DiversityCurve", 
          slots=c(diversity="data.frame", 
                  tests="DfNULL",
-                 summary="DfNULL",
                  method="character",
-                 group_by="CharNULL",
+                 group_by="character",
                  groups="character",
                  q="numeric",
                  n="numeric", 
                  ci="numeric"))
               
 #### Diversity methods ####
-
-# TODO:  plot method for DiversityTest
-# TODO:  summary method for DiversityTest
-# TODO:  summary method for DiversityCurve
 
 #' @param    x    AbundanceCurve object
 #' 
@@ -137,7 +124,7 @@ setMethod("plot", c(x="AbundanceCurve", y="missing"),
 #' @rdname   DiversityCurve-class
 #' @aliases  DiversityCurve-method
 #' @export
-setMethod("print", c(x="DiversityCurve"), function(x) { print(x@tests) })
+setMethod("print", c(x="DiversityCurve"), function(x) { print(x@diversity) })
 
 #' @param    y    diversity order to plot (q).
 #' @param    ...  arguments to pass to \link{plotDiversityCurve} or \link{plotDiversityTest}.
