@@ -892,6 +892,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     
     # Test
     if (length(abundance@groups) > 1) {
+        print(q)
         test_df <- helperTest(boot_df, q=q, group=group)
     } else {
         test_df <- NULL

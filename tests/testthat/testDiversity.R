@@ -81,76 +81,67 @@ test_that("calcDiversity", {
 #### estimateAbundance ####
 
 test_that("estimateAbundance-current", {
-    skip("In development")
 	set.seed(90)
-	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
-	expect_equal(bootstrap_obj@abundance$P[1:5], 
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100)
+	expect_equal(abund@abundance$P[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001)
-	expect_equal(bootstrap_obj@abundance$LOWER[c(1:3,8:10)],
-	             c(0.00411, 0, 0, 0, 0, 0),
+	expect_equal(abund@abundance$LOWER[c(1:3,8:10)],
+	             c(0.0041, 0.0004, 0, 0, 0, 0),
 	             tolerance = 0.001)
-	expect_equal(bootstrap_obj@abundance$UPPER[45:50],
-	             c(0.00956, 0.00907, 0.00853, 0.00907, 0.00853, 0.00853),
+	expect_equal(abund@abundance$UPPER[45:50],
+	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
 	             tolerance = 0.001)
-	expect_equal(bootstrap_obj@abundance$RANK[200:203], c(200, 201, 202, 203))
+	expect_equal(abund@abundance$RANK[200:203], c(200, 201, 202, 203))
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
-	expect_warning(bootstrap_obj <- estimateAbundance(db, group="ISOTYPE", nboot=100),
+	expect_warning(abund <- estimateAbundance(db, group="ISOTYPE", nboot=100),
 	               "Not all groups passed threshold")
 })
 
 	
 #### alphaDiversity ####
 
-test_that("alphaDiversity-current", {
-    skip("In development")
-	set.seed(5)
-	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
-	diversity_obj <- alphaDiversity(bootstrap_obj, step_q=1, max_q=10)
-	obs <- diversity_obj@diversity[c(1,3,9,20),]
-
-	exp <- data.frame(
-	        "SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
-	        "Q" = c(0, 2, 8, 8),
-	        "D_ERROR" = c(32.96, 13.62, 12.95, 4.73),
-	        "D" = c(91.29, 51.66, 26.76, 8.36),
-	        "D_LOWER" = c(58.33, 38.04, 13.82, 3.63),
-	        "D_UPPER" = c(124.3, 65.3, 39.7, 13.1),
-	        "E" = c(1.00000000, 0.06373320, 0.04155697, 0.07837609),
-	        "E_LOWER" = c(0.000000, 0.04687418, 0.02998629, 0.05019589),
-	        "E_UPPER" = c(2.04393128, 0.08059223, 0.05312764, 0.10655628),
-	        stringsAsFactors = F
-	    )
-
-	expect_equal(colnames(obs), colnames(exp))
-
-	expect_equal(obs$D, exp$D, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_ERROR, exp$D_ERROR, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_LOWER, exp$D_LOWER, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_UPPER, exp$D_UPPER, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$Q, exp$Q, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$SAMPLE, exp$SAMPLE, tolerance=0.001, check.attributes=F)
-
-	set.seed(3)
-	bootstrap_obj <- estimateAbundance(db, group="SAMPLE", nboot=100)
-	diversity_obj <- alphaDiversity(bootstrap_obj)
-	expect_equal(diversity_obj@tests$PVALUE[1:5], 
-	        c(0.46,0.48,0.52,0.58,0.74), tolerance=0.001)
-	expect_equal(diversity_obj@diversity$D[1:5], 
-	        c(94, 91.2, 88.5, 85.9, 83.3), tolerance=0.001)
+test_that("alphaDiversity", {
+    # Test diversity
+    set.seed(5)
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100)
+	div <- alphaDiversity(abund, step_q=1, max_q=10)
+	obs <- data.frame(div@diversity[c(1,3,9,20), ])
+	exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
+                      "Q" = c(0, 2, 8, 8),
+        	          "D" = c(88.4000, 72.0492, 33.8868, 8.9179),
+	                  "D_SD" = c(3.4902, 9.3973, 11.9207, 2.1954),
+        	          "D_LOWER" = c(81.5592, 53.6307, 10.5224, 4.6149),
+        	          "D_UPPER" = c(95.2407, 90.4677, 57.2511, 13.2210),
+        	          "E" = c(1.0000, 0.8150, 0.3833, 0.1397),
+        	          "E_LOWER" = c(0.9226, 0.6066, 0.1190, 0.0723),
+        	          "E_UPPER" = c(1.0773, 1.0233, 0.6476, 0.2071),
+        	          stringsAsFactors = F)
 	
-	# verify two-steps == one-step
+	expect_equal(colnames(obs), colnames(exp))
+	expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
+
+	# Test diversity p-values
 	set.seed(3)
-	div <- alphaDiversity(db, group="SAMPLE", nboot=100)
-	expect_equal(diversity_obj, div)
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100)
+	div <- alphaDiversity(abund, step_q=1, max_q=4)
+	expect_equal(div@tests$PVALUE[1:5], 
+	             c(0, 0, 0, 0, 0), tolerance=0.001)
+	expect_equal(div@diversity$D[1:5], 
+	             c(88.5600, 82.4607, 72.2387, 60.0029, 50.0501), tolerance=0.001)
+	
+	# Verify two-steps == one-step
+	set.seed(3)
+	div_single <- alphaDiversity(db, step_q=1, max_q=4, group="SAMPLE", nboot=100)
+	expect_equal(div, div_single)
 })
 
 
 #### betaDiversity ####
 
-test_that("betaDiversity-current", {	
+test_that("betaDiversity", {	
     skip("In development")
 	set.seed(3)
 	beta_db <- db %>% 
