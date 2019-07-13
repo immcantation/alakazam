@@ -151,13 +151,13 @@ test_that("betaDiversity", {
 	diversity_obj  <- betaDiversity(beta_db, 
 		comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
 
-	obs <- diversity_obj@diversity[c(1,5,12,72),]
+	obs <- data.frame(diversity_obj@diversity[c(1, 5, 12, 72), ])
 
 	exp <- data.frame(
 	        "COMPARISON" = c("1-2", "1-2", "1-2", "1-3"),
 	        "Q" = c(0, 0.4, 1.1, 3.0),
-	        "D_ERROR" = c(0.2257, 0.1997, 0.1563, 0.3084),
 	        "D" = c(1.790, 1.752, 1.634, 1.275), 
+	        "D_SD" = c(0.2257, 0.1997, 0.1563, 0.3084),
 	        "D_LOWER" = c(1.5643, 1.5524, 1.4775, 0.9664),
 	        "D_UPPER" = c(2.0157, 1.9517, 1.79017, 1.5831),
 	        "E" = c(1.00000000, 0.97879, 0.91273, 0.72458),
@@ -167,13 +167,8 @@ test_that("betaDiversity", {
 	    )
 
 	expect_equal(colnames(obs), colnames(exp))
+	expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
 
-	expect_equal(obs$D, exp$D, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_ERROR, exp$D_ERROR, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_LOWER, exp$D_LOWER, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$D_UPPER, exp$D_UPPER, tolerance=0.001, check.attributes=F)
-	expect_equal(obs$Q, exp$Q, tolerance=0.001, check.attributes=F)
-	
 	# TODO: fix me. This test isn't right, SAMPLE doen'st exist is exp or obs
 	# expect_equal(obs$SAMPLE, exp$SAMPLE, tolerance=0.001, check.attributes=F)
 
