@@ -59,26 +59,15 @@ graphs <- ExampleTrees[1-10]
 
 # Perform edge test on isotypes
 x <- testEdges(graphs, "ISOTYPE", nperm=10)
+
+```
+
+**Error in ecdf(d)**: 'x' must have 1 or more non-missing values
+```R
 print(x)
 ```
 
-
-```
-    PARENT   CHILD COUNT   EXPECTED PVALUE
-1      IgA     IgA    39  60.200000    0.9
-2      IgA IgA,IgG     3   3.000000    0.3
-3      IgA     IgG     2   4.800000    0.6
-4  IgA,IgG     IgA    29   8.714286    0.0
-5  IgA,IgG IgA,IgG     1   1.500000    0.5
-6  IgA,IgG     IgG    24   2.250000    0.0
-7  IgD,IgG     IgG     8   2.750000    0.0
-8      IgG     IgA     1   4.666667    1.0
-9      IgG IgD,IgG     1   1.000000    0.0
-10     IgG     IgG   112 135.700000    1.0
-
-```
-
-
+**Error in print(x)**: object 'x' not found
 
 See also
 -------------------

@@ -67,16 +67,6 @@ bootstrap delta distribution for the test.
 + `PVALUE`:      p-value for the test.
 
 
-`summary`
-:   data.frame containing summary statistics for the diversity index 
-bootstrap distributions, at the given value of <code class = 'eq'>q</code>, with columns:
-
-+ `GROUP`:   the name of the group.
-+ `MEAN`:    mean of the <code class = 'eq'>D</code> bootstrap distribution.
-+ `SD`:      standard deviation of the <code class = 'eq'>D</code> bootstrap 
-distribution.
-
-
 `group_by`
 :   string specifying the name of the grouping column in diversity calculation.
 

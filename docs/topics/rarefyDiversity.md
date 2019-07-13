@@ -1,4 +1,4 @@
-**rarefyDiversity** - *Generate a clonal diversity index curve (wrapper for calculateAlphaDiversity)*
+**rarefyDiversity** - *Generate a clonal diversity index curve*
 
 Description
 --------------------
@@ -79,7 +79,7 @@ Details
 -------------------
 
 Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
-proposed by Hill (Hill, 1973). See [calcInferredDiversity](calcInferredDiversity.md) for further details.
+proposed by Hill (Hill, 1973). See [calcDiversity](calcDiversity.md) for further details.
 
 Diversity is calculated on the estimated complete clonal abundance distribution.
 This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -119,32 +119,23 @@ Examples
 -------------------
 
 ```R
+### Not run:
 # Group by sample identifier
-div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
-plotDiversityCurve(div, legend_title="Sample")
-
+# div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
+# plotDiversityCurve(div, legend_title="Sample")
+# 
+# # Grouping by isotype rather than sample identifier
+# div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+# nboot=100)
+# plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-![2](rarefyDiversity-2.png)
-
-```R
-
-# Grouping by isotype rather than sample identifier
-div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
-nboot=100)
-plotDiversityCurve(div, legend_title="Isotype")
-```
-
-![4](rarefyDiversity-4.png)
 
 
 See also
 -------------------
 
-See [calcInferredDiversity](calcInferredDiversity.md) for the basic calculation and 
-[DiversityCurve](DiversityCurve-class.md) for the return object. 
-See [testDiversity](testDiversity.md) for significance testing.
-See [plotDiversityCurve](plotDiversityCurve.md) for plotting the return object.
+[alphaDiversity](alphaDiversity.md)
 
 
 

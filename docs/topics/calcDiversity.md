@@ -4,7 +4,7 @@ Description
 --------------------
 
 `calcDiversity` calculates the clonal diversity index for a vector of diversity 
-orders with a correction for the presence of unseen species.
+orders.
 
 
 Usage
@@ -45,9 +45,7 @@ the diversity index (<code class = 'eq'>D</code>) depends less on rare clones an
 ones, thus encompassing a range of definitions that can be visualized as a single curve. 
 
 Values of <code class = 'eq'>q < 0</code> are valid, but are generally not meaningful. The value of <code class = 'eq'>D</code> 
-at <code class = 'eq'>q=1</code> is estimated by <code class = 'eq'>D</code> at <code class = 'eq'>q=0.9999</code>. 
-
-An adjusted detected species relative abundance distribution is applied before calculating diversity.
+at <code class = 'eq'>q=1</code> is estimated by <code class = 'eq'>D</code> at <code class = 'eq'>q=0.9999</code>.
 
 
 References

@@ -62,14 +62,14 @@ Value
 -------------------
 
 A [DiversityCurve](DiversityCurve-class.md) object containing slot test with p-values and summary 
-		 statistics.
+statistics.
 
 
 Details
 -------------------
 
 Clonal diversity is calculated using the generalized diversity index proposed by 
-Hill (Hill, 1973). See [calcInferredDiversity](calcInferredDiversity.md) for further details.
+Hill (Hill, 1973). See [calcDiversity](calcDiversity.md) for further details.
 
 Diversity is calculated on the estimated complete clonal abundance distribution.
 This distribution is inferred by using the Chao1 estimator to estimate the number
@@ -125,58 +125,9 @@ Examples
 -------------------
 
 ```R
+### Not run:
 # Groups under the size threshold are excluded and a warning message is issued.
-testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
-```
-
-
-```
-An object of class "DiversityCurve"
-Slot "div":
-# A tibble: 4 x 9
-# Groups:   SAMPLE [2]
-  SAMPLE     Q D_ERROR      D D_LOWER D_UPPER     E E_LOWER E_UPPER
-  <chr>  <dbl>   <dbl>  <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
-1 -1h       -1 19058.  39263.  20205.  58321.  49.2  25.3     73.1 
-2 -1h        0   279.    798.    518.   1077.   1     0.650    1.35
-3 +7d       -1  7726.  10453.   2727.  18179.  54.3  14.2     94.5 
-4 +7d        0    67.2   192.    125.    260.   1     0.651    1.35
-
-Slot "test":
-$tests
-# A tibble: 2 x 5
-  test_name  Q     DELTA_MEAN DELTA_SD PVALUE
-  <chr>      <chr>      <dbl>    <dbl>  <dbl>
-1 -1h != +7d -1        28810.   11142.      0
-2 -1h != +7d 0           605.     152.      0
-
-$summary
-# A tibble: 4 x 4
-# Groups:   SAMPLE [2]
-  SAMPLE     Q     SD   MEAN
-  <chr>  <dbl>  <dbl>  <dbl>
-1 -1h       -1 9723.  39263.
-2 -1h        0  143.    798.
-3 +7d       -1 3942.  10453.
-4 +7d        0   34.3   192.
-
-
-Slot "method":
-[1] "alpha"
-
-Slot "div_group":
-[1] "SAMPLE"
-
-Slot "div_groups":
-[1] "-1h" "+7d"
-
-Slot "q":
-[1] -1  0
-
-Slot "ci":
-[1] 0.95
-
-
+# testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
 ```
 
 
@@ -184,10 +135,7 @@ Slot "ci":
 See also
 -------------------
 
-See [calcInferredDiversity](calcInferredDiversity.md) for the basic calculation.
-See [rarefyDiversity](rarefyDiversity.md) for curve generation.
-See [ecdf](http://www.rdocumentation.org/packages/stats/topics/ecdf) for computation of the empirical cumulative 
-distribution function.
+[alphaDiversity](alphaDiversity.md)
 
 
 
