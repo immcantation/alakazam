@@ -66,7 +66,6 @@ pages:
       - topics/plotDiversityTest.md
       - topics/AbundanceCurve-class.md
       - topics/DiversityCurve-class.md
-      - topics/DiversityTest-class.md
     - 'Ig and TCR Sequence Annotation':
       - topics/countGenes.md
       - topics/sortGenes.md
