@@ -506,7 +506,7 @@ estimateAbundance <- function(data, clone="CLONE", copy=NULL, group=NULL,
 #'            Ecology. 1973 54(2):427-32.
 #' }
 #' 
-#' @seealso  Used by \link{alphaDiversity} and \link{betaDiversity}.
+#' @seealso  Used by \link{alphaDiversity}.
 #' 
 #' @examples
 #' # May define p as clonal member counts
@@ -564,7 +564,7 @@ calcDiversity <- function(p, q) {
 #            Ecology. 1973 54(2):427-32.
 # }
 # 
-# @seealso  Used by \link{alphaDiversity} and \link{betaDiversity}.
+# @seealso  Used by \link{alphaDiversity}
 # 
 # @examples
 # # May define p as clonal member counts
@@ -913,54 +913,54 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
    return(div_obj) 
 }
 
-#' Calculates the pairwise beta diversity
-#'
-#' \code{betaDiversity} takes in a data.frame or \link{AbundanceCurve} and computes 
-#' the multiplicative beta diversity across a range of Hill diversity indices. 
-#' 
-#' @param    data         data.frame with Change-O style columns containing clonal assignments or
-#'                        an \link{AbundanceCurve} object generate by \link{estimateAbundance}.
-#'                        containing a previously calculated bootstrap distributions of clonal abundance.
-#' @param    comparisons  named list of comparisons between group members for computing beta diversity. 
-#' @param    min_q        minimum value of \eqn{q}.
-#' @param    max_q        maximum value of \eqn{q}.
-#' @param    step_q       value by which to increment \eqn{q}.
-#' @param    ci           confidence interval to calculate; the value must be between 0 and 1.
-#' @param    ...          additional arguments to pass to \link{estimateAbundance}. Additional arguments
-#'                        are ignored if a \link{AbundanceCurve} is provided as input.
-#'                     
-#' @return   A \link{DiversityCurve} object summarizing the diversity scores.
-#' 
-#' @details 
-#' Beta diversity or the comparative difference between two samples as quantified using Hill
-#' diversity indices proposed by Jost (Jost, 2007). 
-#' 
-#' Briefly, the alpha and gamma diversity components are calculated for each comparison. 
-#' Alpha diversity is calculated as the average hill diversity across each independent sample
-#' while Gamma diversity is calculated as the total diversity without distinguishing between
-#' samples. Beta diversity is computed as Gamma/Alpha. 
-#' 
-#' Diversity is calculated on the estimated clonal abundance distribution with a correction
-#' for unseen species much like the calculation for alpha diversity \link{alphaDiversity}.
-#' A smooth curve is generated in the same manner as in \link{alphaDiversity}.
-#' Confidence intervals are derived using the standard deviation of the resampling realizations. 
-#'
-#' \enumerate{
-#'   \item  Hill M. Diversity and evenness: a unifying notation and its consequences. 
-#'            Ecology. 1973 54(2):427-32.
-#'   \item  Jost L. Partitioning Diversity Into Independent Alpha and Beta Components. 
-#'            Ecology. 2007 88(10):2427–2439.
-#'   \item  Jost L, et al. Partitioning diversity for conservation analyses. 
-#'            Diversity Distrib. 2010 16(1):65–76
-#' }
-#' 
-#' @examples
-#' div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE", 
-#'                      min_n=40, step_q=1, max_q=10, nboot=100)
-#'                       
-#' plotDiversityCurve(div, legend_title="Isotype")
-#' 
-#' @export
+# Calculates the pairwise beta diversity
+# 
+# \code{betaDiversity} takes in a data.frame or \link{AbundanceCurve} and computes
+# the multiplicative beta diversity across a range of Hill diversity indices.
+# 
+# @param    data         data.frame with Change-O style columns containing clonal assignments or
+#                        an \link{AbundanceCurve} object generate by \link{estimateAbundance}.
+#                        containing a previously calculated bootstrap distributions of clonal abundance.
+# @param    comparisons  named list of comparisons between group members for computing beta diversity.
+# @param    min_q        minimum value of \eqn{q}.
+# @param    max_q        maximum value of \eqn{q}.
+# @param    step_q       value by which to increment \eqn{q}.
+# @param    ci           confidence interval to calculate; the value must be between 0 and 1.
+# @param    ...          additional arguments to pass to \link{estimateAbundance}. Additional arguments
+#                        are ignored if a \link{AbundanceCurve} is provided as input.
+# 
+# @return   A \link{DiversityCurve} object summarizing the diversity scores.
+# 
+# @details
+# Beta diversity or the comparative difference between two samples as quantified using Hill
+# diversity indices proposed by Jost (Jost, 2007).
+# 
+# Briefly, the alpha and gamma diversity components are calculated for each comparison.
+# Alpha diversity is calculated as the average hill diversity across each independent sample
+# while Gamma diversity is calculated as the total diversity without distinguishing between
+# samples. Beta diversity is computed as Gamma/Alpha.
+# 
+# Diversity is calculated on the estimated clonal abundance distribution with a correction
+# for unseen species much like the calculation for alpha diversity \link{alphaDiversity}.
+# A smooth curve is generated in the same manner as in \link{alphaDiversity}.
+# Confidence intervals are derived using the standard deviation of the resampling realizations.
+# 
+# \enumerate{
+#   \item  Hill M. Diversity and evenness: a unifying notation and its consequences.
+#            Ecology. 1973 54(2):427-32.
+#   \item  Jost L. Partitioning Diversity Into Independent Alpha and Beta Components.
+#            Ecology. 2007 88(10):2427–2439.
+#   \item  Jost L, et al. Partitioning diversity for conservation analyses.
+#            Diversity Distrib. 2010 16(1):65–76
+# }
+# 
+# @examples
+# div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE",
+#                      min_n=40, step_q=1, max_q=10, nboot=100)
+# 
+# plotDiversityCurve(div, legend_title="Isotype")
+# 
+# @export
 betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     # Hack for visibility of dplyr variables
     . <- NULL
@@ -1150,12 +1150,12 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
 }
 
 
-#' Plot the results of alphaDiversity or betaDiversity
+#' Plot the results of alphaDiversity
 #' 
 #' \code{plotDiversityCurve} plots a \code{DiversityCurve} object.
 #'
 #' @param    data            \link{DiversityCurve} object returned by 
-#'                           \link{alphaDiversity} or \link{betaDiversity}.
+#'                           \link{alphaDiversity}.
 #' @param    colors          named character vector whose names are values in the 
 #'                           \code{group} column of the \code{data} slot of \code{data},
 #'                           and whose values are colors to assign to those group names.

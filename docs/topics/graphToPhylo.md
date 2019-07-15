@@ -68,12 +68,6 @@ library(igraph)
 
 *
 Attaching package: ‘igraph’
-**The following object is masked from ‘package:testthat’:
-
-    compare
-**The following objects are masked from ‘package:dplyr’:
-
-    as_data_frame, groups, union
 **The following objects are masked from ‘package:stats’:
 
     decompose, spectrum

@@ -1,4 +1,4 @@
-Version 0.2.11.999:  June 10, 2019
+Version 0.2.11.999:  July 15, 2019
 -------------------------------------------------------------------------------
 
 Deprecated:
@@ -26,10 +26,8 @@ Diversity:
 + Added rarefaction options to `estimateAbundance` through the `min_n`, 
   `max_n`, and `uniform` arguments.
 + Moved the rarefaction calculation for the diversity functions into 
-  `estimateAbundance`. `alphaDiversity` and `betaDiversity` will call 
-  `estimateAbundance` for bootstrapping if not provided an existing 
-  `AbundanceCurve` object.
-+ Added the `betaDiversity` function to calculating pairwise beta diversity scores.
+  `estimateAbundance`. `alphaDiversity` will call `estimateAbundance` for 
+  bootstrapping if not provided an existing `AbundanceCurve` object.
 + Restructured to the `DiversityCurve` and `AbundanceCurve` objects to accomodate
   the new diversity methods.
 
