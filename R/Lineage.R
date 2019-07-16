@@ -172,7 +172,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
 # @param   clone  a ChangeoClone object
 # @param   path   a directory to store the write the output files to
 # @return  a named vector translating SEQUENCE_ID (names) to PHYLIP taxa (values)
-writePhylipInput <- function(clone, path) {
+writePhylipInput <- function(clone, path, id="SEQUENCE_ID") {
     # Define PHYLIP columns
     nseq <- nrow(clone@data)
     v1 <- c(sprintf('%-9s', nseq + 1),
@@ -184,7 +184,7 @@ writePhylipInput <- function(clone, path) {
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["SEQUENCE_ID"]])
+    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[[id]])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
