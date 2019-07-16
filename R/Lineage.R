@@ -907,7 +907,7 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, clone="CLONE", format=c("graph", "phylo"), collapse=TRUE) {
     # Check arguments
     format <- match.arg(format)
     
@@ -918,17 +918,17 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["param"]] <- params
     out[["command"]] <- df[1, ]$TREE
     for (i in 2:nrow(df)) {
-        tree <- ape::read.tree(text=df[i, ]$TREE)
-        rtree <- rerootGermline(tree,paste0(df[i, ]$CLONE, "_GERM"),resolve=TRUE)
+        tree <- ape::read.tree(text=df[i, ][["TREE"]])
+        rtree <- rerootGermline(tree,paste0(df[[clone]][i], "_GERM"),resolve=TRUE)
         if (collapse) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
         }
         if (format == "graph") {
             ig <- phyloToGraph(rtree, germline=rtree$germid)
-            trees[[df[i, ]$CLONE]] <- ig
+            trees[[df[[clone]][i]]] <- ig
         } else if (format == "phylo") {
-            trees[[df[i, ]$CLONE]] <- tree
+            trees[[df[[clone]][i]]] <- tree
         } else {
             stop("Format must be either 'graph' or 'phylo'.")
         }
