@@ -237,18 +237,18 @@ test_that("groupGenes, single-cell mode, heavy and light", {
     # gg1 first=F
     # 1 by itself; 2 by itself; 3-5 together; 6-9 together; 10-11 together
     gg1_expect = c(rep("G2", 2), 
-                   rep("G1", 3), 
+                   rep("G1", 4), 
                    rep("G3", 2+2+2), 
-                   rep("G4", 3+2+2+2), 
+                   rep("G4", 2+3+2+2), 
                    rep("G5", 2+2))
     
     # gg2 first=T
     # 1 by itself; 2 by itself; 3-4 together; 5 by itself; 6-9 together; 10-11 together
     gg2_expect = c(rep("G2", 2),
-                   rep("G1", 3), 
+                   rep("G1", 4), 
                    rep("G4", 2+2), 
                    rep("G3", 2), 
-                   rep("G5", 3+2+2+2), 
+                   rep("G5", 2+3+2+2), 
                    rep("G6", 2+2))
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
@@ -291,9 +291,9 @@ test_that("groupGenes, single-cell mode, heavy only", {
     
     # 1 by itself, 2 by itself, 3-5 together, 6-11 together
     gg1_expect = c(rep("G2", 2), 
-                   rep("G1", 3), 
+                   rep("G1", 4), 
                    rep("G3", 2+2+2), 
-                   rep("G4", 3+2+2+2+2+2)) 
+                   rep("G4", 2+3+2+2+2+2)) 
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 

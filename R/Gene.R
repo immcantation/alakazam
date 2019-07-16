@@ -552,8 +552,34 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         
         if (useOnlyIGH) {
             
+            # use heavy chains only
+            
+            # Straightforward subsetting like below won't work in cases 
+            #     where multiple HCs are present for a cell 
             # subset to heavy only
-            db <- db_orig[db_orig[[locus]]=="IGH", ]
+            # db <- db_orig[db_orig[[locus]]=="IGH", ]
+            
+            # flatten data
+            cols <- c(cell_id, v_call, j_call, junc_len)
+            db <- data.frame(matrix(NA, nrow=length(cell_seq_idx), ncol=length(cols)))
+            colnames(db) <- cols
+            
+            for (i_cell in 1:length(cell_seq_idx)) {
+                i_cell_h <- cell_seq_idx[[i_cell]][["heavy"]]
+                
+                db[[cell_id]][i_cell] <- cell_id_uniq[i_cell]
+                
+                # heavy chain V, J, junc_len
+                db[[v_call]][i_cell] <- paste0(db_orig[[v_call]][i_cell_h], 
+                                               collapse=separator_between_seq)
+                db[[j_call]][i_cell] <- paste0(db_orig[[v_call]][i_cell_h], 
+                                               collapse=separator_between_seq)
+                if (!is.null(junc_len)) {
+                    db[[junc_len]][i_cell] <- paste0(db_orig[[junc_len]][i_cell_h], 
+                                                     collapse=separator_between_seq)
+                }
+            }
+            
             
         } else {
             
