@@ -200,13 +200,12 @@ test_that("groupGenes heavy only",{
     expect_equal(db$VJ_GROUP, expected)
 })
 
-test_that("groupGenes heavy and light", {
-    # load db with light chains
-    # by design: each row represents a cell; each cell could have multiple heavy and/or light chains
-    # (yes, in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
-    load(file.path("..", "data-tests", "db_with_light.rda")) # data_t1
+test_that("groupGenes, single-cell mode, heavy and light", {
     
-    # View(data_t1[, c("V_CALL", "J_CALL", "LEN", "V_CALL_LIGHT", "J_CALL_LIGHT", "LEN_LIGHT")])
+    # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
+    load(file.path("..", "data-tests", "db_sc.rda")) # data_t1
+    
+    # View(data_t1[, c("V_CALL", "J_CALL", "LEN")])
     
     # manual deduction
     # 1 
@@ -237,23 +236,69 @@ test_that("groupGenes heavy and light", {
     
     # gg1 first=F
     # 1 by itself; 2 by itself; 3-5 together; 6-9 together; 10-11 together
-    gg1_expect = c("G2", "G1", rep("G3", 3), rep("G4", 4), rep("G5", 2))
+    gg1_expect = c(rep("G2", 2), 
+                   rep("G1", 3), 
+                   rep("G3", 2+2+2), 
+                   rep("G4", 3+2+2+2), 
+                   rep("G5", 2+2))
     
     # gg2 first=T
     # 1 by itself; 2 by itself; 3-4 together; 5 by itself; 6-9 together; 10-11 together
-    gg2_expect = c("G2", "G1", rep("G4", 2), "G3", rep("G5", 4), rep("G6", 2))
+    gg2_expect = c(rep("G2", 2),
+                   rep("G1", 3), 
+                   rep("G4", 2+2), 
+                   rep("G3", 2), 
+                   rep("G5", 3+2+2+2), 
+                   rep("G6", 2+2))
     
+    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                     useOnlyIGH=FALSE, first=FALSE)
     
-    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=FALSE,
-                     separator_within_seq=",", separator_between_seq=";", 
-                     v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
-                     junc_len="LEN", junc_len_light="LEN_LIGHT")
-    
-    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", first=TRUE,
-                     separator_within_seq=",", separator_between_seq=";", 
-                     v_call_light="V_CALL_LIGHT", j_call_light="J_CALL_LIGHT", 
-                     junc_len="LEN", junc_len_light="LEN_LIGHT")
-    
+    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                     useOnlyIGH=FALSE, first=TRUE)
+                     
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     expect_equal(gg2[["VJ_GROUP"]], gg2_expect)
+})
+
+test_that("groupGenes, single-cell mode, heavy only", {
+    
+    # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
+    load(file.path("..", "data-tests", "db_sc.rda")) # data_t1
+    
+    # manual deduction
+    # 1 
+    # IGHV3-11 IGHJ4 93 
+    # 2 
+    # IGHV3-7 IGHJ1 24 
+    # IGHV3-6 IGHJ1 24  (first=F)
+    # IGHV1-4 IGHJ3 27 
+    # IGHV1-4 IGHJ4 27  (first=F)
+    # 
+    # 3 IGHV3-7 IGHJ5 90
+    # 4 IGHV3-7 IGHJ5 90
+    # 5 IGHV3-7 IGHJ5 90
+    # 
+    # 6 IGHV4-59 IGHJ1 84 
+    # 7 IGHV4-59 IGHJ1 84 
+    # 8 IGHV4-59 IGHJ1 84 
+    # 9 IGHV4-59 IGHJ1 84 
+    # 
+    # 10 IGHV4-59 IGHJ1 84
+    # 11 IGHV4-59 IGHJ1 84
+    
+    # 1 by itself, 2 by itself, 3-5 together, 6-11 together
+    gg1_expect = c(rep("G2", 2), 
+                   rep("G1", 3), 
+                   rep("G3", 2+2+2), 
+                   rep("G4", 3+2+2+2+2+2)) 
+    
+    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                     useOnlyIGH=TRUE, first=FALSE)
+    
+    expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
+    
 })
