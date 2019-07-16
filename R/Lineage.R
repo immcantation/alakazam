@@ -152,7 +152,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         tmp_names <- names(tmp_df)
     }
     names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
-    names(tmp_df)[tmp_names == id] <- id
+    names(tmp_df)[tmp_names == id] <- "SEQUENCE_ID"
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
