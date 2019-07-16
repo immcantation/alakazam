@@ -684,7 +684,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
                       ifelse(is.null(v_call_light), "", ", "), v_call_light,
                       ifelse(is.null(j_call_light), "", ", "), j_call_light,
                       ifelse(is.null(junc_len_light), "", ", "), junc_len_light,
-                      " } columns. ", sum(bool_na), entityeName, " removed.\n")
+                      " } columns. ", sum(bool_na), entityName, " removed.\n")
         warning(msg)
         db <- db[!bool_na, ]
         if (single_cell) {
