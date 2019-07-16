@@ -426,10 +426,6 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'                                   allele calls.
 #' @param    junc_len                name of the column containing the heavy chain junction
 #'                                   length. Optional.
-#' @param    first                   if \code{TRUE} only the first call of the gene assignments 
-#'                                   is used. if \code{FALSE} the union of ambiguous gene 
-#'                                   assignments is used to group all sequences with any 
-#'                                   overlapping gene calls.
 #' @param    cell_id                 name of the column containing cell IDs. Only applicable 
 #'                                   and required for single-cell mode.
 #' @param    locus                   name of the column containing locus information. Only applicable 
@@ -437,6 +433,10 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' @param    only_igh                use only heavy chain (\code{IGH}) sequences for grouping,
 #'                                   disregarding light chains. Only applicable and required for
 #'                                   single-cell mode. Default is \code{TRUE}.
+#' @param    first                   if \code{TRUE} only the first call of the gene assignments 
+#'                                   is used. if \code{FALSE} the union of ambiguous gene 
+#'                                   assignments is used to group all sequences with any 
+#'                                   overlapping gene calls.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{VJ_GROUP} column. 
@@ -491,7 +491,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' 
 #' @examples
 #' # Group by genes
-#' db <- groupGenes(data=ExampleDb, v_call="V_CALL", j_call="J_CALL")
+#' db <- groupGenes(ExampleDb, v_call="V_CALL", j_call="J_CALL")
 #'  
 #' @export
 groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
@@ -501,25 +501,20 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
     # calling `db` `data` is hugely problematic b/c `data` is a default R function
     # data_orig <- data will cause downstream errors
     
+    # Check input
+    check <- checkColumns(db, c(v_call, j_call, junc_len, cell_id, locus))
+    if (check != TRUE) { stop(check) }
+    
     # e.g.: "Homsap IGHV3-7*01 F,Homsap IGHV3-6*01 F;Homsap IGHV1-4*01 F"
     separator_within_seq <- ","
     separator_between_seq <- ";"
     
-    # check existence of additional columns, if specified
-    if (!is.null(junc_len)) {
-        if (!junc_len %in% colnames(db)) {
-            stop(junc_len, " not found as a column in db")
-        }
-    }
-    
     # single-cell mode?
     if ( !is.null(cell_id) & !is.null(locus) ) {
         single_cell <- TRUE
-        
         if (!all(db[[locus]] %in% c("IGH", "IGK", "IGL"))) {
             stop("The locus column must be one of {IGH, IGK, IGL}.")
         }
-        
     } else {
         single_cell <- FALSE
     }
@@ -548,7 +543,6 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         
         # make a copy
         db_orig <- db; rm(db)
-        
         
         if (only_igh) {
             
