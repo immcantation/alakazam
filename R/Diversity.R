@@ -687,7 +687,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
         dplyr::group_by(!!rlang::sym(clone)) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(sum) %>%
-        dplyr::do(helperAlpha(., q = q, clone=clone)) %>%
+        dplyr::do(helperAlpha(., q=q, clone=clone)) %>%
         tidyr::gather(key="N", value="GAMMA", -!!rlang::sym("Q")) %>%
         dplyr::mutate(GAMMA=as.numeric(!!rlang::sym("GAMMA")))
 
@@ -991,7 +991,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
         beta_diversity_list[[comparison]] <- abundance@bootstrap %>%
             dplyr::ungroup() %>%
             dplyr::filter(.[[abundance@group_by]] %in% comparisons[[comparison]]) %>%
-            dplyr::do(helperBeta(., q = q, clone=abundance@clone_by, group=abundance@group_by, ci_x=ci_x))
+            dplyr::do(helperBeta(., q=q, clone=abundance@clone_by, group=abundance@group_by, ci_x=ci_x))
     }
 
     # Generate summary diversity output
