@@ -434,7 +434,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'                                   and required for single-cell mode.
 #' @param    locus                   name of the column containing locus information. Only applicable 
 #'                                   and required for single-cell mode.
-#' @param    useOnlyIGH              use only heavy chain (\code{IGH}) sequences for grouping,
+#' @param    only_igh                use only heavy chain (\code{IGH}) sequences for grouping,
 #'                                   disregarding light chains. Only applicable and required for
 #'                                   single-cell mode. Default is \code{TRUE}.
 #'
@@ -454,7 +454,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
 #' should be done using only heavy chain (\code{IGH}) sequences only, or using both heavy chain
 #' (\code{IGH}) and light chain (\code{IGK}, \code{IGL}) sequences. This is governed by 
-#' \code{useOnlyIGH}.
+#' \code{only_igh}.
 #' 
 #' Values in the \code{locus} column must be one of \code{"IGH"}, \code{"IGK"}, and \code{"IGL"}.
 #' 
@@ -495,7 +495,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'  
 #' @export
 groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
-                       cell_id=NULL, locus=NULL, useOnlyIGH=TRUE,
+                       cell_id=NULL, locus=NULL, only_igh=TRUE,
                        first=FALSE) {
     
     # calling `db` `data` is hugely problematic b/c `data` is a default R function
@@ -524,7 +524,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         single_cell <- FALSE
     }
     
-    # only set if `single_cell` & `useOnlyIGH`
+    # only set if `single_cell` & `only_igh`
     v_call_light <- NULL
     j_call_light <- NULL
     junc_len_light <- NULL
@@ -550,7 +550,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         db_orig <- db; rm(db)
         
         
-        if (useOnlyIGH) {
+        if (only_igh) {
             
             # use heavy chains only
             
@@ -666,7 +666,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
              ifelse(is.null(junc_len), " ", ", "), junc_len, 
              "} is factor. Must be character.\n")
     }
-    if (single_cell & !useOnlyIGH) {
+    if (single_cell & !only_igh) {
         if (any( sapply(cols_for_grouping_light, function(x) {class(db[[x]]) == "factor"}) )) {
             stop("one or more of { ", v_call_light, ", ", j_call_light,  
                  ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
@@ -703,7 +703,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
     
     # unique combinations of VJL
     # heavy chain seqs only
-    if ( (!single_cell) | (single_cell & useOnlyIGH) ) {
+    if ( (!single_cell) | (single_cell & only_igh) ) {
         combo_unique <- unique(db[, cols_for_grouping_heavy])
         
         # unique components
@@ -749,7 +749,7 @@ groupGenes <- function(db, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
         }
         
     } else {
-        # single_cell & !useOnlyIGH
+        # single_cell & !only_igh
         
         # important: do not do this separately for heavy and light
         # must keep the pairing structure

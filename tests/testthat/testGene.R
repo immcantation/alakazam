@@ -253,11 +253,11 @@ test_that("groupGenes, single-cell mode, heavy and light", {
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     useOnlyIGH=FALSE, first=FALSE)
+                     only_igh=FALSE, first=FALSE)
     
     gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     useOnlyIGH=FALSE, first=TRUE)
+                     only_igh=FALSE, first=TRUE)
                      
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     expect_equal(gg2[["VJ_GROUP"]], gg2_expect)
@@ -297,7 +297,7 @@ test_that("groupGenes, single-cell mode, heavy only", {
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     useOnlyIGH=TRUE, first=FALSE)
+                     only_igh=TRUE, first=FALSE)
     
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     
