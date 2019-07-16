@@ -836,8 +836,6 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' 
 #' @param    file          IgPhyML output file (.tab).
 #' @param    id            ID to assign to output object.
-#' @param    clone         Name of the field used to identify clonally related sequences. 
-#'                         Default is CLONE
 #' @param    format        if \code{"graph"} return trees as igraph \code{graph} objects. 
 #'                         if \code{"phylo"} return trees as ape \code{phylo} objects.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
