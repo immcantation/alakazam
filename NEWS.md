@@ -36,8 +36,7 @@ Gene Usage:
 + `groupGenes` now supports grouping by V gene, J gene, and junction length 
    (`junc_len`) as well, in addition to grouping by V gene and J gene without 
    junction length. Also added support for single-cell input data with the addition
-   of new arguments `cell_id`, `locus`, and `only_igh`. Renamed argument `data` to
-   `db`.
+   of new arguments `cell_id`, `locus`, and `only_igh`.
 
 
 Version 0.2.11:  September 12, 2018
