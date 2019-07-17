@@ -4,7 +4,7 @@ Version 0.3.0:  July 17, 2019
 Deprecated:
 
 + `rarefyDiversity` is deprecated in favor of `alphaDiversity`, which includes
-  the same functionality
+  the same functionality.
 + `testDiversity` is deprecated. The test calculation have been added to the 
    normal output of `alphaDiversity`.
 
@@ -21,14 +21,14 @@ Lineage:
 
 Diversity:
 
-+ Fixed a bug in `estimateAbundance` where specifying the `clone` column to a 
++ Fixed a bug in `estimateAbundance` where setting the `clone` column to a 
   non-default value produced an error.
 + Added rarefaction options to `estimateAbundance` through the `min_n`, 
   `max_n`, and `uniform` arguments.
 + Moved the rarefaction calculation for the diversity functions into 
   `estimateAbundance`. `alphaDiversity` will call `estimateAbundance` for 
   bootstrapping if not provided an existing `AbundanceCurve` object.
-+ Restructured to the `DiversityCurve` and `AbundanceCurve` objects to accomodate
++ Restructured the `DiversityCurve` and `AbundanceCurve` objects to accomodate
   the new diversity methods.
 
 Gene Usage:

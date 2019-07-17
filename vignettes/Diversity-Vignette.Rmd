@@ -157,7 +157,7 @@ Significance testing across groups is performed using the delta of the bootstrap
 distributions between groups when running `alphaDiversity` for all values of `q` 
 specified.
 
-```{r, eval=TRUE}
+```{r, eval=TRUE, fig.width=6, fig.height=3}
 # Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
 # Simpson's index) across values in the "SAMPLE" column
 # 200 bootstrap realizations are performed (nboot=200)
