@@ -67,6 +67,4 @@ the multiple sclerosis brain mature in the draining cervical lymph nodes.” _Sc
 Medicine_, *6*(248), 248ra107. doi: 10.1126/scitranslmed.3008879 (URL:
 http://doi.org/10.1126/scitranslmed.3008879).
 
-To see these entries in BibTeX format, use 'print(<citation>, bibtex=TRUE)', 'toBibtex(.)', or set
-'options(citation.bibtex.max=999)'.
 
