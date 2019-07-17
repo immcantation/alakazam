@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.3.0
-Date: 2019-07-16   
+Date: 2019-07-17   
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
