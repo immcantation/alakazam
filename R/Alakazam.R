@@ -113,6 +113,7 @@
 #' @import      graphics
 #' @import      methods
 #' @import      utils
+#' @importFrom  airr        read_airr write_airr
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root ladderize
 #' @importFrom  dplyr       do n desc %>%
 #'                          bind_cols bind_rows combine arrange 

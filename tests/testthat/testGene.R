@@ -302,3 +302,84 @@ test_that("groupGenes, single-cell mode, heavy only", {
     expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
     
 })
+
+#### AIRR-format migration tests ####
+
+test_that("countGenes, AIRR-format migration", {
+    
+    db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
+    db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz"))
+    
+    # 1
+    genes_c <- countGenes(db_c, gene="V_CALL", groups="SAMPLE", mode="allele")
+    genes_a <- countGenes(db_a, gene="v_call", groups="sample", mode="allele")
+    
+    expect_true(all(genes_c==genes_a))
+    
+    # 2
+    genes_c <- countGenes(db_c, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
+                          copy="DUPCOUNT", mode="family")
+    genes_a <- countGenes(db_a, gene="v_call", groups=c("sample", "isotype"), 
+                          copy="duplicate_count", mode="family")
+    
+    expect_true(all(genes_c==genes_a))
+    
+    # 3
+    genes_c <- countGenes(db_c, gene="V_CALL", groups="SAMPLE", 
+                          mode="allele", fill=TRUE)
+    genes_a <- countGenes(db_a, gene="v_call", groups="sample", 
+                          mode="allele", fill=TRUE)
+    
+    expect_true(all(genes_c==genes_a))
+    
+})
+
+test_that("groupGenes, AIRR-format migration", {
+
+    # 1 
+    db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
+    db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz"))
+    
+    newDb_c <- groupGenes(db_c, v_call="V_CALL", j_call="J_CALL")
+    newDb_a <- groupGenes(db_a, v_call="v_call", j_call="j_call")
+    
+    # newDb_c and newDb_a not directly comparable b/c diff ncol
+    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    
+    rm(db_c, db_a, newDb_c, newDb_a)
+
+    # 2 
+    load(file.path("..", "data-tests", "db_sc.rda")) # data_t1, data_t2
+    load(file.path("..", "data-tests", "db_sc_airr.rda")) # data_t1_airr, data_t2_airr
+    
+    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                          only_igh=FALSE, first=FALSE)
+    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
+                          junc_len="len", cell_id="cell_id", locus="locus", 
+                          only_igh=FALSE, first=FALSE)
+    
+    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    
+    # 3
+    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                          only_igh=FALSE, first=TRUE)
+    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
+                          junc_len="len", cell_id="cell_id", locus="locus", 
+                          only_igh=FALSE, first=TRUE)
+    
+    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    
+    # 4
+    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                          only_igh=TRUE, first=FALSE)
+    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
+                          junc_len="len", cell_id="cell_id", locus="locus", 
+                          only_igh=TRUE, first=FALSE)
+    
+    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    
+})
+
