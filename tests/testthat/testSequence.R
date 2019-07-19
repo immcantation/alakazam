@@ -321,7 +321,7 @@ test_that("collapseDuplicates", {
     
     # Annotations are not parsed if neither text_fields nor num_fields is specified
     # The retained sequence annotations will be random
-    obs <- collapseDuplicates(db, verbose=F)
+    obs <- collapseDuplicates(db, verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp <- data.frame(
         "SEQUENCE_ID" = c("C", "A"),
         "SEQUENCE_IMGT" = c("NAACTGGN", "CCCCTGGG"),
@@ -332,7 +332,7 @@ test_that("collapseDuplicates", {
     )
     expect_equivalent(obs, exp[2:1,])
     
-    obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T)
+    obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "ambiguous_duplicate", "ambiguous"))
     
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
@@ -340,11 +340,11 @@ test_that("collapseDuplicates", {
     
     ## Try messing up order
     ## C comes first
-    obs_dry <- collapseDuplicates(db, verbose=F, dry=T)
+    obs_dry <- collapseDuplicates(db, verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
     ## E comes first
-    obs_dry <- collapseDuplicates(db[nrow(db):1,], verbose=F, dry=T)
+    obs_dry <- collapseDuplicates(db[nrow(db):1,], verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
                  c("A","E"))
     
@@ -352,7 +352,7 @@ test_that("collapseDuplicates", {
     # num_fields annotations are summed
     # Ambiguous duplicates are discarded
     obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
-                       verbose=F)
+                       verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COUNT <- c(3,3)
     expect_equal(obs, exp)
@@ -360,13 +360,13 @@ test_that("collapseDuplicates", {
     
     # Use alternate delimiter for collapsing textual annotations
     obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
-                       sep="/", verbose=F)
+                       sep="/", verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp$TYPE <- c("IgG","IgG/IgM")
     expect_equal(obs, exp)
     
     # Add count of duplicates
     obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
-                       add_count=TRUE, verbose=F)
+                       add_count=TRUE, verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp$TYPE <- c("IgG","IgG,IgM")
     exp$COLLAPSE_COUNT <- c(1,2)
     expect_equal(obs, exp)
@@ -374,7 +374,7 @@ test_that("collapseDuplicates", {
     # Masking ragged ends may impact duplicate removal
     db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
     obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
-                       add_count=TRUE, verbose=F)    
+                       add_count=TRUE, verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp <- data.frame(
         "SEQUENCE_ID" = "A",
         "SEQUENCE_IMGT" = "NNNCTGNN",
@@ -412,9 +412,9 @@ test_that("collapseDuplicates", {
     # g <- graph_from_adjacency_matrix(d_mat)
     # plot(g)
     expect <- c("AANCTCTTT", "ATCTCNTTT")
-    col <- collapseDuplicates(test)
+    col <- collapseDuplicates(test, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(col$SEQUENCE_ID, expect)
-    col_dry <- collapseDuplicates(test, dry=T)
+    col_dry <- collapseDuplicates(test, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(col_dry$SEQUENCE_ID[col_dry$COLLAPSE_PASS], expect)
     
 })

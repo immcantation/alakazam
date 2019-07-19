@@ -30,10 +30,10 @@ NULL
 #'           
 #' @examples
 #' # Calculate clone sizes
-#' clones <- countClones(ExampleDb, groups="SAMPLE")
+#' clones <- countClones(ExampleDb, groups="sample")
 #' 
 #' # Calculate 1first order coverage for a single sample
-#' calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
+#' calcCoverage(clones$SEQ_COUNT[clones$sample == "+7d"])
 #'
 #' @export
 calcCoverage <- function(x, r=1) {
@@ -225,10 +225,10 @@ inferCompleteAbundance <- function(x) {
 #' 
 #' @examples
 #' # Without copy numbers
-#' clones <- countClones(ExampleDb, groups="SAMPLE")
+#' clones <- countClones(ExampleDb, groups="sample")
 #'
 #' # With copy numbers and multiple groups
-#' clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+#' clones <- countClones(ExampleDb, groups=c("sample", "isotype"), copy="duplicate_count")
 #' 
 #' @export
 countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
@@ -346,14 +346,14 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #' See \link{alphaDiversity} for a similar application to clonal diversity.
 #'           
 #' @examples
-#' abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+#' abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 #'
 #' @export
 estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL, 
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
                               progress=FALSE) {
     ## DEBUG
-    # data=ExampleDb; group="SAMPLE"; clone="clone_id"; copy=NULL; min_n=1; max_n=NULL; ci=0.95; uniform=F; nboot=100
+    # data=ExampleDb; group="sample"; clone="clone_id"; copy=NULL; min_n=1; max_n=NULL; ci=0.95; uniform=F; nboot=100
     # copy="duplicate_count"
     # group=NULL
 
@@ -643,7 +643,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
 helperAlpha <- function(boot_output, q, clone="clone_id", group=NULL) {
     ## DEBUG
-    # abundance <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+    # abundance <- estimateAbundance(ExampleDb, group="sample", nboot=100)
     # clone <- abundance@clone_by
     # group <- abundance@group_by
   
@@ -827,12 +827,12 @@ helperTest <- function(div_df, q, group="GROUP") {
 #'
 #' @examples
 #' # Group by sample identifier in two steps
-#' abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+#' abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 #' div <- alphaDiversity(abund, step_q=1, max_q=10)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier in one step
-#' div <- alphaDiversity(ExampleDb, group="ISOTYPE", min_n=40, step_q=1, max_q=10, 
+#' div <- alphaDiversity(ExampleDb, group="isotype", min_n=40, step_q=1, max_q=10, 
 #'                       nboot=100)
 #' plotDiversityCurve(div, legend_title="Isotype")
 #'
@@ -951,7 +951,7 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
 # }
 # 
 # @examples
-# div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="SAMPLE",
+# div <- betaDiversity(ExampleDb, comparisons=list("TIME"=c("-1h", "+7d")), group="sample",
 #                      min_n=40, step_q=1, max_q=10, nboot=100)
 # 
 # plotDiversityCurve(div, legend_title="Isotype")
@@ -1065,7 +1065,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #'           
 #' @examples
 #' # Estimate abundance by sample and plot
-#' abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+#' abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 #' plotAbundanceCurve(abund, legend_title="Sample")
 #' 
 #' @export
@@ -1182,7 +1182,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
 #' 
 #' @examples
 #' # Calculate diversity
-#' div <- alphaDiversity(ExampleDb, group="SAMPLE", nboot=100)
+#' div <- alphaDiversity(ExampleDb, group="sample", nboot=100)
 #' 
 #' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample")
@@ -1320,7 +1320,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' 
 #' @examples
 #' # Calculate diversity
-#' div <- alphaDiversity(ExampleDb, group="SAMPLE", min_q=0, max_q=2, step_q=1, nboot=100)
+#' div <- alphaDiversity(ExampleDb, group="sample", min_q=0, max_q=2, step_q=1, nboot=100)
 #' 
 #' # Plot results at q=0 (equivalent to species richness)
 #' plotDiversityTest(div, 0, legend_title="Sample")
