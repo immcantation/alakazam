@@ -45,21 +45,21 @@ described in:
         generalizing the Good-Turing sample coverage theory. 
         Ecology. 2015 96, 11891201.
 
-This package provides methods for the inferrence of a complete clonal 
-abundance distribution, using the `estimateAbundance` function, along with 
-two approaches to assess diversity of these distributions: 
+This package provides methods for the inference of a complete clonal 
+abundance distribution (using the `estimateAbundance` function) along with 
+two approaches to assess the diversity of these distributions: 
 
 1. Generation of a smooth diversity (D) curve over a range of diversity orders (q) 
-using `alphaDiversity`.
+using `alphaDiversity`, and
 2. A significance test of the diversity (D) at a fixed diversity order (q).
 
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
-Diversity calculation requires the `CLONE` field (column) to be present in the 
-Change-O file, as well as an additional grouping column. In this example we 
-will use the grouping columns `SAMPLE` and `ISOTYPE`.
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
+Diversity calculation requires the `clone` field (column) to be present in the 
+AIRR file, as well as an additional grouping column. In this example we 
+will use the grouping columns `sample` and `isotype`.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Load required packages
@@ -72,7 +72,7 @@ data(ExampleDb)
 ## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
-generated using the `countClones` function either without copy numbers, where
+generated using the `countClones` function either with or without copy numbers, where
 the size of each clone is determined by the number of sequence members:
 
 ```{r, eval=TRUE, warning=FALSE}
@@ -121,7 +121,7 @@ orders (q) to generate a smooth curve.
 
 ```{r, eval=TRUE, results='hide'}
 # Compare diversity curve across values in the "sample" column
-# q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
+# q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 increments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 200 resampling realizations are performed (nboot=200)
 sample_curve <- alphaDiversity(ExampleDb, group="sample", clone="clone_id",

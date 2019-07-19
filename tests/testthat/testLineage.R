@@ -13,6 +13,18 @@ test_that("makeChangeoClone",{
                      TYPE=c("IgM", "IgG", "IgG", "IgA"),
                      COUNT=1:4,
                      stringsAsFactors=FALSE)
+
+   changeodb <- data.frame(SEQUENCE_ID=LETTERS[1:4],
+                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+                  V_CALL="Homsap IGKV1-39*01 F",
+                  J_CALL="Homsap IGKJ5*01 F",
+                  JUNCTION_LENGTH=2,
+                  GERMLINE_IMGT_D_MASK="CCCCAGGG",
+                  CLONE=1,
+                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
+                  COUNT=1:4,
+                  stringsAsFactors=FALSE)
+                   
     exp <- data.frame("SEQUENCE_ID"=c("C", "A"),
                       "SEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
                       "TYPE"=c("IgG", "IgG,IgM"),
@@ -23,6 +35,10 @@ test_that("makeChangeoClone",{
     # Without end masking
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
     
+    changeoclone <- makeChangeoClone(changeodb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
+           germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL", 
+           junc_len="JUNCTION_LENGTH", clone="CLONE", text_fields="TYPE", num_fields="COUNT")
+
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")
     expect_equal(clone@germline, "CCCCAGGG")
@@ -30,11 +46,20 @@ test_that("makeChangeoClone",{
     expect_equal(clone@j_gene, "IGKJ5")
     expect_equal(clone@junc_len, 2)
     expect_equal(clone@data, exp, tolerance=0.001)
+    expect_equal(changeoclone@data, exp, tolerance=0.001)
     
     # With padding
     db_trim <- db
     db_trim$sequence_alignment <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
     clone <- makeChangeoClone(db_trim, text_fields="TYPE", num_fields="COUNT", pad_end=TRUE)
+
+    db_trim <- changeodb
+    db_trim$sequence_alignment <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
+    changeoclone <- makeChangeoClone(db_trim, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
+           germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL", 
+           junc_len="JUNCTION_LENGTH", clone="CLONE",text_fields="TYPE", 
+           num_fields="COUNT", pad_end=TRUE)
+
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")
     expect_equal(clone@germline, "CCCCAGGG")
@@ -42,9 +67,15 @@ test_that("makeChangeoClone",{
     expect_equal(clone@j_gene, "IGKJ5")
     expect_equal(clone@junc_len, 2)
     expect_equal(clone@data, exp, tolerance=0.001)
-    
+    expect_equal(changeoclone@data, exp, tolerance=0.001)
+
     # With end masking
     clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+    changeoclone <- makeChangeoClone(changeodb, max_mask=3, id="SEQUENCE_ID",
+            seq="SEQUENCE_IMGT", germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", 
+            jcall="J_CALL", junc_len="JUNCTION_LENGTH", clone="CLONE", 
+            text_fields="TYPE", num_fields="COUNT")
+
     exp <- data.frame("SEQUENCE_ID"="A",
                       "SEQUENCE"=c("NNNCTGNN"),
                       "TYPE"=c("IgA,IgG,IgM"),
@@ -59,6 +90,7 @@ test_that("makeChangeoClone",{
     expect_equal(clone@j_gene, "IGKJ5")
     expect_equal(clone@junc_len, 2)
     expect_equal(clone@data, exp, tolerance=0.001)
+    expect_equal(changeoclone@data, exp, tolerance=0.001)
 })
 
 test_that("buildPhylipLineage", {

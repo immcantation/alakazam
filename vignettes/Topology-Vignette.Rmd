@@ -34,7 +34,7 @@ that focus on quantifying annotation relationships within lineages.
 
 ## Example data
 
-A small set of annotated example trees are included in the `alakazam` package.
+A small set of annotated example trees, `ExampleTrees`, are included in the `alakazam` package.
 The trees are `igraph` objects with the following tree annotations (graph attributes):
 
 * `clone`: An identifier for the clonal group. These entries correspond to the `CLONE`
@@ -73,7 +73,7 @@ graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)
 
 ## Plotting annotations on a tree
 
-There are many options for configuring how an igrpah object is plotted which
+There are many options for configuring how an igraph object is plotted which
 are helpful for visualing annotation topologies. Below is an extensive example of
 how to plot a tree by configuring the colors, labels, shapes and sizes of
 different visual elements according to annotations embedded in the graph.
@@ -116,7 +116,7 @@ legend("topleft", c("Germline", "Inferred", "-1h", "+7d"),
 ## Summarizing node properties
 
 Various annotation dependent node statistics can be calculated using the
-`summarizeSubstrees` and `getPathLengths` functions. `getPathLengths` 
+`summarizeSubtrees` and `getPathLengths` functions. `getPathLengths` 
 calculates distances from the root (germline) *to child nodes*, whereas 
 `summarizeSubtrees` calculates paths and subtree statistics 
 *from child nodes*.
@@ -133,7 +133,7 @@ getPathLengths(graph, root="Germline")
 ```
 
 Note, the `STEPS` counted in the above example include traversal of inferred 
-intermediates. If you want to exclude such nodes, and consider only nodes
+intermediates. If you want to exclude such nodes and consider only nodes
 associated with observed sequences, you can specify an annotation field and 
 value that will be excluded from the number of steps. In the example below
 we are excluding `NA` values in the `isotype` annotation 
@@ -270,8 +270,8 @@ plotEdgeTest(edge_test, color="steelblue", main_title="Isotype Edges",
 ## Counting and testing MRCA annotations
 
 The most recent common ancestor (MRCA) of an Ig lineage we define herein
-as the most ancestral observed, or inferred, sequences in the lineage tree. 
-Meaning, the node that is most proximal, by some measure, to the germline (root) 
+as the most ancestral observed (or inferred) sequences in the lineage tree. 
+Meaning, the node that is most proximal (by some measure) to the germline/root 
 node. The `getMRCA` and `testMRCA` functions provide extraction and significance
 testing of MRCA sequences by annotation value, respectively.
 
@@ -281,7 +281,7 @@ Extracting the MRCA from a tree is accomplished using the `getMRCA` function.
 The germline distance criteria are as described above for `getPathLengths`
 and can be either node hops or mutational events, with or without exclusion
 of nodes with specific annotations. To simply extract the annotations for the 
-node(s) immediately below the germline, you can use the  `path=steps` argument 
+node(s) immediately below the germline, you can use the `path=steps` argument 
 without any node exclusion:
 
 ```{r, eval=TRUE}

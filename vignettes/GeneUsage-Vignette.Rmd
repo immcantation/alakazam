@@ -35,8 +35,8 @@ are also provided.
 
 ## Example data
 
-A small example AIRR-format database, `ExampleDb`, is included in the `alakazam` package. 
-Gene usages analysis requires only the following columns:
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
+Gene usage analysis requires only the following columns:
 
 * `v_call`
 * `d_call`
@@ -69,7 +69,7 @@ gene <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
 head(gene, n=4)
 ```
 
-In the resultant `data.frame` the `SEQ_COUNT` columns is the number of raw sequences within each `sample` 
+In the resultant `data.frame`, the `SEQ_COUNT` column is the number of raw sequences within each `sample` 
 group for the given `GENE`. `SEQ_FREQ` is the frequency of each `GENE` within the given `sample`.
 
 Below we plot only the IGHV1 abundance by filtering on the `GENE` column to only rows 
@@ -122,13 +122,13 @@ plot(g2)
 ## Tabulating gene abundance using additional groupings
 
 The `groups` argument to `countGenes` can accept multiple grouping columns and
-will calculated abundance within each unique combination. In the examples below
+will calculate abundance within each unique combination. In the examples below,
 groupings will be perform by unique sample and isotype pairs 
 (`groups=c("sample", "isotype")`). Furthermore, instead of quantifying abundance
-by sequence count we will quantify it by clone count. Meaning, each clone will
-be counted only once regardless of how many sequences the clone represents.  
+by sequence count, we will quantify it by clone count (each clone will
+be counted only once regardless of how many sequences the clone represents).  
 Clonal citeria are added by passing a value to the `clone` argument of `countGenes`
-(`clone="clone_id"`). For each clonal group, only the most common family/gene/allele will
+(`clone="clone_id"`). For each clonal group, only the most common allele/gene/family will
 be considered for counting.
 
 ```{r, eval=TRUE, warning=FALSE}
