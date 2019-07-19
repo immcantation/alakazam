@@ -5,9 +5,10 @@ graph <- ExampleTrees[[5]]
 graph_2 <- graph
 
 test_that("Test summarizeSubtrees",{
-    obs_graph_sum_sub <- summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
+    obs_graph_sum_sub <- summarizeSubtrees(graph, fields="isotype", root="Germline")
     expected <- file.path("..","data-tests", "exp_graph_sum_sub.rda")
     load(expected)
+    names(exp_graph_sum_sub)[2] = "isotype"
     expect_equal(obs_graph_sum_sub, exp_graph_sum_sub, tolerance=1)
 })
 
@@ -19,7 +20,7 @@ test_that("Test getPathLengths",{
     expect_equal(pl$DISTANCE, c(28,0,32,34))
     
     # Exclude nodes without an isotype annotation from step count
-    pl_exclude <- getPathLengths(graph_2, root="Germline", field="ISOTYPE", 
+    pl_exclude <- getPathLengths(graph_2, root="Germline", field="isotype", 
                                  exclude=NA)
     expect_equal(pl_exclude$STEPS, c(0,0,1,1))
     expect_equal(pl_exclude$DISTANCE, c(28,0,32,34))
@@ -30,14 +31,14 @@ test_that("Test getMRCA and testMRCA",{
     expect_equal(mrca$NAME, "Inferred1")
     
     mrca_2 <- getMRCA(graph_2, path="distance", root="Germline", 
-                      field="ISOTYPE", exclude=NA)
+                      field="isotype", exclude=NA)
     expect_equal( mrca_2$NAME,  c("GN5SHBT03CABH1"))
     
     graphs <- ExampleTrees[1-10]
      
     # Perform MRCA test on isotypes
     set.seed(8)
-    x <- testMRCA(graphs, "ISOTYPE", nperm=10)
+    x <- testMRCA(graphs, "isotype", nperm=10)
     x_tests <- slot(x, "tests")
     expect_equal(x_tests$ANNOTATION, c("IgA","IgA,IgG","IgG"))
     expect_equal(x_tests$COUNT, c(16, 1, 31))
@@ -50,19 +51,19 @@ test_that("Test tableEdges",{
     graph <- ExampleTrees[[23]]
     
     # Count direct edges between isotypes including inferred nodes
-    tab <- tableEdges(graph, "ISOTYPE")
+    tab <- tableEdges(graph, "isotype")
     expect_equal(tab$PARENT, c( NA, "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(tab$CHILD, c( "IgA", "IgA,IgG", "IgA", "IgG"))
     expect_equal(tab$COUNT, c( 1, 1, 1, 3))
     
     # Count direct edges excluding edges to and from germline and inferred nodes
-    tab <- tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
+    tab <- tableEdges(graph, "isotype", exclude=c("Germline", NA))
     expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG"))
     expect_equal(tab$COUNT, c( 1, 1, 3))
     
     # Count indirect edges walking through germline and inferred nodes
-    tab <- tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
+    tab <- tableEdges(graph, "isotype", indirect=TRUE, exclude=c("Germline", NA))
     expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG"))
     expect_equal(tab$COUNT, c( 1, 1, 3))    
@@ -74,8 +75,8 @@ test_that("Test permuteLabels",{
  
     # Permute annotations and plot new tree
     set.seed(43)
-    g <- permuteLabels(graph, "ISOTYPE")
-    expect_equal(V(g)$ISOTYPE,
+    g <- permuteLabels(graph, "isotype")
+    expect_equal(V(g)$isotype,
                  c("IgG", "IgG", NA, "IgA", "IgA", "IgG", "IgA,IgG")
     )
 })
@@ -86,11 +87,10 @@ test_that("Test testEdges", {
     
     # Perform edge test on isotypes
     set.seed(4)
-    x <- slot(testEdges(graphs, "ISOTYPE", nperm=10), "tests")
+    x <- slot(testEdges(graphs, "isotype", nperm=10), "tests")
     expect_equal(x$PARENT[1:5], c("IgA", "IgA", "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(x$CHILD[5:10], c("IgA,IgG", "IgG", "IgG", "IgA", "IgD,IgG", "IgG"))
     expect_equal(x$COUNT[1:5], c(39, 3, 2, 29, 1))
     expect_equal(x$EXPECTED[5:10], c(2, 6.25, 1.33, 7, 1.00, 133.7), tolerance=0.01)
     expect_equal(x$PVALUE[3:8], c(0.7, 0.0, 0.5, 0.0, 0.0, 1.0), tolerance=0.01)
-    
 })

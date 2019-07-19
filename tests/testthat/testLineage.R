@@ -1,15 +1,15 @@
-ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
+ExampleDb <- file.path("..", "data-tests", "ExampleDb_airr.gz")
 db <- readChangeoDb(ExampleDb)
 
 test_that("makeChangeoClone",{
     # Example Change-O data.frame
-    db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-                     SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-                     V_CALL="Homsap IGKV1-39*01 F",
-                     J_CALL="Homsap IGKJ5*01 F",
-                     JUNCTION_LENGTH=2,
-                     GERMLINE_IMGT_D_MASK="CCCCAGGG",
-                     CLONE=1,
+    db <- data.frame(sequence_id=LETTERS[1:4],
+                     sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+                     v_call="Homsap IGKV1-39*01 F",
+                     j_call="Homsap IGKJ5*01 F",
+                     junction_length=2,
+                     germline_alignment_d_mask="CCCCAGGG",
+                     clone_id=1,
                      TYPE=c("IgM", "IgG", "IgG", "IgA"),
                      COUNT=1:4,
                      stringsAsFactors=FALSE)
@@ -33,7 +33,7 @@ test_that("makeChangeoClone",{
     
     # With padding
     db_trim <- db
-    db_trim$SEQUENCE_IMGT <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
+    db_trim$sequence_alignment <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
     clone <- makeChangeoClone(db_trim, text_fields="TYPE", num_fields="COUNT", pad_end=TRUE)
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")
@@ -63,9 +63,9 @@ test_that("makeChangeoClone",{
 
 test_that("buildPhylipLineage", {
     # Preprocess clone
-    clone <- subset(db, CLONE == 164)
-    clone <- makeChangeoClone(clone, text_fields=c("SAMPLE", "ISOTYPE"), 
-                              num_fields="DUPCOUNT")
+    clone <- subset(db, clone_id == 164)
+    clone <- makeChangeoClone(clone, text_fields=c("sample", "isotype"), 
+                              num_fields="duplicate_count")
     
     # Run PHYLIP and process output
     
@@ -108,7 +108,7 @@ test_that("buildPhylipLineage", {
                      ))
         
         expect_equal(igraph::vertex_attr_names(graph),
-                     c("name", "sequence", "SAMPLE", "ISOTYPE", "DUPCOUNT", 
+                     c("name", "sequence", "sample", "isotype", "duplicate_count", 
                        "COLLAPSE_COUNT", "label"))
 
         expect_equal(E(graph)$weight,c(1,1,1,0))

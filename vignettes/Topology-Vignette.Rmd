@@ -62,7 +62,7 @@ library(dplyr)
 data(ExampleTrees)
 
 # Select one tree for example purposes
-graph <- ExampleTrees[[26]]
+graph <- ExampleTrees[[24]]
 # And add some annotation complexity to the tree
 V(graph)$sample[c(2, 7)] <- "-1h"
 V(graph)$isotype[c(2, 7)] <- "IgM"

@@ -110,8 +110,8 @@ graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load data insted of running phylip
-# Clone 3138 is at index 25
-graph <- ExampleTrees[[25]]
+# Clone 3138 is at index 23
+graph <- ExampleTrees[[23]]
 ```
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
