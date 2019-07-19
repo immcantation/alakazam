@@ -45,7 +45,7 @@ graphs[sapply(graphs, is.null)] <- NULL
 airr_trees <- graphs[sapply(graphs, vcount) >= 4]
 
 # Place these trees in the same order as the previously used Change-O trees
-load("data/ExampleTreesChangeo.rda")
+load("data-raw/ExampleTreesChangeo.rda")
 changeo_trees <- ExampleTrees
 changeoClones <- unlist(lapply(ExampleTrees,function(x)x$clone))
 airrClones <- unlist(lapply(airr_trees,function(x)x$clone))

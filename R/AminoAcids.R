@@ -473,15 +473,15 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' 
 #' @examples
 #' # Subset example data
-#' db <- ExampleDb[c(1,10,100), c("SEQUENCE_ID", "JUNCTION")]
+#' db <- ExampleDb[c(1,10,100), c("sequence_id", "junction")]
 #' 
 #' # Calculate default amino acid properties from amino acid sequences
 #' # Use a custom output column prefix
-#' db$JUNCTION_TRANS <- translateDNA(db$JUNCTION)
-#' aminoAcidProperties(db, seq="JUNCTION_TRANS", label="JUNCTION")
+#' db$junction_aa <- translateDNA(db$junction)
+#' aminoAcidProperties(db, seq="junction_aa", label="junction")
 #
 #' # Calculate default amino acid properties from DNA sequences
-#' aminoAcidProperties(db, seq="JUNCTION", nt=TRUE)
+#' aminoAcidProperties(db, seq="junction", nt=TRUE)
 #' 
 #' # Use the Grantham, 1974 side chain volume scores from the seqinr package
 #' # Set pH=7.0 for the charge calculation
@@ -493,14 +493,14 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' # Rename the score vector to use single-letter codes
 #' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate properties
-#' aminoAcidProperties(db, property=c("bulk", "charge"), seq="JUNCTION", nt=TRUE, 
+#' aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", nt=TRUE, 
 #'                     trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
 #'
 #' @export
 aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
                                                  "aliphatic","polarity","charge",
                                                  "basic","acidic", "aromatic"),
-                                seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
+                                seq="junction", nt=FALSE, trim=FALSE, label=NULL, ...) {
     # Check arguments
     property <- match.arg(property, several.ok=TRUE)
     
