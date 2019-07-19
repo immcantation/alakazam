@@ -210,7 +210,7 @@ inferCompleteAbundance <- function(x) {
 #' 
 #' @return   A data.frame summarizing clone counts and frequencies with columns:
 #'           \itemize{
-#'             \item \code{clone_id}:    clone identifier.
+#'             \item \code{CLONE}:    	 clone identifier.
 #'             \item \code{SEQ_COUNT}:   total number of sequences for the clone.
 #'             \item \code{SEQ_FREQ}:    frequency of the clone as a fraction of the total
 #'                                       number of sequences within each group.
@@ -242,7 +242,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
             group_by(!!!rlang::syms(c(groups, clone))) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT")))
+            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
+			dplyr::rename("CLONE"=clone)
     } else {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
@@ -250,7 +251,8 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
                               COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
                            COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) 
+            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) %>%
+			dplyr::rename("CLONE"=clone)
     }
     return(clone_tab)
 }
@@ -420,11 +422,11 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         # Extract abundance vector
         if (!is.null(group)) {
             abund_obs <- clone_tab$CLONE_COUNT[clone_tab[[group]] == g]
-            names(abund_obs) <- clone_tab[[clone]][clone_tab[[group]] == g]
+            names(abund_obs) <- clone_tab[["CLONE"]][clone_tab[[group]] == g]
         } else {
             # Extract abundance vector
             abund_obs <- clone_tab$CLONE_COUNT
-            names(abund_obs) <- clone_tab[[clone]]
+            names(abund_obs) <- clone_tab[["CLONE"]]
         } 
         
         # Infer complete abundance distribution
@@ -438,7 +440,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         p_upper <- p_mean + p_err
         
         # Assemble and sort abundance data.frame
-	    abund_df <- tibble::tibble(!!clone := rownames(boot_mat), P=p_mean, P_SD=p_sd,
+	    abund_df <- tibble::tibble(CLONE=rownames(boot_mat), P=p_mean, P_SD=p_sd,
 	                           LOWER=p_lower, UPPER=p_upper) %>%
 	        dplyr::arrange(desc(!!rlang::sym("P"))) %>%
 	        dplyr::mutate(RANK=1:n())
@@ -448,7 +450,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         
         # Save bootstrap
         boot_list[[g]] <- as.data.frame(boot_mat) %>%
-          tibble::rownames_to_column(clone)
+          tibble::rownames_to_column("CLONE")
         
         if (progress) { pb$tick() }
     }
@@ -460,7 +462,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     abund_obj <- new("AbundanceCurve",
                      bootstrap=bootstrap_df, 
                      abundance=abundance_df,
-                     clone_by=clone,
+                     clone_by="CLONE",
                      group_by=id_col,
                      #groups=if_else(is.null(group), as.character(NA), group_keep),
                      groups=group_keep,
@@ -641,7 +643,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #                        diversity calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperAlpha <- function(boot_output, q, clone="clone_id", group=NULL) {
+helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL) {
     ## DEBUG
     # abundance <- estimateAbundance(ExampleDb, group="sample", nboot=100)
     # clone <- abundance@clone_by
@@ -675,7 +677,7 @@ helperAlpha <- function(boot_output, q, clone="clone_id", group=NULL) {
 #                         calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperBeta <- function(boot_output, q, ci_x, clone="clone_id", group="GROUP") { 
+helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") { 
     # Hack for visibility of dplyr variables
     . <- NULL
         
