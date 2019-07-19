@@ -43,7 +43,7 @@ can be applied to other regions simply by altering the sequence data column used
 
 ## Example data
 
-A small example AIRR database (`ExampleDb`) is included in the `alakazam` package.
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package.
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Load required packages
@@ -156,7 +156,7 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ### Getting vectors of individual properties
 
 The `aminoAcidProperties` function provides a convenient wrapper for calculating
-multiple properties at once from a data frame. If a vector of a specific property is
+multiple properties at once from a `data.frame`. If a vector of a specific property is
 required this may be accomplished using one of the worker functions:
 
 * `gravy`: grand average of hydrophobicity

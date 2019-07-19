@@ -30,7 +30,7 @@ vignette: >
 
 Reconstruction of an Ig lineage requires the following steps:
 
-1. Load a Change-O tab-delimited database file and select a clone
+1. Load an AIRR tab-delimited database file and select a clone
 2. Preprocess the clone to remove gap characters and duplicate sequences
 3. Run PHYLIP, parse the output, and modify the tree topology
 
@@ -54,18 +54,18 @@ library(alakazam)
 library(igraph)
 library(dplyr)
 
-# Select clone from example database
+# Select a clone from the example database
 data(ExampleDb)
 sub_db <- subset(ExampleDb, clone_id == 3138)
 ```
 
 ## Preprocess a clone
 
-Before a lineage can be constructed the sequences must first be cleaned of gap
+Before a lineage can be constructed, the sequences must first be cleaned of gap
 (-, .) characters added by IMGT, duplicate sequences must be removed, and
 annotations must be combined for each cluster of duplicate sequences. 
-Optionally, "ragged" ends of sequences, such as may occur from primer template
-switching, may also be cleaned by masking mismatched positions and the leading
+Optionally, "ragged" ends of sequences (such as those that may occur from primer template
+switching) may also be cleaned by masking mismatched positions and the leading
 and trailing ends of each sequence. The function `makeChangeoClone` is a wrapper
 function which combines these steps and returns a `ChangeoClone` object which
 may then be passed into the lineage reconstruction function.
@@ -99,7 +99,7 @@ annotations as vertex attributes, and mutations along edges as edge attributes.
 The system call to `dnapars` requires a temporary folder to store input and 
 output. This is created in the system temporary location (according to 
 `base::tempfile`), and is not deleted by default (only because automatically 
-deleting files is somewhat rude).  In most cases, you will want to set 
+deleting files is somewhat rude). In most cases, you will want to set 
 `rm_temp=TRUE` to delete this folder.
 
 ```{r, eval=FALSE}
