@@ -477,7 +477,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' 
 #' # Calculate default amino acid properties from amino acid sequences
 #' # Use a custom output column prefix
-#' db$JUNCTION_TRANS <- translateDNA(db$JUNCTION)
+#' db$junction_TRANS <- translateDNA(db$JUNCTION)
 #' aminoAcidProperties(db, seq="JUNCTION_TRANS", label="JUNCTION")
 #
 #' # Calculate default amino acid properties from DNA sequences
@@ -500,7 +500,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
                                                  "aliphatic","polarity","charge",
                                                  "basic","acidic", "aromatic"),
-                                seq="JUNCTION", nt=FALSE, trim=FALSE, label=NULL, ...) {
+                                seq="junction", nt=FALSE, trim=FALSE, label=NULL, ...) {
     # Check arguments
     property <- match.arg(property, several.ok=TRUE)
     

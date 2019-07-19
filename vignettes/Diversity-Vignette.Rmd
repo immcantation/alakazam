@@ -77,7 +77,7 @@ the size of each clone is determined by the number of sequence members:
 
 ```{r, eval=TRUE, warning=FALSE}
 # Partitions the data based on the SAMPLE column
-clones <- countClones(ExampleDb, group="SAMPLE")
+clones <- countClones(ExampleDb, group="SAMPLE", clone="CLONE")
 head(clones, 5)
 ```
 
@@ -91,7 +91,7 @@ normalized to within multiple group data partitions.
 ```{r, eval=TRUE, warning=FALSE}
 # Partitions the data based on both the SAMPLE and ISOTYPE columns
 # Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
 head(clones, 5)
 ```
 
@@ -103,7 +103,7 @@ This output may be visualized using the `plotAbundanceCurve` function.
 ```{r, eval=TRUE, results='hide', warning=FALSE, fig.width=6, fig.height=4}
 # Partitions the data on the SAMPLE column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-curve <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
+curve <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200, clone="CLONE")
 ```
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
@@ -126,14 +126,14 @@ orders (q) to generate a smooth curve.
 # 200 resampling realizations are performed (nboot=200)
 sample_curve <- alphaDiversity(ExampleDb, group="SAMPLE",
                                min_q=0, max_q=4, step_q=0.1,
-                               ci=0.95, nboot=200)
+                               ci=0.95, nboot=200, clone="CLONE")
 
 # Compare diversity curve across values in the "ISOTYPE" column
 # Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
 isotype_curve <- alphaDiversity(ExampleDb, group="ISOTYPE",
                                 min_q=0, max_q=4, step_q=0.1,
-                                ci=0.95, nboot=200)
+                                ci=0.95, nboot=200, clone="CLONE")
 ```
 
 ```{r, eval=TRUE, fig.width=6, fig.height=4}
@@ -161,7 +161,7 @@ specified.
 # Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
 # Simpson's index) across values in the "SAMPLE" column
 # 200 bootstrap realizations are performed (nboot=200)
-isotype_test <- alphaDiversity(ExampleDb, group="ISOTYPE", min_q=0, max_q=2, step_q=1, nboot=200)
+isotype_test <- alphaDiversity(ExampleDb, group="ISOTYPE", min_q=0, max_q=2, step_q=1, nboot=200, clone="CLONE")
 
 # Print P-value table
 print(isotype_test)

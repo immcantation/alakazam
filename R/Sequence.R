@@ -367,8 +367,8 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #'
 #' @examples
 #' # Example Change-O data.frame
-#' db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-#'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#' db <- data.frame(sequence_id=LETTERS[1:4],
+#'                  sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 #'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
 #'                  SAMPLE=c("S1", "S1", "S2", "S2"),
 #'                  COUNT=1:4,
@@ -393,12 +393,12 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #'                    add_count=TRUE, verbose=TRUE)
 #' 
 #' # Masking ragged ends may impact duplicate removal
-#' db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
+#' db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
 #' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 #'                    add_count=TRUE, verbose=TRUE)
 #'
 #' @export
-collapseDuplicates <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                                add_count=FALSE, ignore=c("N", "-", ".", "?"), 
                                sep=",", dry=FALSE, verbose=FALSE) {
