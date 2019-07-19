@@ -97,9 +97,9 @@
 #' @format   A list of igraph objects output by \link{buildPhylipLineage}.
 #'           Each node of each tree has the following annotations (vertex attributes):
 #'   \itemize{
-#'     \item  \code{SAMPLE}:    Sample identifier(s). Time in relation to vaccination.
-#'     \item  \code{ISOTYPE}:   Isotype assignment(s). 
-#'     \item  \code{DUPCOUNT}:  Copy count (number of duplicates) of the sequence.
+#'     \item  \code{sample}:    Sample identifier(s). Time in relation to vaccination.
+#'     \item  \code{isotype}:   Isotype assignment(s). 
+#'     \item  \code{duplication_count}:  Copy count (number of duplicates) of the sequence.
 #'   }
 #'   
 #' @seealso \link{ExampleTrees}
