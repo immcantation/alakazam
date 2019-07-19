@@ -36,17 +36,17 @@ Reconstruction of an Ig lineage requires the following steps:
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
 Lineage reconstruction requires the following fields (columns) to be present 
-in the Change-O file: 
+in the AIRR file: 
 
-* `SEQUENCE_ID`
-* `SEQUENCE_IMGT` 
-* `CLONE`
-* `GERMLINE_IMGT_D_MASK`
-* `V_CALL`
-* `J_CALL`
-* `JUNCTION_LENGTH`
+* `sequence_id`
+* `sequence_alignment` 
+* `clone_id`
+* `germline_alignment_d_mask`
+* `v_call`
+* `j_call`
+* `junction_length`
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Load required packages
@@ -56,7 +56,7 @@ library(dplyr)
 
 # Select clone from example database
 data(ExampleDb)
-sub_db <- subset(ExampleDb, CLONE == 3138)
+sub_db <- subset(ExampleDb, clone_id == 3138)
 ```
 
 ## Preprocess a clone
@@ -79,11 +79,11 @@ following duplicate removal. Unique values appearing within columns given by the
 ```{r, eval=TRUE}
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- makeChangeoClone(sub_db, text_fields=c("SAMPLE", "ISOTYPE"), 
-                          num_fields="DUPCOUNT")
+clone <- makeChangeoClone(sub_db, text_fields=c("sample", "isotype"), 
+                          num_fields="duplicate_count")
 
 # Show combined annotations
-clone@data[, c("SAMPLE", "ISOTYPE", "DUPCOUNT")]
+clone@data[, c("sample", "isotype", "duplicate_count")]
 ```
 
 ## Run PHYLIP
@@ -110,21 +110,21 @@ graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 # Load data insted of running phylip
-# Clone 3138 is at index 23
-graph <- ExampleTrees[[23]]
+# Clone 3138 is at index 25
+graph <- ExampleTrees[[25]]
 ```
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # The graph has shared annotations for the clone
-data.frame(CLONE=graph$clone,
-           JUNCTION_LENGTH=graph$junc_len,
-           V_GENE=graph$v_gene,
-           J_GENE=graph$j_gene)
+data.frame(clone_id=graph$clone,
+           junction_length=graph$junc_len,
+           v_gene=graph$v_gene,
+           j_gene=graph$j_gene)
 
 # The vertices have sequence specific annotations
-data.frame(SEQUENCE_ID=V(graph)$name, 
-           ISOTYPE=V(graph)$ISOTYPE,
-           DUPCOUNT=V(graph)$DUPCOUNT)
+data.frame(sequence_id=V(graph)$name, 
+           isotype=V(graph)$isotype,
+           duplicate_count=V(graph)$duplicate_count)
 ```
 
 ## Plotting of the lineage tree
@@ -149,7 +149,7 @@ germline sequence, which is named "Germline" in the object returned by
 V(graph)$color <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
-V(graph)$label <- V(graph)$ISOTYPE
+V(graph)$label <- V(graph)$isotype
 E(graph)$label <- ""
 
 # Remove large default margins
@@ -172,9 +172,9 @@ data.frame on the clone column.
 ```{r, eval=TRUE, warning=FALSE, results="hide"}
 # Preprocess clones
 clones <- ExampleDb %>%
-    group_by(CLONE) %>%
-    do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
-                                num_fields="DUPCOUNT"))
+    group_by(clone_id) %>%
+    do(CHANGEO=makeChangeoClone(., text_fields=c("sample", "isotype"), 
+                                num_fields="duplicate_count"))
 ```
 
 ```{r, eval=FALSE}

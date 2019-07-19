@@ -8,12 +8,12 @@ NULL
 
 #' Generate a ChangeoClone object for lineage construction
 #' 
-#' \code{makeChangeoClone} takes a data.frame with Change-O style columns as input and 
+#' \code{makeChangeoClone} takes a data.frame with AIRR or Change-O style columns as input and 
 #' masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
 #' annotations associated with duplicate sequences. It returns a \code{ChangeoClone} 
 #' object which serves as input for lineage reconstruction.
 #' 
-#' @param    data         data.frame containing the Change-O data for a clone. See Details
+#' @param    data         data.frame containing the AIRR or Change-O data for a clone. See Details
 #'                        for the list of required columns and their default values.
 #' @param    id           name of the column containing sequence identifiers.
 #' @param    seq          name of the column containing observed DNA sequences. All 
@@ -58,13 +58,13 @@ NULL
 #' arguments: \code{id}, \code{seq}, \code{germ}, \code{vcall}, \code{jcall}, 
 #' \code{junc_len}, and \code{clone}.  The default values are as follows:
 #' \itemize{
-#'   \item  \code{id       = "SEQUENCE_ID"}:           unique sequence identifier.
-#'   \item  \code{seq      = "SEQUENCE_IMGT"}:         IMGT-gapped sample sequence.
-#'   \item  \code{germ     = "GERMLINE_IMGT_D_MASK"}:  IMGT-gapped germline sequence.
-#'   \item  \code{vcall    = "V_CALL"}:                V-segment allele call.
-#'   \item  \code{jcall    = "J_CALL"}:                J-segment allele call.
-#'   \item  \code{junc_len = "JUNCTION_LENGTH"}:       junction sequence length.
-#'   \item  \code{clone    = "CLONE"}:                 clone identifier.
+#'   \item  \code{id       = "sequence_id"}:           unique sequence identifier.
+#'   \item  \code{seq      = "sequence_alignment"}:         IMGT-gapped sample sequence.
+#'   \item  \code{germ     = "germline_alignment_d_mask"}:  IMGT-gapped germline sequence.
+#'   \item  \code{vcall    = "v_call"}:                V-segment allele call.
+#'   \item  \code{jcall    = "j_call"}:                J-segment allele call.
+#'   \item  \code{junc_len = "junction_length"}:       junction sequence length.
+#'   \item  \code{clone    = "clone_id"}:                 clone identifier.
 #' }
 #' Additional annotation columns specified in the \code{text_fields}, \code{num_fields} 
 #' or \code{seq_fields} arguments will be retained in the \code{data} slot of the return 
@@ -88,27 +88,28 @@ NULL
 #' 
 #' @examples
 #' # Example Change-O data.frame
-#' db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-#'                  SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-#'                  V_CALL="Homsap IGKV1-39*01 F",
-#'                  J_CALL="Homsap IGKJ5*01 F",
-#'                  JUNCTION_LENGTH=2,
-#'                  GERMLINE_IMGT_D_MASK="CCCCAGGG",
-#'                  CLONE=1,
-#'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
-#'                  COUNT=1:4,
-#'                  stringsAsFactors=FALSE)
+#' db <- data.frame(sequence_id=LETTERS[1:4],
+#'                   sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                   v_call="Homsap IGKV1-39*01 F",
+#'                   j_call="Homsap IGKJ5*01 F",
+#'                   junction_length=2,
+#'                   germline_imgt_d_mask="CCCCAGGG",
+#'                   clone_id=1,
+#'                   TYPE=c("IgM", "IgG", "IgG", "IgA"),
+#'                   COUNT=1:4,
+#'                   stringsAsFactors=FALSE)
 #' 
-#' # Without end masking
-#' makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
-#'
-#' # With end masking
-#' makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+#' 
+#'  # Without end masking
+#'  makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
+#' 
+#'  # With end masking
+#'  makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
 #'
 #' @export
-makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
-                             germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL",
-                             junc_len="JUNCTION_LENGTH", clone="CLONE", mask_char="N",
+makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
+                             germ="germline_alignment_d_mask", vcall="v_call", jcall="j_call",
+                             junc_len="junction_length", clone="clone_id", mask_char="N",
                              max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
@@ -126,7 +127,7 @@ makeChangeoClone <- function(data, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
         tmp_df[[seq]] <- padSeqEnds(tmp_df[[seq]], pad_char=mask_char)
     }
     
-    seq_len <- stri_length(tmp_df[[seq]])
+    seq_len <- stringi::stri_length(tmp_df[[seq]])
     if (any(seq_len != seq_len[1])) {
         len_message <- paste0("All sequences are not the same length for data with first ", 
                               id, " = ", tmp_df[[id]][1], ".")
@@ -178,7 +179,7 @@ writePhylipInput <- function(clone, path) {
     v1 <- c(sprintf('%-9s', nseq + 1),
             sprintf("%-9s", "Germline"), 
             sprintf("SAM%-6s", 1:nseq))
-    v2 <- c(stri_length(clone@germline),
+    v2 <- c(stringi::stri_length(clone@germline),
             clone@germline, 
             clone@data[["SEQUENCE"]])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
@@ -526,9 +527,9 @@ phylipToGraph <- function(edges, clone) {
 #' @examples
 #' \dontrun{
 #' # Preprocess clone
-#' db <- subset(ExampleDb, CLONE == 3138)
-#' clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
-#'                           num_fields="DUPCOUNT")
+#' db <- subset(ExampleDb, clone_id == 3138)
+#' clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+#'                           num_fields="duplicate_count")
 #' 
 #' # Run PHYLIP and process output
 #' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
@@ -536,13 +537,13 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$isotype, 
 #'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # To consider each indel event as a mutation, change the masking character 
 #' # and distance matrix
-#' clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
-#'                           num_fields="DUPCOUNT", mask_char="-")
+#' clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+#'                           num_fields="duplicate_count", mask_char="-")
 #' graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
 #'                             rm_temp=TRUE)
 #' }
@@ -558,8 +559,8 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     }
     
     # Check fields
-    seq_len = unique(stri_length(clone@data[["SEQUENCE"]]))
-    germ_len = ifelse(length(clone@germline) == 0, 0, stri_length(clone@germline))
+    seq_len = unique(stringi::stri_length(clone@data[["SEQUENCE"]]))
+    germ_len = ifelse(length(clone@germline) == 0, 0, stringi::stri_length(clone@germline))
     if(germ_len == 0) {
         stop("Clone ", clone@clone, "does not contain a germline sequence.")
     }
@@ -599,7 +600,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     
     # Extract inferred sequences from PHYLIP output
     inf_df <- getPhylipInferred(phylip_out)
-    clone@data <- as.data.frame(bind_rows(clone@data, inf_df))
+    clone@data <- as.data.frame(dplyr::bind_rows(clone@data, inf_df))
 
     # Extract edge table from PHYLIP output 
     edges <- getPhylipEdges(phylip_out, id_map=id_map)
