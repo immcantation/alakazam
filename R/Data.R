@@ -16,6 +16,42 @@
 
 #### Data ####
 
+#' Example AIRR database
+#'
+#' A small example database subset from Laserson and Vigneault et al, 2014.
+#'
+#' @format   A data.frame with the following AIRR style columns:
+#'   \itemize{
+#'     \item  \code{sequence_id}:           Sequence identifier
+#'     \item  \code{sequence_alignment}:    IMGT-gapped observed sequence.
+#'     \item  \code{germline_alignment_d_mask}:  IMGT-gapped germline sequence with N, P and 
+#'                                          D regions masked.
+#'     \item  \code{v_call}:                V region allele assignments.
+#'     \item  \code{v_call_genotyped}:      TIgGER corrected V region allele assignment.
+#'     \item  \code{d_call}:                D region allele assignments.
+#'     \item  \code{j_call}:                J region allele assignments.
+#'     \item  \code{junction}:              Junction region sequence.
+#'     \item  \code{junction_length}:       Length of the junction region in nucleotides.
+#'     \item  \code{np1_length}:            Combined length of the N and P regions proximal
+#'                                          to the V region.
+#'     \item  \code{np2_length}:            Combined length of the N and P regions proximal
+#'                                          to the J region.
+#'     \item  \code{sample}:                Sample identifier. Time in relation to vaccination.
+#'     \item  \code{isotype}:               Isotype assignment.
+#'     \item  \code{duplicate_count}:       Copy count (number of duplicates) of the sequence.
+#'     \item  \code{clone_id}:              Change-O assignment clonal group identifier.
+#' }
+#' 
+#' @seealso \link{ExampleDbChangeo} \link{ExampleTrees}
+#' 
+#' @references
+#' \enumerate{
+#'   \item  Laserson U and Vigneault F, et al. High-resolution antibody dynamics of 
+#'            vaccine-induced immune responses. 
+#'            Proc Natl Acad Sci USA. 2014 111:4928-33.
+#' }
+"ExampleDb"
+
 #' Example Change-O database
 #'
 #' A small example database subset from Laserson and Vigneault et al, 2014.
@@ -42,7 +78,7 @@
 #'     \item  \code{CLONE}:                 Change-O assignment clonal group identifier.
 #' }
 #' 
-#' @seealso \link{ExampleTrees}
+#' @seealso \link{ExampleDb} \link{ExampleTrees}
 #' 
 #' @references
 #' \enumerate{
@@ -50,7 +86,7 @@
 #'            vaccine-induced immune responses. 
 #'            Proc Natl Acad Sci USA. 2014 111:4928-33.
 #' }
-"ExampleDb"
+"ExampleDbChangeo"
 
 
 #' Example Ig lineage trees
