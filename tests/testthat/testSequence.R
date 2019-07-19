@@ -1,8 +1,8 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
-ExampleDb_airr <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
-db_airr <- read_airr(ExampleDb_airr)
+#ExampleDb_airr <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
+#db_airr <- read_airr(ExampleDb_airr)
 
 # Load test database
 e1 <- new.env()
@@ -12,11 +12,11 @@ db2 <- get("TestDb", envir=e1)
 rm(e1)
 
 # Load test database airr format
-e1 <- new.env()
+#e1 <- new.env()
 #load(file.path("tests", "data-tests", "TestDb.rda"), envir=e1)
-load(file.path("..", "data-tests", "TestDb_airr.rda"), envir=e1)
-db2_airr <- get("db2_airr", envir=e1)
-rm(e1)
+#load(file.path("..", "data-tests", "TestDb_airr.rda"), envir=e1)
+#db2_airr <- get("db2_airr", envir=e1)
+#rm(e1)
 
 #### seqDist ####
 
