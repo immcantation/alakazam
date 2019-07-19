@@ -7,7 +7,7 @@
 #' Determines the count and relative abundance of V(D)J alleles, genes or families within
 #' groups.
 #'
-#' @param    data    data.frame with Change-O style columns.
+#' @param    data    data.frame with AIRR-format or Change-O style columns.
 #' @param    gene    column containing allele assignments. Only the first allele in the
 #'                   column will be considered when \code{mode} is "gene", "family" or 
 #'                   "allele". The value will be used as it is with \code{mode="asis"}. 
@@ -27,7 +27,7 @@
 #'                   families (calling \code{getFamily}), alleles (calling 
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
-#' @param    fill  logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
+#' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
 #'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
@@ -51,20 +51,20 @@
 #'
 #' @examples
 #' # Without copy numbers
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="family")
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="gene")
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="family")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-#'                     copy="DUPCOUNT", mode="family")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+#'                     copy="duplicate_count", mode="family")
 #' 
 #' # Count by clone
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-#'                     clone="CLONE", mode="family")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+#'                     clone="clone_id", mode="family")
 #'
 #' # Count absent genes 
-#' genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", 
 #'                     mode="allele", fill=TRUE)
 #'
 #'@export
@@ -491,10 +491,10 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' 
 #' @examples
 #' # Group by genes
-#' db <- groupGenes(ExampleDb, v_call="V_CALL", j_call="J_CALL")
+#' db <- groupGenes(ExampleDb, v_call="v_call", j_call="j_call")
 #'  
 #' @export
-groupGenes <- function(data, v_call="V_CALL", j_call="J_CALL", junc_len=NULL,
+groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        cell_id=NULL, locus=NULL, only_igh=TRUE,
                        first=FALSE) {
     
