@@ -1,5 +1,8 @@
 #ensure older version of sample() used
-RNGkind(sample.kind="Round")
+R_v <- paste(version$major, version$minor,sep=".")
+if ( numeric_version(R_v) >= numeric_version("3.6.0") ) {
+    RNGkind(sample.kind="Round")   
+}
 
 ExampleTrees <- file.path("..", "data-tests", "ExampleTrees.rda")
 load(ExampleTrees)
