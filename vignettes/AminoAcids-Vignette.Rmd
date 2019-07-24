@@ -3,16 +3,16 @@ title: 'Alakazam: Amino acid physicochemical property analysis'
 author: "Susanna Marquez"
 date: '`r Sys.Date()`'
 output:
-  md_document:
-    fig_height: 4
-    fig_width: 7.5
-    preserve_yaml: no
-    toc: yes
   pdf_document:
     dev: pdf
     fig_height: 4
     fig_width: 7.5
     highlight: pygments
+    toc: yes  
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
     toc: yes
   html_document:
     fig_height: 4
@@ -23,9 +23,9 @@ output:
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Amino acid property analysis}
   %\usepackage[utf8]{inputenc}
-  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 The `alakazam` package includes a set of functions to analyze the physicochemical 
