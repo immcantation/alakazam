@@ -420,14 +420,14 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' analagous to single-linkage clustering (i.e., allowing for chaining).
 #'
 #' @param    data                    data.frame containing sequence data.
-#' @param    v_call                  name of the character column containing the heavy chain 
+#' @param    v_call                  name of the column containing the heavy chain 
 #'                                   V-segment allele calls.
-#' @param    j_call                  name of the character column containing the heavy chain 
+#' @param    j_call                  name of the column containing the heavy chain 
 #'                                   J-segment allele calls.
 #' @param    junc_len                name of column containing the junction length. Optional.
-#' @param    cell_id                 name of the charater column containing cell IDs. Only 
+#' @param    cell_id                 name of the column containing cell IDs. Only 
 #'                                   applicable and required for single-cell mode.
-#' @param    locus                   name of the character column containing locus information. 
+#' @param    locus                   name of the column containing locus information. 
 #'                                   Only applicable and required for single-cell mode.
 #' @param    only_igh                use only heavy chain (\code{IGH}) sequences for grouping,
 #'                                   disregarding light chains. Only applicable and required for
@@ -443,6 +443,10 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'           Note that if \code{junc_len} is supplied, the grouping this \code{VJ_GROUP} 
 #'           will have been based on V, J, and L simultaneously despite the column name 
 #'           being \code{VJ_GROUP}.
+#'           
+#'           Note that the output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
+#'           columns will be converted to \code{character} if they were \code{factor} in the 
+#'           input \code{data}.
 #'
 #' @details
 #' 
@@ -506,6 +510,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # Check input
     check <- checkColumns(data, c(v_call, j_call, junc_len, cell_id, locus))
     if (check != TRUE) { stop(check) }
+    
+    # if necessary, cast select columns to character (factor not allowed later on)
+    if (class(v_call)=="factor") { db[[v_call]] <- as.character(db[[v_call]]) }
+    if (class(j_call)=="factor") { db[[j_call]] <- as.character(db[[j_call]]) }
+    if (class(cell_id)=="factor") { db[[cell_id]] <- as.character(db[[cell_id]]) }
+    if (class(locus)=="factor") { db[[locus]] <- as.character(db[[locus]]) }
     
     # e.g.: "Homsap IGHV3-7*01 F,Homsap IGHV3-6*01 F;Homsap IGHV1-4*01 F"
     separator_within_seq <- ","
