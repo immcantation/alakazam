@@ -420,16 +420,15 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' analagous to single-linkage clustering (i.e., allowing for chaining).
 #'
 #' @param    data                    data.frame containing sequence data.
-#' @param    v_call                  name of the column containing the heavy chain V-segment 
-#'                                   allele calls.
-#' @param    j_call                  name of the column containing the heavy chain J-segment 
-#'                                   allele calls.
-#' @param    junc_len                name of the column containing the heavy chain junction
-#'                                   length. Optional.
-#' @param    cell_id                 name of the column containing cell IDs. Only applicable 
-#'                                   and required for single-cell mode.
-#' @param    locus                   name of the column containing locus information. Only applicable 
-#'                                   and required for single-cell mode.
+#' @param    v_call                  name of the character column containing the heavy chain 
+#'                                   V-segment allele calls.
+#' @param    j_call                  name of the character column containing the heavy chain 
+#'                                   J-segment allele calls.
+#' @param    junc_len                name of column containing the junction length. Optional.
+#' @param    cell_id                 name of the charater column containing cell IDs. Only 
+#'                                   applicable and required for single-cell mode.
+#' @param    locus                   name of the character column containing locus information. 
+#'                                   Only applicable and required for single-cell mode.
 #' @param    only_igh                use only heavy chain (\code{IGH}) sequences for grouping,
 #'                                   disregarding light chains. Only applicable and required for
 #'                                   single-cell mode. Default is \code{TRUE}.
@@ -465,6 +464,9 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' stage further split based on junction length.
 #' 
 #' It is assumed that ambiguous gene assignments are separated by commas.
+#' 
+#' In the input \code{data}, the \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus} 
+#' columns, if present, must be \code{character}, as opposed to \code{factor}.
 #' 
 #' All rows containing \code{NA} values in their any of the \code{v_call}, \code{j_call}, and, 
 #' if specified, \code{junc_len}, columns will be removed. A warning will be issued when a row 
