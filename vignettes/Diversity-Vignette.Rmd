@@ -164,7 +164,7 @@ specified.
 isotype_test <- alphaDiversity(ExampleDb, group="isotype", min_q=0, max_q=2, step_q=1, nboot=200, clone="clone_id")
 
 # Print P-value table
-print(isotype_test)
+print(isotype_test@tests)
 
 # Plot results at q=0 and q=2
 # Plot the mean and standard deviations at q=0 and q=2
