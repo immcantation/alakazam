@@ -112,3 +112,7 @@ checkColumns(df, c("A", "D"), logic="any")
 
 
 
+
+
+
+

@@ -60,33 +60,21 @@ x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 
 ```
 
-
-```
-
-
-```
-
-
+**Error**: Evaluation error: object 'ISOTYPE' not found.
 ```R
 print(x)
 ```
 
-
-```
-  ANNOTATION COUNT EXPECTED PVALUE
-1        IgA    16     13.6    0.0
-2    IgA,IgG     1      1.2    0.2
-3        IgG    31     33.5    1.0
-
-```
-
-
+**Error in print(x)**: object 'x' not found
 
 See also
 -------------------
 
 Uses [getMRCA](getMRCA.md) and [getPathLengths](getPathLengths.md). 
 See [plotMRCATest](plotMRCATest.md) for plotting the permutation distributions.
+
+
+
 
 
 

@@ -15,7 +15,7 @@ analagous to single-linkage clustering (i.e., allowing for chaining).
 Usage
 --------------------
 ```
-groupGenes(data, v_call = "V_CALL", j_call = "J_CALL",
+groupGenes(data, v_call = "v_call", j_call = "j_call",
 junc_len = NULL, cell_id = NULL, locus = NULL, only_igh = TRUE,
 first = FALSE)
 ```
@@ -27,24 +27,23 @@ data
 :   data.frame containing sequence data.
 
 v_call
-:   name of the column containing the heavy chain V-segment 
-allele calls.
+:   name of the column containing the heavy chain 
+V-segment allele calls.
 
 j_call
-:   name of the column containing the heavy chain J-segment 
-allele calls.
+:   name of the column containing the heavy chain 
+J-segment allele calls.
 
 junc_len
-:   name of the column containing the heavy chain junction
-length. Optional.
+:   name of column containing the junction length. Optional.
 
 cell_id
-:   name of the column containing cell IDs. Only applicable 
-and required for single-cell mode.
+:   name of the column containing cell IDs. Only 
+applicable and required for single-cell mode.
 
 locus
-:   name of the column containing locus information. Only applicable 
-and required for single-cell mode.
+:   name of the column containing locus information. 
+Only applicable and required for single-cell mode.
 
 only_igh
 :   use only heavy chain (`IGH`) sequences for grouping,
@@ -70,6 +69,10 @@ Note that if `junc_len` is supplied, the grouping this `VJ_GROUP`
 will have been based on V, J, and L simultaneously despite the column name 
 being `VJ_GROUP`.
 
+Note that the output `v_call`, `j_call`, `cell_id`, and `locus`
+columns will be converted to `character` if they were `factor` in the 
+input `data`.
+
 
 Details
 -------------------
@@ -92,6 +95,9 @@ are partitioned in the first stage based on V annotation and J annotation, and t
 stage further split based on junction length.
 
 It is assumed that ambiguous gene assignments are separated by commas.
+
+In the input `data`, the `v_call`, `j_call`, `cell_id`, and `locus` 
+columns, if present, must be `character`, as opposed to `factor`.
 
 All rows containing `NA` values in their any of the `v_call`, `j_call`, and, 
 if specified, `junc_len`, columns will be removed. A warning will be issued when a row 
@@ -127,8 +133,12 @@ Examples
 
 ```R
 # Group by genes
-db <- groupGenes(ExampleDb, v_call="V_CALL", j_call="J_CALL")
+db <- groupGenes(ExampleDb, v_call="v_call", j_call="j_call")
 ```
+
+
+
+
 
 
 

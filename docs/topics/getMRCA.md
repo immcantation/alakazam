@@ -72,8 +72,8 @@ getMRCA(graph, path="steps", root="Germline")
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               SAMPLE ISOTYPE DUPCOUNT          label STEPS DISTANCE
-GN5SHBT06HH3QD    +7d     IgA       10 GN5SHBT06HH3QD     1       20
+               sample isotype duplicate_count          label STEPS DISTANCE
+GN5SHBT06HH3QD    +7d     IgA              10 GN5SHBT06HH3QD     1       20
 
 ```
 
@@ -90,8 +90,8 @@ getMRCA(graph, path="distance", root="Germline", field="ISOTYPE", exclude=NA)
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               SAMPLE ISOTYPE DUPCOUNT          label STEPS DISTANCE
-GN5SHBT06HH3QD    +7d     IgA       10 GN5SHBT06HH3QD     1       20
+               sample isotype duplicate_count          label STEPS DISTANCE
+GN5SHBT06HH3QD    +7d     IgA              10 GN5SHBT06HH3QD     1       20
 
 ```
 
@@ -101,6 +101,9 @@ See also
 -------------------
 
 Path lengths are determined with [getPathLengths](getPathLengths.md).
+
+
+
 
 
 

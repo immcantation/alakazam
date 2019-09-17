@@ -1,8 +1,8 @@
 # Amino acid property analysis
 
-The `alakazam` package includes a set of function to analyze the physicochemical 
+The `alakazam` package includes a set of functions to analyze the physicochemical 
 properties of Ig and TCR amino acid sequences. Of particular interest is the analysis of 
-CDR3 properties, which this vignette will demonstate. However, the same process
+CDR3 properties, which this vignette will demonstrate. The same process 
 can be applied to other regions simply by altering the sequence data column used.
 
     Wu YC, et al. High-throughput immunoglobulin repertoire analysis distinguishes 
@@ -15,7 +15,7 @@ can be applied to other regions simply by altering the sequence data column used
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package.
 
 
 ```r
@@ -25,7 +25,7 @@ library(dplyr)
 
 # Subset example data
 data(ExampleDb)
-db <- ExampleDb[ExampleDb$SAMPLE == "+7d", ]
+db <- ExampleDb[ExampleDb$sample == "+7d", ]
 ```
 
 ## Calculate the properties of amino acid sequences
@@ -39,13 +39,12 @@ Multiple amino acid physicochemical properties can be obtained with the function
 * `polarity`: average polarity
 * `aliphatic`: normalized aliphatic index
 * `charge`: normalized net charge
-* `acidic`: acidic side chain content
+* `acidic`: acidic side chain residue content
 * `basic`: basic side chain residue content
 * `aromatic`: aromatic side chain content
 
 This example demonstrates how to calculate all of the available amino acid 
-properties from DNA sequences found in `JUNCTION` column of the Change-O file 
-previously loaded. 
+properties from DNA sequences found in the `junction` column of the previously loaded AIRR file.
 
 Translation of the DNA sequences to amino acid sequences is accomplished by 
 specifying the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
@@ -55,7 +54,7 @@ to the output column names using the `label="CDR3"` argument.
 
 
 ```r
-db_props <- aminoAcidProperties(db, seq="JUNCTION", nt=TRUE, trim=TRUE, 
+db_props <- aminoAcidProperties(db, seq="junction", nt=TRUE, trim=TRUE, 
                                 label="CDR3")
 
 # The full set of properties are calculated by default
@@ -81,29 +80,29 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 # Define a ggplot theme for all plots
 tmp_theme <- theme_bw() + theme(legend.position="bottom")
 
-# Generate plots for a four of the properties
-g1 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_LENGTH)) + tmp_theme +
+# Generate plots for all four of the properties
+g1 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_LENGTH)) + tmp_theme +
     ggtitle("CDR3 length") + 
     xlab("Isotype") + ylab("Amino acids") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=ISOTYPE))
-g2 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_GRAVY)) + tmp_theme + 
+    geom_boxplot(aes(fill=isotype))
+g2 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_GRAVY)) + tmp_theme + 
     ggtitle("CDR3 hydrophobicity") + 
     xlab("Isotype") + ylab("GRAVY") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=ISOTYPE))
-g3 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_BASIC)) + tmp_theme +
+    geom_boxplot(aes(fill=isotype))
+g3 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_BASIC)) + tmp_theme +
     ggtitle("CDR3 basic residues") + 
     xlab("Isotype") + ylab("Basic residues") +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=ISOTYPE))
-g4 <- ggplot(db_props, aes(x=ISOTYPE, y=CDR3_AA_ACIDIC)) + tmp_theme +
+    geom_boxplot(aes(fill=isotype))
+g4 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_ACIDIC)) + tmp_theme +
     ggtitle("CDR3 acidic residues") + 
     xlab("Isotype") + ylab("Acidic residues") +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=ISOTYPE))
+    geom_boxplot(aes(fill=isotype))
 
 # Plot in a 2x2 grid
 gridPlot(g1, g2, g3, g4, ncol=2)
@@ -114,13 +113,13 @@ gridPlot(g1, g2, g3, g4, ncol=2)
 ### Obtaining properties individually
 
 A subset of the properties may be calculated using the `property` argument of
-`aminoAcidProperties`.  For example, calculations may be restricted to only the 
+`aminoAcidProperties`. For example, calculations may be restricted to only the 
 grand average of hydrophobicity (`gravy`) index and normalized net charge 
 (`charge`) by specifying `property=c("gravy", "charge")`. 
 
 
 ```r
-db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"),
+db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"),
                                 nt=TRUE, trim=TRUE, label="CDR3")
 dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ```
@@ -150,7 +149,7 @@ h <- aaindex[["KIDA850101"]]$I
 p <- setNames(pK[["Murray"]], rownames(pK))
 # Rename the hydrophobicity vector to use single-letter codes
 names(h) <- translateStrings(names(h), ABBREV_AA)
-db_props <- aminoAcidProperties(db, seq="JUNCTION", property=c("gravy", "charge"), 
+db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"), 
                                 nt=TRUE, trim=TRUE, label="CDR3", 
                                 hydropathy=h, pK=p)
 dplyr::select(db_props[1:3, ], starts_with("CDR3"))
@@ -166,7 +165,7 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 ### Getting vectors of individual properties
 
 The `aminoAcidProperties` function provides a convenient wrapper for calculating
-multiple properties at once from a data.frame. If a vector of a specific property is
+multiple properties at once from a `data.frame`. If a vector of a specific property is
 required this may be accomplished using one of the worker functions:
 
 * `gravy`: grand average of hydrophobicity
@@ -176,12 +175,12 @@ required this may be accomplished using one of the worker functions:
 * `charge`: net charge
 * `countPatterns`: counts the occurrence of patterns in amino acid sequences
 
-The input to each function must be vector of amino acid sequences.
+The input to each function must be a vector of amino acid sequences.
 
 
 ```r
 # Translate junction DNA sequences to amino acids and trim first and last codons
-cdr3 <- translateDNA(db$JUNCTION[1:3], trim=TRUE)
+cdr3 <- translateDNA(db$junction[1:3], trim=TRUE)
 
 # Grand average of hydrophobicity
 gravy(cdr3)

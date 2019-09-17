@@ -9,6 +9,8 @@ from Change-O data.
 
 
 
+
+
 Slots
 -------------------
 
@@ -41,6 +43,9 @@ See also
 -------------------
 
 See [makeChangeoClone](makeChangeoClone.md) and [buildPhylipLineage](buildPhylipLineage.md) for use.
+
+
+
 
 
 

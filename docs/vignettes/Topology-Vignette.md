@@ -6,7 +6,7 @@ that focus on quantifying annotation relationships within lineages.
 
 ## Example data
 
-A small set of annotated example trees are included in the `alakazam` package.
+A small set of annotated example trees, `ExampleTrees`, are included in the `alakazam` package.
 The trees are `igraph` objects with the following tree annotations (graph attributes):
 
 * `clone`: An identifier for the clonal group. These entries correspond to the `CLONE`
@@ -17,11 +17,11 @@ The trees are `igraph` objects with the following tree annotations (graph attrib
 
 And the following node annotations (vertex attributes):
 
-* `SAMPLE`: Time point in relation to influenza vaccination.
-* `ISOTYPE`: The isotype(s) assigned to the sequence. Multiple isotypes are 
+* `sample`: Time point in relation to influenza vaccination.
+* `isotype`: The isotype(s) assigned to the sequence. Multiple isotypes are 
              delimited by comma, and reflect identical V(D)J sequences observed
              with more than one isotype.
-* `DUPCOUNT`: The copy number (duplicate count), which indicates the total number 
+* `duplicate_count`: The copy number (duplicate count), which indicates the total number 
               of reads with the same V(D)J sequence.
 
 
@@ -37,16 +37,16 @@ data(ExampleTrees)
 # Select one tree for example purposes
 graph <- ExampleTrees[[24]]
 # And add some annotation complexity to the tree
-V(graph)$SAMPLE[c(2, 7)] <- "-1h"
-V(graph)$ISOTYPE[c(2, 7)] <- "IgM"
+V(graph)$sample[c(2, 7)] <- "-1h"
+V(graph)$isotype[c(2, 7)] <- "IgM"
 
 # Make a list of example trees excluding multi-isotype trees
-graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)$ISOTYPE)))]
+graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)$isotype)))]
 ```
 
 ## Plotting annotations on a tree
 
-There are many options for configuring how an igrpah object is plotted which
+There are many options for configuring how an igraph object is plotted which
 are helpful for visualing annotation topologies. Below is an extensive example of
 how to plot a tree by configuring the colors, labels, shapes and sizes of
 different visual elements according to annotations embedded in the graph.
@@ -54,13 +54,13 @@ different visual elements according to annotations embedded in the graph.
 
 ```r
 # Set node colors
-V(graph)$color[V(graph)$SAMPLE == "-1h"] <- "seagreen"
-V(graph)$color[V(graph)$SAMPLE == "+7d"] <- "steelblue"
+V(graph)$color[V(graph)$sample == "-1h"] <- "seagreen"
+V(graph)$color[V(graph)$sample == "+7d"] <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
 
 # Set node labels
-V(graph)$label <- paste(V(graph)$SAMPLE, V(graph)$ISOTYPE, sep=", ")
+V(graph)$label <- paste(V(graph)$sample, V(graph)$isotype, sep=", ")
 V(graph)$label[V(graph)$name == "Germline"] <- ""
 V(graph)$label[grepl("Inferred", V(graph)$name)] <- ""
 
@@ -92,7 +92,7 @@ legend("topleft", c("Germline", "Inferred", "-1h", "+7d"),
 ## Summarizing node properties
 
 Various annotation dependent node statistics can be calculated using the
-`summarizeSubstrees` and `getPathLengths` functions. `getPathLengths` 
+`summarizeSubtrees` and `getPathLengths` functions. `getPathLengths` 
 calculates distances from the root (germline) *to child nodes*, whereas 
 `summarizeSubtrees` calculates paths and subtree statistics 
 *from child nodes*.
@@ -123,16 +123,16 @@ getPathLengths(graph, root="Germline")
 ```
 
 Note, the `STEPS` counted in the above example include traversal of inferred 
-intermediates. If you want to exclude such nodes, and consider only nodes
+intermediates. If you want to exclude such nodes and consider only nodes
 associated with observed sequences, you can specify an annotation field and 
 value that will be excluded from the number of steps. In the example below
-we are excluding `NA` values in the `ISOTYPE` annotation 
-(`field="ISOTYPE", exclude=NA`). 
+we are excluding `NA` values in the `isotype` annotation 
+(`field="isotype", exclude=NA`). 
 
 
 ```r
 # Exclude nodes without an isotype annotation from step count
-getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
+getPathLengths(graph, root="Germline", field="isotype", exclude=NA)
 ```
 
 ```
@@ -167,19 +167,19 @@ following properties for each node:
 * `DEPTH_NORM`: The `DEPTH` normalized by the total tree depth.
 * `PATHLENGTH_NORM`: The `PATHLENGTH` normalized by the longest path.
 
-The `fields=c("SAMPLE", "ISOTYPE")` argument in the example below simply
+The `fields=c("sample", "isotype")` argument in the example below simply
 defines which annotations we wish to retain in the output. This argument
 has no effect on the results, in constast to the behavior of `getPathLengths`.
 
 
 ```r
 # Summarize tree
-df <- summarizeSubtrees(graph, fields=c("SAMPLE", "ISOTYPE"), root="Germline")
+df <- summarizeSubtrees(graph, fields=c("sample", "isotype"), root="Germline")
 print(df[1:4])
 ```
 
 ```
-##             NAME SAMPLE ISOTYPE         PARENT
+##             NAME sample isotype         PARENT
 ## 1      Inferred1   <NA>    <NA>       Germline
 ## 2 GN5SHBT04CW57C    -1h     IgM      Inferred1
 ## 3      Inferred2   <NA>    <NA> GN5SHBT04CW57C
@@ -238,19 +238,19 @@ a separate panel of the same figure.
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
 
 # Box plots of node outdegree by sample
-p1 <- plotSubtrees(graph_list, "SAMPLE", "outdegree", colors=sample_colors, 
+p1 <- plotSubtrees(graph_list, "sample", "outdegree", colors=sample_colors, 
                    main_title="Node outdegree", legend_title="Time", 
                    style="box", silent=TRUE)
 # Box plots of subtree size by sample
-p2 <- plotSubtrees(graph_list, "SAMPLE", "size", colors=sample_colors, 
+p2 <- plotSubtrees(graph_list, "sample", "size", colors=sample_colors, 
                    main_title="Subtree size", legend_title="Time", 
                    style="box", silent=TRUE)
 # Violin plots of subtree path length by isotype
-p3 <- plotSubtrees(graph_list, "ISOTYPE", "pathlength", colors=IG_COLORS, 
+p3 <- plotSubtrees(graph_list, "isotype", "pathlength", colors=IG_COLORS, 
                    main_title="Subtree path length", legend_title="Isotype", 
                    style="violin", silent=TRUE)
 # Violin plots of subtree depth by isotype
-p4 <- plotSubtrees(graph_list,  "ISOTYPE", "depth", colors=IG_COLORS, 
+p4 <- plotSubtrees(graph_list,  "isotype", "depth", colors=IG_COLORS, 
                    main_title="Subtree depth", legend_title="Isotype", 
                    style="violin", silent=TRUE)
 
@@ -276,7 +276,7 @@ annotation can be performed like so:
 
 ```r
 # Count direct edges between isotypes
-tableEdges(graph, "ISOTYPE")
+tableEdges(graph, "isotype")
 ```
 
 ```
@@ -298,7 +298,7 @@ annotated with either `Germline` or `NA` for isotype using the `exclude` argumen
 
 ```r
 # Direct edges excluding germline and inferred nodes
-tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
+tableEdges(graph, "isotype", exclude=c("Germline", NA))
 ```
 
 ```
@@ -317,7 +317,7 @@ which will skip over the excluded nodes when tabulating annotation pairs:
 
 ```r
 # Count indirect edges walking through germline and inferred nodes
-tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
+tableEdges(graph, "isotype", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
 ```
@@ -343,7 +343,7 @@ annotation pair is observed more often than expected.
 
 ```r
 # Test isotype relationships
-edge_test <- testEdges(graph_list, "ISOTYPE", nperm=20)
+edge_test <- testEdges(graph_list, "isotype", nperm=20)
 
 # Print p-value table
 print(edge_test)
@@ -351,10 +351,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.850000 0.1000000
+## 1    IgA   IgA    36 34.800000 0.0500000
 ## 2    IgA   IgG     2  3.066667 0.6000000
-## 3    IgG   IgA     1  2.411765 0.8235294
-## 4    IgG   IgG    99 98.800000 0.4000000
+## 3    IgG   IgA     1  2.444444 0.7777778
+## 4    IgG   IgG    99 98.700000 0.3000000
 ```
 
 ```r
@@ -368,8 +368,8 @@ plotEdgeTest(edge_test, color="steelblue", main_title="Isotype Edges",
 ## Counting and testing MRCA annotations
 
 The most recent common ancestor (MRCA) of an Ig lineage we define herein
-as the most ancestral observed, or inferred, sequences in the lineage tree. 
-Meaning, the node that is most proximal, by some measure, to the germline (root) 
+as the most ancestral observed (or inferred) sequences in the lineage tree. 
+Meaning, the node that is most proximal (by some measure) to the germline/root 
 node. The `getMRCA` and `testMRCA` functions provide extraction and significance
 testing of MRCA sequences by annotation value, respectively.
 
@@ -379,7 +379,7 @@ Extracting the MRCA from a tree is accomplished using the `getMRCA` function.
 The germline distance criteria are as described above for `getPathLengths`
 and can be either node hops or mutational events, with or without exclusion
 of nodes with specific annotations. To simply extract the annotations for the 
-node(s) immediately below the germline, you can use the  `path=steps` argument 
+node(s) immediately below the germline, you can use the `path=steps` argument 
 without any node exclusion:
 
 
@@ -388,11 +388,11 @@ without any node exclusion:
 mrca_df <- getMRCA(graph, path="steps", root="Germline")
 
 # Print subset of the annotation data.frame
-print(mrca_df[c("NAME", "SAMPLE", "ISOTYPE", "STEPS", "DISTANCE")])
+print(mrca_df[c("NAME", "sample", "isotype", "STEPS", "DISTANCE")])
 ```
 
 ```
-##                NAME SAMPLE ISOTYPE STEPS DISTANCE
+##                NAME sample isotype STEPS DISTANCE
 ## Inferred1 Inferred1   <NA>    <NA>     1       20
 ```
 
@@ -404,14 +404,14 @@ exclusion value within that field (`exclude=NA`):
 ```r
 # Exclude nodes without an isotype annotation and use weighted path length
 mrca_df <- getMRCA(graph, path="distance", root="Germline", 
-                   field="ISOTYPE", exclude=NA)
+                   field="isotype", exclude=NA)
 
 # Print excluding sequence, label, color, shape and size annotations
-print(mrca_df[c("NAME", "SAMPLE", "ISOTYPE", "STEPS", "DISTANCE")])
+print(mrca_df[c("NAME", "sample", "isotype", "STEPS", "DISTANCE")])
 ```
 
 ```
-##                          NAME SAMPLE ISOTYPE STEPS DISTANCE
+##                          NAME sample isotype STEPS DISTANCE
 ## GN5SHBT01D6X0W GN5SHBT01D6X0W    -1h     IgM     1       22
 ```
 
@@ -425,7 +425,7 @@ that the annotation is observed more often than expected in the MRCA position.
 
 ```r
 # Test isotype MRCA annotations
-mrca_test <- testMRCA(graph_list, "ISOTYPE", nperm=20)
+mrca_test <- testMRCA(graph_list, "isotype", nperm=20)
 ```
 
 ```r
@@ -435,8 +435,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.45   0.00
-## 2        IgG    31    31.55   0.55
+## 1        IgA    12    11.25   0.00
+## 2        IgG    31    31.75   0.75
 ```
 
 ```r

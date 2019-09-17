@@ -60,20 +60,7 @@ tableEdges(graph, "ISOTYPE")
 
 ```
 
-
-```
-# A tibble: 4 x 3
-# Groups:   PARENT [3]
-  PARENT  CHILD   COUNT
-  <chr>   <chr>   <int>
-1 <NA>    IgA         1
-2 IgA     IgA,IgG     1
-3 IgA,IgG IgA         1
-4 IgA,IgG IgG         3
-
-```
-
-
+**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
 ```R
 
 # Count direct edges excluding edges to and from germline and inferred nodes
@@ -81,43 +68,22 @@ tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
 
 ```
 
-
-```
-# A tibble: 3 x 3
-# Groups:   PARENT [2]
-  PARENT  CHILD   COUNT
-  <chr>   <chr>   <int>
-1 IgA     IgA,IgG     1
-2 IgA,IgG IgA         1
-3 IgA,IgG IgG         3
-
-```
-
-
+**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
 ```R
 
 # Count indirect edges walking through germline and inferred nodes
 tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
-
-```
-# A tibble: 3 x 3
-# Groups:   PARENT [2]
-  PARENT  CHILD   COUNT
-  <chr>   <chr>   <int>
-1 IgA     IgA,IgG     1
-2 IgA,IgG IgA         1
-3 IgA,IgG IgG         3
-
-```
-
-
+**Error**: Column `PARENT` is unknown
 
 See also
 -------------------
 
 See [testEdges](testEdges.md) for performed a permutation test on edge relationships.
+
+
+
 
 
 

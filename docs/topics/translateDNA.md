@@ -51,13 +51,14 @@ translateDNA("ACTGACTCGA")
 ```R
 
 # Translate a vector of sequences
-translateDNA(ExampleDb$JUNCTION[1:3])
+translateDNA(ExampleDb$junction[1:3])
 
 ```
 
 
 ```
-[1] "CARVKRRGWRRNSLWFGESTPSDAHRWFDPW" "CARMVILGSCYSRGCGTPGPGDGETQYW"    "CARVGIDVVVPAAIPGFDYYYGMDVW"     
+[1] "CARVKRRGWRRNSLWFGESTPSDAHRWFDPW" "CARMVILGSCYSRGCGTPGPGDGETQYW"   
+[3] "CARVGIDVVVPAAIPGFDYYYGMDVW"     
 
 ```
 
@@ -65,12 +66,13 @@ translateDNA(ExampleDb$JUNCTION[1:3])
 ```R
 
 # Remove the first and last codon from the translation
-translateDNA(ExampleDb$JUNCTION[1:3], trim=TRUE)
+translateDNA(ExampleDb$junction[1:3], trim=TRUE)
 ```
 
 
 ```
-[1] "ARVKRRGWRRNSLWFGESTPSDAHRWFDP" "ARMVILGSCYSRGCGTPGPGDGETQY"    "ARVGIDVVVPAAIPGFDYYYGMDV"     
+[1] "ARVKRRGWRRNSLWFGESTPSDAHRWFDP" "ARMVILGSCYSRGCGTPGPGDGETQY"   
+[3] "ARVGIDVVVPAAIPGFDYYYGMDV"     
 
 ```
 
@@ -80,6 +82,9 @@ See also
 -------------------
 
 `[translate](http://www.rdocumentation.org/packages/seqinr/topics/translate)`.
+
+
+
 
 
 

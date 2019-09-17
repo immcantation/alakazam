@@ -68,13 +68,7 @@ x <- testMRCA(graphs, "ISOTYPE", nperm=10)
 
 ```
 
-
-```
-
-
-```
-
-
+**Error**: Evaluation error: object 'ISOTYPE' not found.
 ```R
 
 # Plot
@@ -82,19 +76,20 @@ plotMRCATest(x, color="steelblue", style="hist")
 
 ```
 
-![4](plotMRCATest-4.png)
-
+**Error in rename(data@tests, Annotation = "ANNOTATION")**: object 'x' not found
 ```R
 plotMRCATest(x, style="cdf")
 ```
 
-![6](plotMRCATest-6.png)
-
+**Error in rename(data@tests, Annotation = "ANNOTATION")**: object 'x' not found
 
 See also
 -------------------
 
 See [testEdges](testEdges.md) for performing the test.
+
+
+
 
 
 

@@ -2,23 +2,23 @@
 
 Reconstruction of an Ig lineage requires the following steps:
 
-1. Load a Change-O tab-delimited database file and select a clone
+1. Load an AIRR tab-delimited database file and select a clone
 2. Preprocess the clone to remove gap characters and duplicate sequences
 3. Run PHYLIP, parse the output, and modify the tree topology
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
 Lineage reconstruction requires the following fields (columns) to be present 
-in the Change-O file: 
+in the AIRR file: 
 
-* `SEQUENCE_ID`
-* `SEQUENCE_IMGT` 
-* `CLONE`
-* `GERMLINE_IMGT_D_MASK`
-* `V_CALL`
-* `J_CALL`
-* `JUNCTION_LENGTH`
+* `sequence_id`
+* `sequence_alignment` 
+* `clone_id`
+* `germline_alignment_d_mask`
+* `v_call`
+* `j_call`
+* `junction_length`
 
 
 ```r
@@ -27,18 +27,18 @@ library(alakazam)
 library(igraph)
 library(dplyr)
 
-# Select clone from example database
+# Select a clone from the example database
 data(ExampleDb)
-sub_db <- subset(ExampleDb, CLONE == 3138)
+sub_db <- subset(ExampleDb, clone_id == 3138)
 ```
 
 ## Preprocess a clone
 
-Before a lineage can be constructed the sequences must first be cleaned of gap
+Before a lineage can be constructed, the sequences must first be cleaned of gap
 (-, .) characters added by IMGT, duplicate sequences must be removed, and
 annotations must be combined for each cluster of duplicate sequences. 
-Optionally, "ragged" ends of sequences, such as may occur from primer template
-switching, may also be cleaned by masking mismatched positions and the leading
+Optionally, "ragged" ends of sequences (such as those that may occur from primer template
+switching) may also be cleaned by masking mismatched positions and the leading
 and trailing ends of each sequence. The function `makeChangeoClone` is a wrapper
 function which combines these steps and returns a `ChangeoClone` object which
 may then be passed into the lineage reconstruction function.
@@ -53,21 +53,21 @@ following duplicate removal. Unique values appearing within columns given by the
 ```r
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- makeChangeoClone(sub_db, text_fields=c("SAMPLE", "ISOTYPE"), 
-                          num_fields="DUPCOUNT")
+clone <- makeChangeoClone(sub_db, text_fields=c("sample", "isotype"), 
+                          num_fields="duplicate_count")
 
 # Show combined annotations
-clone@data[, c("SAMPLE", "ISOTYPE", "DUPCOUNT")]
+clone@data[, c("sample", "isotype", "duplicate_count")]
 ```
 
 ```
-##   SAMPLE ISOTYPE DUPCOUNT
-## 1    +7d     IgA        1
-## 2    +7d     IgG        1
-## 3    +7d IgA,IgG       10
-## 4    +7d     IgG       36
-## 5    +7d     IgA       10
-## 6    +7d     IgG       13
+##   sample isotype duplicate_count
+## 1    +7d     IgA               1
+## 2    +7d     IgG               1
+## 3    +7d IgA,IgG              10
+## 4    +7d     IgG              36
+## 5    +7d     IgA              10
+## 6    +7d     IgG              13
 ```
 
 ## Run PHYLIP
@@ -83,7 +83,7 @@ annotations as vertex attributes, and mutations along edges as edge attributes.
 The system call to `dnapars` requires a temporary folder to store input and 
 output. This is created in the system temporary location (according to 
 `base::tempfile`), and is not deleted by default (only because automatically 
-deleting files is somewhat rude).  In most cases, you will want to set 
+deleting files is somewhat rude). In most cases, you will want to set 
 `rm_temp=TRUE` to delete this folder.
 
 
@@ -98,33 +98,33 @@ graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
 
 ```r
 # The graph has shared annotations for the clone
-data.frame(CLONE=graph$clone,
-           JUNCTION_LENGTH=graph$junc_len,
-           V_GENE=graph$v_gene,
-           J_GENE=graph$j_gene)
+data.frame(clone_id=graph$clone,
+           junction_length=graph$junc_len,
+           v_gene=graph$v_gene,
+           j_gene=graph$j_gene)
 ```
 
 ```
-##   CLONE JUNCTION_LENGTH   V_GENE J_GENE
-## 1  3138              60 IGHV3-49  IGHJ5
+##   clone_id junction_length   v_gene j_gene
+## 1     3138              60 IGHV3-49  IGHJ5
 ```
 
 ```r
 # The vertices have sequence specific annotations
-data.frame(SEQUENCE_ID=V(graph)$name, 
-           ISOTYPE=V(graph)$ISOTYPE,
-           DUPCOUNT=V(graph)$DUPCOUNT)
+data.frame(sequence_id=V(graph)$name, 
+           isotype=V(graph)$isotype,
+           duplicate_count=V(graph)$duplicate_count)
 ```
 
 ```
-##      SEQUENCE_ID ISOTYPE DUPCOUNT
-## 1 GN5SHBT06HH3QD     IgA       10
-## 2 GN5SHBT08F45HV IgA,IgG       10
-## 3       Germline    <NA>       NA
-## 4 GN5SHBT06IFV0R     IgG       13
-## 5 GN5SHBT08I3P11     IgG       36
-## 6 GN5SHBT01BXJY7     IgG        1
-## 7 GN5SHBT01EGEU6     IgA        1
+##      sequence_id isotype duplicate_count
+## 1 GN5SHBT06HH3QD     IgA              10
+## 2 GN5SHBT08F45HV IgA,IgG              10
+## 3       Germline    <NA>              NA
+## 4 GN5SHBT06IFV0R     IgG              13
+## 5 GN5SHBT08I3P11     IgG              36
+## 6 GN5SHBT01BXJY7     IgG               1
+## 7 GN5SHBT01EGEU6     IgA               1
 ```
 
 ## Plotting of the lineage tree
@@ -153,7 +153,7 @@ germline sequence, which is named "Germline" in the object returned by
 V(graph)$color <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
-V(graph)$label <- V(graph)$ISOTYPE
+V(graph)$label <- V(graph)$isotype
 E(graph)$label <- ""
 
 # Remove large default margins
@@ -179,9 +179,9 @@ data.frame on the clone column.
 ```r
 # Preprocess clones
 clones <- ExampleDb %>%
-    group_by(CLONE) %>%
-    do(CHANGEO=makeChangeoClone(., text_fields=c("SAMPLE", "ISOTYPE"), 
-                                num_fields="DUPCOUNT"))
+    group_by(clone_id) %>%
+    do(CHANGEO=makeChangeoClone(., text_fields=c("sample", "isotype"), 
+                                num_fields="duplicate_count"))
 ```
 
 

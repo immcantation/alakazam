@@ -81,26 +81,14 @@ Examples
 
 ```R
 # Calculate diversity
-div <- alphaDiversity(ExampleDb, group="SAMPLE", nboot=100)
-
-```
-
-
-```
- [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8
-[30] 2.9 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3.8 3.9 4.0
-
-```
-
-
-```R
+div <- alphaDiversity(ExampleDb, group="sample", nboot=100)
 
 # Plot diversity
 plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-![4](plotDiversityCurve-4.png)
+![2](plotDiversityCurve-2.png)
 
 ```R
 
@@ -108,7 +96,7 @@ plotDiversityCurve(div, legend_title="Sample")
 plotDiversityCurve(div, legend_title="Sample", score="evenness")
 ```
 
-![6](plotDiversityCurve-6.png)
+![4](plotDiversityCurve-4.png)
 
 
 See also
@@ -116,6 +104,9 @@ See also
 
 See [alphaDiversity](alphaDiversity.md) and [alphaDiversity](alphaDiversity.md) for generating 
 [DiversityCurve](DiversityCurve-class.md) objects for input. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+
+
+
 
 
 

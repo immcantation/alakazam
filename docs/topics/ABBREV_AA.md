@@ -14,6 +14,7 @@ ABBREV_AA
 
 
 
+
 Format
 -------------------
 Named character vector defining single-letter character codes to 
@@ -33,6 +34,10 @@ translateStrings(aa, ABBREV_AA)
 [1] "A" "I" "W"
 
 ```
+
+
+
+
 
 
 

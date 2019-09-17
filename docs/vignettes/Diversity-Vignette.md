@@ -17,21 +17,21 @@ described in:
         generalizing the Good-Turing sample coverage theory. 
         Ecology. 2015 96, 11891201.
 
-This package provides methods for the inferrence of a complete clonal 
-abundance distribution, using the `estimateAbundance` function, along with 
-two approaches to assess diversity of these distributions: 
+This package provides methods for the inference of a complete clonal 
+abundance distribution (using the `estimateAbundance` function) along with 
+two approaches to assess the diversity of these distributions: 
 
 1. Generation of a smooth diversity (D) curve over a range of diversity orders (q) 
-using `alphaDiversity`.
+using `alphaDiversity`, and
 2. A significance test of the diversity (D) at a fixed diversity order (q).
 
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
-Diversity calculation requires the `CLONE` field (column) to be present in the 
-Change-O file, as well as an additional grouping column. In this example we 
-will use the grouping columns `SAMPLE` and `ISOTYPE`.
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
+Diversity calculation requires the `clone` field (column) to be present in the 
+AIRR file, as well as an additional grouping column. In this example we 
+will use the grouping columns `sample` and `isotype`.
 
 
 ```r
@@ -45,26 +45,26 @@ data(ExampleDb)
 ## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
-generated using the `countClones` function either without copy numbers, where
+generated using the `countClones` function either with or without copy numbers, where
 the size of each clone is determined by the number of sequence members:
 
 
 ```r
-# Partitions the data based on the SAMPLE column
-clones <- countClones(ExampleDb, group="SAMPLE")
+# Partitions the data based on the sample column
+clones <- countClones(ExampleDb, group="sample")
 head(clones, 5)
 ```
 
 ```
 ## # A tibble: 5 x 4
-## # Groups:   SAMPLE [1]
-##   SAMPLE CLONE SEQ_COUNT SEQ_FREQ
-##   <chr>  <chr>     <int>    <dbl>
-## 1 +7d    3128        100    0.1  
-## 2 +7d    3100         50    0.05 
-## 3 +7d    3141         44    0.044
-## 4 +7d    3177         30    0.03 
-## 5 +7d    3170         28    0.028
+## # Groups:   sample [1]
+##   sample CLONE SEQ_COUNT SEQ_FREQ
+##   <chr>  <dbl>     <int>    <dbl>
+## 1 +7d     3128       100    0.1  
+## 2 +7d     3100        50    0.05 
+## 3 +7d     3141        44    0.044
+## 4 +7d     3177        30    0.03 
+## 5 +7d     3170        28    0.028
 ```
 
 You may also specify a column containing the abundance count of each sequence 
@@ -76,22 +76,22 @@ normalized to within multiple group data partitions.
 
 
 ```r
-# Partitions the data based on both the SAMPLE and ISOTYPE columns
-# Weights the clone sizes by the DUPCOUNT column
-clones <- countClones(ExampleDb, group=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+# Partitions the data based on both the sample and isotype columns
+# Weights the clone sizes by the duplicate_count column
+clones <- countClones(ExampleDb, group=c("sample", "isotype"), copy="duplicate_count", clone="clone_id")
 head(clones, 5)
 ```
 
 ```
 ## # A tibble: 5 x 7
-## # Groups:   SAMPLE, ISOTYPE [2]
-##   SAMPLE ISOTYPE CLONE SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
-##   <chr>  <chr>   <chr>     <int>      <int>    <dbl>     <dbl>
-## 1 +7d    IgA     3128         88        651   0.331     0.497 
-## 2 +7d    IgG     3100         49        279   0.0928    0.173 
-## 3 +7d    IgA     3141         44        240   0.165     0.183 
-## 4 +7d    IgG     3192         19        141   0.0360    0.0874
-## 5 +7d    IgG     3177         29        130   0.0549    0.0806
+## # Groups:   sample, isotype [2]
+##   sample isotype CLONE SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
+##   <chr>  <chr>   <dbl>     <int>      <dbl>    <dbl>     <dbl>
+## 1 +7d    IgA      3128        88        651   0.331     0.497 
+## 2 +7d    IgG      3100        49        279   0.0928    0.173 
+## 3 +7d    IgA      3141        44        240   0.165     0.183 
+## 4 +7d    IgG      3192        19        141   0.0360    0.0874
+## 5 +7d    IgG      3177        29        130   0.0549    0.0806
 ```
 
 While `countClones` will report observed abundances, it will not provide confidence 
@@ -101,9 +101,9 @@ This output may be visualized using the `plotAbundanceCurve` function.
 
 
 ```r
-# Partitions the data on the SAMPLE column
+# Partitions the data on the sample column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-curve <- estimateAbundance(ExampleDb, group="SAMPLE", ci=0.95, nboot=200)
+curve <- estimateAbundance(ExampleDb, group="sample", ci=0.95, nboot=200, clone="clone_id")
 ```
 
 
@@ -124,18 +124,18 @@ orders (q) to generate a smooth curve.
 
 
 ```r
-# Compare diversity curve across values in the "SAMPLE" column
-# q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 incriments (step_q=0.05)
+# Compare diversity curve across values in the "sample" column
+# q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 increments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
 # 200 resampling realizations are performed (nboot=200)
-sample_curve <- alphaDiversity(ExampleDb, group="SAMPLE",
+sample_curve <- alphaDiversity(ExampleDb, group="sample", clone="clone_id",
                                min_q=0, max_q=4, step_q=0.1,
                                ci=0.95, nboot=200)
 
-# Compare diversity curve across values in the "ISOTYPE" column
-# Analyse is restricted to ISOTYPE values with at least 30 sequences by min_n=30
+# Compare diversity curve across values in the "isotype" column
+# Analyse is restricted to isotype values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
-isotype_curve <- alphaDiversity(ExampleDb, group="ISOTYPE",
+isotype_curve <- alphaDiversity(ExampleDb, group="isotype", clone="clone_id",
                                 min_q=0, max_q=4, step_q=0.1,
                                 ci=0.95, nboot=200)
 ```
@@ -171,37 +171,36 @@ specified.
 
 ```r
 # Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
-# Simpson's index) across values in the "SAMPLE" column
+# Simpson's index) across values in the "sample" column
 # 200 bootstrap realizations are performed (nboot=200)
-isotype_test <- alphaDiversity(ExampleDb, group="ISOTYPE", min_q=0, max_q=2, step_q=1, nboot=200)
-```
+isotype_test <- alphaDiversity(ExampleDb, group="isotype", min_q=0, max_q=2, step_q=1, nboot=200, clone="clone_id")
 
-```
-## [1] 0 1 2
-```
-
-```r
 # Print P-value table
-print(isotype_test)
+print(isotype_test@tests)
 ```
 
 ```
-## # A tibble: 12 x 9
-## # Groups:   ISOTYPE [4]
-##    ISOTYPE     Q     D  D_SD D_LOWER D_UPPER     E E_LOWER E_UPPER
-##    <chr>   <dbl> <dbl> <dbl>   <dbl>   <dbl> <dbl>   <dbl>   <dbl>
-##  1 IgA         0  92.4  5.97   80.7    104.  1      0.873    1.13 
-##  2 IgA         1  36.5  4.45   27.8     45.2 0.395  0.301    0.490
-##  3 IgA         2  12.9  2.06    8.90    17.0 0.140  0.0963   0.184
-##  4 IgD         0 231.   5.24  221.     241.  1      0.956    1.04 
-##  5 IgD         1 220.   7.58  205.     235.  0.951  0.887    1.02 
-##  6 IgD         2 203.  11.9   179.     226.  0.877  0.776    0.978
-##  7 IgG         0  96.5  5.79   85.1    108.  1      0.882    1.12 
-##  8 IgG         1  60.8  5.01   51.0     70.6 0.630  0.529    0.732
-##  9 IgG         2  39.9  4.49   31.1     48.7 0.413  0.322    0.505
-## 10 IgM         0 251.   2.87  245.     256.  1      0.978    1.02 
-## 11 IgM         1 247.   4.11  239.     256.  0.987  0.955    1.02 
-## 12 IgM         2 242.   6.28  230.     255.  0.966  0.917    1.02
+## # A tibble: 18 x 5
+##    TEST       Q     DELTA_MEAN DELTA_SD PVALUE
+##    <chr>      <chr>      <dbl>    <dbl>  <dbl>
+##  1 IgA != IgD 0         139.       7.93   0   
+##  2 IgA != IgD 1         184.       8.34   0   
+##  3 IgA != IgD 2         190.      11.8    0   
+##  4 IgA != IgG 0           3.35     8.36   0.81
+##  5 IgA != IgG 1          23.6      6.26   0   
+##  6 IgA != IgG 2          26.2      4.46   0   
+##  7 IgA != IgM 0         159.       6.16   0   
+##  8 IgA != IgM 1         212.       5.66   0   
+##  9 IgA != IgM 2         230.       6.22   0   
+## 10 IgD != IgG 0         135.       7.98   0   
+## 11 IgD != IgG 1         160.       9.40   0   
+## 12 IgD != IgG 2         164.      13.0    0   
+## 13 IgD != IgM 0          20.1      6.09   0   
+## 14 IgD != IgM 1          28.0      8.69   0   
+## 15 IgD != IgM 2          39.5     13.2    0   
+## 16 IgG != IgM 0         155.       6.20   0   
+## 17 IgG != IgM 1         188.       5.86   0   
+## 18 IgG != IgM 2         204.       7.16   0
 ```
 
 ```r

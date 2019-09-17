@@ -133,9 +133,9 @@ Examples
 ```R
 ### Not run:
 # Preprocess clone
-# db <- subset(ExampleDb, CLONE == 3138)
-# clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
-# num_fields="DUPCOUNT")
+# db <- subset(ExampleDb, clone_id == 3138)
+# clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+# num_fields="duplicate_count")
 # 
 # # Run PHYLIP and process output
 # dnapars_exec <- "~/apps/phylip-3.69/dnapars"
@@ -143,13 +143,13 @@ Examples
 # 
 # # Plot graph with a tree layout
 # library(igraph)
-# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$isotype, 
 # vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 # 
 # # To consider each indel event as a mutation, change the masking character 
 # # and distance matrix
-# clone <- makeChangeoClone(db, text_fields=c("SAMPLE", "ISOTYPE"), 
-# num_fields="DUPCOUNT", mask_char="-")
+# clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+# num_fields="duplicate_count", mask_char="-")
 # graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
 # rm_temp=TRUE)
 ```
@@ -164,6 +164,9 @@ Temporary directories are created with [makeTempDir](makeTempDir.md).
 Distance is calculated using [seqDist](seqDist.md). 
 See [igraph](http://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package) and [igraph.plotting](http://www.rdocumentation.org/packages/igraph/topics/plot.common) for working 
 with igraph `graph` objects.
+
+
+
 
 
 

@@ -38,7 +38,7 @@ makeTempDir("Clone50")
 
 
 ```
-[1] "/var/folders/dv/8ryjx62x2dxfsb1zp8_9zl0m0000gp/T//RtmpXyVEHR/Clone50-temp-10b397f573c35"
+[1] "/tmp/RtmpTjuhPR/Clone50-temp-625666d1ec"
 
 ```
 
@@ -49,6 +49,9 @@ See also
 
 This is just a wrapper for [tempfile](http://www.rdocumentation.org/packages/base/topics/tempfile) and 
 [dir.create](http://www.rdocumentation.org/packages/base/topics/files2).
+
+
+
 
 
 

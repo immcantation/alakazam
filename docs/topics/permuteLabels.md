@@ -47,23 +47,31 @@ vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
-![2](permuteLabels-2.png)
 
 ```R
 
 # Permute annotations and plot new tree
 g <- permuteLabels(graph, "ISOTYPE")
+
+```
+
+*Warning*:Only 1 node to permute
+
+```R
 plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE,
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
-![4](permuteLabels-4.png)
+![5](permuteLabels-5.png)
 
 
 See also
 -------------------
 
 [testEdges](testEdges.md).
+
+
+
 
 
 

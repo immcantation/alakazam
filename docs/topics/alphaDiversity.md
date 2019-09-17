@@ -96,45 +96,23 @@ Examples
 
 ```R
 # Group by sample identifier in two steps
-abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 div <- alphaDiversity(abund, step_q=1, max_q=10)
-
-```
-
-
-```
- [1]  0  1  2  3  4  5  6  7  8  9 10
-
-```
-
-
-```R
 plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-![4](alphaDiversity-4.png)
+![2](alphaDiversity-2.png)
 
 ```R
 
 # Grouping by isotype rather than sample identifier in one step
-div <- alphaDiversity(ExampleDb, group="ISOTYPE", min_n=40, step_q=1, max_q=10, 
+div <- alphaDiversity(ExampleDb, group="isotype", min_n=40, step_q=1, max_q=10, 
 nboot=100)
-
-```
-
-
-```
- [1]  0  1  2  3  4  5  6  7  8  9 10
-
-```
-
-
-```R
 plotDiversityCurve(div, legend_title="Isotype")
 ```
 
-![8](alphaDiversity-8.png)
+![4](alphaDiversity-4.png)
 
 
 See also
@@ -143,6 +121,9 @@ See also
 See [calcDiversity](calcDiversity.md) for the basic calculation and 
 [DiversityCurve](DiversityCurve-class.md) for the return object. 
 See [plotDiversityCurve](plotDiversityCurve.md) for plotting the return object.
+
+
+
 
 
 

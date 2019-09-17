@@ -18,7 +18,7 @@ Arguments
 -------------------
 
 data
-:   data.frame with Change-O style columns.
+:   data.frame with AIRR-format or Change-O style columns.
 
 gene
 :   column containing allele assignments. Only the first allele in the
@@ -85,22 +85,26 @@ Examples
 
 ```R
 # Without copy numbers
-genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="family")
-genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="gene")
-genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", mode="allele")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="family")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="allele")
 
 # With copy numbers and multiple groups
-genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-copy="DUPCOUNT", mode="family")
+genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+copy="duplicate_count", mode="family")
 
 # Count by clone
-genes <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-clone="CLONE", mode="family")
+genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+clone="clone_id", mode="family")
 
 # Count absent genes 
-genes <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample", 
 mode="allele", fill=TRUE)
 ```
+
+
+
+
 
 
 

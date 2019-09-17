@@ -18,6 +18,7 @@ IUPAC_AA
 
 
 
+
 Format
 -------------------
 A list with single character codes as names and values containing character 
@@ -26,6 +27,10 @@ ambiguous character.
 
 + `IUPAC_DNA`:  DNA ambiguous character translations.
 + `IUPAC_AA`:   Amino acid ambiguous character translations.
+
+
+
+
 
 
 

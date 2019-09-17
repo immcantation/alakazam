@@ -20,6 +20,7 @@ TR_COLORS
 
 
 
+
 Format
 -------------------
 Named character vectors with hexcode colors as values.
@@ -59,6 +60,10 @@ plot(1:4, 1:4, col=colors, pch=16, cex=6)
 ```
 
 ![4](DEFAULT_COLORS-4.png)
+
+
+
+
 
 
 

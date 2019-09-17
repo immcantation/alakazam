@@ -50,10 +50,10 @@ Examples
 
 ```R
 # Calculate clone sizes
-clones <- countClones(ExampleDb, groups="SAMPLE")
+clones <- countClones(ExampleDb, groups="sample")
 
 # Calculate 1first order coverage for a single sample
-calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "+7d"])
+calcCoverage(clones$SEQ_COUNT[clones$sample == "+7d"])
 ```
 
 
@@ -68,6 +68,9 @@ See also
 -------------------
 
 Used by [alphaDiversity](alphaDiversity.md).
+
+
+
 
 
 

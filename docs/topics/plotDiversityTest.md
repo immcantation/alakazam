@@ -68,25 +68,14 @@ Examples
 
 ```R
 # Calculate diversity
-div <- alphaDiversity(ExampleDb, group="SAMPLE", min_q=0, max_q=2, step_q=1, nboot=100)
-
-```
-
-
-```
-[1] 0 1 2
-
-```
-
-
-```R
+div <- alphaDiversity(ExampleDb, group="sample", min_q=0, max_q=2, step_q=1, nboot=100)
 
 # Plot results at q=0 (equivalent to species richness)
 plotDiversityTest(div, 0, legend_title="Sample")
 
 ```
 
-![4](plotDiversityTest-4.png)
+![2](plotDiversityTest-2.png)
 
 ```R
 
@@ -94,7 +83,7 @@ plotDiversityTest(div, 0, legend_title="Sample")
 plotDiversityTest(div, q=2, legend_title="Sample")
 ```
 
-![6](plotDiversityTest-6.png)
+![4](plotDiversityTest-4.png)
 
 
 See also
@@ -102,6 +91,9 @@ See also
 
 See [alphaDiversity](alphaDiversity.md) for generating input.
 Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+
+
+
 
 
 

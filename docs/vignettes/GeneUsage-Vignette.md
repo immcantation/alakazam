@@ -7,15 +7,15 @@ are also provided.
 
 ## Example data
 
-A small example Change-O database, `ExampleDb`, is included in the `alakazam` package. 
-Gene usages analysis requires only the following columns:
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
+Gene usage analysis requires only the following columns:
 
-* `V_CALL`
-* `D_CALL`
-* `J_CALL`
+* `v_call`
+* `d_call`
+* `j_call`
 
-However, the optional clonal clustering (`CLONE`) and duplicate count (`DUPCOUNT`) 
-columns may be used to quanitify usage by different abundance criteria.
+However, the optional clonal clustering (`clone_id`) and duplicate count (`duplicate_count`) 
+columns may be used to quantify usage by different abundance criteria.
 
 
 ```r
@@ -32,22 +32,21 @@ data(ExampleDb)
 
 The relative abundance of V(D)J alleles, genes or families within groups can be obtained 
 with the function `countGenes`. To analyze differences in the V gene usage across 
-different samples we will set `gene="V_CALL"` (the column containing gene data) and 
-`groups="SAMPLE"` (the columns containing grouping variables). To quanitify abundance at
+different samples we will set `gene="v_call"` (the column containing gene data) and 
+`groups="sample"` (the columns containing grouping variables). To quantify abundance at
 the gene level we set `mode="gene"`:
 
 
 ```r
 # Quantify usage at the gene level
-gene <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
-                   mode="gene")
+gene <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
 head(gene, n=4)
 ```
 
 ```
 ## # A tibble: 4 x 4
-## # Groups:   SAMPLE [2]
-##   SAMPLE GENE     SEQ_COUNT SEQ_FREQ
+## # Groups:   sample [2]
+##   sample GENE     SEQ_COUNT SEQ_FREQ
 ##   <chr>  <chr>        <int>    <dbl>
 ## 1 +7d    IGHV3-49       699    0.699
 ## 2 -1h    IGHV3-9         83    0.083
@@ -55,8 +54,8 @@ head(gene, n=4)
 ## 4 -1h    IGHV3-30        58    0.058
 ```
 
-In the resultant `data.frame` the `SEQ_COUNT` columns is the number of raw sequences within each `SAMPLE` 
-group for the given `GENE`. `SEQ_FREQ` is the frequency of each `GENE` within the given `SAMPLE`.
+In the resultant `data.frame`, the `SEQ_COUNT` column is the number of raw sequences within each `sample` 
+group for the given `GENE`. `SEQ_FREQ` is the frequency of each `GENE` within the given `sample`.
 
 Below we plot only the IGHV1 abundance by filtering on the `GENE` column to only rows 
 containing IGHV1 family genes. We extract the family portion of the gene name using the 
@@ -81,7 +80,7 @@ g1 <- ggplot(ighv1, aes(x=GENE, y=SEQ_FREQ)) +
     xlab("") +
     scale_y_continuous(labels=percent) +
     scale_color_brewer(palette="Set1") +
-    geom_point(aes(color=SAMPLE), size=5, alpha=0.8)
+    geom_point(aes(color=sample), size=5, alpha=0.8)
 plot(g1)
 ```
 
@@ -93,8 +92,7 @@ family level (`mode="family"`):
 
 ```r
 # Quantify V family usage by sample
-family <- countGenes(ExampleDb, gene="V_CALL", groups="SAMPLE", 
-                     mode="family")
+family <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="family")
 
 # Plot V family usage by sample
 g2 <- ggplot(family, aes(x=GENE, y=SEQ_FREQ)) +
@@ -105,7 +103,7 @@ g2 <- ggplot(family, aes(x=GENE, y=SEQ_FREQ)) +
     xlab("") +
     scale_y_continuous(labels=percent) +
     scale_color_brewer(palette="Set1") +
-    geom_point(aes(color=SAMPLE), size=5, alpha=0.8)
+    geom_point(aes(color=sample), size=5, alpha=0.8)
 plot(g2)
 ```
 
@@ -115,27 +113,27 @@ plot(g2)
 ## Tabulating gene abundance using additional groupings
 
 The `groups` argument to `countGenes` can accept multiple grouping columns and
-will calculated abundance within each unique combination. In the examples below
+will calculate abundance within each unique combination. In the examples below,
 groupings will be perform by unique sample and isotype pairs 
-(`groups=c("SAMPLE", "ISOTYPE")`). Furthermore, instead of quantifying abundance
-by sequence count we will quantify it by clone count. Meaning, each clone will
-be counted only once regardless of how many sequences the clone represents.  
+(`groups=c("sample", "isotype")`). Furthermore, instead of quantifying abundance
+by sequence count, we will quantify it by clone count (each clone will
+be counted only once regardless of how many sequences the clone represents).  
 Clonal citeria are added by passing a value to the `clone` argument of `countGenes`
-(`clone="CLONE"`). For each clonal group, only the most common family/gene/allele will
+(`clone="clone_id"`). For each clonal group, only the most common allele/gene/family will
 be considered for counting.
 
 
 ```r
 # Quantify V family clonal usage by sample and isotype
-family <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                     clone="CLONE", mode="family")
+family <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+                     clone="clone_id", mode="family")
 head(family, n=4)
 ```
 
 ```
 ## # A tibble: 4 x 5
-## # Groups:   SAMPLE, ISOTYPE [3]
-##   SAMPLE ISOTYPE GENE  CLONE_COUNT CLONE_FREQ
+## # Groups:   sample, isotype [3]
+##   sample isotype GENE  CLONE_COUNT CLONE_FREQ
 ##   <chr>  <chr>   <chr>       <int>      <dbl>
 ## 1 -1h    IgA     IGHV2           1     0.0149
 ## 2 -1h    IgG     IGHV6           1     0.0156
@@ -143,14 +141,14 @@ head(family, n=4)
 ## 4 +7d    IgA     IGHV6           1     0.0172
 ```
 
-The output `data.frame` contains the additional grouping column (`ISOTYPE`) along with the 
+The output `data.frame` contains the additional grouping column (`isotype`) along with the 
 `CLONE_COUNT` and `CLONE_FREQ` columns that represent the count of clones for each V family 
-and the frequencies within the given `SAMPLE` and `ISOTYPE` pair, respectively.
+and the frequencies within the given `sample` and `isotype` pair, respectively.
 
 
 ```r
 # Subset to IgM and IgG for plotting
-family <- filter(family, ISOTYPE %in% c("IgM", "IgG"))
+family <- filter(family, isotype %in% c("IgM", "IgG"))
 # Plot V family clonal usage by sample and isotype
 g3 <- ggplot(family, aes(x=GENE, y=CLONE_FREQ)) +
     theme_bw() +
@@ -160,8 +158,8 @@ g3 <- ggplot(family, aes(x=GENE, y=CLONE_FREQ)) +
     xlab("") +
     scale_y_continuous(labels=percent) +
     scale_color_brewer(palette="Set1") +
-    geom_point(aes(color=SAMPLE), size=5, alpha=0.8) +
-    facet_grid(. ~ ISOTYPE)
+    geom_point(aes(color=sample), size=5, alpha=0.8) +
+    facet_grid(. ~ isotype)
 plot(g3)
 ```
 
@@ -169,23 +167,23 @@ plot(g3)
 
 Instead of calculating abundance by sequence or clone count, abundance can be calculated
 using copy numbers for the individual sequences.  This is accomplished by passing
-a copy number column to the `copy` argument (`copy="DUPCOUNT"`). Specifying both
+a copy number column to the `copy` argument (`copy="duplicate_count"`). Specifying both
 `clone` and `copy` arguments is not meaningful and will result in the `clone` argument
 being ignored.
 
 
 ```r
 # Calculate V family copy numbers by sample and isotype
-family <- countGenes(ExampleDb, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                    mode="family", copy="DUPCOUNT")
+family <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+                     mode="family", copy="duplicate_count")
 head(family, n=4)
 ```
 
 ```
 ## # A tibble: 4 x 7
-## # Groups:   SAMPLE, ISOTYPE [3]
-##   SAMPLE ISOTYPE GENE  SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
-##   <chr>  <chr>   <chr>     <int>      <int>    <dbl>     <dbl>
+## # Groups:   sample, isotype [3]
+##   sample isotype GENE  SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
+##   <chr>  <chr>   <chr>     <int>      <dbl>    <dbl>     <dbl>
 ## 1 +7d    IgG     IGHV3       516       1587    0.977     0.984
 ## 2 +7d    IgA     IGHV3       240       1224    0.902     0.935
 ## 3 -1h    IgM     IGHV3       237        250    0.421     0.386
@@ -194,12 +192,12 @@ head(family, n=4)
 
 The output `data.frame` includes the `SEQ_COUNT` and `SEQ_FREQ` columns as previously defined, 
 as well as the additional copy number columns `COPY_COUNT` and `COPY_FREQ` reflected the summed 
-copy number (`DUPCOUNT`) for each sequence within the given `GENE`, `SAMPLE` and `ISOTYPE`.
+copy number (`duplicate_count`) for each sequence within the given `GENE`, `sample` and `isotype`.
 
 
 ```r
 # Subset to IgM and IgG for plotting
-family <- filter(family, ISOTYPE %in% c("IgM", "IgG"))
+family <- filter(family, isotype %in% c("IgM", "IgG"))
 # Plot V family copy abundance by sample and isotype
 g4 <- ggplot(family, aes(x=GENE, y=COPY_FREQ)) +
     theme_bw() +
@@ -209,8 +207,8 @@ g4 <- ggplot(family, aes(x=GENE, y=COPY_FREQ)) +
     xlab("") +
     scale_y_continuous(labels=percent) +
     scale_color_brewer(palette="Set1") +
-    geom_point(aes(color=SAMPLE), size=5, alpha=0.8) +
-    facet_grid(. ~ ISOTYPE)
+    geom_point(aes(color=sample), size=5, alpha=0.8) +
+    facet_grid(. ~ isotype)
 plot(g4)
 ```
 

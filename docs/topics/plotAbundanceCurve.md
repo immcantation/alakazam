@@ -69,11 +69,11 @@ Examples
 
 ```R
 # Estimate abundance by sample and plot
-abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 plotAbundanceCurve(abund, legend_title="Sample")
 ```
 
-**Error in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, **: polygon edge not found![3](plotAbundanceCurve-3.png)
+![2](plotAbundanceCurve-2.png)
 
 
 See also
@@ -82,6 +82,9 @@ See also
 See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for 
 generating the input abundance distribution.
 Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+
+
+
 
 
 

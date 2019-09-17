@@ -10,10 +10,10 @@ characters, removes the duplicate entries, and combines any associated annotatio
 Usage
 --------------------
 ```
-collapseDuplicates(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
-text_fields = NULL, num_fields = NULL, seq_fields = NULL,
-add_count = FALSE, ignore = c("N", "-", ".", "?"), sep = ",",
-dry = FALSE, verbose = FALSE)
+collapseDuplicates(data, id = "sequence_id",
+seq = "sequence_alignment", text_fields = NULL, num_fields = NULL,
+seq_fields = NULL, add_count = FALSE, ignore = c("N", "-", ".",
+"?"), sep = ",", dry = FALSE, verbose = FALSE)
 ```
 
 Arguments
@@ -127,8 +127,8 @@ Examples
 
 ```R
 # Example Change-O data.frame
-db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+db <- data.frame(sequence_id=LETTERS[1:4],
+sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
 TYPE=c("IgM", "IgG", "IgG", "IgA"),
 SAMPLE=c("S1", "S1", "S2", "S2"),
 COUNT=1:4,
@@ -154,9 +154,9 @@ DISCARDED> 1
 
 
 ```
-  SEQUENCE_ID SEQUENCE_IMGT TYPE SAMPLE COUNT
-1           C      NAACTGGN  IgG     S2     3
-2           A      CCCCTGGG  IgM     S1     1
+  sequence_id sequence_alignment TYPE SAMPLE COUNT
+1           C           NAACTGGN  IgG     S2     3
+2           A           CCCCTGGG  IgM     S1     1
 
 ```
 
@@ -185,9 +185,9 @@ DISCARDED> 1
 
 
 ```
-  SEQUENCE_ID SEQUENCE_IMGT    TYPE SAMPLE COUNT
-1           C      NAACTGGN     IgG     S2     3
-2           A      CCCCTGGG IgG,IgM     S1     3
+  sequence_id sequence_alignment    TYPE SAMPLE COUNT
+1           C           NAACTGGN     IgG     S2     3
+2           A           CCCCTGGG IgG,IgM     S1     3
 
 ```
 
@@ -214,9 +214,9 @@ DISCARDED> 1
 
 
 ```
-  SEQUENCE_ID SEQUENCE_IMGT    TYPE SAMPLE COUNT
-1           C      NAACTGGN     IgG     S2     3
-2           A      CCCCTGGG IgG/IgM     S1     3
+  sequence_id sequence_alignment    TYPE SAMPLE COUNT
+1           C           NAACTGGN     IgG     S2     3
+2           A           CCCCTGGG IgG/IgM     S1     3
 
 ```
 
@@ -243,9 +243,9 @@ DISCARDED> 1
 
 
 ```
-  SEQUENCE_ID SEQUENCE_IMGT    TYPE SAMPLE COUNT COLLAPSE_COUNT
-1           C      NAACTGGN     IgG     S2     3              1
-2           A      CCCCTGGG IgG,IgM     S1     3              2
+  sequence_id sequence_alignment    TYPE SAMPLE COUNT COLLAPSE_COUNT
+1           C           NAACTGGN     IgG     S2     3              1
+2           A           CCCCTGGG IgG,IgM     S1     3              2
 
 ```
 
@@ -253,7 +253,7 @@ DISCARDED> 1
 ```R
 
 # Masking ragged ends may impact duplicate removal
-db$SEQUENCE_IMGT <- maskSeqEnds(db$SEQUENCE_IMGT)
+db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
 collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
 add_count=TRUE, verbose=TRUE)
 ```
@@ -272,8 +272,8 @@ DISCARDED> 0
 
 
 ```
-  SEQUENCE_ID SEQUENCE_IMGT        TYPE SAMPLE COUNT COLLAPSE_COUNT
-1           A      NNNCTGNN IgA,IgG,IgM  S1,S2    10              4
+  sequence_id sequence_alignment        TYPE SAMPLE COUNT COLLAPSE_COUNT
+1           A           NNNCTGNN IgA,IgG,IgM  S1,S2    10              4
 
 ```
 
@@ -284,6 +284,9 @@ See also
 
 Equality is tested with [seqEqual](seqEqual.md) and [pairwiseEqual](pairwiseEqual.md). 
 For IUPAC ambiguous character codes see [IUPAC_DNA](IUPAC_CODES.md).
+
+
+
 
 
 

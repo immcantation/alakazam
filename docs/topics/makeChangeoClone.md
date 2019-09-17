@@ -3,7 +3,7 @@
 Description
 --------------------
 
-`makeChangeoClone` takes a data.frame with Change-O style columns as input and 
+`makeChangeoClone` takes a data.frame with AIRR or Change-O style columns as input and 
 masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
 annotations associated with duplicate sequences. It returns a `ChangeoClone` 
 object which serves as input for lineage reconstruction.
@@ -12,19 +12,19 @@ object which serves as input for lineage reconstruction.
 Usage
 --------------------
 ```
-makeChangeoClone(data, id = "SEQUENCE_ID", seq = "SEQUENCE_IMGT",
-germ = "GERMLINE_IMGT_D_MASK", vcall = "V_CALL", jcall = "J_CALL",
-junc_len = "JUNCTION_LENGTH", clone = "CLONE", mask_char = "N",
-max_mask = 0, pad_end = FALSE, text_fields = NULL,
-num_fields = NULL, seq_fields = NULL, add_count = TRUE,
-verbose = FALSE)
+makeChangeoClone(data, id = "sequence_id", seq = "sequence_alignment",
+germ = "germline_alignment_d_mask", vcall = "v_call",
+jcall = "j_call", junc_len = "junction_length", clone = "clone_id",
+mask_char = "N", max_mask = 0, pad_end = FALSE,
+text_fields = NULL, num_fields = NULL, seq_fields = NULL,
+add_count = TRUE, verbose = FALSE)
 ```
 
 Arguments
 -------------------
 
 data
-:   data.frame containing the Change-O data for a clone. See Details
+:   data.frame containing the AIRR or Change-O data for a clone. See Details
 for the list of required columns and their default values.
 
 id
@@ -108,13 +108,13 @@ The input data.frame (`data`) must columns for each of the required column name
 arguments: `id`, `seq`, `germ`, `vcall`, `jcall`, 
 `junc_len`, and `clone`.  The default values are as follows:
 
-+ `id       = "SEQUENCE_ID"`:           unique sequence identifier.
-+ `seq      = "SEQUENCE_IMGT"`:         IMGT-gapped sample sequence.
-+ `germ     = "GERMLINE_IMGT_D_MASK"`:  IMGT-gapped germline sequence.
-+ `vcall    = "V_CALL"`:                V-segment allele call.
-+ `jcall    = "J_CALL"`:                J-segment allele call.
-+ `junc_len = "JUNCTION_LENGTH"`:       junction sequence length.
-+ `clone    = "CLONE"`:                 clone identifier.
++ `id       = "sequence_id"`:           unique sequence identifier.
++ `seq      = "sequence_alignment"`:         IMGT-gapped sample sequence.
++ `germ     = "germline_alignment_d_mask"`:  IMGT-gapped germline sequence.
++ `vcall    = "v_call"`:                V-segment allele call.
++ `jcall    = "j_call"`:                J-segment allele call.
++ `junc_len = "junction_length"`:       junction sequence length.
++ `clone    = "clone_id"`:                 clone identifier.
 
 Additional annotation columns specified in the `text_fields`, `num_fields` 
 or `seq_fields` arguments will be retained in the `data` slot of the return 
@@ -138,81 +138,31 @@ Examples
 
 ```R
 # Example Change-O data.frame
-db <- data.frame(SEQUENCE_ID=LETTERS[1:4],
-SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-V_CALL="Homsap IGKV1-39*01 F",
-J_CALL="Homsap IGKJ5*01 F",
-JUNCTION_LENGTH=2,
-GERMLINE_IMGT_D_MASK="CCCCAGGG",
-CLONE=1,
+db <- data.frame(sequence_id=LETTERS[1:4],
+sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+v_call="Homsap IGKV1-39*01 F",
+j_call="Homsap IGKJ5*01 F",
+junction_length=2,
+germline_imgt_d_mask="CCCCAGGG",
+clone_id=1,
 TYPE=c("IgM", "IgG", "IgG", "IgA"),
 COUNT=1:4,
 stringsAsFactors=FALSE)
 
-# Without end masking
-makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
+
+ # Without end masking
+ makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
 
 ```
 
-
-```
-An object of class "ChangeoClone"
-Slot "data":
-  SEQUENCE_ID SEQUENCE    TYPE COUNT COLLAPSE_COUNT
-1           C NAACTGGN     IgG     3              1
-2           A CCCCTGGG IgG,IgM     3              2
-
-Slot "clone":
-[1] "1"
-
-Slot "germline":
-[1] "CCCCAGGG"
-
-Slot "v_gene":
-[1] "IGKV1-39"
-
-Slot "j_gene":
-[1] "IGKJ5"
-
-Slot "junc_len":
-[1] 2
-
-
-```
-
-
+**Error in makeChangeoClone(db, text_fields = "TYPE", num_fields = "COUNT")**: The column germline_alignment_d_mask was not found
 ```R
 
-# With end masking
-makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+ # With end masking
+ makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
 ```
 
-
-```
-An object of class "ChangeoClone"
-Slot "data":
-  SEQUENCE_ID SEQUENCE        TYPE COUNT COLLAPSE_COUNT
-1           A NNNCTGNN IgA,IgG,IgM    10              4
-
-Slot "clone":
-[1] "1"
-
-Slot "germline":
-[1] "CCCCAGGG"
-
-Slot "v_gene":
-[1] "IGKV1-39"
-
-Slot "j_gene":
-[1] "IGKJ5"
-
-Slot "junc_len":
-[1] 2
-
-
-```
-
-
+**Error in makeChangeoClone(db, max_mask = 3, text_fields = "TYPE", num_fields = "COUNT")**: The column germline_alignment_d_mask was not found
 
 See also
 -------------------
@@ -221,6 +171,9 @@ Executes in order [maskSeqGaps](maskSeqGaps.md), [maskSeqEnds](maskSeqEnds.md),
 [padSeqEnds](padSeqEnds.md), and [collapseDuplicates](collapseDuplicates.md). 
 Returns a [ChangeoClone](ChangeoClone-class.md) object which serves as input to
 [buildPhylipLineage](buildPhylipLineage.md).
+
+
+
 
 
 

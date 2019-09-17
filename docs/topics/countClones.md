@@ -10,7 +10,7 @@ clonal groups.
 Usage
 --------------------
 ```
-countClones(data, groups = NULL, copy = NULL, clone = "CLONE")
+countClones(data, groups = NULL, copy = NULL, clone = "clone_id")
 ```
 
 Arguments
@@ -39,7 +39,7 @@ Value
 
 A data.frame summarizing clone counts and frequencies with columns:
 
-+  `CLONE`:       clone identifier.
++  `CLONE`:    	 clone identifier.
 +  `SEQ_COUNT`:   total number of sequences for the clone.
 +  `SEQ_FREQ`:    frequency of the clone as a fraction of the total
 number of sequences within each group.
@@ -59,11 +59,15 @@ Examples
 
 ```R
 # Without copy numbers
-clones <- countClones(ExampleDb, groups="SAMPLE")
+clones <- countClones(ExampleDb, groups="sample")
 
 # With copy numbers and multiple groups
-clones <- countClones(ExampleDb, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT")
+clones <- countClones(ExampleDb, groups=c("sample", "isotype"), copy="duplicate_count")
 ```
+
+
+
+
 
 
 

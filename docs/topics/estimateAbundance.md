@@ -10,9 +10,9 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, clone = "CLONE", copy = NULL, group = NULL,
-min_n = 30, max_n = NULL, uniform = TRUE, ci = 0.95,
-nboot = 200, progress = FALSE)
+estimateAbundance(data, clone = "clone_id", copy = NULL,
+group = NULL, min_n = 30, max_n = NULL, uniform = TRUE,
+ci = 0.95, nboot = 200, progress = FALSE)
 ```
 
 Arguments
@@ -87,7 +87,7 @@ Examples
 -------------------
 
 ```R
-abund <- estimateAbundance(ExampleDb, group="SAMPLE", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
 ```
 
 
@@ -97,6 +97,9 @@ See also
 
 See [plotAbundanceCurve](plotAbundanceCurve.md) for plotting of the abundance distribution.
 See [alphaDiversity](alphaDiversity.md) for a similar application to clonal diversity.
+
+
+
 
 
 

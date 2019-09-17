@@ -1,3 +1,11 @@
+Version 0.3.0.999:  July 17, 2019
+-------------------------------------------------------------------------------
+
+Diversity:
+
++ Fixed documentation error in Diversity-Vignetted.rmd for viewing test results 
+  given new diversity object.
+
 Version 0.3.0:  July 17, 2019
 -------------------------------------------------------------------------------
 

@@ -98,8 +98,7 @@ plotSubtrees(graphs, "SAMPLE", "out", style="v")
 
 ```
 
-![2](plotSubtrees-2.png)
-
+**Error**: Evaluation error: object 'SAMPLE' not found.
 ```R
 
 # Violin plots of subtree size by sample
@@ -107,21 +106,22 @@ plotSubtrees(graphs, "SAMPLE", "size", style="v")
 
 ```
 
-![4](plotSubtrees-4.png)
-
+**Error**: Evaluation error: object 'SAMPLE' not found.
 ```R
 
 # Boxplot of node depth by isotype
 plotSubtrees(graphs,  "ISOTYPE", "depth", style="b")
 ```
 
-![6](plotSubtrees-6.png)
-
+**Error**: Evaluation error: object 'ISOTYPE' not found.
 
 See also
 -------------------
 
 Subtree statistics are calculated with [summarizeSubtrees](summarizeSubtrees.md).
+
+
+
 
 
 

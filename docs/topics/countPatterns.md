@@ -73,3 +73,7 @@ countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="CDR3")
 
 
 
+
+
+
+
