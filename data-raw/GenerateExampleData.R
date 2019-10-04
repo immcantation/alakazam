@@ -11,6 +11,7 @@ library(igraph)
 ExampleDb <- readChangeoDb("data-raw/ExampleDb.gz")
 ExampleDb <- ExampleDb[c("sequence_id",
                          "sequence_alignment",
+                         "germline_alignment",
                          "germline_alignment_d_mask",
                          "v_call",
                          "v_call_genotyped",
@@ -26,8 +27,8 @@ ExampleDb <- ExampleDb[c("sequence_id",
                          "sample_id")]
 c_trans <- c(IGHM="IgM", IGHD="IgD", IGHA="IgA", IGHG="IgG")
 ExampleDb <- ExampleDb %>%
-    rename("germline_alignment"="germline_alignment_d_mask") %>%
-    mutate(c_call=translateStrings(c_call, c_trans))
+    mutate(c_call=translateStrings(c_call, c_trans),
+           germline_alignment=germline_alignment_d_mask)
 
 
 # Save
