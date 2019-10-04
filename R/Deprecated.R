@@ -74,11 +74,11 @@ NULL
 #' @examples
 #' \dontrun{
 #' # Group by sample identifier
-#' div <- rarefyDiversity(ExampleDb, "SAMPLE", step_q=1, max_q=10, nboot=100)
+#' div <- rarefyDiversity(ExampleDb, "sample_id", step_q=1, max_q=10, nboot=100)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
 #' # Grouping by isotype rather than sample identifier
-#' div <- rarefyDiversity(ExampleDb, "ISOTYPE", min_n=40, step_q=1, max_q=10, 
+#' div <- rarefyDiversity(ExampleDb, "c_call", min_n=40, step_q=1, max_q=10, 
 #'                        nboot=100)
 #' plotDiversityCurve(div, legend_title="Isotype")
 #' }
@@ -171,7 +171,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @examples  
 #' \dontrun{
 #' # Groups under the size threshold are excluded and a warning message is issued.
-#' testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
+#' testDiversity(ExampleDb, "sample_id", q=0, min_n=30, nboot=100)
 #' }
 #' 
 #' @export

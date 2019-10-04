@@ -24,22 +24,22 @@
 #'   \itemize{
 #'     \item  \code{sequence_id}:           Sequence identifier
 #'     \item  \code{sequence_alignment}:    IMGT-gapped observed sequence.
-#'     \item  \code{germline_alignment_d_mask}:  IMGT-gapped germline sequence with N, P and 
+#'     \item  \code{germline_alignment}:    IMGT-gapped germline sequence with N, P and 
 #'                                          D regions masked.
 #'     \item  \code{v_call}:                V region allele assignments.
 #'     \item  \code{v_call_genotyped}:      TIgGER corrected V region allele assignment.
 #'     \item  \code{d_call}:                D region allele assignments.
 #'     \item  \code{j_call}:                J region allele assignments.
+#'     \item  \code{c_call}:                Isotype (C region) assignment.
 #'     \item  \code{junction}:              Junction region sequence.
 #'     \item  \code{junction_length}:       Length of the junction region in nucleotides.
 #'     \item  \code{np1_length}:            Combined length of the N and P regions proximal
 #'                                          to the V region.
 #'     \item  \code{np2_length}:            Combined length of the N and P regions proximal
 #'                                          to the J region.
-#'     \item  \code{sample}:                Sample identifier. Time in relation to vaccination.
-#'     \item  \code{isotype}:               Isotype assignment.
 #'     \item  \code{duplicate_count}:       Copy count (number of duplicates) of the sequence.
 #'     \item  \code{clone_id}:              Change-O assignment clonal group identifier.
+#'     \item  \code{sample_id}:             Sample identifier. Time in relation to vaccination.
 #' }
 #' 
 #' @seealso \link{ExampleDbChangeo} \link{ExampleTrees}
@@ -97,8 +97,8 @@
 #' @format   A list of igraph objects output by \link{buildPhylipLineage}.
 #'           Each node of each tree has the following annotations (vertex attributes):
 #'   \itemize{
-#'     \item  \code{sample}:    Sample identifier(s). Time in relation to vaccination.
-#'     \item  \code{isotype}:   Isotype assignment(s). 
+#'     \item  \code{sample_id}:          Sample identifier(s). Time in relation to vaccination.
+#'     \item  \code{c_call}:             Isotype assignment(s). 
 #'     \item  \code{duplication_count}:  Copy count (number of duplicates) of the sequence.
 #'   }
 #'   
@@ -117,14 +117,14 @@
 #'   \item  \code{DNA_COLORS}:  DNA character colors 
 #'                              \code{c("A", "C", "G", "T")}.
 #'   \item  \code{IG_COLORS}:   Ig isotype colors 
-#'                              \code{c("IgA", "IgD", "IgE", "IgG", "IgM", "IgK", "IgL")}.
+#'                              \code{c("IGHA", "IGHD", "IGHE", "IGHG", "IGHM", "IGHK", "IGHL")}.
 #'   \item  \code{TR_COLORS}:   TCR chain colors 
 #'                              \code{c("TRA", "TRB", "TRD", "TRG")}.
 #' }
 #' 
 #' @examples 
 #' # IG_COLORS as an isotype color set for ggplot
-#' isotype <- c("IgG", "IgM", "IgM", "IgA")
+#' isotype <- c("IGHG", "IGHM", "IGHM", "IGHA")
 #' db <- data.frame(x=1:4, y=1:4, iso=isotype)
 #' g1 <- ggplot(db, aes(x=x, y=y, color=iso)) + 
 #'     scale_color_manual(name="Isotype", values=IG_COLORS) +
@@ -149,13 +149,13 @@ DNA_COLORS <- c("A"="#64F73F",
 
 #' @rdname DEFAULT_COLORS
 #' @export
-IG_COLORS <- c("IgA"="#377EB8", 
-               "IgD"="#FF7F00", 
-               "IgE"="#E41A1C", 
-               "IgG"="#4DAF4A", 
-               "IgM"="#984EA3",
-               "IgK"="#E5C494",
-               "IgL"="#FFD92F")
+IG_COLORS <- c("IGHA"="#377EB8", 
+               "IGHD"="#FF7F00", 
+               "IGHE"="#E41A1C", 
+               "IGHG"="#4DAF4A", 
+               "IGHM"="#984EA3",
+               "IGHK"="#E5C494",
+               "IGHL"="#FFD92F")
 
 #' @rdname DEFAULT_COLORS
 #' @export

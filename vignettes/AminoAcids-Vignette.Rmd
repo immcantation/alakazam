@@ -52,7 +52,7 @@ library(dplyr)
 
 # Subset example data
 data(ExampleDb)
-db <- ExampleDb[ExampleDb$sample == "+7d", ]
+db <- ExampleDb[ExampleDb$sample_id == "+7d", ]
 ```
 
 ## Calculate the properties of amino acid sequences
@@ -90,28 +90,28 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 tmp_theme <- theme_bw() + theme(legend.position="bottom")
 
 # Generate plots for all four of the properties
-g1 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_LENGTH)) + tmp_theme +
+g1 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_LENGTH)) + tmp_theme +
     ggtitle("CDR3 length") + 
     xlab("Isotype") + ylab("Amino acids") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=isotype))
-g2 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_GRAVY)) + tmp_theme + 
+    geom_boxplot(aes(fill=c_call))
+g2 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_GRAVY)) + tmp_theme + 
     ggtitle("CDR3 hydrophobicity") + 
     xlab("Isotype") + ylab("GRAVY") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=isotype))
-g3 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_BASIC)) + tmp_theme +
+    geom_boxplot(aes(fill=c_call))
+g3 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_BASIC)) + tmp_theme +
     ggtitle("CDR3 basic residues") + 
     xlab("Isotype") + ylab("Basic residues") +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=isotype))
-g4 <- ggplot(db_props, aes(x=isotype, y=CDR3_AA_ACIDIC)) + tmp_theme +
+    geom_boxplot(aes(fill=c_call))
+g4 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_ACIDIC)) + tmp_theme +
     ggtitle("CDR3 acidic residues") + 
     xlab("Isotype") + ylab("Acidic residues") +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
-    geom_boxplot(aes(fill=isotype))
+    geom_boxplot(aes(fill=c_call))
 
 # Plot in a 2x2 grid
 gridPlot(g1, g2, g3, g4, ncol=2)

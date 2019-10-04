@@ -51,28 +51,28 @@
 #'
 #' @examples
 #' # Without copy numbers
-#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="family")
-#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
-#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="allele")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="family")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="gene")
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
 #'                     copy="duplicate_count", mode="family")
 #' 
 #' # Count by clone
-#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+#' genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
 #'                     clone="clone_id", mode="family")
 #'
 #' # Count absent genes 
-#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample", 
+#' genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", 
 #'                     mode="allele", fill=TRUE)
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
                        mode=c("gene", "allele", "family", "asis")) {
     ## DEBUG
-    # data=ExampleDb; gene="V_CALL"; groups=NULL; mode="gene"; clone="CLONE"
-    # data=subset(db, CLONE == 3138)
+    # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
+    # data=subset(db, clond_id == 3138)
     # Hack for visibility of dplyr variables
     . <- NULL
     

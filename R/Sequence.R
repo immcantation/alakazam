@@ -366,12 +366,12 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #'           For IUPAC ambiguous character codes see \link{IUPAC_DNA}.
 #'
 #' @examples
-#' # Example Change-O data.frame
+#' # Example data.frame
 #' db <- data.frame(sequence_id=LETTERS[1:4],
 #'                  sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-#'                  TYPE=c("IgM", "IgG", "IgG", "IgA"),
-#'                  SAMPLE=c("S1", "S1", "S2", "S2"),
-#'                  COUNT=1:4,
+#'                  c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
+#'                  sample_id=c("S1", "S1", "S2", "S2"),
+#'                  duplicate_count=1:4,
 #'                  stringsAsFactors=FALSE)
 #' 
 #' # Annotations are not parsed if neither text_fields nor num_fields is specified
@@ -381,20 +381,20 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #' # Unique text_fields annotations are combined into a single string with ","
 #' # num_fields annotations are summed
 #' # Ambiguous duplicates are discarded
-#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 #'                    verbose=TRUE)
 #'
 #' # Use alternate delimiter for collapsing textual annotations
-#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 #'                    sep="/", verbose=TRUE)
 #' 
 #' # Add count of duplicates
-#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 #'                    add_count=TRUE, verbose=TRUE)
 #' 
 #' # Masking ragged ends may impact duplicate removal
 #' db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
-#' collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 #'                    add_count=TRUE, verbose=TRUE)
 #'
 #' @export
@@ -693,19 +693,19 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
 #' 
 #' @examples
 #' # Assign example clone
-#' clone <- subset(ExampleDb, CLONE == 3138)
+#' clone <- subset(ExampleDb, clone_id == 3138)
 #'
 #' # Get all regions
-#' extractVRegion(clone$SEQUENCE_IMGT)
+#' extractVRegion(clone$sequence_alignment)
 #' 
 #' # Get single region
-#' extractVRegion(clone$SEQUENCE_IMGT, "FWR1")
+#' extractVRegion(clone$sequence_alignment, "FWR1")
 #' 
 #' # Get all CDRs
-#' extractVRegion(clone$SEQUENCE_IMGT, c("CDR1", "CDR2"))
+#' extractVRegion(clone$sequence_alignment, c("CDR1", "CDR2"))
 #' 
 #' # Get all FWRs
-#' extractVRegion(clone$SEQUENCE_IMGT, c("FWR1", "FWR2", "FWR3"))
+#' extractVRegion(clone$sequence_alignment, c("FWR1", "FWR2", "FWR3"))
 #'
 #' @export
 extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")) {

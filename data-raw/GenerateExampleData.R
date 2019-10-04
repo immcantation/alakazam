@@ -16,14 +16,19 @@ ExampleDb <- ExampleDb[c("sequence_id",
                          "v_call_genotyped",
                          "d_call",
                          "j_call",
+                         "c_call",
                          "junction",
                          "junction_length",
                          "np1_length",
                          "np2_length",
-                         "sample",
-                         "isotype",
                          "duplicate_count",
-                         "clone_id")]
+                         "clone_id",
+                         "sample_id")]
+c_trans <- c(IGHM="IgM", IGHD="IgD", IGHA="IgA", IGHG="IgG")
+ExampleDb <- ExampleDb %>%
+    rename("germline_alignment"="germline_alignment_d_mask") %>%
+    mutate(c_call=translateStrings(c_call, c_trans))
+
 
 # Save
 usethis::use_data(ExampleDb, overwrite=TRUE)
@@ -33,10 +38,11 @@ usethis::use_data(ExampleDb, overwrite=TRUE)
 # Preprocess clones
 clones <- ExampleDb %>%
     group_by(clone_id) %>%
-    do(CHANGEO=makeChangeoClone(., text_fields=c("sample", "isotype"),
+    do(CHANGEO=makeChangeoClone(., id="sequence_id", seq="sequence_alignment", 
+                                germ="germline_alignment", text_fields=c("sample_id", "c_call"),
                                 num_fields="duplicate_count", add_count=FALSE))
 # Build lineages
-dnapars_exec <- "~/apps/phylip-3.69/dnapars"
+dnapars_exec <- "~/local/apps/phylip-3.695/bin/dnapars"
 graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
                  dnapars_exec=dnapars_exec, rm_temp=TRUE)
 

@@ -58,13 +58,13 @@ NULL
 #' arguments: \code{id}, \code{seq}, \code{germ}, \code{vcall}, \code{jcall}, 
 #' \code{junc_len}, and \code{clone}.  The default values are as follows:
 #' \itemize{
-#'   \item  \code{id       = "sequence_id"}:           unique sequence identifier.
-#'   \item  \code{seq      = "sequence_alignment"}:         IMGT-gapped sample sequence.
-#'   \item  \code{germ     = "germline_alignment_d_mask"}:  IMGT-gapped germline sequence.
-#'   \item  \code{vcall    = "v_call"}:                V-segment allele call.
-#'   \item  \code{jcall    = "j_call"}:                J-segment allele call.
-#'   \item  \code{junc_len = "junction_length"}:       junction sequence length.
-#'   \item  \code{clone    = "clone_id"}:                 clone identifier.
+#'   \item  \code{id       = "sequence_id"}:         unique sequence identifier.
+#'   \item  \code{seq      = "sequence_alignment"}:  IMGT-gapped sample sequence.
+#'   \item  \code{germ     = "germline_alignment"}:  IMGT-gapped germline sequence.
+#'   \item  \code{vcall    = "v_call"}:              V segment allele call.
+#'   \item  \code{jcall    = "j_call"}:              J segment allele call.
+#'   \item  \code{junc_len = "junction_length"}:     junction sequence length.
+#'   \item  \code{clone    = "clone_id"}:            clone identifier.
 #' }
 #' Additional annotation columns specified in the \code{text_fields}, \code{num_fields} 
 #' or \code{seq_fields} arguments will be retained in the \code{data} slot of the return 
@@ -87,28 +87,28 @@ NULL
 #'           \link{buildPhylipLineage}.
 #' 
 #' @examples
-#' # Example Change-O data.frame
+#' # Example data
 #' db <- data.frame(sequence_id=LETTERS[1:4],
-#'                   sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-#'                   v_call="Homsap IGKV1-39*01 F",
-#'                   j_call="Homsap IGKJ5*01 F",
-#'                   junction_length=2,
-#'                   germline_imgt_d_mask="CCCCAGGG",
-#'                   clone_id=1,
-#'                   TYPE=c("IgM", "IgG", "IgG", "IgA"),
-#'                   COUNT=1:4,
-#'                   stringsAsFactors=FALSE)
+#'                  sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
+#'                  germline_alignment="CCCCAGGG",
+#'                  v_call="Homsap IGKV1-39*01 F",
+#'                  j_call="Homsap IGKJ5*01 F",
+#'                  junction_length=2,
+#'                  clone_id=1,
+#'                  c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
+#'                  duplicate_count=1:4,
+#'                  stringsAsFactors=FALSE)
 #' 
 #' 
 #'  # Without end masking
-#'  makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
+#'  makeChangeoClone(db, text_fields="c_call", num_fields="duplicate_count")
 #' 
 #'  # With end masking
-#'  makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
+#'  makeChangeoClone(db, max_mask=3, text_fields="c_call", num_fields="duplicate_count")
 #'
 #' @export
 makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
-                             germ="germline_alignment_d_mask", vcall="v_call", jcall="j_call",
+                             germ="germline_alignment", vcall="v_call", jcall="j_call",
                              junc_len="junction_length", clone="clone_id", mask_char="N",
                              max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE, verbose=FALSE) {
@@ -528,7 +528,7 @@ phylipToGraph <- function(edges, clone) {
 #' \dontrun{
 #' # Preprocess clone
 #' db <- subset(ExampleDb, clone_id == 3138)
-#' clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+#' clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 #'                           num_fields="duplicate_count")
 #' 
 #' # Run PHYLIP and process output
@@ -537,12 +537,12 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
-#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$isotype, 
+#' plot(graph, layout=layout_as_tree, vertex.label=V(graph)$c_call, 
 #'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # To consider each indel event as a mutation, change the masking character 
 #' # and distance matrix
-#' clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+#' clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 #'                           num_fields="duplicate_count", mask_char="-")
 #' graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
 #'                             rm_temp=TRUE)
