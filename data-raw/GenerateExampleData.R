@@ -30,7 +30,6 @@ ExampleDb <- ExampleDb %>%
     mutate(c_call=translateStrings(c_call, c_trans),
            germline_alignment=germline_alignment_d_mask)
 
-
 # Save
 usethis::use_data(ExampleDb, overwrite=TRUE)
 
