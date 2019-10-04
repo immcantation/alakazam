@@ -1,19 +1,21 @@
+# ExampleDb <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
 ExampleDb <- file.path("..", "data-tests", "ExampleDb_airr.gz")
 db <- readChangeoDb(ExampleDb)
 
 test_that("makeChangeoClone",{
-    # Example Change-O data.frame
+    # Example AIRR data.frame
     db <- data.frame(sequence_id=LETTERS[1:4],
                      sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
                      v_call="Homsap IGKV1-39*01 F",
                      j_call="Homsap IGKJ5*01 F",
                      junction_length=2,
-                     germline_alignment_d_mask="CCCCAGGG",
+                     germline_alignment="CCCCAGGG",
                      clone_id=1,
                      TYPE=c("IgM", "IgG", "IgG", "IgA"),
                      COUNT=1:4,
                      stringsAsFactors=FALSE)
-
+    
+    # Example Change-O data.frame
    changeodb <- data.frame(SEQUENCE_ID=LETTERS[1:4],
                   SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
                   V_CALL="Homsap IGKV1-39*01 F",
@@ -96,7 +98,7 @@ test_that("makeChangeoClone",{
 test_that("buildPhylipLineage", {
     # Preprocess clone
     clone <- subset(db, clone_id == 164)
-    clone <- makeChangeoClone(clone, text_fields=c("sample", "isotype"), 
+    clone <- makeChangeoClone(clone, germ="germline_alignment_d_mask", text_fields=c("sample", "isotype"), 
                               num_fields="duplicate_count")
     
     # Run PHYLIP and process output
@@ -140,7 +142,7 @@ test_that("buildPhylipLineage", {
                      ))
         
         expect_equal(igraph::vertex_attr_names(graph),
-                     c("name", "sequence", "sample", "isotype", "duplicate_count", 
+                     c("name", "sequence", "sample_id", "c_call", "duplicate_count", 
                        "COLLAPSE_COUNT", "label"))
 
         expect_equal(E(graph)$weight,c(1,1,1,0))
