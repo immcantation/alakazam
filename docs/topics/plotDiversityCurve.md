@@ -81,7 +81,7 @@ Examples
 
 ```R
 # Calculate diversity
-div <- alphaDiversity(ExampleDb, group="sample", nboot=100)
+div <- alphaDiversity(ExampleDb, group="sample_id", nboot=100)
 
 # Plot diversity
 plotDiversityCurve(div, legend_title="Sample")

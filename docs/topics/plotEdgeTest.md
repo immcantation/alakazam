@@ -64,24 +64,21 @@ Examples
 graphs <- ExampleTrees[1-10]
 
 # Perform edge test on isotypes
-x <- testEdges(graphs, "ISOTYPE", nperm=10)
-
-```
-
-**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
-```R
+x <- testEdges(graphs, "c_call", nperm=10)
 
 # Plot
 plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-**Error in rename(data@tests, Parent = "PARENT", Child = "CHILD")**: object 'x' not found
+![2](plotEdgeTest-2.png)
+
 ```R
 plotEdgeTest(x, style="cdf")
 ```
 
-**Error in rename(data@tests, Parent = "PARENT", Child = "CHILD")**: object 'x' not found
+![4](plotEdgeTest-4.png)
+
 
 See also
 -------------------

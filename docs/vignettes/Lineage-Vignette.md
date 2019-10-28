@@ -14,11 +14,11 @@ in the AIRR file:
 
 * `sequence_id`
 * `sequence_alignment` 
-* `clone_id`
-* `germline_alignment_d_mask`
+* `germline_alignment`
 * `v_call`
 * `j_call`
 * `junction_length`
+* `clone_id`
 
 
 ```r
@@ -53,21 +53,21 @@ following duplicate removal. Unique values appearing within columns given by the
 ```r
 # This example data set does not have ragged ends
 # Preprocess clone without ragged end masking (default)
-clone <- makeChangeoClone(sub_db, text_fields=c("sample", "isotype"), 
+clone <- makeChangeoClone(sub_db, text_fields=c("sample_id", "c_call"), 
                           num_fields="duplicate_count")
 
 # Show combined annotations
-clone@data[, c("sample", "isotype", "duplicate_count")]
+clone@data[, c("sample_id", "c_call", "duplicate_count")]
 ```
 
 ```
-##   sample isotype duplicate_count
-## 1    +7d     IgA               1
-## 2    +7d     IgG               1
-## 3    +7d IgA,IgG              10
-## 4    +7d     IgG              36
-## 5    +7d     IgA              10
-## 6    +7d     IgG              13
+##   sample_id    c_call duplicate_count
+## 1       +7d      IGHA               1
+## 2       +7d      IGHG               1
+## 3       +7d IGHA,IGHG              10
+## 4       +7d      IGHG              36
+## 5       +7d      IGHA              10
+## 6       +7d      IGHG              13
 ```
 
 ## Run PHYLIP
@@ -112,19 +112,19 @@ data.frame(clone_id=graph$clone,
 ```r
 # The vertices have sequence specific annotations
 data.frame(sequence_id=V(graph)$name, 
-           isotype=V(graph)$isotype,
+           c_call=V(graph)$c_call,
            duplicate_count=V(graph)$duplicate_count)
 ```
 
 ```
-##      sequence_id isotype duplicate_count
-## 1 GN5SHBT06HH3QD     IgA              10
-## 2 GN5SHBT08F45HV IgA,IgG              10
-## 3       Germline    <NA>              NA
-## 4 GN5SHBT06IFV0R     IgG              13
-## 5 GN5SHBT08I3P11     IgG              36
-## 6 GN5SHBT01BXJY7     IgG               1
-## 7 GN5SHBT01EGEU6     IgA               1
+##      sequence_id    c_call duplicate_count
+## 1 GN5SHBT06HH3QD      IGHA              10
+## 2 GN5SHBT08F45HV IGHA,IGHG              10
+## 3       Germline      <NA>              NA
+## 4 GN5SHBT06IFV0R      IGHG              13
+## 5 GN5SHBT08I3P11      IGHG              36
+## 6 GN5SHBT01BXJY7      IGHG               1
+## 7 GN5SHBT01EGEU6      IGHA               1
 ```
 
 ## Plotting of the lineage tree
@@ -153,7 +153,7 @@ germline sequence, which is named "Germline" in the object returned by
 V(graph)$color <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
-V(graph)$label <- V(graph)$isotype
+V(graph)$label <- V(graph)$c_call
 E(graph)$label <- ""
 
 # Remove large default margins
@@ -180,7 +180,7 @@ data.frame on the clone column.
 # Preprocess clones
 clones <- ExampleDb %>%
     group_by(clone_id) %>%
-    do(CHANGEO=makeChangeoClone(., text_fields=c("sample", "isotype"), 
+    do(CHANGEO=makeChangeoClone(., text_fields=c("sample_id", "c_call"), 
                                 num_fields="duplicate_count"))
 ```
 

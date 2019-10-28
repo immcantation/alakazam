@@ -94,26 +94,29 @@ Examples
 graphs <- ExampleTrees[1-10]
 
 # Violin plots of node outdegree by sample
-plotSubtrees(graphs, "SAMPLE", "out", style="v")
+plotSubtrees(graphs, "sample_id", "out", style="v")
 
 ```
 
-**Error**: Evaluation error: object 'SAMPLE' not found.
+![2](plotSubtrees-2.png)
+
 ```R
 
 # Violin plots of subtree size by sample
-plotSubtrees(graphs, "SAMPLE", "size", style="v")
+plotSubtrees(graphs, "sample_id", "size", style="v")
 
 ```
 
-**Error**: Evaluation error: object 'SAMPLE' not found.
+![4](plotSubtrees-4.png)
+
 ```R
 
 # Boxplot of node depth by isotype
-plotSubtrees(graphs,  "ISOTYPE", "depth", style="b")
+plotSubtrees(graphs, "c_call", "depth", style="b")
 ```
 
-**Error**: Evaluation error: object 'ISOTYPE' not found.
+![6](plotSubtrees-6.png)
+
 
 See also
 -------------------

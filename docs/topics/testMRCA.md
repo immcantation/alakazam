@@ -56,16 +56,31 @@ Examples
 graphs <- ExampleTrees[1-10]
 
 # Perform MRCA test on isotypes
-x <- testMRCA(graphs, "ISOTYPE", nperm=10)
+x <- testMRCA(graphs, "c_call", nperm=10)
 
 ```
 
-**Error**: Evaluation error: object 'ISOTYPE' not found.
+
+```
+
+
+```
+
+
 ```R
 print(x)
 ```
 
-**Error in print(x)**: object 'x' not found
+
+```
+  ANNOTATION COUNT EXPECTED PVALUE
+1       IGHA    16     13.5      0
+2  IGHA,IGHG     1      1.0      0
+3       IGHG    31     33.6      1
+
+```
+
+
 
 See also
 -------------------

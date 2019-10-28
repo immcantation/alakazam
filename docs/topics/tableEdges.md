@@ -56,26 +56,63 @@ Examples
 graph <- ExampleTrees[[23]]
 
 # Count direct edges between isotypes including inferred nodes
-tableEdges(graph, "ISOTYPE")
+tableEdges(graph, "c_call")
 
 ```
 
-**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
+
+```
+# A tibble: 4 x 3
+# Groups:   PARENT [3]
+  PARENT    CHILD     COUNT
+  <chr>     <chr>     <int>
+1 IGHA      IGHA,IGHG     1
+2 IGHA,IGHG IGHA          1
+3 IGHA,IGHG IGHG          3
+4 <NA>      IGHA          1
+
+```
+
+
 ```R
 
 # Count direct edges excluding edges to and from germline and inferred nodes
-tableEdges(graph, "ISOTYPE", exclude=c("Germline", NA))
+tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 ```
 
-**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
+
+```
+# A tibble: 3 x 3
+# Groups:   PARENT [2]
+  PARENT    CHILD     COUNT
+  <chr>     <chr>     <int>
+1 IGHA      IGHA,IGHG     1
+2 IGHA,IGHG IGHA          1
+3 IGHA,IGHG IGHG          3
+
+```
+
+
 ```R
 
 # Count indirect edges walking through germline and inferred nodes
-tableEdges(graph, "ISOTYPE", indirect=TRUE, exclude=c("Germline", NA))
+tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
-**Error**: Column `PARENT` is unknown
+
+```
+# A tibble: 3 x 3
+# Groups:   PARENT [2]
+  PARENT    CHILD     COUNT
+  <chr>     <chr>     <int>
+1 IGHA      IGHA,IGHG     1
+2 IGHA,IGHG IGHA          1
+3 IGHA,IGHG IGHG          3
+
+```
+
+
 
 See also
 -------------------

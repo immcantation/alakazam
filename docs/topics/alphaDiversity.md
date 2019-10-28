@@ -96,7 +96,7 @@ Examples
 
 ```R
 # Group by sample identifier in two steps
-abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 div <- alphaDiversity(abund, step_q=1, max_q=10)
 plotDiversityCurve(div, legend_title="Sample")
 
@@ -107,7 +107,7 @@ plotDiversityCurve(div, legend_title="Sample")
 ```R
 
 # Grouping by isotype rather than sample identifier in one step
-div <- alphaDiversity(ExampleDb, group="isotype", min_n=40, step_q=1, max_q=10, 
+div <- alphaDiversity(ExampleDb, group="c_call", min_n=40, step_q=1, max_q=10, 
 nboot=100)
 plotDiversityCurve(div, legend_title="Isotype")
 ```

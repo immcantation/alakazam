@@ -126,12 +126,12 @@ Examples
 -------------------
 
 ```R
-# Example Change-O data.frame
+# Example data.frame
 db <- data.frame(sequence_id=LETTERS[1:4],
 sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-TYPE=c("IgM", "IgG", "IgG", "IgA"),
-SAMPLE=c("S1", "S1", "S2", "S2"),
-COUNT=1:4,
+c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
+sample_id=c("S1", "S1", "S2", "S2"),
+duplicate_count=1:4,
 stringsAsFactors=FALSE)
 
 # Annotations are not parsed if neither text_fields nor num_fields is specified
@@ -154,9 +154,9 @@ DISCARDED> 1
 
 
 ```
-  sequence_id sequence_alignment TYPE SAMPLE COUNT
-1           C           NAACTGGN  IgG     S2     3
-2           A           CCCCTGGG  IgM     S1     1
+  sequence_id sequence_alignment c_call sample_id duplicate_count
+1           C           NAACTGGN   IGHG        S2               3
+2           A           CCCCTGGG   IGHM        S1               1
 
 ```
 
@@ -166,7 +166,7 @@ DISCARDED> 1
 # Unique text_fields annotations are combined into a single string with ","
 # num_fields annotations are summed
 # Ambiguous duplicates are discarded
-collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 verbose=TRUE)
 
 ```
@@ -185,9 +185,9 @@ DISCARDED> 1
 
 
 ```
-  sequence_id sequence_alignment    TYPE SAMPLE COUNT
-1           C           NAACTGGN     IgG     S2     3
-2           A           CCCCTGGG IgG,IgM     S1     3
+  sequence_id sequence_alignment    c_call sample_id duplicate_count
+1           C           NAACTGGN      IGHG        S2               3
+2           A           CCCCTGGG IGHG,IGHM        S1               3
 
 ```
 
@@ -195,7 +195,7 @@ DISCARDED> 1
 ```R
 
 # Use alternate delimiter for collapsing textual annotations
-collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 sep="/", verbose=TRUE)
 
 ```
@@ -214,9 +214,9 @@ DISCARDED> 1
 
 
 ```
-  sequence_id sequence_alignment    TYPE SAMPLE COUNT
-1           C           NAACTGGN     IgG     S2     3
-2           A           CCCCTGGG IgG/IgM     S1     3
+  sequence_id sequence_alignment    c_call sample_id duplicate_count
+1           C           NAACTGGN      IGHG        S2               3
+2           A           CCCCTGGG IGHG/IGHM        S1               3
 
 ```
 
@@ -224,7 +224,7 @@ DISCARDED> 1
 ```R
 
 # Add count of duplicates
-collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 add_count=TRUE, verbose=TRUE)
 
 ```
@@ -243,9 +243,12 @@ DISCARDED> 1
 
 
 ```
-  sequence_id sequence_alignment    TYPE SAMPLE COUNT COLLAPSE_COUNT
-1           C           NAACTGGN     IgG     S2     3              1
-2           A           CCCCTGGG IgG,IgM     S1     3              2
+  sequence_id sequence_alignment    c_call sample_id duplicate_count
+1           C           NAACTGGN      IGHG        S2               3
+2           A           CCCCTGGG IGHG,IGHM        S1               3
+  COLLAPSE_COUNT
+1              1
+2              2
 
 ```
 
@@ -254,7 +257,7 @@ DISCARDED> 1
 
 # Masking ragged ends may impact duplicate removal
 db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
-collapseDuplicates(db, text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 add_count=TRUE, verbose=TRUE)
 ```
 
@@ -272,8 +275,10 @@ DISCARDED> 0
 
 
 ```
-  sequence_id sequence_alignment        TYPE SAMPLE COUNT COLLAPSE_COUNT
-1           A           NNNCTGNN IgA,IgG,IgM  S1,S2    10              4
+  sequence_id sequence_alignment         c_call sample_id duplicate_count
+1           A           NNNCTGNN IGHA,IGHG,IGHM     S1,S2              10
+  COLLAPSE_COUNT
+1              4
 
 ```
 

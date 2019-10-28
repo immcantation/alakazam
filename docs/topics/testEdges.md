@@ -58,16 +58,27 @@ Examples
 graphs <- ExampleTrees[1-10]
 
 # Perform edge test on isotypes
-x <- testEdges(graphs, "ISOTYPE", nperm=10)
-
-```
-
-**Error in matrix(edge_mat, ncol = 2, dimnames = list(NULL, c("PARENT", **: 'data' must be of a vector type, was 'NULL'
-```R
+x <- testEdges(graphs, "c_call", nperm=10)
 print(x)
 ```
 
-**Error in print(x)**: object 'x' not found
+
+```
+      PARENT     CHILD COUNT EXPECTED PVALUE
+1       IGHA      IGHA    39     61.1    0.9
+2       IGHA IGHA,IGHG     3      3.5    0.5
+3       IGHA      IGHG     2      5.0    0.9
+4  IGHA,IGHG      IGHA    29     11.6    0.0
+5  IGHA,IGHG IGHA,IGHG     1      2.5    1.0
+6  IGHA,IGHG      IGHG    24      2.9    0.0
+7  IGHD,IGHG      IGHG     8      1.0    0.0
+8       IGHG      IGHA     1      3.7    0.9
+9       IGHG IGHD,IGHG     1      1.0    0.0
+10      IGHG      IGHG   112    134.7    1.0
+
+```
+
+
 
 See also
 -------------------

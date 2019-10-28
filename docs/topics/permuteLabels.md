@@ -42,27 +42,22 @@ Examples
 # Define and plot example graph
 library(igraph)
 graph <- ExampleTrees[[23]]
-plot(graph, layout=layout_as_tree, vertex.label=V(graph)$ISOTYPE, 
+plot(graph, layout=layout_as_tree, vertex.label=V(graph)$c_call, 
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
+![2](permuteLabels-2.png)
 
 ```R
 
 # Permute annotations and plot new tree
-g <- permuteLabels(graph, "ISOTYPE")
-
-```
-
-*Warning*:Only 1 node to permute
-
-```R
-plot(g, layout=layout_as_tree, vertex.label=V(g)$ISOTYPE,
+g <- permuteLabels(graph, "c_call")
+plot(g, layout=layout_as_tree, vertex.label=V(g)$c_call,
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
-![5](permuteLabels-5.png)
+![4](permuteLabels-4.png)
 
 
 See also

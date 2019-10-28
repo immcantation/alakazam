@@ -1,10 +1,15 @@
-Version 0.3.0.999:  July 17, 2019
+Version 0.3.0.999:  October 4, 2019
 -------------------------------------------------------------------------------
+
++ ExampleDb converted to the AIRR Rearrangement format and examples updated 
+  accordingly.
++ `IG_COLOR` names converted to official C region identifiers 
+   (IGHA, IGHD, IGHE, IGHG, IGHM, IGHK, IGHL).
 
 Diversity:
 
-+ Fixed documentation error in Diversity-Vignetted.rmd for viewing test results 
-  given new diversity object.
++ Fixed documentation error in diversity vignette for viewing test results.
+
 
 Version 0.3.0:  July 17, 2019
 -------------------------------------------------------------------------------

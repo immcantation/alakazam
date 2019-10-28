@@ -127,7 +127,7 @@ Examples
 ```R
 ### Not run:
 # Groups under the size threshold are excluded and a warning message is issued.
-# testDiversity(ExampleDb, "SAMPLE", q=0, min_n=30, nboot=100)
+# testDiversity(ExampleDb, "sample_id", q=0, min_n=30, nboot=100)
 ```
 
 

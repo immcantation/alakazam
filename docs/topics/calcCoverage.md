@@ -50,10 +50,10 @@ Examples
 
 ```R
 # Calculate clone sizes
-clones <- countClones(ExampleDb, groups="sample")
+clones <- countClones(ExampleDb, groups="sample_id")
 
 # Calculate 1first order coverage for a single sample
-calcCoverage(clones$SEQ_COUNT[clones$sample == "+7d"])
+calcCoverage(clones$SEQ_COUNT[clones$sample_id == "+7d"])
 ```
 
 

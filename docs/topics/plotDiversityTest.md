@@ -68,7 +68,7 @@ Examples
 
 ```R
 # Calculate diversity
-div <- alphaDiversity(ExampleDb, group="sample", min_q=0, max_q=2, step_q=1, nboot=100)
+div <- alphaDiversity(ExampleDb, group="sample_id", min_q=0, max_q=2, step_q=1, nboot=100)
 
 # Plot results at q=0 (equivalent to species richness)
 plotDiversityTest(div, 0, legend_title="Sample")

@@ -61,27 +61,27 @@ Examples
 ```R
 # Summarize a tree
 graph <- ExampleTrees[[23]]
-summarizeSubtrees(graph, fields="ISOTYPE", root="Germline")
+summarizeSubtrees(graph, fields="c_call", root="Germline")
 ```
 
 
 ```
-            NAME         PARENT OUTDEGREE SIZE DEPTH PATHLENGTH OUTDEGREE_NORM
-1 GN5SHBT06HH3QD       Germline         1    6     3         10      0.1666667
-2 GN5SHBT08F45HV GN5SHBT06HH3QD         4    5     2          7      0.6666667
-3       Germline           <NA>         1    7     4         30      0.1666667
-4 GN5SHBT06IFV0R GN5SHBT08F45HV         0    1     1          0      0.0000000
-5 GN5SHBT08I3P11 GN5SHBT08F45HV         0    1     1          0      0.0000000
-6 GN5SHBT01BXJY7 GN5SHBT08F45HV         0    1     1          0      0.0000000
-7 GN5SHBT01EGEU6 GN5SHBT08F45HV         0    1     1          0      0.0000000
-  SIZE_NORM DEPTH_NORM PATHLENGTH_NORM
-1 0.8571429       0.75       0.3333333
-2 0.7142857       0.50       0.2333333
-3 1.0000000       1.00       1.0000000
-4 0.1428571       0.25       0.0000000
-5 0.1428571       0.25       0.0000000
-6 0.1428571       0.25       0.0000000
-7 0.1428571       0.25       0.0000000
+            NAME    c_call         PARENT OUTDEGREE SIZE DEPTH PATHLENGTH
+1 GN5SHBT06HH3QD      IGHA       Germline         1    6     3         10
+2 GN5SHBT08F45HV IGHA,IGHG GN5SHBT06HH3QD         4    5     2          7
+3       Germline      <NA>           <NA>         1    7     4         30
+4 GN5SHBT06IFV0R      IGHG GN5SHBT08F45HV         0    1     1          0
+5 GN5SHBT08I3P11      IGHG GN5SHBT08F45HV         0    1     1          0
+6 GN5SHBT01BXJY7      IGHG GN5SHBT08F45HV         0    1     1          0
+7 GN5SHBT01EGEU6      IGHA GN5SHBT08F45HV         0    1     1          0
+  OUTDEGREE_NORM SIZE_NORM DEPTH_NORM PATHLENGTH_NORM
+1      0.1666667 0.8571429       0.75       0.3333333
+2      0.6666667 0.7142857       0.50       0.2333333
+3      0.1666667 1.0000000       1.00       1.0000000
+4      0.0000000 0.1428571       0.25       0.0000000
+5      0.0000000 0.1428571       0.25       0.0000000
+6      0.0000000 0.1428571       0.25       0.0000000
+7      0.0000000 0.1428571       0.25       0.0000000
 
 ```
 

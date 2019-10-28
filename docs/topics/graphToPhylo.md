@@ -66,7 +66,7 @@ library(igraph)
 
 ```
 
-*Loading required package: methods**
+*
 Attaching package: ‘igraph’
 **The following objects are masked from ‘package:stats’:
 

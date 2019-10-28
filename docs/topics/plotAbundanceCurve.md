@@ -69,7 +69,7 @@ Examples
 
 ```R
 # Estimate abundance by sample and plot
-abund <- estimateAbundance(ExampleDb, group="sample", nboot=100)
+abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 plotAbundanceCurve(abund, legend_title="Sample")
 ```
 

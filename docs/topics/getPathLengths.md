@@ -77,21 +77,21 @@ getPathLengths(graph, root="Germline")
 ```R
 
 # Exclude nodes without an isotype annotation from step count
-getPathLengths(graph, root="Germline", field="ISOTYPE", exclude=NA)
+getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 ```
 
 
 ```
             NAME STEPS DISTANCE
-1      Inferred1     1       20
-2 GN5SHBT04CW57C     2       26
-3      Inferred2     3       28
-4 GN5SHBT08I7RKL     4       29
-5 GN5SHBT04CAVIG     5       30
+1      Inferred1     0       20
+2 GN5SHBT04CW57C     1       26
+3      Inferred2     1       28
+4 GN5SHBT08I7RKL     2       29
+5 GN5SHBT04CAVIG     3       30
 6       Germline     0        0
-7 GN5SHBT01D6X0W     2       22
-8 GN5SHBT06H7TQD     6       31
-9 GN5SHBT05HEG2J     4       33
+7 GN5SHBT01D6X0W     1       22
+8 GN5SHBT06H7TQD     4       31
+9 GN5SHBT05HEG2J     2       33
 
 ```
 

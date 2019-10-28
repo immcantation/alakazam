@@ -85,24 +85,27 @@ Examples
 
 ```R
 # Without copy numbers
-genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="family")
-genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="gene")
-genes <- countGenes(ExampleDb, gene="v_call", groups="sample", mode="allele")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="family")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="gene")
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="allele")
 
 # With copy numbers and multiple groups
-genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
 copy="duplicate_count", mode="family")
 
 # Count by clone
-genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample", "isotype"), 
+genes <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
 clone="clone_id", mode="family")
 
 # Count absent genes 
-genes <- countGenes(ExampleDb, gene="v_call", groups="sample", 
+genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", 
 mode="allele", fill=TRUE)
 ```
 
-
+*Warning*:`complete_()` is deprecated as of tidyr 1.0.0.
+Please use `complete()` instead.
+This warning is displayed once per session.
+Call `lifecycle::last_warnings()` to see where this warning was generated.
 
 
 

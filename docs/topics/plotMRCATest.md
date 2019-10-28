@@ -64,11 +64,17 @@ Examples
 graphs <- ExampleTrees[1-10]
 
 # Perform MRCA test on isotypes
-x <- testMRCA(graphs, "ISOTYPE", nperm=10)
+x <- testMRCA(graphs, "c_call", nperm=10)
 
 ```
 
-**Error**: Evaluation error: object 'ISOTYPE' not found.
+
+```
+
+
+```
+
+
 ```R
 
 # Plot
@@ -76,12 +82,14 @@ plotMRCATest(x, color="steelblue", style="hist")
 
 ```
 
-**Error in rename(data@tests, Annotation = "ANNOTATION")**: object 'x' not found
+![4](plotMRCATest-4.png)
+
 ```R
 plotMRCATest(x, style="cdf")
 ```
 
-**Error in rename(data@tests, Annotation = "ANNOTATION")**: object 'x' not found
+![6](plotMRCATest-6.png)
+
 
 See also
 -------------------

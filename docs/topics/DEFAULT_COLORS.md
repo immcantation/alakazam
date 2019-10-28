@@ -28,7 +28,7 @@ Named character vectors with hexcode colors as values.
 + `DNA_COLORS`:  DNA character colors 
 `c("A", "C", "G", "T")`.
 + `IG_COLORS`:   Ig isotype colors 
-`c("IgA", "IgD", "IgE", "IgG", "IgM", "IgK", "IgL")`.
+`c("IGHA", "IGHD", "IGHE", "IGHG", "IGHM", "IGHK", "IGHL")`.
 + `TR_COLORS`:   TCR chain colors 
 `c("TRA", "TRB", "TRD", "TRG")`.
 
@@ -39,7 +39,7 @@ Examples
 
 ```R
 # IG_COLORS as an isotype color set for ggplot
-isotype <- c("IgG", "IgM", "IgM", "IgA")
+isotype <- c("IGHG", "IGHM", "IGHM", "IGHA")
 db <- data.frame(x=1:4, y=1:4, iso=isotype)
 g1 <- ggplot(db, aes(x=x, y=y, color=iso)) + 
 scale_color_manual(name="Isotype", values=IG_COLORS) +

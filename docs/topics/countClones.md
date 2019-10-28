@@ -59,10 +59,10 @@ Examples
 
 ```R
 # Without copy numbers
-clones <- countClones(ExampleDb, groups="sample")
+clones <- countClones(ExampleDb, groups="sample_id")
 
 # With copy numbers and multiple groups
-clones <- countClones(ExampleDb, groups=c("sample", "isotype"), copy="duplicate_count")
+clones <- countClones(ExampleDb, groups=c("sample_id", "c_call"), copy="duplicate_count")
 ```
 
 

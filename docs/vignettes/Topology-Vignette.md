@@ -17,10 +17,10 @@ The trees are `igraph` objects with the following tree annotations (graph attrib
 
 And the following node annotations (vertex attributes):
 
-* `sample`: Time point in relation to influenza vaccination.
-* `isotype`: The isotype(s) assigned to the sequence. Multiple isotypes are 
-             delimited by comma, and reflect identical V(D)J sequences observed
-             with more than one isotype.
+* `sample_id`: Time point in relation to influenza vaccination.
+* `c_call`: The isotype(s) assigned to the sequence. Multiple isotypes are 
+            delimited by comma, and reflect identical V(D)J sequences observed
+            with more than one isotype.
 * `duplicate_count`: The copy number (duplicate count), which indicates the total number 
               of reads with the same V(D)J sequence.
 
@@ -37,11 +37,11 @@ data(ExampleTrees)
 # Select one tree for example purposes
 graph <- ExampleTrees[[24]]
 # And add some annotation complexity to the tree
-V(graph)$sample[c(2, 7)] <- "-1h"
-V(graph)$isotype[c(2, 7)] <- "IgM"
+V(graph)$sample_id[c(2, 7)] <- "-1h"
+V(graph)$c_call[c(2, 7)] <- "IGHM"
 
 # Make a list of example trees excluding multi-isotype trees
-graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)$isotype)))]
+graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)$c_call)))]
 ```
 
 ## Plotting annotations on a tree
@@ -54,13 +54,13 @@ different visual elements according to annotations embedded in the graph.
 
 ```r
 # Set node colors
-V(graph)$color[V(graph)$sample == "-1h"] <- "seagreen"
-V(graph)$color[V(graph)$sample == "+7d"] <- "steelblue"
+V(graph)$color[V(graph)$sample_id == "-1h"] <- "seagreen"
+V(graph)$color[V(graph)$sample_id == "+7d"] <- "steelblue"
 V(graph)$color[V(graph)$name == "Germline"] <- "black"
 V(graph)$color[grepl("Inferred", V(graph)$name)] <- "white"
 
 # Set node labels
-V(graph)$label <- paste(V(graph)$sample, V(graph)$isotype, sep=", ")
+V(graph)$label <- paste(V(graph)$sample_id, V(graph)$c_call, sep=", ")
 V(graph)$label[V(graph)$name == "Germline"] <- ""
 V(graph)$label[grepl("Inferred", V(graph)$name)] <- ""
 
@@ -126,13 +126,13 @@ Note, the `STEPS` counted in the above example include traversal of inferred
 intermediates. If you want to exclude such nodes and consider only nodes
 associated with observed sequences, you can specify an annotation field and 
 value that will be excluded from the number of steps. In the example below
-we are excluding `NA` values in the `isotype` annotation 
-(`field="isotype", exclude=NA`). 
+we are excluding `NA` values in the `c_call` annotation 
+(`field="c_call", exclude=NA`). 
 
 
 ```r
 # Exclude nodes without an isotype annotation from step count
-getPathLengths(graph, root="Germline", field="isotype", exclude=NA)
+getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 ```
 
 ```
@@ -167,28 +167,28 @@ following properties for each node:
 * `DEPTH_NORM`: The `DEPTH` normalized by the total tree depth.
 * `PATHLENGTH_NORM`: The `PATHLENGTH` normalized by the longest path.
 
-The `fields=c("sample", "isotype")` argument in the example below simply
+The `fields=c("sample_id", "c_call")` argument in the example below simply
 defines which annotations we wish to retain in the output. This argument
 has no effect on the results, in constast to the behavior of `getPathLengths`.
 
 
 ```r
 # Summarize tree
-df <- summarizeSubtrees(graph, fields=c("sample", "isotype"), root="Germline")
+df <- summarizeSubtrees(graph, fields=c("sample_id", "c_call"), root="Germline")
 print(df[1:4])
 ```
 
 ```
-##             NAME sample isotype         PARENT
-## 1      Inferred1   <NA>    <NA>       Germline
-## 2 GN5SHBT04CW57C    -1h     IgM      Inferred1
-## 3      Inferred2   <NA>    <NA> GN5SHBT04CW57C
-## 4 GN5SHBT08I7RKL    +7d     IgG      Inferred2
-## 5 GN5SHBT04CAVIG    +7d     IgG GN5SHBT08I7RKL
-## 6       Germline   <NA>    <NA>           <NA>
-## 7 GN5SHBT01D6X0W    -1h     IgM      Inferred1
-## 8 GN5SHBT06H7TQD    +7d     IgG GN5SHBT04CAVIG
-## 9 GN5SHBT05HEG2J    +7d     IgG      Inferred2
+##             NAME sample_id c_call         PARENT
+## 1      Inferred1      <NA>   <NA>       Germline
+## 2 GN5SHBT04CW57C       -1h   IGHM      Inferred1
+## 3      Inferred2      <NA>   <NA> GN5SHBT04CW57C
+## 4 GN5SHBT08I7RKL       +7d   IGHG      Inferred2
+## 5 GN5SHBT04CAVIG       +7d   IGHG GN5SHBT08I7RKL
+## 6       Germline      <NA>   <NA>           <NA>
+## 7 GN5SHBT01D6X0W       -1h   IGHM      Inferred1
+## 8 GN5SHBT06H7TQD       +7d   IGHG GN5SHBT04CAVIG
+## 9 GN5SHBT05HEG2J       +7d   IGHG      Inferred2
 ```
 
 ```r
@@ -238,19 +238,19 @@ a separate panel of the same figure.
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
 
 # Box plots of node outdegree by sample
-p1 <- plotSubtrees(graph_list, "sample", "outdegree", colors=sample_colors, 
+p1 <- plotSubtrees(graph_list, "sample_id", "outdegree", colors=sample_colors, 
                    main_title="Node outdegree", legend_title="Time", 
                    style="box", silent=TRUE)
 # Box plots of subtree size by sample
-p2 <- plotSubtrees(graph_list, "sample", "size", colors=sample_colors, 
+p2 <- plotSubtrees(graph_list, "sample_id", "size", colors=sample_colors, 
                    main_title="Subtree size", legend_title="Time", 
                    style="box", silent=TRUE)
 # Violin plots of subtree path length by isotype
-p3 <- plotSubtrees(graph_list, "isotype", "pathlength", colors=IG_COLORS, 
+p3 <- plotSubtrees(graph_list, "c_call", "pathlength", colors=IG_COLORS, 
                    main_title="Subtree path length", legend_title="Isotype", 
                    style="violin", silent=TRUE)
 # Violin plots of subtree depth by isotype
-p4 <- plotSubtrees(graph_list,  "isotype", "depth", colors=IG_COLORS, 
+p4 <- plotSubtrees(graph_list,  "c_call", "depth", colors=IG_COLORS, 
                    main_title="Subtree depth", legend_title="Isotype", 
                    style="violin", silent=TRUE)
 
@@ -276,7 +276,7 @@ annotation can be performed like so:
 
 ```r
 # Count direct edges between isotypes
-tableEdges(graph, "isotype")
+tableEdges(graph, "c_call")
 ```
 
 ```
@@ -284,21 +284,21 @@ tableEdges(graph, "isotype")
 ## # Groups:   PARENT [3]
 ##   PARENT CHILD COUNT
 ##   <chr>  <chr> <int>
-## 1 <NA>   <NA>      1
-## 2 <NA>   IgG       2
-## 3 <NA>   IgM       2
-## 4 IgG    IgG       2
-## 5 IgM    <NA>      1
+## 1 IGHG   IGHG      2
+## 2 IGHM   <NA>      1
+## 3 <NA>   IGHG      2
+## 4 <NA>   IGHM      2
+## 5 <NA>   <NA>      1
 ```
 
 The above output is cluttered with the `NA` annotations from the germline and 
 inferred nodes. We can perform the same direct tabulation, but exclude any nodes 
-annotated with either `Germline` or `NA` for isotype using the `exclude` argument:
+annotated with either `Germline` or `NA` for c_call using the `exclude` argument:
 
 
 ```r
 # Direct edges excluding germline and inferred nodes
-tableEdges(graph, "isotype", exclude=c("Germline", NA))
+tableEdges(graph, "c_call", exclude=c("Germline", NA))
 ```
 
 ```
@@ -306,7 +306,7 @@ tableEdges(graph, "isotype", exclude=c("Germline", NA))
 ## # Groups:   PARENT [1]
 ##   PARENT CHILD COUNT
 ##   <chr>  <chr> <int>
-## 1 IgG    IgG       2
+## 1 IGHG   IGHG      2
 ```
 
 As there are inferred nodes in the tree, we might want to consider indirect
@@ -317,7 +317,7 @@ which will skip over the excluded nodes when tabulating annotation pairs:
 
 ```r
 # Count indirect edges walking through germline and inferred nodes
-tableEdges(graph, "isotype", indirect=TRUE, exclude=c("Germline", NA))
+tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
 ```
@@ -325,8 +325,8 @@ tableEdges(graph, "isotype", indirect=TRUE, exclude=c("Germline", NA))
 ## # Groups:   PARENT [2]
 ##   PARENT CHILD COUNT
 ##   <chr>  <chr> <int>
-## 1 IgG    IgG       2
-## 2 IgM    IgG       2
+## 1 IGHG   IGHG      2
+## 2 IGHM   IGHG      2
 ```
 
 ### Significance testing of edges in a population of trees
@@ -343,7 +343,7 @@ annotation pair is observed more often than expected.
 
 ```r
 # Test isotype relationships
-edge_test <- testEdges(graph_list, "isotype", nperm=20)
+edge_test <- testEdges(graph_list, "c_call", nperm=20)
 
 # Print p-value table
 print(edge_test)
@@ -351,10 +351,10 @@ print(edge_test)
 
 ```
 ##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1    IgA   IgA    36 34.800000 0.0500000
-## 2    IgA   IgG     2  3.066667 0.6000000
-## 3    IgG   IgA     1  2.444444 0.7777778
-## 4    IgG   IgG    99 98.700000 0.3000000
+## 1   IGHA  IGHA    36 34.600000 0.0500000
+## 2   IGHA  IGHG     2  3.250000 0.5000000
+## 3   IGHG  IGHA     1  2.578947 0.8421053
+## 4   IGHG  IGHG    99 99.000000 0.4500000
 ```
 
 ```r
@@ -388,31 +388,31 @@ without any node exclusion:
 mrca_df <- getMRCA(graph, path="steps", root="Germline")
 
 # Print subset of the annotation data.frame
-print(mrca_df[c("NAME", "sample", "isotype", "STEPS", "DISTANCE")])
+print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
 ```
 
 ```
-##                NAME sample isotype STEPS DISTANCE
-## Inferred1 Inferred1   <NA>    <NA>     1       20
+##                NAME sample_id c_call STEPS DISTANCE
+## Inferred1 Inferred1      <NA>   <NA>     1       20
 ```
 
 To use mutational distance and consider only observed (ie, non-germline and 
-non-inferred) nodes, we specify the exclusion field (`field="ISOTYPE"`) and
+non-inferred) nodes, we specify the exclusion field (`field="c_call"`) and
 exclusion value within that field (`exclude=NA`):
 
 
 ```r
 # Exclude nodes without an isotype annotation and use weighted path length
 mrca_df <- getMRCA(graph, path="distance", root="Germline", 
-                   field="isotype", exclude=NA)
+                   field="c_call", exclude=NA)
 
 # Print excluding sequence, label, color, shape and size annotations
-print(mrca_df[c("NAME", "sample", "isotype", "STEPS", "DISTANCE")])
+print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
 ```
 
 ```
-##                          NAME sample isotype STEPS DISTANCE
-## GN5SHBT01D6X0W GN5SHBT01D6X0W    -1h     IgM     1       22
+##                          NAME sample_id c_call STEPS DISTANCE
+## GN5SHBT01D6X0W GN5SHBT01D6X0W       -1h   IGHM     1       22
 ```
 
 ### Significance testing of MRCA annotations
@@ -425,7 +425,7 @@ that the annotation is observed more often than expected in the MRCA position.
 
 ```r
 # Test isotype MRCA annotations
-mrca_test <- testMRCA(graph_list, "isotype", nperm=20)
+mrca_test <- testMRCA(graph_list, "c_call", nperm=20)
 ```
 
 ```r
@@ -435,8 +435,8 @@ print(mrca_test)
 
 ```
 ##   ANNOTATION COUNT EXPECTED PVALUE
-## 1        IgA    12    11.25   0.00
-## 2        IgG    31    31.75   0.75
+## 1       IGHA    12    11.15   0.00
+## 2       IGHG    31    31.85   0.85
 ```
 
 ```r

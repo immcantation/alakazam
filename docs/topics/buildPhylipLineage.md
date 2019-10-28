@@ -134,7 +134,7 @@ Examples
 ### Not run:
 # Preprocess clone
 # db <- subset(ExampleDb, clone_id == 3138)
-# clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+# clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 # num_fields="duplicate_count")
 # 
 # # Run PHYLIP and process output
@@ -143,12 +143,12 @@ Examples
 # 
 # # Plot graph with a tree layout
 # library(igraph)
-# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$isotype, 
+# plot(graph, layout=layout_as_tree, vertex.label=V(graph)$c_call, 
 # vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 # 
 # # To consider each indel event as a mutation, change the masking character 
 # # and distance matrix
-# clone <- makeChangeoClone(db, text_fields=c("sample", "isotype"), 
+# clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 # num_fields="duplicate_count", mask_char="-")
 # graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
 # rm_temp=TRUE)
