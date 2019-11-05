@@ -126,12 +126,13 @@ CHANGEO <- list(SEQUENCE_ID="c",
                 PRIMER="c",
                 PRCONS="c",
                 CONSCOUNT="i",
-                DUPCOUNT="i")
+                DUPCOUNT="i",
+                CELL="c")
 
 
 #### Save to R/sysdata.rda ####
 
-devtools::use_data(HYDROPATHY_KYTJ82,
+usethis::use_data(HYDROPATHY_KYTJ82,
                    BULKINESS_ZIMJ68,
                    POLARITY_GRAR74,
                    PK_EMBOSS,
