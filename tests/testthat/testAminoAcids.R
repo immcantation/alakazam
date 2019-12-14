@@ -80,12 +80,12 @@ test_that("aminoAcidProperties", {
     junction_charge <- charge(seq_aa)
     
     junction_properties <- aminoAcidProperties(db[1:5, ], seq="JUNCTION", nt=TRUE,
-                                               trim=FALSE, label="JUNCTION")
-    expect_equal(junction_gravy, junction_properties$JUNCTION_AA_GRAVY, tolerance=0.001)
-    expect_equal(junction_bulk, junction_properties$JUNCTION_AA_BULK, tolerance=0.001)
-    expect_equal(junction_polar, junction_properties$JUNCTION_AA_POLAR, tolerance=0.001)
-    expect_equal(junction_aliphatic, junction_properties$JUNCTION_AA_ALIPHATIC, tolerance=0.001)
-    expect_equal(junction_charge, junction_properties$JUNCTION_AA_CHARGE, tolerance=0.001)
+                                               trim=FALSE, label="junction")
+    expect_equal(junction_gravy, junction_properties$junction_aa_gravy, tolerance=0.001)
+    expect_equal(junction_bulk, junction_properties$junction_aa_bulk, tolerance=0.001)
+    expect_equal(junction_polar, junction_properties$junction_aa_polar, tolerance=0.001)
+    expect_equal(junction_aliphatic, junction_properties$junction_aa_aliphatic, tolerance=0.001)
+    expect_equal(junction_charge, junction_properties$junction_aa_charge, tolerance=0.001)
     
     
     data(aaindex, package="seqinr")
@@ -95,9 +95,9 @@ test_that("aminoAcidProperties", {
     
     junction_gravy_h <- gravy(seq_aa, hydropathy =  h)
     junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
-                                            trim=FALSE, label="JUNCTION",
+                                            trim=FALSE, label="junction",
                                             hydropathy = h)
-    expect_equal(junction_gravy_h, junction_properties_h$JUNCTION_AA_GRAVY, tolerance = .001)
+    expect_equal(junction_gravy_h, junction_properties_h$junction_aa_gravy, tolerance = .001)
     
     junction_gravy_na <- gravy(c(NA, "NA", "NULL"), hydropathy=h)
     expect_equal(junction_gravy_na, c(NA, 0.27, NA), tolerance=0.001)
@@ -107,21 +107,21 @@ test_that("aminoAcidProperties", {
     db[3,"JUNCTION"] <- "NULL"
     db[4,"JUNCTION"] <- "NLL"
     expect_warning(junction_properties_na <- aminoAcidProperties(db[1:4,], seq="JUNCTION", nt=FALSE,
-                                                 trim=FALSE, label="JUNCTION",
+                                                 trim=FALSE, label="junction",
                                                  hydropathy=h),
                    "Found 2 sequences with non valid amino acid symbols")
-    expect_equal(junction_properties_na$JUNCTION_AA_LENGTH, c(NA, 2, NA, 3))
-    expect_equal(junction_properties_na$JUNCTION_AA_GRAVY, tolerance=0.001,
+    expect_equal(junction_properties_na$junction_aa_length, c(NA, 2, NA, 3))
+    expect_equal(junction_properties_na$junction_aa_gravy, tolerance=0.001,
                  c(NA,0.27,NA,-0.463))
-    expect_equal(junction_properties_na$JUNCTION_AA_BULK,c(NA, 12.16, NA, 18.54), tolerance=0.001)
-    expect_equal(junction_properties_na$JUNCTION_AA_ALIPHATIC, c(NA, 0.5, NA, 2.6), tolerance=0.001)
-    expect_equal(junction_properties_na$JUNCTION_AA_POLARITY, c(NA, 9.85, NA, 7.13), tolerance=0.001)
-    expect_equal(junction_properties_na$JUNCTION_AA_CHARGE, c(NA, 0, NA, 0), tolerance=0.001)
-    expect_equal(junction_properties_na$JUNCTION_AA_BASIC, c(NA, 0, NA, 0), tolerance=0.001)
-    expect_equal(junction_properties_na$JUNCTION_AA_ACIDIC, c(NA, 0, NA, 0), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_bulk,c(NA, 12.16, NA, 18.54), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_aliphatic, c(NA, 0.5, NA, 2.6), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_polarity, c(NA, 9.85, NA, 7.13), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_charge, c(NA, 0, NA, 0), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_basic, c(NA, 0, NA, 0), tolerance=0.001)
+    expect_equal(junction_properties_na$junction_aa_acidic, c(NA, 0, NA, 0), tolerance=0.001)
     expect_equal(isValidAASeq(db$JUNCTION[1:4]), c(FALSE, TRUE, FALSE, TRUE))
     expect_warning(aminoAcidProperties(db[1:4, ], seq="JUNCTION", nt=FALSE,
-                                       trim=FALSE, label="JUNCTION", property="length"),
+                                       trim=FALSE, label="junction", property="length"),
                    "2 sequences")
 })
 
@@ -136,9 +136,9 @@ test_that("countPatterns", {
              "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
              "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
     patterns <- c("A", "V", "[LI]")
-    names(patterns) <- c("ARG", "VAL", "ISO_LEU")
-    obs <- countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="CDR3")
-    expect_equal(obs$CDR3_ARG, c(0.1250000, 0.1111111, 0.1111111), tolerance=0.001)
-    expect_equal(obs$CDR3_VAL, c(0, 0, 0))
-    expect_equal(obs$CDR3_ISO_LEU, c(0, 0.1111111, 0), tolerance=0.001)
+    names(patterns) <- c("arg", "val", "iso_leu")
+    obs <- countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
+    expect_equal(obs$cdr3_arg, c(0.1250000, 0.1111111, 0.1111111), tolerance=0.001)
+    expect_equal(obs$cdr3_val, c(0, 0, 0))
+    expect_equal(obs$cdr3_iso_leu, c(0, 0.1111111, 0), tolerance=0.001)
 })

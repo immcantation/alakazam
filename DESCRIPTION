@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 0.3.0.999
-Date: 2019-11-05
+Date: 2019-11-22
 Authors@R: c(person("Jason", "Vander Heiden", role=c("aut", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
@@ -42,7 +42,7 @@ Depends:
     ggplot2 (>= 3.2.0)
 Imports:
     ape,
-    dplyr (>= 0.8.1),
+    dplyr (>= 0.8.3),
     graphics,
     grid,
     igraph (>= 1.0.0),
@@ -58,14 +58,14 @@ Imports:
     stats,
     stringi,
     tibble,
-    tidyr,
+    tidyr (>= 1.0.0),
     utils
 LinkingTo: Rcpp
 Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Collate: 
     'Alakazam.R'
     'AminoAcids.R'
