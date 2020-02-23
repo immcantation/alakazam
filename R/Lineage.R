@@ -446,6 +446,8 @@ phylipToGraph <- function(edges, clone) {
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
 #'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
 #'                         the console.
+#' @param    phylo         return tree as a \code{phylo} object
+#' @param    temp_path     specific path to temp directory if desired  
 #'                                                
 #' @return   An igraph \code{graph} object defining the Ig lineage tree. Each unique input 
 #'           sequence in \code{clone} is a vertex of the tree, with additional vertices being
@@ -550,7 +552,8 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0), 
-                               rm_temp=FALSE, verbose=FALSE) {
+                               rm_temp=FALSE, verbose=FALSE, phylo=FALSE,
+                               temp_path=NULL) {
     # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
@@ -577,7 +580,13 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     }
     
     # Create temporary directory
-    temp_path <- makeTempDir(paste0(clone@clone, "-phylip"))
+    if(is.null(temp_path)){
+        temp_path <- makeTempDir(paste0(clone@clone, "-phylip"))
+    }else{
+        if(!dir.exists(temp_path)){
+            dir.create(temp_path)
+        }
+    }
     if (verbose) {
         cat("TEMP_DIR> ", temp_path, "\n", sep="")
     }
@@ -585,6 +594,27 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
     runPhylip(temp_path, dnapars_exec, verbose=verbose)
+    if(phylo){
+        phylo = ape::read.tree(file.path(temp_path, "outtree"))
+        if(class(phylo) == "multiPhylo"){
+            if(verbose){
+                print(paste("Sampling 1 of",length(phylo),"possible trees"))
+            }
+            phylo = phylo[[sample(1:length(phylo),1)]]
+        }
+        id_map = c(id_map, "Germline")
+        names(id_map)[length(id_map)] = "Germline"
+        map_id = names(id_map)
+        names(map_id) = id_map
+        phylo$tip.label = map_id[phylo$tip.label]
+        phylo = rerootGermline(phylo, germid="Germline", resolve=TRUE)
+        phylo = ape::ladderize(phylo,right=FALSE)
+        # Remove temporary directory
+        if (rm_temp) {
+            unlink(temp_path, recursive=TRUE)
+        }
+        return(phylo)
+    }
     phylip_out <- readPhylipOutput(temp_path)
     
     # Remove temporary directory
