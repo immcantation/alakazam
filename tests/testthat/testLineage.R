@@ -31,6 +31,8 @@ test_that("makeChangeoClone",{
                       "SEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
                       "TYPE"=c("IgG", "IgG,IgM"),
                       "COUNT"=c(3, 3),
+                      "LSEQUENCE"=c("", ""),
+                      "HLSEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
                       "COLLAPSE_COUNT"=c(1, 2),
                       stringsAsFactors=FALSE)
     
@@ -82,6 +84,8 @@ test_that("makeChangeoClone",{
                       "SEQUENCE"=c("NNNCTGNN"),
                       "TYPE"=c("IgA,IgG,IgM"),
                       "COUNT"=c(10),
+                      "LSEQUENCE"=c(""),
+                      "HLSEQUENCE"=c("NNNCTGNN"),
                       "COLLAPSE_COUNT"=c(4),
                       stringsAsFactors=F)
     
