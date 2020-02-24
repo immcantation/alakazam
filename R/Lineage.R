@@ -99,8 +99,8 @@ function(data, id="sequence_id", seq="sequence_alignment",
     germ="germline_alignment", vcall="v_call", jcall="j_call",
     junc_len="junction_length", clone="clone_id", mask_char="N",
     max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-    add_count=TRUE, verbose=FALSE,collapse=TRUE,region="H",heavy=NULL,
-    cell="cell",locus="locus",traits=NULL){
+    add_count=TRUE, verbose=FALSE, collapse=TRUE, region="H", heavy=NULL,
+    cell="cell", locus="locus", traits=NULL){
 
     # Check for valid fields
     check <- alakazam::checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 

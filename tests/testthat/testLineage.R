@@ -147,7 +147,7 @@ test_that("buildPhylipLineage", {
         
         expect_equal(igraph::vertex_attr_names(graph),
                      c("name", "sequence", "sample", "isotype", "duplicate_count", 
-                       "COLLAPSE_COUNT", "label"))
+                       "LSEQUENCE","HLSEQUENCE","COLLAPSE_COUNT", "label"))
 
         expect_equal(E(graph)$weight,c(1,1,1,0))
         expect_equal(E(graph)$label,c(1,1,1,0))
