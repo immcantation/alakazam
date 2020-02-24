@@ -59,6 +59,7 @@ Imports:
     stringi,
     tibble,
     tidyr,
+    tidyselect,
     utils
 LinkingTo: Rcpp
 Suggests:

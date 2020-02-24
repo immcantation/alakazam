@@ -4,8 +4,6 @@
 NULL
 
 
-#### Preprocessing functions ####
-
 #' Generate a ChangeoClone object for lineage construction
 #' 
 #' \code{makeChangeoClone} takes a data.frame with AIRR or Change-O style columns as input and 
@@ -50,7 +48,12 @@ NULL
 #' @param    verbose      passed on to \code{collapseDuplicates}. If \code{TRUE}, report the 
 #'                        numbers of input, discarded and output sequences; otherwise, process
 #'                        sequences silently.                        
-#'
+#' @param     collapse    iollapse identical sequences?
+#' @param     traits      column ids to keep distinct during sequence collapse 
+#' @param     region      if HL, include light chain information if available.
+#' @param     heavy       name of heavy chain locus (default = "IGH")
+#' @param     cell        name of the column containing cell assignment information
+#' @param     locus       name of the column containing locus information
 #' @return   A \link{ChangeoClone} object containing the modified clone.
 #'
 #' @details
@@ -86,65 +89,174 @@ NULL
 #'           Returns a \link{ChangeoClone} object which serves as input to
 #'           \link{buildPhylipLineage}.
 #' 
-#' @examples
-#' # Example data
-#' db <- data.frame(sequence_id=LETTERS[1:4],
-#'                  sequence_alignment=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN"),
-#'                  germline_alignment="CCCCAGGG",
-#'                  v_call="Homsap IGKV1-39*01 F",
-#'                  j_call="Homsap IGKJ5*01 F",
-#'                  junction_length=2,
-#'                  clone_id=1,
-#'                  c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
-#'                  duplicate_count=1:4,
-#'                  stringsAsFactors=FALSE)
-#' 
-#' 
-#'  # Without end masking
-#'  makeChangeoClone(db, text_fields="c_call", num_fields="duplicate_count")
-#' 
-#'  # With end masking
-#'  makeChangeoClone(db, max_mask=3, text_fields="c_call", num_fields="duplicate_count")
-#'
 #' @export
-makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
-                             germ="germline_alignment", vcall="v_call", jcall="j_call",
-                             junc_len="junction_length", clone="clone_id", mask_char="N",
-                             max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                             add_count=TRUE, verbose=FALSE) {
+#requires one loci to be the "primary" which is present in all cells and 
+#is assumed to descend from a single common ancestor via point mutations
+#and allow for one other alternate loci, which is assumed to descend by
+#point mutations from a common ancestor
+makeChangeoClone = 
+function(data, id="sequence_id", seq="sequence_alignment", 
+    germ="germline_alignment_d_mask", vcall="v_call", jcall="j_call",
+    junc_len="junction_length", clone="clone_id", mask_char="N",
+    max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
+    add_count=TRUE, verbose=FALSE,collapse=FALSE,region="H",heavy=NULL,
+    cell="cell",locus="locus",traits=NULL){
+
     # Check for valid fields
-    check <- checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
-                                  text_fields, num_fields, seq_fields))
+    check <- alakazam::checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
+                                      text_fields, num_fields, seq_fields,traits))
     if (check != TRUE) { stop(check) }
-    
-    # Replace gaps with Ns and masked ragged ends
-    tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
-    tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, outer_only=FALSE)
-    tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], mask_char=mask_char, max_mask=max_mask, trim=FALSE)
-    
-    # Pad ends
-    if (pad_end) {
-        tmp_df[[seq]] <- padSeqEnds(tmp_df[[seq]], pad_char=mask_char)
+
+    if(region=="HL"){
+        check <- alakazam::checkColumns(data, c(cell,locus))
+        if (check != TRUE) { stop(check) }
+        if(is.null(heavy)){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "heavy chain loci ID must be specified if combining loci!"))
+        }
+        # Ensure cell and loci columns are not duplicated
+        text_fields <- text_fields[text_fields != rlang::sym(cell)]
+        text_fields <- text_fields[text_fields != rlang::sym(locus)]
+        seq_fields <- seq_fields[seq_fields != rlang::sym(cell)]
+        seq_fields <- seq_fields[seq_fields != rlang::sym(locus)]
+        # Replace gaps with Ns and masked ragged ends
+        tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields, cell, locus, traits)]
+        tmp_df[[seq]] <- alakazam::maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, 
+            outer_only=FALSE)
+        hc = dplyr::filter(tmp_df,!!rlang::sym(locus)==rlang::sym(heavy))
+        alt = dplyr::filter(tmp_df,!!rlang::sym(locus)!=rlang::sym(heavy))
+        if(nrow(hc) == 0){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "heavy chain locus not found in dataset!"))
+        }
+        if(nrow(alt) == 0){
+            #print("Light chain not found")
+            region = "H"
+        }else{
+            if(length(unique(dplyr::pull(alt,rlang::sym(locus)))) > 1){
+                stop(paste("clone",unique(dplyr::pull(data,clone)),
+                    "currently only one alternate loci per clone supported"))
+            }
+        }
+    }else{
+        # Replace gaps with Ns and masked ragged ends
+        tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields, traits)]
+        tmp_df[[seq]] <- alakazam::maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, 
+            outer_only=FALSE)
+    }
+
+    if(region=="HL"){
+        #print("Concatenating H and L")
+        hc[[seq]] <- alakazam::maskSeqEnds(hc[[seq]], mask_char=mask_char, 
+            max_mask=max_mask, trim=FALSE)
+        alt[[seq]] <- alakazam::maskSeqEnds(alt[[seq]], mask_char=mask_char, 
+            max_mask=max_mask, trim=FALSE)
+        # Pad ends
+        if(pad_end) {
+            hc[[seq]] <- alakazam::padSeqEnds(hc[[seq]], pad_char=mask_char)
+            alt[[seq]] <- alakazam::padSeqEnds(alt[[seq]], pad_char=mask_char)
+        }
+        hc_length = unique(nchar(dplyr::pull(hc,rlang::sym(seq))))
+        alt_length = unique(nchar(dplyr::pull(alt,rlang::sym(seq))))
+        if(length(hc_length) > 1){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "Heavy chain sequences must be same length!"))
+        }
+        if(length(hc_length) > 1){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "Light chain sequences must be same length!"))
+        }
+        hc$LSEQUENCE = ""
+        hc$HLSEQUENCE = ""
+        for(cell_name in unique(dplyr::pull(hc,!!rlang::sym(cell)))){
+            if(!cell_name %in% dplyr::pull(alt,rlang::sym(cell))){
+                altseq = paste(rep(mask_char,alt_length),collapse="")
+            }else{
+                altseq = dplyr::pull(dplyr::filter(alt,
+                    !!rlang::sym(cell) == cell_name),rlang::sym(seq))
+            }
+            hc[dplyr::pull(hc,!!rlang::sym(cell)) == cell_name,]$LSEQUENCE = altseq
+            hc[dplyr::pull(hc,!!rlang::sym(cell)) == cell_name,]$HLSEQUENCE = 
+                paste0(hc[dplyr::pull(hc,!!rlang::sym(cell)) == cell_name,seq],altseq)
+        }
+        hcd = dplyr::filter(data,!!rlang::sym(locus)==rlang::sym(heavy))
+        altd = dplyr::filter(data,!!rlang::sym(locus)!=rlang::sym(heavy))
+        germline = alakazam::maskSeqGaps(hcd[[germ]][1], mask_char=mask_char, outer_only=FALSE)
+        lgermline = alakazam::maskSeqGaps(altd[[germ]][1], mask_char=mask_char, outer_only=FALSE)
+        hlgermline = paste0(germline,
+            alakazam::maskSeqGaps(altd[[germ]][1], mask_char=mask_char, outer_only=FALSE))
+        tmp_df = hc
+        loci = unique(dplyr::pull(data,locus))
+        tmp_df[[rlang::sym(locus)]] = paste(loci,collapse=",")
+        regions = c(rep(unique(dplyr::pull(hc,rlang::sym(locus))),times=hc_length),
+                 rep(unique(dplyr::pull(alt,rlang::sym(locus))),times=alt_length))
+        if(length(regions) != unique(nchar(tmp_df$HLSEQUENCE))){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "regions vector not equal to total sequence length!"))
+        }
+        if(length(regions) != nchar(hlgermline)){
+            stop(paste("clone",unique(dplyr::pull(data,clone)),
+                "regions vector not equal to germline sequence length!"))
+        }
+        new_seq = "HLSEQUENCE"
+    }else{
+        tmp_df[[seq]] <- alakazam::maskSeqEnds(tmp_df[[seq]], 
+            mask_char=mask_char, max_mask=max_mask, trim=FALSE)
+        if(pad_end){
+            tmp_df[[seq]] <- alakazam::padSeqEnds(tmp_df[[seq]], pad_char=mask_char)
+        }
+        germline = alakazam::maskSeqGaps(data[[germ]][1], 
+            mask_char=mask_char, outer_only=FALSE)
+        check <- alakazam::checkColumns(data, c(locus))
+        if(check == TRUE){
+            loci = unique(dplyr::pull(data,locus))
+            if(length(loci) > 1){
+                warning(paste("clone",unique(dplyr::pull(data,clone)),
+                    "mutliple loci present but not dealt with!"))
+                loci = paste(loci,collapse=",")
+            }
+        }else{
+            loci = "N"
+        }
+        regions = rep(loci,times=nchar(germline))
+        lgermline = ""
+        hlgermline = germline
+        tmp_df$LSEQUENCE = ""
+        tmp_df$HLSEQUENCE = tmp_df[[seq]]
+        new_seq = seq
     }
     
-    seq_len <- stringi::stri_length(tmp_df[[seq]])
-    if (any(seq_len != seq_len[1])) {
+    seq_len = nchar(tmp_df[[seq]])
+    if(any(seq_len != seq_len[1])){
         len_message <- paste0("All sequences are not the same length for data with first ", 
-                              id, " = ", tmp_df[[id]][1], ".")
+                id, " = ", tmp_df[[id]][1], ".")
         if (!pad_end) {
             len_message <- paste(len_message, 
-                                 "Consider specifying pad_end=TRUE and verify the multiple alignment.")
+                "Consider specifying pad_end=TRUE and verify the multiple alignment.")
         } else {
             len_message <- paste(len_message,
-                                 "Verify that all sequences are properly multiple-aligned.")
+                "Verify that all sequences are properly multiple-aligned.")
         }
         stop(len_message)
     }
     
     # Remove duplicates
-    tmp_df <- collapseDuplicates(tmp_df, id=id, seq=seq, text_fields=text_fields, 
-                                 num_fields=num_fields, seq_fields=seq_fields,
-                                 add_count=add_count, verbose=verbose)
+    if(collapse){
+        if(is.null(traits)){
+            tmp_df <- alakazam::collapseDuplicates(tmp_df, id=id, seq=new_seq, 
+            text_fields=text_fields, 
+            num_fields=num_fields, seq_fields=seq_fields,
+            add_count=add_count, verbose=verbose)
+        }else{
+            tmp_df = tmp_df %>%
+                dplyr::group_by_at(dplyr::vars(tidyselect::all_of(traits))) %>%
+                dplyr::do(alakazam::collapseDuplicates(!!rlang::sym("."), id=id, seq=new_seq, 
+                text_fields=text_fields, 
+                num_fields=num_fields, seq_fields=seq_fields,
+                add_count=add_count, verbose=verbose)) %>%
+                dplyr::ungroup()
+          }
+    }
     
     # Define return object
     tmp_names <- names(tmp_df)
@@ -154,15 +266,32 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     }
     names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
     names(tmp_df)[tmp_names == id] <- "SEQUENCE_ID"
-    clone <- new("ChangeoClone", 
+    
+    if(region=="HL"){
+        phylo_seq = "HLSEQUENCE"
+    }else if(region=="L"){
+        phylo_seq = "LSEQUENCE"
+    }else{
+        phylo_seq = "SEQUENCE"
+    }
+    
+    outclone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
-                 germline=maskSeqGaps(data[[germ]][1], mask_char=mask_char, outer_only=FALSE), 
-                 v_gene=getGene(data[[vcall]][1]), 
-                 j_gene=getGene(data[[jcall]][1]), 
-                 junc_len=data[[junc_len]][1])
+                 germline=alakazam::maskSeqGaps(germline, mask_char=mask_char, 
+                    outer_only=FALSE),
+                 lgermline=alakazam::maskSeqGaps(lgermline, mask_char=mask_char, 
+                    outer_only=FALSE),
+                 hlgermline=alakazam::maskSeqGaps(hlgermline, mask_char=mask_char, 
+                    outer_only=FALSE), 
+                 v_gene=alakazam::getGene(data[[vcall]][1]), 
+                 j_gene=alakazam::getGene(data[[jcall]][1]), 
+                 junc_len=data[[junc_len]][1],
+                 locus=unique(loci),
+                 region=regions,
+                 phylo_seq=phylo_seq)
     
-    return(clone)
+    outclone
 }
 
 
