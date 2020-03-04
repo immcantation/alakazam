@@ -277,9 +277,9 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
     
     # Pad
     if (!start) { 
-        seq <- stri_pad_right(seq, width=width, pad="N")
+        seq <- stri_pad_right(seq, width=width, pad=pad_char)
     } else {
-        seq <- stri_pad_left(seq, width=width, pad="N")
+        seq <- stri_pad_left(seq, width=width, pad=pad_char)
     }
 
     return(seq)
