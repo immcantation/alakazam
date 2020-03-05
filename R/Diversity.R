@@ -242,8 +242,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
             group_by(!!!rlang::syms(c(groups, clone))) %>%
             dplyr::summarize(SEQ_COUNT=n()) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
-			dplyr::rename("CLONE"=clone)
+            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT")))
     } else {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
@@ -251,8 +250,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
                               COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
                            COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) %>%
-			dplyr::rename("CLONE"=clone)
+            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) 
     }
     return(clone_tab)
 }
