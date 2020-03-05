@@ -130,7 +130,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     if (fill) {
         gene_tab <- gene_tab %>%
             ungroup() %>%
-            tidyr::complete_(as.list(c(groups, gene))) %>%
+            tidyr::complete(!!!rlang::syms(as.list(c(groups, gene)))) %>%
             replace(is.na(.), 0)
     }
 
