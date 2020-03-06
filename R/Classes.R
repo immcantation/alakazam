@@ -72,12 +72,12 @@ setClass("AbundanceCurve",
 #'                   }
 #' @slot  tests    data.frame describing the significance test results with columns:
 #'                 \itemize{
-#'                   \item  \code{TEST}:        string listing the two groups tested.
-#'                   \item  \code{DELTA_MEAN}:  mean of the \eqn{D} bootstrap delta 
+#'                   \item  \code{test}:        string listing the two groups tested.
+#'                   \item  \code{delta_mean}:  mean of the \eqn{D} bootstrap delta 
 #'                                              distribution for the test.
-#'                   \item  \code{DELTA_SD}:    standard deviation of the \eqn{D} 
+#'                   \item  \code{delta_sd}:    standard deviation of the \eqn{D} 
 #'                                              bootstrap delta distribution for the test.
-#'                   \item  \code{PVALUE}:      p-value for the test.
+#'                   \item  \code{pvalue}:      p-value for the test.
 #'                 }
 #' @slot  group_by   string specifying the name of the grouping column in diversity calculation.
 #' @slot  groups     vector specifying the names of unique groups in group column in diversity calculation.
