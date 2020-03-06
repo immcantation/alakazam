@@ -920,7 +920,12 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["command"]] <- df[1, ]$TREE
     for (i in 2:nrow(df)) {
         tree <- ape::read.tree(text=df[i, ][["TREE"]])
-        rtree <- rerootGermline(tree,paste0(df[["CLONE"]][i], "_GERM"),resolve=TRUE)
+        germ_base <- paste0(df[["CLONE"]][i], "_GERM")
+        germ_id <- tree$tip.label[grepl(germ_base,tree$tip.label)]
+        if(length(germ_id) > 1){
+            stop("Can only be one tip of the form '<cloneid>_GERM'")
+        }
+        rtree <- rerootGermline(tree,germ_id,resolve=TRUE)
         if (collapse) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
@@ -943,6 +948,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     
     return(out)
 }
+
 
 #' Combine IgPhyML object parameters into a dataframe
 #' 

@@ -366,6 +366,9 @@ cpuCount <-function(){
     } else {
         nproc <- 1    
     }
+	
+	# in case an NA is returned
+	if(is.na(nproc)){nproc <- 1}
     
     return(nproc)
 }

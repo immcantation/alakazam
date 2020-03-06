@@ -277,9 +277,9 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
     
     # Pad
     if (!start) { 
-        seq <- stri_pad_right(seq, width=width, pad="N")
+        seq <- stri_pad_right(seq, width=width, pad=pad_char)
     } else {
-        seq <- stri_pad_left(seq, width=width, pad="N")
+        seq <- stri_pad_left(seq, width=width, pad=pad_char)
     }
 
     return(seq)
@@ -500,8 +500,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         data[["COLLAPSE_PASS"]][ambig_rows] <- FALSE
     }
     
-    # Return single sequence if all sequence belong to ambiguous clusters
-    if (discard_count == nrow(d_mat)) {
+    # Return single sequence if all or all but one sequence belong to ambiguous clusters 
+	if (nrow(d_mat) - discard_count <= 1) {
         inform_len <- data.frame(list("inform_len"=.informativeLength(data[[seq]])))
         # For each ambiguous cluster, return the best sequence
         g <- igraph::simplify(igraph::graph_from_adjacency_matrix(d_mat))
