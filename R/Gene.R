@@ -33,7 +33,7 @@
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
 #'           \itemize{
-#'             \item \code{GENE}:         name of the family, gene or allele
+#'             \item \code{gene}:         name of the family, gene or allele
 #'             \item \code{seq_count}:    total number of sequences for the gene.
 #'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
@@ -135,7 +135,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     }
 
     # Rename gene column
-    gene_tab <- rename(gene_tab, "GENE"=gene)
+    gene_tab <- rename(gene_tab, "gene"=gene)
     
     return(gene_tab)
 }
