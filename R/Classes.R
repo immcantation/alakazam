@@ -21,7 +21,7 @@ setClassUnion("CharNULL", members=c("character", "NULL"))
 #'                   containing the following columns:
 #'                   \itemize{
 #'                     \item  \code{group}:  group identifier.
-#'                     \item  \code{CLONE}:  clone identifier.
+#'                     \item  \code{clone_id} or \code{CLONE}:  clone identifier. 
 #'                     \item  \code{p}:      relative abundance of the clone.
 #'                     \item  \code{lower}:  lower confidence inverval bound.
 #'                     \item  \code{upper}:  upper confidence interval bound.
