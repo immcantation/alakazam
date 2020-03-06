@@ -438,11 +438,11 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'                                   overlapping gene calls.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
-#'           in a new \code{VJ_GROUP} column. 
+#'           in a new \code{vj_group} column. 
 #'           
-#'           Note that if \code{junc_len} is supplied, the grouping this \code{VJ_GROUP} 
+#'           Note that if \code{junc_len} is supplied, the grouping this \code{vj_group} 
 #'           will have been based on V, J, and L simultaneously despite the column name 
-#'           being \code{VJ_GROUP}.
+#'           being \code{vj_group}.
 #'           
 #'           Note that the output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
 #'           columns will be converted to \code{character} if they were \code{factor} in the 
@@ -1059,16 +1059,16 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     stopifnot( n_cells_or_seqs == length(unique(unlist(cellIdx_byGroup_lst, use.names=FALSE))) )
     
     # assign
-    data$VJ_GROUP <- NA
+    data$vj_group <- NA
     for (i in 1:length(cellIdx_byGroup_lst)) {
-        data[["VJ_GROUP"]][cellIdx_byGroup_lst[[i]]] <- names(VJL_groups)[i]
+        data[["vj_group"]][cellIdx_byGroup_lst[[i]]] <- names(VJL_groups)[i]
     }
-    stopifnot(!any(is.na(data[["VJ_GROUP"]])))
+    stopifnot(!any(is.na(data[["vj_group"]])))
     
     if (!single_cell) {
         return(data)
     } else {
-        data_orig$VJ_GROUP <- NA
+        data_orig$vj_group <- NA
         
         # map back to data_orig
         for (i_cell in 1:nrow(data)) {
@@ -1078,12 +1078,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             # sanity check
             stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
             # grouping
-            data_orig$VJ_GROUP[c(i_orig_h, i_orig_l)] <- data$VJ_GROUP[i_cell]
+            data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
         }
         
-        # remove rows with $VJ_GROUP values of NA
+        # remove rows with $vj_group values of NA
         # these had already been removed by the NA check for `data`
-        data_orig <- data_orig[!is.na(data_orig$VJ_GROUP), ]
+        data_orig <- data_orig[!is.na(data_orig$vj_group), ]
         
         return(data_orig)
     }

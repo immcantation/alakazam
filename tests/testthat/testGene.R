@@ -197,7 +197,7 @@ test_that("groupGenes heavy only",{
     #expected <- c(2, 3, 2, 2, 2, 1, 2, 3)
     # same underlying spirit as before
     expected <- c("G1","G2","G1","G1","G1","G3","G1","G2")
-    expect_equal(db$VJ_GROUP, expected)
+    expect_equal(db$vj_group, expected)
 })
 
 test_that("groupGenes, single-cell mode, heavy and light", {
@@ -259,8 +259,8 @@ test_that("groupGenes, single-cell mode, heavy and light", {
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                      only_igh=FALSE, first=TRUE)
                      
-    expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
-    expect_equal(gg2[["VJ_GROUP"]], gg2_expect)
+    expect_equal(gg1[["vj_group"]], gg1_expect)
+    expect_equal(gg2[["vj_group"]], gg2_expect)
 })
 
 test_that("groupGenes, single-cell mode, heavy only", {
@@ -299,7 +299,7 @@ test_that("groupGenes, single-cell mode, heavy only", {
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                      only_igh=TRUE, first=FALSE)
     
-    expect_equal(gg1[["VJ_GROUP"]], gg1_expect)
+    expect_equal(gg1[["vj_group"]], gg1_expect)
     
 })
 
@@ -344,7 +344,7 @@ test_that("groupGenes, AIRR-format migration", {
     newDb_a <- groupGenes(db_a, v_call="v_call", j_call="j_call")
     
     # newDb_c and newDb_a not directly comparable b/c diff ncol
-    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     rm(db_c, db_a, newDb_c, newDb_a)
 
@@ -359,7 +359,7 @@ test_that("groupGenes, AIRR-format migration", {
                           junc_len="len", cell_id="cell_id", locus="locus", 
                           only_igh=FALSE, first=FALSE)
     
-    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     # 3
     newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
@@ -369,7 +369,7 @@ test_that("groupGenes, AIRR-format migration", {
                           junc_len="len", cell_id="cell_id", locus="locus", 
                           only_igh=FALSE, first=TRUE)
     
-    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     # 4
     newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
@@ -379,7 +379,7 @@ test_that("groupGenes, AIRR-format migration", {
                           junc_len="len", cell_id="cell_id", locus="locus", 
                           only_igh=TRUE, first=FALSE)
     
-    expect_true(all(newDb_c[["VJ_GROUP"]]==newDb_a[["VJ_GROUP"]]))
+    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
 })
 
