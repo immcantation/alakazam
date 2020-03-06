@@ -438,7 +438,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         p_upper <- p_mean + p_err
         
         # Assemble and sort abundance data.frame
-	    abund_df <- tibble::tibble(CLONE=rownames(boot_mat), p=p_mean, p_sd=p_sd,
+	    abund_df <- tibble::tibble(!!clone := rownames(boot_mat), p=p_mean, p_sd=p_sd,
 	                           lower=p_lower, upper=p_upper) %>%
 	        dplyr::arrange(desc(!!rlang::sym("p"))) %>%
 	        dplyr::mutate(rank=1:n())
