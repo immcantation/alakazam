@@ -28,7 +28,7 @@ test_that("countClones", {
 
 	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
 	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
-	expect_equal(clones$COPY_FREQ[6:11], 
+	expect_equal(clones$copy_freq[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
     
@@ -41,13 +41,13 @@ test_that("countClones", {
 	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
 	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
 	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
-	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
+	                                 copy_freq=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
 	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
 	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
 	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
-	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
+	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
 	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
@@ -406,7 +406,7 @@ test_that("countClones", {
 
 	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
 	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
-	expect_equal(clones$COPY_FREQ[6:11], 
+	expect_equal(clones$copy_freq[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
     
@@ -419,13 +419,13 @@ test_that("countClones", {
 	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
 	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
 	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
-	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
+	                                 copy_freq=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
 	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
 	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
 	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
-	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
+	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
 	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 

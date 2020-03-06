@@ -40,7 +40,7 @@
 #'             \item \code{copy_count}:   sum of the copy counts in the \code{copy} column.
 #'                                        for each gene. Only present if the \code{copy} 
 #'                                        argument is specified.
-#'             \item \code{COPY_FREQ}:    frequency of the gene as a fraction of the total
+#'             \item \code{copy_freq}:    frequency of the gene as a fraction of the total
 #'                                        copy number within each group. Only present if 
 #'                                        the \code{copy} argument is specified.
 #'             \item \code{CLONE_COUNT}:  total number of clones for the gene.
@@ -122,7 +122,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             summarize(seq_count=length(!!rlang::sym(gene)),
                        copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
             mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
-                    COPY_FREQ=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+                   copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
             arrange(desc(!!rlang::sym("copy_count")))
     }
 

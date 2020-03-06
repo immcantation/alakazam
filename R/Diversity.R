@@ -217,7 +217,7 @@ inferCompleteAbundance <- function(x) {
 #'             \item \code{copy_count}:  sum of the copy counts in the \code{copy} column.
 #'                                       Only present if the \code{copy} argument is 
 #'                                       specified.
-#'             \item \code{COPY_FREQ}:   frequency of the clone as a fraction of the total
+#'             \item \code{copy_freq}:   frequency of the clone as a fraction of the total
 #'                                       copy number within each group. Only present if 
 #'                                       the \code{copy} argument is specified.
 #'           }
@@ -249,7 +249,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
             dplyr::summarize(seq_count=length(.data[[clone]]),
                               copy_count=sum(.data[[copy]], na.rm=TRUE)) %>%
             dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
-                           COPY_FREQ=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+                          copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
             dplyr::arrange(desc(!!rlang::sym("copy_count"))) 
     }
     return(clone_tab)
