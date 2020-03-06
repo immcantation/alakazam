@@ -43,8 +43,8 @@
 #'             \item \code{copy_freq}:    frequency of the gene as a fraction of the total
 #'                                        copy number within each group. Only present if 
 #'                                        the \code{copy} argument is specified.
-#'             \item \code{CLONE_COUNT}:  total number of clones for the gene.
-#'             \item \code{CLONE_FREQ}:   frequency of the gene as a fraction of the total
+#'             \item \code{clone_count}:  total number of clones for the gene.
+#'             \item \code{clone_freq}:   frequency of the gene as a fraction of the total
 #'                                        number of clones within each grouping.
 #'           }
 #'           Additional columns defined by the \code{groups} argument will also be present.
@@ -102,15 +102,15 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
             group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
-            dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
+            dplyr::mutate(clone_gene_count=n()) %>%
             ungroup() %>%
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            slice(which.max(!!rlang::sym("CLONE_GENE_COUNT"))) %>%
+            slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
             ungroup() %>%
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(CLONE_COUNT=n()) %>%
-            mutate(CLONE_FREQ=!!rlang::sym("CLONE_COUNT")/sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
-            arrange(!!rlang::sym("CLONE_COUNT"))
+            dplyr::summarize(clone_count=n()) %>%
+            mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+            arrange(!!rlang::sym("clone_count"))
     } else {
         if (!is.null(clone) & !is.null(copy)) {
             warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
