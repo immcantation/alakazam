@@ -33,7 +33,7 @@ NULL
 #' clones <- countClones(ExampleDb, groups="sample_id")
 #' 
 #' # Calculate 1first order coverage for a single sample
-#' calcCoverage(clones$SEQ_COUNT[clones$sample_id == "+7d"])
+#' calcCoverage(clones$seq_count[clones$sample_id == "+7d"])
 #'
 #' @export
 calcCoverage <- function(x, r=1) {
@@ -211,10 +211,10 @@ inferCompleteAbundance <- function(x) {
 #' @return   A data.frame summarizing clone counts and frequencies with columns:
 #'           \itemize{
 #'             \item \code{CLONE}:    	 clone identifier.
-#'             \item \code{SEQ_COUNT}:   total number of sequences for the clone.
-#'             \item \code{SEQ_FREQ}:    frequency of the clone as a fraction of the total
+#'             \item \code{seq_count}:   total number of sequences for the clone.
+#'             \item \code{seq_freq}:    frequency of the clone as a fraction of the total
 #'                                       number of sequences within each group.
-#'             \item \code{COPY_COUNT}:  sum of the copy counts in the \code{copy} column.
+#'             \item \code{copy_count}:  sum of the copy counts in the \code{copy} column.
 #'                                       Only present if the \code{copy} argument is 
 #'                                       specified.
 #'             \item \code{COPY_FREQ}:   frequency of the clone as a fraction of the total
@@ -240,17 +240,17 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
     if (is.null(copy)) {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT")))
+            dplyr::summarize(seq_count=n()) %>%
+            dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("seq_count")))
     } else {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
-                              COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
-            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
-                           COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) 
+            dplyr::summarize(seq_count=length(.data[[clone]]),
+                              copy_count=sum(.data[[copy]], na.rm=TRUE)) %>%
+            dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                           COPY_FREQ=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("copy_count"))) 
     }
     return(clone_tab)
 }
@@ -374,31 +374,31 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     ci_x <- qnorm(ci_z)
     
     # Tabulate clonal abundance
-    count_col <- if (!is.null(copy)) { "COPY_COUNT" } else { "SEQ_COUNT" }
+    count_col <- if (!is.null(copy)) { "copy_count" } else { "seq_count" }
     clone_tab <- countClones(data, copy=copy, clone=clone, groups=group) %>%
-        dplyr::mutate(CLONE_COUNT=!!rlang::sym(count_col))
+        dplyr::mutate(clone_count=!!rlang::sym(count_col))
 
     # Tabulate group sizes
     if (!is.null(group)) {
         # Summarize groups
         group_tab <- clone_tab %>%
             group_by(!!rlang::sym(group)) %>%
-            dplyr::summarize(COUNT=sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
-            rename(GROUP=!!rlang::sym(group))
+            dplyr::summarize(count=sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+            rename(group=!!rlang::sym(group))
     } else {
-        group_tab <- data.frame(V="All", COUNT=sum(clone_tab$CLONE_COUNT, na.rm=T))
-        names(group_tab)[1] <- "GROUP"
+        group_tab <- data.frame(v="All", count=sum(clone_tab$clone_count, na.rm=T))
+        names(group_tab)[1] <- "group"
     }
-    group_all <- as.character(group_tab$GROUP)
-    group_tab <- group_tab[group_tab$COUNT >= min_n, ]
-    group_keep <- as.character(group_tab$GROUP)
+    group_all <- as.character(group_tab$group)
+    group_tab <- group_tab[group_tab$count >= min_n, ]
+    group_keep <- as.character(group_tab$group)
     
     # Set number of sampled sequence
     if (uniform) {
-        nsam <- min(group_tab$COUNT, max_n)
+        nsam <- min(group_tab$count, max_n)
         nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
     } else {
-        nsam <- if (is.null(max_n)) { group_tab$COUNT } else { pmin(group_tab$COUNT, max_n) }
+        nsam <- if (is.null(max_n)) { group_tab$count } else { pmin(group_tab$count, max_n) }
         nsam <- setNames(nsam, group_keep)
     }
     
@@ -419,12 +419,12 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         
         # Extract abundance vector
         if (!is.null(group)) {
-            abund_obs <- clone_tab$CLONE_COUNT[clone_tab[[group]] == g]
-            names(abund_obs) <- clone_tab[["CLONE"]][clone_tab[[group]] == g]
+            abund_obs <- clone_tab$clone_count[clone_tab[[group]] == g]
+            names(abund_obs) <- clone_tab[[clone]][clone_tab[[group]] == g]
         } else {
             # Extract abundance vector
-            abund_obs <- clone_tab$CLONE_COUNT
-            names(abund_obs) <- clone_tab[["CLONE"]]
+            abund_obs <- clone_tab$clone_count
+            names(abund_obs) <- clone_tab[[clone]]
         } 
         
         # Infer complete abundance distribution
@@ -438,21 +438,21 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         p_upper <- p_mean + p_err
         
         # Assemble and sort abundance data.frame
-	    abund_df <- tibble::tibble(CLONE=rownames(boot_mat), P=p_mean, P_SD=p_sd,
-	                           LOWER=p_lower, UPPER=p_upper) %>%
-	        dplyr::arrange(desc(!!rlang::sym("P"))) %>%
-	        dplyr::mutate(RANK=1:n())
+	    abund_df <- tibble::tibble(CLONE=rownames(boot_mat), p=p_mean, p_sd=p_sd,
+	                           lower=p_lower, upper=p_upper) %>%
+	        dplyr::arrange(desc(!!rlang::sym("p"))) %>%
+	        dplyr::mutate(rank=1:n())
 			
         # Save summary
         abund_list[[g]] <- abund_df
         
         # Save bootstrap
         boot_list[[g]] <- as.data.frame(boot_mat) %>%
-          tibble::rownames_to_column("CLONE")
+          tibble::rownames_to_column(clone)
         
         if (progress) { pb$tick() }
     }
-    id_col <- if_else(is.null(group), "GROUP", group)
+    id_col <- if_else(is.null(group), "group", group)
     abundance_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
     bootstrap_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
@@ -460,7 +460,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     abund_obj <- new("AbundanceCurve",
                      bootstrap=bootstrap_df, 
                      abundance=abundance_df,
-                     clone_by="CLONE",
+                     clone_by=clone,
                      group_by=id_col,
                      #groups=if_else(is.null(group), as.character(NA), group_keep),
                      groups=group_keep,

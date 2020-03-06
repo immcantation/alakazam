@@ -34,10 +34,10 @@
 #'           with columns:
 #'           \itemize{
 #'             \item \code{GENE}:         name of the family, gene or allele
-#'             \item \code{SEQ_COUNT}:    total number of sequences for the gene.
-#'             \item \code{SEQ_FREQ}:     frequency of the gene as a fraction of the total
+#'             \item \code{seq_count}:    total number of sequences for the gene.
+#'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
-#'             \item \code{COPY_COUNT}:   sum of the copy counts in the \code{copy} column.
+#'             \item \code{copy_count}:   sum of the copy counts in the \code{copy} column.
 #'                                        for each gene. Only present if the \code{copy} 
 #'                                        argument is specified.
 #'             \item \code{COPY_FREQ}:    frequency of the gene as a fraction of the total
@@ -95,9 +95,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Tabulate sequence abundance
         gene_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(SEQ_COUNT=n()) %>%
-            mutate(., SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("SEQ_COUNT")))
+            dplyr::summarize(seq_count=n()) %>%
+            mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("seq_count")))
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
@@ -119,11 +119,11 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Tabulate copy abundance
         gene_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            summarize(SEQ_COUNT=length(!!rlang::sym(gene)),
-                       COPY_COUNT=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
-            mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
-                    COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("COPY_COUNT")))
+            summarize(seq_count=length(!!rlang::sym(gene)),
+                       copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
+            mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                    COPY_FREQ=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("copy_count")))
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s

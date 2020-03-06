@@ -6,18 +6,18 @@ db <- readChangeoDb(ExampleDb)
 test_that("countGenes",{
     # Without copy numbers
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.76, 0.87, 0.24, 0.05, 0.05, 0.02, 0.01),
                  tolerance=0.001)
     
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene")
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.41, 0.35, 0.24, 0.33, 0.26, 0.11, 0.10, 0.05, 0.05,
                    0.04, 0.02, 0.02, 0.01, 0.01),
                  tolerance=0.001)
     
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele")
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.350, 0.325, 0.215, 0.330, 0.085, 0.150, 0.100, 0.100, 0.070,
                    0.050, 0.050, 0.025, 0.040, 0.030, 0.020, 0.020,
                    0.010, 0.010, 0.010, 0.010),
@@ -26,21 +26,21 @@ test_that("countGenes",{
     # With copy numbers and multiple groups
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="family")
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.78, 0.95, 0.95, 0.22, 0.63, 0.37, 0.60, 0.20, 0.40, 0.67,
                    0.60, 0.80, 0.40, 0.33, 0.03, 0.05, 0.01, 0.01),
                  tolerance=0.01)
     
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="gene")
-    expect_equal(round(genes$SEQ_FREQ,2)[1:12], 
+    expect_equal(round(genes$seq_freq,2)[1:12], 
                  c(0.61, 0.75, 0.22, 0.54, 0.40, 0.37, 0.17,
                    0.20, 0.15, 0.20, 0.60, 0.20),
                  tolerance=0.01)
     
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="allele")
-    expect_equal(genes$SEQ_FREQ[1:12], 
+    expect_equal(genes$seq_freq[1:12], 
                  c(0.61, 0.72, 0.16, 0.41, 0.40, 0.37, 0.06, 0.20, 0.08, 0.20, 0.50, 0.08),
                  tolerance=0.01)
 
@@ -48,18 +48,18 @@ test_that("countGenes",{
 
     # Without copy numbers
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family", fill = T)
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.02,0.87,0.05,0.05,0.01,0,0.76,0,0.24,0),
                  tolerance=0.001)
 
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene", fill = T)
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.02,0.04,0.01,0.1,0.11,0.26,0.33,0.02,0,0.05,0.05,0.01,0,0,
                     0,0,0.41,0,0,0,0.35,0,0.24,0),
                  tolerance=0.001)
 
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele", fill = T)
-    expect_equal(genes$SEQ_FREQ, 
+    expect_equal(genes$seq_freq, 
                  c(0.02,0.01,0.03,0.01,0.1,0.07,0.04,0.01,0.1,0.15,0.33,0.02,0,
                     0.05,0.05,0,0.01,0,0,0,0,0,0.085,0.325,0,0,0,0,0,0.35,0,0.215,0.025,0),
                  tolerance=0.01)
@@ -67,19 +67,19 @@ test_that("countGenes",{
     # With copy numbers and multiple groups
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="family", fill = T)
-    expect_equal(round(genes$SEQ_FREQ,2)[1:12], 
+    expect_equal(round(genes$seq_freq,2)[1:12], 
                  c(0,0.8,0,0.2,0,0,0.6,0.4,0,0,0,0.6),
                  tolerance=0.01)
 
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="gene", fill = T)
-    expect_equal(round(genes$SEQ_FREQ,2)[1:12], 
+    expect_equal(round(genes$seq_freq,2)[1:12], 
                  c(0,0,0,0.2,0,0,0.6,0,0,0,0.2,0),
                  tolerance=0.01)
 
     genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
                         copy="DUPCOUNT", mode="allele", fill = T)
-    expect_equal(genes$SEQ_FREQ[1:12], 
+    expect_equal(genes$seq_freq[1:12], 
                  c(0,0,0,0,0.2,0,0,0,0,0,0.6,0),
                  tolerance=0.01)
 })

@@ -8,7 +8,7 @@ test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(db, groups="SAMPLE", clone="CLONE")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
+    obs <- calcCoverage(clones$seq_count[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 
@@ -18,16 +18,16 @@ test_that("calcCoverage", {
 test_that("countClones", {
 	# Calculate clone sizes
 	clones <- countClones(db, groups="SAMPLE", clone="CLONE")
-	expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
-	expect_equal(clones$SEQ_FREQ[1:6], 
+	expect_equal(clones$seq_count[1:6], c(31, 15, 5, 4, 4, 4))
+	expect_equal(clones$seq_freq[1:6], 
 	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
 	clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
 
-	expect_equal(clones$SEQ_COUNT[1:6], c(23, 15, 5, 3, 4, 1))
-	expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
+	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
+	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
 	expect_equal(clones$COPY_FREQ[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
@@ -38,15 +38,15 @@ test_that("countClones", {
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
-	                                 SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
-	                                 COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
-	                                 SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
+	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
+	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
+	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
 	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
-	                               SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
-	                               COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
-	                               SEQ_FREQ=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
+	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
+	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
+	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
 	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
@@ -83,16 +83,16 @@ test_that("calcDiversity", {
 test_that("estimateAbundance-current", {
 	set.seed(90)
 	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
-	expect_equal(abund@abundance$P[1:5], 
+	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001)
-	expect_equal(abund@abundance$LOWER[c(1:3,8:10)],
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$UPPER[45:50],
+	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$RANK[200:203], c(200, 201, 202, 203))
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -262,22 +262,22 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     #              c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
     #              tolerance = 0.001)
     # v0.2.11 test results with nboot=1000
-    expect_equal(abund@abundance$P[1:6],
+    expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
                  tolerance=0.005)
-    expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+    expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$UPPER[45:50],
+    expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100, clone="CLONE")
-    expect_equal(abund@abundance$LOWER, c(1, 1))
-    expect_equal(abund@abundance$UPPER, c(1, 1))
-    expect_equal(abund@abundance$RANK, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1))
+    expect_equal(abund@abundance$upper, c(1, 1))
+    expect_equal(abund@abundance$rank, c(1, 1))
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
@@ -376,7 +376,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
 
 
 
-# example_file <- file.path("tests", "data-tests", "ExampleDb.gz")
+# example_file <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
 example_file <- file.path("..", "data-tests", "ExampleDb_airr.gz")
 db <- readChangeoDb(example_file)
 
@@ -386,7 +386,7 @@ test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(db, groups="sample")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$sample == "RL01"])
+    obs <- calcCoverage(clones$seq_count[clones$sample == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 
@@ -396,16 +396,16 @@ test_that("calcCoverage", {
 test_that("countClones", {
 	# Calculate clone sizes
 	clones <- countClones(db, groups="sample")
-	expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
-	expect_equal(clones$SEQ_FREQ[1:6], 
+	expect_equal(clones$seq_count[1:6], c(31, 15, 5, 4, 4, 4))
+	expect_equal(clones$seq_freq[1:6], 
 	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
 	clones <- countClones(db, groups=c("sample", "isotype"), copy="duplicate_count")
 
-	expect_equal(clones$SEQ_COUNT[1:6], c(23, 15, 5, 3, 4, 1))
-	expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
+	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
+	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
 	expect_equal(clones$COPY_FREQ[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
@@ -416,15 +416,15 @@ test_that("countClones", {
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
-	                                 SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
-	                                 COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
-	                                 SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
+	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
+	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
+	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
 	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
-	                               SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
-	                               COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
-	                               SEQ_FREQ=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
+	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
+	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
+	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
 	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
@@ -461,16 +461,16 @@ test_that("calcDiversity", {
 test_that("estimateAbundance-current", {
 	set.seed(90)
 	abund <- estimateAbundance(db, group="sample", nboot=100)
-	expect_equal(abund@abundance$P[1:5], 
+	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001)
-	expect_equal(abund@abundance$LOWER[c(1:3,8:10)],
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$UPPER[45:50],
+	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$RANK[200:203], c(200, 201, 202, 203))
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -640,22 +640,22 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     #              c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
     #              tolerance = 0.001)
     # v0.2.11 test results with nboot=1000
-    expect_equal(abund@abundance$P[1:6],
+    expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
                  tolerance=0.005)
-    expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+    expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$UPPER[45:50],
+    expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="sample", min_n=1, uniform=FALSE, nboot=100)
-    expect_equal(abund@abundance$LOWER, c(1, 1))
-    expect_equal(abund@abundance$UPPER, c(1, 1))
-    expect_equal(abund@abundance$RANK, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1))
+    expect_equal(abund@abundance$upper, c(1, 1))
+    expect_equal(abund@abundance$rank, c(1, 1))
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
