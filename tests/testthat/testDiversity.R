@@ -127,7 +127,7 @@ test_that("alphaDiversity", {
 	set.seed(3)
 	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	div <- alphaDiversity(abund, step_q=1, max_q=4)
-	expect_equal(div@tests$PVALUE[1:5], 
+	expect_equal(div@tests$pvalue[1:5], 
 	             c(0, 0, 0, 0, 0), tolerance=0.001)
 	expect_equal(div@diversity$d[1:5], 
 	             c(88.5600, 82.4607, 72.2387, 60.0029, 50.0501), tolerance=0.001)
@@ -178,7 +178,7 @@ test_that("betaDiversity", {
 	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
 	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
-	expect_equal(diversity_obj@tests$PVALUE[1:5], 
+	expect_equal(diversity_obj@tests$pvalue[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
 	expect_equal(diversity_obj@diversity$d[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
@@ -352,7 +352,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0)
     # expect_equal(div@diversity$D, c(88.10, 63.11), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0, tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0, tolerance=0.05)
     expect_equal(div@diversity$d, c(88.13, 63.57), tolerance=0.05)
     
     set.seed(3)
@@ -362,7 +362,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0.88)
     # expect_equal(div@diversity$D, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0.88, tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
     expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
 
@@ -505,7 +505,7 @@ test_that("alphaDiversity", {
 	set.seed(3)
 	abund <- estimateAbundance(db, group="sample", nboot=100)
 	div <- alphaDiversity(abund, step_q=1, max_q=4)
-	expect_equal(div@tests$PVALUE[1:5], 
+	expect_equal(div@tests$pvalue[1:5], 
 	             c(0, 0, 0, 0, 0), tolerance=0.001)
 	expect_equal(div@diversity$d[1:5], 
 	             c(88.5600, 82.4607, 72.2387, 60.0029, 50.0501), tolerance=0.001)
@@ -556,7 +556,7 @@ test_that("betaDiversity", {
 	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
 	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
-	expect_equal(diversity_obj@tests$PVALUE[1:5], 
+	expect_equal(diversity_obj@tests$pvalue[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
 	expect_equal(diversity_obj@diversity$d[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
@@ -730,7 +730,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0)
     # expect_equal(div@diversity$D, c(88.10, 63.11), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0, tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0, tolerance=0.05)
     expect_equal(div@diversity$d, c(88.13, 63.57), tolerance=0.05)
     
     set.seed(3)
@@ -740,7 +740,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0.88)
     # expect_equal(div@diversity$D, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0.88, tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
     expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
 
