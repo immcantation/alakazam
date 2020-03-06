@@ -57,7 +57,7 @@ setClass("AbundanceCurve",
 #' 
 #' @slot  diversity  data.frame defining the diversity curve with the following columns:
 #'                   \itemize{
-#'                     \item  \code{GROUP}:    group label.
+#'                     \item  \code{group}:    group label.
 #'                     \item  \code{Q}:        diversity order.
 #'                     \item  \code{D}:        mean diversity index over all bootstrap 
 #'                                             realizations.

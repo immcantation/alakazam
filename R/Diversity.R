@@ -314,7 +314,7 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
 #' @param    group     name of the \code{data} column containing group identifiers. 
-#'                     If \code{NULL} then no grouping is performed and the \code{GROUP} 
+#'                     If \code{NULL} then no grouping is performed and the \code{group} 
 #'                     column of the output will contain the value \code{NA} for each row.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
@@ -1357,8 +1357,8 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     # Define plot values
     df <- data@diversity %>%
         dplyr::filter(!!rlang::sym("Q") == q) %>%
-        dplyr::mutate(LOWER=!!rlang::sym("D") - !!rlang::sym("D_SD"), 
-                      UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD"))
+        dplyr::mutate(lower=!!rlang::sym("D") - !!rlang::sym("D_SD"), 
+                      upper=!!rlang::sym("D") + !!rlang::sym("D_SD"))
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x=data@group_by)) + 
