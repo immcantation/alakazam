@@ -276,34 +276,35 @@ baseTheme <- function(sizing=c("figure", "window")) {
     # Check arguments
     sizing <- match.arg(sizing)
     
+    base_theme <- theme_bw() +
+        theme(strip.background=element_blank(),
+              plot.background=element_blank(),
+              panel.grid.major=element_blank(), 
+              panel.grid.minor=element_blank())
+              
     # Define universal plot settings appropriate for PDF figures
     if (sizing == "figure") {
-        base_theme <- theme_bw() + 
-            theme(text=element_text(size=8)) +
-            theme(plot.title=element_text(size=8)) +
-            theme(plot.background=element_blank(),
-                  panel.grid.major=element_blank(), 
-                  panel.grid.minor=element_blank()) +
-            theme(strip.background=element_blank(),
-                  strip.text=element_text(size=7, face='bold')) +
-            theme(axis.title=element_text(size=8, vjust=0.25),
+        base_theme <- base_theme + 
+            theme(text=element_text(size=8),
+                  plot.title=element_text(size=8),
+                  strip.text=element_text(size=7, face="bold"),
+                  axis.title=element_text(size=8, vjust=0.25),
                   axis.text.x=element_text(size=8, vjust=0.5, hjust=0.5),
-                  axis.text.y=element_text(size=8)) +
-            theme(legend.text=element_text(size=7),
+                  axis.text.y=element_text(size=8),
+                  legend.text=element_text(size=7),
                   legend.title=element_text(size=7),
                   legend.key.height=grid::unit(10, "points"), 
                   legend.key.width=grid::unit(10, "points"))
     } else if (sizing == "window") {
         # Define universal plot settings appropriate for an interactive session
-        base_theme <- theme_bw() + 
-            theme(text=element_text(size=14)) +
-            theme(plot.title=element_text(size=16)) +
-            theme(strip.background=element_rect(fill='white'), 
-                  strip.text=element_text(size=14, face='bold')) +
-            theme(axis.title=element_text(size=16, vjust=0.25),
+        base_theme <- base_theme + 
+            theme(text=element_text(size=14),
+                  plot.title=element_text(size=16),
+                  strip.text=element_text(size=14, face="bold"),
+                  axis.title=element_text(size=16, vjust=0.25),
                   axis.text.x=element_text(size=16, vjust=0.5, hjust=0.5),
-                  axis.text.y=element_text(size=16)) +
-            theme(legend.text=element_text(size=14),
+                  axis.text.y=element_text(size=16),
+                  legend.text=element_text(size=14),
                   legend.title=element_text(size=14),
                   legend.key.height=grid::unit(18, "points"), 
                   legend.key.width=grid::unit(18, "points"))
