@@ -31,7 +31,7 @@ test_that("makeChangeoClone",{
                       "SEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
                       "TYPE"=c("IgG", "IgG,IgM"),
                       "COUNT"=c(3, 3),
-                      "collapse_count"=c(1, 2),
+                      "COLLAPSE_COUNT"=c(1, 2),
                       stringsAsFactors=FALSE)
     
     # Without end masking
@@ -82,7 +82,7 @@ test_that("makeChangeoClone",{
                       "SEQUENCE"=c("NNNCTGNN"),
                       "TYPE"=c("IgA,IgG,IgM"),
                       "COUNT"=c(10),
-                      "collapse_count"=c(4),
+                      "COLLAPSE_COUNT"=c(4),
                       stringsAsFactors=F)
     
     expect_true(inherits(clone, "ChangeoClone"))
@@ -143,7 +143,7 @@ test_that("buildPhylipLineage", {
         
         expect_equal(igraph::vertex_attr_names(graph),
                      c("name", "sequence", "sample", "isotype", "duplicate_count", 
-                       "collapse_count", "label"))
+                       "COLLAPSE_COUNT", "label"))
 
         expect_equal(E(graph)$weight,c(1,1,1,0))
         expect_equal(E(graph)$label,c(1,1,1,0))

@@ -45,7 +45,7 @@ NULL
 #'                        arguments, which contain the primary sequence data for the clone
 #'                        and should not be repeated in this argument.
 #' @param    add_count    if \code{TRUE} add an additional annotation column called 
-#'                        \code{collapse_count} during duplicate removal that indicates the 
+#'                        \code{COLLAPSE_COUNT} during duplicate removal that indicates the 
 #'                        number of sequences that were collapsed.
 #' @param    verbose      passed on to \code{collapseDuplicates}. If \code{TRUE}, report the 
 #'                        numbers of input, discarded and output sequences; otherwise, process
