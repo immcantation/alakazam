@@ -307,7 +307,7 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #'                        retained. Where a non-informative character is one of 
 #'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
-#' @param    add_count    if \code{TRUE} add the column \code{COLLAPSE_COUNT} that 
+#' @param    add_count    if \code{TRUE} add the column \code{collapse_count} that 
 #'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
 #' @param    ignore       vector of characters to ignore when testing for equality.
@@ -346,7 +346,7 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #' vary across sequences, and are discarded along with their annotations when \code{dry=FALSE}. 
 #' Thus, ambiguous sequences are removed as duplicates of some sequence, but do not create a potential
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
-#' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
+#' \code{collapse_count} annotation that is added when \code{add_count=TRUE}.
 #' 
 #' If \code{dry=TRUE} sequences will not be removed from the input. Instead, the following columns
 #' will be appended to the input defining the collapse action that would have been performed in the
@@ -444,7 +444,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
     
-    # Initialize COLLAPSE_COUNT with 1 for each sequence
+    # Initialize collapse_count with 1 for each sequence
     if(add_count) {
         data[["collapse_count"]] <- rep(1, nrow(data))
         num_fields <- c(num_fields, "collapse_count")
