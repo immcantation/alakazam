@@ -1,19 +1,20 @@
-Version 0.3.0.999:  November 1, 2019
+Version 0.3.0.999:  March 17, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
 
-+ Changed default expected data format from Change-O to AIRR. Example: where
-  functions used the column name 'V_CALL' (change-O format) as the default to
-  identify the field that stored the V gene/allele calls, they now use 'v_call' 
-  (AIRR standard). That means, scripts/pipelines that relied on default values 
-  (previously, v_call="V_CALL"), will now fail if calls to the functions are 
-  not updated to reflect the correct value for the data. If data are in Change-O
-  format, the current default value v_call="v_call" will fail to identify the
-  column with the V gene/allele calls, as the column "v_call" doesn't exist. In
-  this case, v_call="V_CALL" needs to be specified in the function call.
-+ ExampleDb converted to the AIRR Rearrangement format and examples updated 
-  accordingly. The changeo version is available as ExampleDbChangeo.
++ Changed default expected data format from the Change-O data format to the
+  AIRR Rearrangement standard. For example: where functions used the column 
+  name `V_CALL` (Change-O) as the default to identify the field that stored 
+  the V gene calls, they now use `v_call` (AIRR). That means, scripts that 
+  relied on default values (previously, `v_call="V_CALL"`), will now fail if 
+  calls to the functions are not updated to reflect the correct value for the 
+  data. If data are in the Change-O format, the current default value 
+  `v_call="v_call"` will fail to identify the column with the V gene callsm
+  as the column `v_call` doesn't exist. In this case, `v_call="V_CALL"` needs 
+  to be specified in the function call.
++ `ExampleDb` converted to the AIRR Rearrangement standard and examples updated 
+  accordingly. The legacy Change-O version is available as `ExampleDbChangeo`.
 
 General:
 
