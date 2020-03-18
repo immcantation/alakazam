@@ -1,4 +1,4 @@
-Version 0.3.0.999:  March 17, 2020
+Version 0.3.0.999:  March 18, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -10,11 +10,22 @@ Backwards Incompatible Changes:
   relied on default values (previously, `v_call="V_CALL"`), will now fail if 
   calls to the functions are not updated to reflect the correct value for the 
   data. If data are in the Change-O format, the current default value 
-  `v_call="v_call"` will fail to identify the column with the V gene callsm
+  `v_call="v_call"` will fail to identify the column with the V gene calls
   as the column `v_call` doesn't exist. In this case, `v_call="V_CALL"` needs 
   to be specified in the function call.
 + `ExampleDb` converted to the AIRR Rearrangement standard and examples updated 
   accordingly. The legacy Change-O version is available as `ExampleDbChangeo`.
++ For consistency with the style of the new default, other names have been 
+  updated to use the same capitalization. This change affects:
+     - amino acid physicochemical properties (e.g. `GRAVY` to `gravy`); 
+     - `countGenes`, `countClones` (e.g. `SEQ_COUNT` to `seq_count`)
+     - `estimateAbundance` (in slot `abundance`, `RANK` to `rank`)
+     - `groupGenes` (e.g. `VJ_GROUP` to `vj_group`)
+     - `collapseDuplicates` and `makeChangeoClone` (e.g. `COLLAPSE_COUNT` to `collapse_count`)
++ `estimateAbundance` slot `clone_by` retuns the actual name of the column
+   with clones identifier, as specified in the function call. Example: if the 
+   function is called with `clone = "clone_id"`, `abundace@clone_by` will be 
+   `clone_id`.
 
 General:
 
