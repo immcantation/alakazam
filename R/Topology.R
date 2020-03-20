@@ -17,21 +17,21 @@ NULL
 #' 
 #' @return   A data.frame with columns: 
 #'           \itemize{
-#'             \item  \code{NAME}:             node name.
-#'             \item  \code{PARENT}:           name of the parent node.
-#'             \item  \code{OUTDEGREE}:        number of edges leading from the node.
-#'             \item  \code{SIZE}:             total number of nodes within the subtree rooted 
+#'             \item  \code{name}:             node name.
+#'             \item  \code{parent}:           name of the parent node.
+#'             \item  \code{outdegree}:        number of edges leading from the node.
+#'             \item  \code{size}:             total number of nodes within the subtree rooted 
 #'                                             at the node.
-#'             \item  \code{DEPTH}:            the depth of the subtree that is rooted at 
+#'             \item  \code{depth}:            the depth of the subtree that is rooted at 
 #'                                             the node.
-#'             \item  \code{PATHLENGTH}:       the maximum pathlength beneath the node.
-#'             \item  \code{OUTDEGREE_NORM}:   \code{OUTDEGREE} normalized by the total 
+#'             \item  \code{pathlength}:       the maximum pathlength beneath the node.
+#'             \item  \code{outdegree_norm}:   \code{outdegree} normalized by the total 
 #'                                             number of edges.
-#'             \item  \code{SIZE_NORM}:        \code{SIZE} normalized by the largest
+#'             \item  \code{size_norm}:        \code{size} normalized by the largest
 #'                                             subtree size (the germline).
-#'             \item  \code{DEPTH_NORM}:       \code{DEPTH} normalized by the largest
+#'             \item  \code{depth_norm}:       \code{depth} normalized by the largest
 #'                                             subtree depth (the germline).
-#'             \item  \code{PATHLENGTH_NORM}:  \code{PATHLEGNTH} normalized by the largest
+#'             \item  \code{pathlength_norm}:  \code{pathlength} normalized by the largest
 #'                                             subtree pathlength (the germline).
 #'           }
 #'           An additional column corresponding to the value of \code{field} is added when
@@ -52,7 +52,7 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
     # TODO:  should probably include a means to exclude inferred from substree size
     
     # Define node attribute data.frame    
-    node_df <- data.frame(NAME=V(graph)$name, stringsAsFactors=F)
+    node_df <- data.frame(name=V(graph)$name, stringsAsFactors=F)
     for (f in fields) { 
         node_df[[f]] <- vertex_attr(graph, name=f) 
     }
@@ -67,23 +67,23 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
     paths_length[!is.finite(paths_length)] <- NA
     
     # Define each node's parent
-    node_df$PARENT <- edges[, 1][match(node_df$NAME, edges[, 2])]
+    node_df$parent <- edges[, 1][match(node_df$name, edges[, 2])]
     # Define each node's outdegree
-    node_df$OUTDEGREE <- igraph::degree(graph, mode="out")
+    node_df$outdegree <- igraph::degree(graph, mode="out")
     # Define the number of nodes in each subtree (child count + 1)
-    node_df$SIZE <- apply(paths_step, 1, function(x) length(na.omit(x)))
+    node_df$size <- apply(paths_step, 1, function(x) length(na.omit(x)))
     # Define number of levels below each node
-    node_df$DEPTH <- apply(paths_step, 1, max, na.rm=TRUE) + 1
+    node_df$depth <- apply(paths_step, 1, max, na.rm=TRUE) + 1
     # Define the maximum shortest path length (genetic distance) to a leaf from each node
-    node_df$PATHLENGTH <- apply(paths_length, 1, max, na.rm=TRUE)
+    node_df$pathlength <- apply(paths_length, 1, max, na.rm=TRUE)
     
     # Normalize
     node_df <- node_df %>%
         dplyr::mutate(
-            OUTDEGREE_NORM=!!rlang::sym("OUTDEGREE")/sum(!!rlang::sym("OUTDEGREE"), na.rm=TRUE),
-            SIZE_NORM=!!rlang::sym("SIZE")/max(!!rlang::sym("SIZE"), na.rm=TRUE),
-            DEPTH_NORM=!!rlang::sym("DEPTH")/max(!!rlang::sym("DEPTH"), na.rm=TRUE),
-            PATHLENGTH_NORM=!!rlang::sym("PATHLENGTH")/max(!!rlang::sym("PATHLENGTH"), na.rm=TRUE))
+            outdegree_norm=!!rlang::sym("outdegree")/sum(!!rlang::sym("outdegree"), na.rm=TRUE),
+            size_norm=!!rlang::sym("size")/max(!!rlang::sym("size"), na.rm=TRUE),
+            depth_norm=!!rlang::sym("depth")/max(!!rlang::sym("depth"), na.rm=TRUE),
+            pathlength_norm=!!rlang::sym("pathlength")/max(!!rlang::sym("pathlength"), na.rm=TRUE))
 
     return(node_df)
 }
@@ -103,9 +103,9 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #'                     
 #' @return   A data.frame with columns:
 #'           \itemize{
-#'             \item  \code{NAME}:      node name
-#'             \item  \code{STEPS}:     path length as the number of nodes traversed
-#'             \item  \code{DISTANCE}:  path length as the sum of edge weights
+#'             \item  \code{name}:      node name
+#'             \item  \code{steps}:     path length as the number of nodes traversed
+#'             \item  \code{distance}:  path length as the sum of edge weights
 #'           }
 #' 
 #' @seealso  See \link{buildPhylipLineage} for generating input trees. 
@@ -123,10 +123,10 @@ summarizeSubtrees <- function(graph, fields=NULL, root="Germline") {
 #' @export
 getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
     # Define path length data.frame
-    path_df <- data.frame(NAME=V(graph)$name, stringsAsFactors=FALSE)
+    path_df <- data.frame(name=V(graph)$name, stringsAsFactors=FALSE)
 
     # Get indices of excluded vertices
-    skip_idx <- which(path_df$NAME == root)
+    skip_idx <- which(path_df$name == root)
     if (!is.null(field)) {
         g <- vertex_attr(graph, name=field)
         skip_idx <- union(skip_idx, which(g %in% exclude))
@@ -139,8 +139,8 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
     # Get path lengths
     for (i in 1:length(step_list)) {
         v <- step_list[[i]]
-        path_df[i, "STEPS"] <- sum(!(v %in% skip_idx)) 
-        path_df[i, "DISTANCE"] <- sum(E(graph, path=v)$weight)
+        path_df[i, "steps"] <- sum(!(v %in% skip_idx)) 
+        path_df[i, "distance"] <- sum(E(graph, path=v)$weight)
     }
     
     return(path_df)
@@ -165,9 +165,9 @@ getPathLengths <- function(graph, root="Germline", field=NULL, exclude=NULL) {
 #'                    
 #' @return   A data.frame of the MRCA node(s) containing the columns:
 #'           \itemize{
-#'             \item  \code{NAME}:      node name
-#'             \item  \code{STEPS}:     path length as the number of nodes traversed
-#'             \item  \code{DISTANCE}:  path length as the sum of edge weights
+#'             \item  \code{name}:      node name
+#'             \item  \code{steps}:     path length as the number of nodes traversed
+#'             \item  \code{distance}:  path length as the sum of edge weights
 #'           }
 #'           Along with additional columns corresponding to the 
 #'           annotations of the input graph.
@@ -194,7 +194,7 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
     path_df <- getPathLengths(graph, root=root, field=field, exclude=exclude)
     
     # Get indices of excluded vertices
-    skip_idx <- which(path_df$NAME == root)
+    skip_idx <- which(path_df$name == root)
     if (!is.null(field)) {
         g <- vertex_attr(graph, name=field)
         skip_idx <- union(skip_idx, which(g %in% exclude))
@@ -202,9 +202,9 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
     
     # Get founder nodes
     if (path == "distance") { 
-        path_len <- setNames(path_df$DISTANCE, 1:nrow(path_df))
+        path_len <- setNames(path_df$distance, 1:nrow(path_df))
     } else if (path == "steps") {
-        path_len <- setNames(path_df$STEPS, 1:nrow(path_df))
+        path_len <- setNames(path_df$steps, 1:nrow(path_df))
     } else {
         stop("Invalid value for 'path' parameter. Must be one of c('distance', 'steps').\n")
     }
@@ -212,11 +212,11 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
     path_len <- path_len[-skip_idx]
     root_idx <- as.numeric(names(path_len)[which(path_len == min(path_len))])
     root_df <- igraph::as_data_frame(graph, what="vertices")[root_idx, ]
-    root_df$STEPS <- path_df$STEPS[root_idx]
-    root_df$DISTANCE <- path_df$DISTANCE[root_idx]
+    root_df$steps <- path_df$steps[root_idx]
+    root_df$distance <- path_df$distance[root_idx]
     
     # Switch name column to uppercase
-    names(root_df)[names(root_df) == "name"] <- "NAME"
+    names(root_df)[names(root_df) == "name"] <- "name"
     
     return(root_df)
 }
@@ -239,9 +239,9 @@ getMRCA <- function(graph, path=c("distance", "steps"), root="Germline",
 #'                     
 #' @return   A data.frame defining total annotation connections in the tree with columns:
 #'           \itemize{
-#'             \item  \code{PARENT}:  parent annotation
-#'             \item  \code{CHILD}:   child annotation
-#'             \item  \code{COUNT}:   count of edges for the parent-child relationship
+#'             \item  \code{parent}:  parent annotation
+#'             \item  \code{child}:   child annotation
+#'             \item  \code{count}:   count of edges for the parent-child relationship
 #'           }
 #'           
 #' @seealso  See \link{testEdges} for performed a permutation test on edge relationships.
@@ -294,7 +294,7 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
                 
             # Define data.frame of connections
             if (length(children) > 0) {
-                edge_list[[i]] <- data.frame("PARENT"=parent, "CHILD"=children, 
+                edge_list[[i]] <- data.frame("parent"=parent, "child"=children, 
                                              stringsAsFactors=FALSE)
             }
         }
@@ -306,17 +306,17 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
         # Get adjacency list
         edge_mat <- as_edgelist(graph, names=FALSE)
         edge_mat <- vertex_attr(graph, name=field, index=edge_mat)
-        edge_mat <- matrix(edge_mat, ncol=2, dimnames=list(NULL, c("PARENT", "CHILD")))
+        edge_mat <- matrix(edge_mat, ncol=2, dimnames=list(NULL, c("parent", "child")))
 
         # Build and subset edge data.frame
         edge_df <- as.data.frame(edge_mat, stringsAsFactors=FALSE)
-        edge_df <- edge_df[!(edge_df$PARENT %in% exclude) & !(edge_df$CHILD %in% exclude), ]
+        edge_df <- edge_df[!(edge_df$parent %in% exclude) & !(edge_df$child %in% exclude), ]
     }
     
     # Count edges
     edge_tab <- edge_df %>%
-        group_by(!!!rlang::syms(c("PARENT", "CHILD"))) %>%
-        dplyr::summarize(COUNT=n())
+        group_by(!!!rlang::syms(c("parent", "child"))) %>%
+        dplyr::summarize(count=n())
 
     return(edge_tab)
 }
@@ -425,9 +425,9 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         # Summarize MRCA counts
         mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
             select(!!!rlang::syms(c("GRAPH", field))) %>%
-            rename("ANNOTATION"=field) %>%
-            group_by(!!rlang::sym("ANNOTATION")) %>%
-            dplyr::summarize(COUNT=n())
+            rename("annotation"=field) %>%
+            group_by(!!rlang::sym("annotation")) %>%
+            dplyr::summarize(count=n())
         
         return(mrca_sum)
     }
@@ -449,7 +449,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         # Summarize MRCA counts
         tmp_sum <- .countMRCA(tmp_list, field=field, exclude=exclude)
         # Update permutation set
-        tmp_sum$ITER <- i
+        tmp_sum$iter <- i
         perm_list[[i]] <- tmp_sum
         
         if (progress) { pb$tick() }
@@ -459,14 +459,14 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
     
     # Test observed against permutation distribution
     for (i in 1:nrow(obs_sum)) {
-        x <- obs_sum$ANNOTATION[i]
+        x <- obs_sum$annotation[i]
         # Annotation count distribution
-        d <- perm_sum$COUNT[perm_sum$ANNOTATION == x]
+        d <- perm_sum$count[perm_sum$annotation == x]
         # Expected mean
-        obs_sum[i, "EXPECTED"] <- mean(d)
+        obs_sum[i, "expected"] <- mean(d)
         # P-value for observed > expected
         f <- ecdf(d)
-        obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
+        obs_sum[i, "pvalue"] <- 1 - f(obs_sum$count[i])
     }
  
     # Generate return object
@@ -527,8 +527,8 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
     .countEdges <- function(x, field, exclude) {
         edge_list <- lapply(x, tableEdges, field=field, indirect=indirect, exclude=exclude)
         edge_sum <- bind_rows(edge_list) %>%
-            group_by(!!!rlang::syms(c("PARENT", "CHILD"))) %>%
-            dplyr::summarize(COUNT=sum(!!rlang::sym("COUNT"), na.rm=TRUE))
+            group_by(!!!rlang::syms(c("parent", "child"))) %>%
+            dplyr::summarize(count=sum(!!rlang::sym("count"), na.rm=TRUE))
         return(edge_sum)
     }
     
@@ -549,7 +549,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
         # Count edges
         tmp_sum <- .countEdges(tmp_list, field, exclude)
         # Update permutation set
-        tmp_sum$ITER <- i
+        tmp_sum$iter <- i
         perm_list[[i]] <- tmp_sum
         
         if (progress) { pb$tick() }
@@ -558,15 +558,15 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
     
     # Test observed against permutation distribution
     for (i in 1:nrow(obs_sum)) {
-        x <- obs_sum$PARENT[i]
-        y <- obs_sum$CHILD[i]
+        x <- obs_sum$parent[i]
+        y <- obs_sum$child[i]
         # Edge count distribution
-        d <- perm_sum$COUNT[perm_sum$PARENT == x & perm_sum$CHILD == y]
+        d <- perm_sum$count[perm_sum$parent == x & perm_sum$child == y]
         # Expected mean
-        obs_sum[i, "EXPECTED"] <- mean(d)
+        obs_sum[i, "expected"] <- mean(d)
         # P-value for observed > expected
         f <- ecdf(d)
-        obs_sum[i, "PVALUE"] <- 1 - f(obs_sum$COUNT[i])
+        obs_sum[i, "pvalue"] <- 1 - f(obs_sum$count[i])
     }
     
     # Generate return object
@@ -628,31 +628,31 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
     style <- match.arg(style)
     
     # Extract plot data
-    obs_sum <- rename(data@tests, "Parent"="PARENT", "Child"="CHILD")
-    perm_sum <- rename(data@permutations, "Parent"="PARENT", "Child"="CHILD")
+    obs_sum <- rename(data@tests, "Parent"="parent", "Child"="child")
+    perm_sum <- rename(data@permutations, "Parent"="parent", "Child"="child")
 
     if (style == "histogram") {
         # Plot edge null distribution
-        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+        p1 <- ggplot(perm_sum, aes_string(x="count")) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("Number of realizations") + 
             geom_histogram(bins=50, fill=color, color=NA) +
-            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+            geom_vline(data=obs_sum, aes_string(xintercept="count"), 
                        color="firebrick", linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
-        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+        p1 <- ggplot(perm_sum, aes_string(x="count")) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
-            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), color="firebrick", 
+            geom_vline(data=obs_sum, aes_string(xintercept="count"), color="firebrick", 
                        linetype=3, size=0.75) + 
-            geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), color="steelblue", 
+            geom_hline(data=obs_sum, aes_string(yintercept="pvalue"), color="steelblue", 
                        linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     }
@@ -714,31 +714,31 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
     style <- match.arg(style)
     
     # Extract plot data
-    obs_sum <- rename(data@tests, "Annotation"="ANNOTATION")
-    perm_sum <- rename(data@permutations, "Annotation"="ANNOTATION")
+    obs_sum <- rename(data@tests, "Annotation"="annotation")
+    perm_sum <- rename(data@permutations, "Annotation"="annotation")
     
     if (style == "histogram") {
         # Plot MRCA null distribution
-        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+        p1 <- ggplot(perm_sum, aes_string(x="count")) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("Number of realizations") + 
             geom_histogram(fill=color, color=NA, bins=50) +
-            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+            geom_vline(data=obs_sum, aes_string(xintercept="count"), 
                        color="firebrick", linetype=3, size=0.75) + 
             facet_wrap("Annotation", ncol=1, scales="free_y")
     } else if (style == "cdf") {
         # Plot ECDF of MRCA null distribution
-        p1 <- ggplot(perm_sum, aes_string(x="COUNT")) +
+        p1 <- ggplot(perm_sum, aes_string(x="count")) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
-            geom_vline(data=obs_sum, aes_string(xintercept="COUNT"), 
+            geom_vline(data=obs_sum, aes_string(xintercept="count"), 
                        color="firebrick", linetype=3, size=0.75) + 
-            geom_hline(data=obs_sum, aes_string(yintercept="PVALUE"), 
+            geom_hline(data=obs_sum, aes_string(yintercept="pvalue"), 
                        color="steelblue", linetype=3, size=0.75) + 
             facet_wrap("Annotation", nrow=1, scales="free_y")
     }
@@ -827,16 +827,16 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
 
     # Set stat column and axis labels
     if (stat == "outdegree") {
-        stat_col <- "OUTDEGREE_NORM"
+        stat_col <- "outdegree_norm"
         y_lab <- "Node outdegree"
     } else if (stat == "size") {
-        stat_col <- "SIZE_NORM"
+        stat_col <- "size_norm"
         y_lab <- "Substree size"
     } else if (stat == "depth") {
-        stat_col <- "DEPTH_NORM"
+        stat_col <- "depth_norm"
         y_lab <- "Depth under node"
     } else if (stat == "pathlength") {
-        stat_col <- "PATHLENGTH_NORM"
+        stat_col <- "pathlength_norm"
         y_lab <- "Path length under node"
     } else {
         stop("Invalid value for 'stat'. How did you get here?")

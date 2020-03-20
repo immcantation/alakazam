@@ -37,7 +37,7 @@ that focus on quantifying annotation relationships within lineages.
 A small set of annotated example trees, `ExampleTrees`, are included in the `alakazam` package.
 The trees are `igraph` objects with the following tree annotations (graph attributes):
 
-* `clone`: An identifier for the clonal group. These entries correspond to the `CLONE`
+* `clone`: An identifier for the clonal group. These entries correspond to the `clone_id`
            column in the `ExampleDb` data.frame from which the trees were generated.
 * `v_gene`: IGHV gene name. 
 * `j_gene`: IGHJ gene name. 
@@ -125,7 +125,7 @@ calculates distances from the root (germline) *to child nodes*, whereas
 
 To determine the shortest path from the germline sequence to any node, 
 we use `getPathLengths`, which returns the distance both as the number
-of "hops" (`STEPS`) and the number of mutational events (`DISTANCE`).
+of "hops" (`steps`) and the number of mutational events (`distance`).
 
 ```{r, eval=TRUE}
 # Consider all nodes
@@ -144,24 +144,24 @@ we are excluding `NA` values in the `c_call` annotation
 getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 ```
 
-Note, `STEPS` has changed with respect to the previous example, but 
-`DISTANCE` remains the same.
+Note, `steps` has changed with respect to the previous example, but 
+`distance` remains the same.
 
 ### Calculating subtree properties
 
 The `summarizeSubtrees` function returns a table of each node with the 
 following properties for each node:
 
-* `NAME`: The node identifier.
-* `PARENT`: The identifier of the node's parent.
-* `OUTDEGREE`: The number of edges leading from the node.
-* `SIZE`: The total number of nodes within the subtree rooted at the node.
-* `DEPTH`: The depth of the subtree that is rooted at the node.
-* `PATHLENGTH`: The maximum path length beneath the node.
-* `OUTDEGREE_NORM`: The `OUTDEGREE` normalized by the total number of edges.
-* `SIZE_NORM`: The `SIZE` normalized by the total tree size.
-* `DEPTH_NORM`: The `DEPTH` normalized by the total tree depth.
-* `PATHLENGTH_NORM`: The `PATHLENGTH` normalized by the longest path.
+* `name`: The node identifier.
+* `parent`: The identifier of the node's parent.
+* `outdegree`: The number of edges leading from the node.
+* `size`: The total number of nodes within the subtree rooted at the node.
+* `depth`: The depth of the subtree that is rooted at the node.
+* `pathlength`: The maximum path length beneath the node.
+* `outdegree_norm`: The `outdegree` normalized by the total number of edges.
+* `size_norm`: The `size` normalized by the total tree size.
+* `depth_norm`: The `depth` normalized by the total tree depth.
+* `pathlength_norm`: The `pathlength` normalized by the longest path.
 
 The `fields=c("sample_id", "c_call")` argument in the example below simply
 defines which annotations we wish to retain in the output. This argument
@@ -289,7 +289,7 @@ without any node exclusion:
 mrca_df <- getMRCA(graph, path="steps", root="Germline")
 
 # Print subset of the annotation data.frame
-print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
+print(mrca_df[c("name", "sample_id", "c_call", "steps", "distance")])
 ```
 
 To use mutational distance and consider only observed (ie, non-germline and 
@@ -302,7 +302,7 @@ mrca_df <- getMRCA(graph, path="distance", root="Germline",
                    field="c_call", exclude=NA)
 
 # Print excluding sequence, label, color, shape and size annotations
-print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
+print(mrca_df[c("name", "sample_id", "c_call", "steps", "distance")])
 ```
 
 ### Significance testing of MRCA annotations

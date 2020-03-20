@@ -22,23 +22,23 @@ test_that("Test getPathLengths",{
     
     # Consider all nodes
     pl <- getPathLengths(graph, root="Germline")
-    expect_equal(pl$STEPS, c(1,0,2,2))
-    expect_equal(pl$DISTANCE, c(28,0,32,34))
+    expect_equal(pl$steps, c(1,0,2,2))
+    expect_equal(pl$distance, c(28,0,32,34))
     
     # Exclude nodes without an isotype annotation from step count
     pl_exclude <- getPathLengths(graph_2, root="Germline", field="isotype", 
                                  exclude=NA)
-    expect_equal(pl_exclude$STEPS, c(0,0,1,1))
-    expect_equal(pl_exclude$DISTANCE, c(28,0,32,34))
+    expect_equal(pl_exclude$steps, c(0,0,1,1))
+    expect_equal(pl_exclude$distance, c(28,0,32,34))
 })
 
 test_that("Test getMRCA and testMRCA",{
     mrca <- getMRCA(graph, path="steps", root="Germline")
-    expect_equal(mrca$NAME, "Inferred1")
+    expect_equal(mrca$name, "Inferred1")
     
     mrca_2 <- getMRCA(graph_2, path="distance", root="Germline", 
                       field="isotype", exclude=NA)
-    expect_equal( mrca_2$NAME,  c("GN5SHBT03CABH1"))
+    expect_equal( mrca_2$name,  c("GN5SHBT03CABH1"))
     
     graphs <- ExampleTrees[1-10]
      
@@ -46,10 +46,10 @@ test_that("Test getMRCA and testMRCA",{
     set.seed(8)
     x <- testMRCA(graphs, "isotype", nperm=10)
     x_tests <- slot(x, "tests")
-    expect_equal(x_tests$ANNOTATION, c("IgA","IgA,IgG","IgG"))
-    expect_equal(x_tests$COUNT, c(16, 1, 31))
-    expect_equal(x_tests$EXPECTED, c(13.6, 1.2, 33.8))
-    expect_equal(x_tests$PVALUE, c(0, 0.2, 1) )
+    expect_equal(x_tests$annotation, c("IgA","IgA,IgG","IgG"))
+    expect_equal(x_tests$count, c(16, 1, 31))
+    expect_equal(x_tests$expected, c(13.6, 1.2, 33.8))
+    expect_equal(x_tests$pvalue, c(0, 0.2, 1) )
     
 })
 
@@ -58,21 +58,21 @@ test_that("Test tableEdges",{
     
     # Count direct edges between isotypes including inferred nodes
     tab <- tableEdges(graph, "isotype")
-    expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG", NA))
-    expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG", "IgA"))
-    expect_equal(tab$COUNT, c( 1, 1, 3, 1))
+    expect_equal(tab$parent, c( "IgA", "IgA,IgG", "IgA,IgG", NA))
+    expect_equal(tab$child, c( "IgA,IgG", "IgA", "IgG", "IgA"))
+    expect_equal(tab$count, c( 1, 1, 3, 1))
     
     # Count direct edges excluding edges to and from germline and inferred nodes
     tab <- tableEdges(graph, "isotype", exclude=c("Germline", NA))
-    expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG"))
-    expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG"))
-    expect_equal(tab$COUNT, c( 1, 1, 3))
+    expect_equal(tab$parent, c( "IgA", "IgA,IgG", "IgA,IgG"))
+    expect_equal(tab$child, c( "IgA,IgG", "IgA", "IgG"))
+    expect_equal(tab$count, c( 1, 1, 3))
     
     # Count indirect edges walking through germline and inferred nodes
     tab <- tableEdges(graph, "isotype", indirect=TRUE, exclude=c("Germline", NA))
-    expect_equal(tab$PARENT, c( "IgA", "IgA,IgG", "IgA,IgG"))
-    expect_equal(tab$CHILD, c( "IgA,IgG", "IgA", "IgG"))
-    expect_equal(tab$COUNT, c( 1, 1, 3))    
+    expect_equal(tab$parent, c( "IgA", "IgA,IgG", "IgA,IgG"))
+    expect_equal(tab$child, c( "IgA,IgG", "IgA", "IgG"))
+    expect_equal(tab$count, c( 1, 1, 3))    
          
 })
 
@@ -94,9 +94,9 @@ test_that("Test testEdges", {
     # Perform edge test on isotypes
     set.seed(4)
     x <- slot(testEdges(graphs, "isotype", nperm=10), "tests")
-    expect_equal(x$PARENT[1:5], c("IgA", "IgA", "IgA", "IgA,IgG", "IgA,IgG"))
-    expect_equal(x$CHILD[5:10], c("IgA,IgG", "IgG", "IgG", "IgA", "IgD,IgG", "IgG"))
-    expect_equal(x$COUNT[1:5], c(39, 3, 2, 29, 1))
-    expect_equal(x$EXPECTED[5:10], c(2, 6.25, 1.33, 7, 1.00, 133.7), tolerance=0.01)
-    expect_equal(x$PVALUE[3:8], c(0.7, 0.0, 0.5, 0.0, 0.0, 1.0), tolerance=0.01)
+    expect_equal(x$parent[1:5], c("IgA", "IgA", "IgA", "IgA,IgG", "IgA,IgG"))
+    expect_equal(x$child[5:10], c("IgA,IgG", "IgG", "IgG", "IgA", "IgD,IgG", "IgG"))
+    expect_equal(x$count[1:5], c(39, 3, 2, 29, 1))
+    expect_equal(x$expected[5:10], c(2, 6.25, 1.33, 7, 1.00, 133.7), tolerance=0.01)
+    expect_equal(x$pvalue[3:8], c(0.7, 0.0, 0.5, 0.0, 0.0, 1.0), tolerance=0.01)
 })

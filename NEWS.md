@@ -15,23 +15,28 @@ Backwards Incompatible Changes:
   to be specified in the function call.
 + `ExampleDb` converted to the AIRR Rearrangement standard and examples updated 
   accordingly. The legacy Change-O version is available as `ExampleDbChangeo`.
-+ For consistency with the style of the new default, other names have been 
-  updated to use the same capitalization. This change affects:
++ For consistency with the style of the new data format default, other field 
+  names have been updated to use the same capitalization. This change affects:
      - amino acid physicochemical properties (e.g. `GRAVY` to `gravy`); 
      - `countGenes`, `countClones` (e.g. `SEQ_COUNT` to `seq_count`)
      - `estimateAbundance` (in slot `abundance`, `RANK` to `rank`)
      - `groupGenes` (e.g. `VJ_GROUP` to `vj_group`)
-     - `collapseDuplicates` and `makeChangeoClone` (e.g. `COLLAPSE_COUNT` to `collapse_count`)
-+ `estimateAbundance` slot `clone_by` retuns the actual name of the column
-   with clones identifier, as specified in the function call. Example: if the 
-   function is called with `clone = "clone_id"`, `abundace@clone_by` will be 
-   `clone_id`.
+     - `collapseDuplicates` and `makeChangeoClone` (e.g. `COLLAPSE_COUNT` to 
+       `collapse_count`)
+     - lineage tree functions (`summarizeTrees`, `getPathLengths`, `getMRCA`, 
+       `tableEdges`, `testEdges`) also return columns in lower case (e.g. 
+       `parent`, `child`, `outdegree`, `steps`, `annotation`, `pvalue`,...)
 
 General:
 
 + `IG_COLOR` names converted to official C region identifiers 
    (IGHA, IGHD, IGHE, IGHG, IGHM, IGHK, IGHL).
 
++ `estimateAbundance` slot `clone_by` retuns the actual name of the column
+   with clones identifier, as specified in the function call. Example: if the 
+   function is called with `clone = "clone_id"`, `abundace@clone_by` will be 
+   `clone_id`.
+   
 Diversity:
 
 + Fixed documentation error in diversity vignette for viewing test results.
