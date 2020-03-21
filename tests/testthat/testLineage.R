@@ -27,8 +27,8 @@ test_that("makeChangeoClone",{
                   COUNT=1:4,
                   stringsAsFactors=FALSE)
                    
-    exp <- data.frame("SEQUENCE_ID"=c("C", "A"),
-                      "SEQUENCE"=c("NAACTGGN", "CCCCTGGG"),
+    exp <- data.frame("sequence_id"=c("C", "A"),
+                      "sequence"=c("NAACTGGN", "CCCCTGGG"),
                       "TYPE"=c("IgG", "IgG,IgM"),
                       "COUNT"=c(3, 3),
                       "collapse_count"=c(1, 2),
@@ -78,8 +78,8 @@ test_that("makeChangeoClone",{
             jcall="J_CALL", junc_len="JUNCTION_LENGTH", clone="CLONE", 
             text_fields="TYPE", num_fields="COUNT")
 
-    exp <- data.frame("SEQUENCE_ID"="A",
-                      "SEQUENCE"=c("NNNCTGNN"),
+    exp <- data.frame("sequence_id"="A",
+                      "sequence"=c("NNNCTGNN"),
                       "TYPE"=c("IgA,IgG,IgM"),
                       "COUNT"=c(10),
                       "collapse_count"=c(4),
@@ -98,7 +98,8 @@ test_that("makeChangeoClone",{
 test_that("buildPhylipLineage", {
     # Preprocess clone
     clone <- subset(db, clone_id == 164)
-    clone <- makeChangeoClone(clone, germ="germline_alignment_d_mask", text_fields=c("sample", "isotype"), 
+    clone <- makeChangeoClone(clone, germ="germline_alignment_d_mask", 
+                              text_fields=c("sample", "isotype"), 
                               num_fields="duplicate_count")
     
     # Run PHYLIP and process output

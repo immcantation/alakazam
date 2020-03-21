@@ -148,12 +148,12 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Define return object
     tmp_names <- names(tmp_df)
-    if ("SEQUENCE" %in% tmp_names & seq != "SEQUENCE") {
-        tmp_df <- tmp_df[, tmp_names != "SEQUENCE"]
+    if ("sequence" %in% tmp_names & seq != "sequence") {
+        tmp_df <- tmp_df[, tmp_names != "sequence"]
         tmp_names <- names(tmp_df)
     }
-    names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
-    names(tmp_df)[tmp_names == id] <- "SEQUENCE_ID"
+    names(tmp_df)[tmp_names == seq] <- "sequence"
+    names(tmp_df)[tmp_names == id] <- "sequence_id"
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
@@ -172,7 +172,7 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
 #
 # @param   clone  a ChangeoClone object
 # @param   path   a directory to store the write the output files to
-# @return  a named vector translating SEQUENCE_ID (names) to PHYLIP taxa (values)
+# @return  a named vector translating sequence_id (names) to PHYLIP taxa (values)
 writePhylipInput <- function(clone, path) {
     # Define PHYLIP columns
     nseq <- nrow(clone@data)
@@ -181,11 +181,11 @@ writePhylipInput <- function(clone, path) {
             sprintf("SAM%-6s", 1:nseq))
     v2 <- c(stringi::stri_length(clone@germline),
             clone@germline, 
-            clone@data[["SEQUENCE"]])
+            clone@data[["sequence"]])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["SEQUENCE_ID"]])
+    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["sequence_id"]])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
@@ -287,9 +287,10 @@ getPhylipInferred <- function(phylip_out) {
     inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
     if (length(inferred_num)>0) {
-        return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq, stringsAsFactors = FALSE))
+        return(data.frame(sequence_id=paste0("Inferred", inferred_num), 
+                          sequence=inferred_seq, stringsAsFactors = FALSE))
     }
-    data.frame(SEQUENCE_ID=c(), SEQUENCE=c(), stringsAsFactors = FALSE)
+    data.frame(sequence_id=c(), sequence=c(), stringsAsFactors = FALSE)
 }
 
 
@@ -342,9 +343,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
         if (edges$from[i] == "Germline") {
             seq1 <- clone@germline
         } else {
-            seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
+            seq1 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$from[i]]
         }
-        seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
+        seq2 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$to[i]]
         edges$weight[i] <- seqDist(seq1, seq2, dist_mat)        
     }
     
@@ -366,9 +367,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
             if (edges$from[i] == "Germline") {
                 seq1 <- clone@germline
             } else {
-                seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
+                seq1 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$from[i]]
             }
-            seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
+            seq2 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$to[i]]
             edges$weight[i] <- seqDist(seq1, seq2, dist_mat)      
         }
         
@@ -382,7 +383,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     }
     
     # Remove rows from clone
-    keep_clone <- clone@data[["SEQUENCE_ID"]] %in% unique(c(edges$from, edges$to))
+    keep_clone <- clone@data[["sequence_id"]] %in% unique(c(edges$from, edges$to))
     clone@data <- as.data.frame(clone@data[keep_clone, ])
     
     return(list(edges=edges, clone=clone))
@@ -402,11 +403,11 @@ phylipToGraph <- function(edges, clone) {
     g <- igraph::set_vertex_attr(g, "sequence", index=germ_idx, clone@germline)
     
     # Add sample sequences and names
-    clone_idx <- match(clone@data[["SEQUENCE_ID"]], igraph::V(g)$name) 
-    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[["SEQUENCE"]])
+    clone_idx <- match(clone@data[["sequence_id"]], igraph::V(g)$name) 
+    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[["sequence"]])
     
     # Add annotations
-    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE"))]
+    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("sequence_id", "sequence"))]
     for (n in ann_fields) {
         g <- igraph::set_vertex_attr(g, n, index=germ_idx, NA)
         g <- igraph::set_vertex_attr(g, n, index=clone_idx, clone@data[[n]])
@@ -454,12 +455,12 @@ phylipToGraph <- function(edges, clone) {
 #'           
 #'           Vertex attributes:
 #'           \itemize{
-#'             \item  \code{name}:      value in the \code{SEQUENCE_ID} column of the \code{data} 
+#'             \item  \code{name}:      value in the \code{sequence_id} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences. 
 #'                                      The germline (root) vertex is assigned the name 
 #'                                      "Germline" and inferred intermediates are assigned
 #'                                      names with the format {"Inferred1", "Inferred2", ...}.
-#'             \item  \code{sequence}:  value in the \code{SEQUENCE} column of the \code{data} 
+#'             \item  \code{sequence}:  value in the \code{sequence} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences.
 #'                                      The germline (root) vertex is assigned the sequence
 #'                                      in the \code{germline} slot of the input \code{clone}.
@@ -559,7 +560,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     }
     
     # Check fields
-    seq_len = unique(stringi::stri_length(clone@data[["SEQUENCE"]]))
+    seq_len = unique(stringi::stri_length(clone@data[["sequence"]]))
     germ_len = ifelse(length(clone@germline) == 0, 0, stringi::stri_length(clone@germline))
     if(germ_len == 0) {
         stop("Clone ", clone@clone, "does not contain a germline sequence.")

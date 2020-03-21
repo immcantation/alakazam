@@ -21,8 +21,8 @@ Backwards Incompatible Changes:
      - `countGenes`, `countClones` (e.g. `SEQ_COUNT` to `seq_count`)
      - `estimateAbundance` (in slot `abundance`, `RANK` to `rank`)
      - `groupGenes` (e.g. `VJ_GROUP` to `vj_group`)
-     - `collapseDuplicates` and `makeChangeoClone` (e.g. `COLLAPSE_COUNT` to 
-       `collapse_count`)
+     - `collapseDuplicates` and `makeChangeoClone` (e.g. `SEQUENCE_ID` to 
+       `sequence_id`, `COLLAPSE_COUNT` to `collapse_count`)
      - lineage tree functions (`summarizeTrees`, `getPathLengths`, `getMRCA`, 
        `tableEdges`, `testEdges`) also return columns in lower case (e.g. 
        `parent`, `child`, `outdegree`, `steps`, `annotation`, `pvalue`,...)
