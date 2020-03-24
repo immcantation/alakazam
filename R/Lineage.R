@@ -917,6 +917,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     trees <- list()
     df <- read.table(file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
     params <- df[, !names(df) %in% c("TREE")]
+    names(params) = tolower(names(params))
     out[["param"]] <- params
     out[["command"]] <- df[1, ]$TREE
     for (i in 2:nrow(df)) {
@@ -944,7 +945,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["trees"]] <- trees
 
     if (!is.null(id)) {
-        out$param$ID <- id
+        out$param$id <- id
     }
     
     return(out)
@@ -956,12 +957,12 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
 #' \code{combineIgphyml} combines IgPhyML object parameters into a data.frame.
 #' 
 #' @param   iglist         list of igphyml objects returned by \link{readIgphyml}. 
-#'                         Each must have an \code{ID} column in its \code{param} attribute, 
+#'                         Each must have an \code{id} column in its \code{param} attribute, 
 #'                         which can be added automatically using the \code{id} option of 
 #'                         \code{readIgphyml}.
 #' @param   format         string specifying whether each column of the resulting data.frame
 #'                         should represent a parameter (\code{wide}) or if 
-#'                         there should only be three columns; i.e. ID, varable, and value
+#'                         there should only be three columns; i.e. id, varable, and value
 #'                         (\code{long}).
 #'                                                
 #' @return   A data.frame containing HLP model parameter estimates for all igphyml objects.
@@ -972,7 +973,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
 #' objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
 #' other hypothesis testing analyses.
 #' 
-#' All igphyml objects used must have an "ID" column in their \code{param} attribute, which
+#' All igphyml objects used must have an "id" column in their \code{param} attribute, which
 #' can be added automatically from the \code{id} flag of \code{readIgphyml}. 
 #' 
 #' @references
@@ -1002,28 +1003,28 @@ combineIgphyml <- function(iglist, format=c("wide", "long")) {
     format <- match.arg(format)
     
     ordered_params <- c(
-        "ID", "NSEQ", "NSITE", "LHOOD", "TREE_LENGTH", 
-        "OMEGA_FWR_MLE", "OMEGA_FWR_LCI", "OMEGA_FWR_UCI", 
-        "OMEGA_CDR_MLE", "OMEGA_CDR_LCI", "OMEGA_CDR_UCI", 
-        "KAPPA_MLE", "KAPPA_LCI", "KAPPA_UCI", 
-        "WRC_2_MLE", "WRC_2_LCI", "WRC_2_UCI", 
-        "GYW_0_MLE", "GYW_0_LCI", "GYW_0_UCI", 
-        "WA_1_MLE", "WA_1_LCI", "WA_1_UCI", 
-        "TW_0_MLE", "TW_0_LCI", "TW_0_UCI", 
-        "SYC_2_MLE", "SYC_2_LCI", "SYC_2_UCI", 
-        "GRS_0_MLE", "GRS_0_LCI", "GRS_0_UCI")
+        "id", "nseq", "nsite", "lhood", "tree_length", 
+        "omega_fwr_mle", "omega_fwr_lci", "omega_fwr_uci", 
+        "omega_cdr_mle", "omega_cdr_lci", "omega_cdr_uci", 
+        "kappa_mle", "kappa_lci", "kappa_uci", 
+        "wrc_2_mle", "wrc_2_lci", "wrc_2_uci", 
+        "gyw_0_mle", "gyw_0_lci", "gyw_0_uci", 
+        "wa_1_mle", "wa_1_lci", "wa_1_uci", 
+        "tw_0_mle", "tw_0_lci", "tw_0_uci", 
+        "syc_2_mle", "syc_2_lci", "syc_2_uci", 
+        "grs_0_mle", "grs_0_lci", "grs_0_uci")
     paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
     params <- names(paramCount[paramCount == max(paramCount)])
     params <- ordered_params[ordered_params %in% params]
-    if (sum(params == "ID") == 0) {
-        message <- "ID not specified in objects. Use 'id' flag in readIgphyml."
+    if (sum(params == "id") == 0) {
+        message <- "id not specified in objects. Use 'id' flag in readIgphyml."
         stop(message)
     }
     
     repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
     if (format == "long") {
-        combined <- tidyr::gather(combined, "variable", "value", -!!rlang::sym("ID"))
+        combined <- tidyr::gather(combined, "variable", "value", -!!rlang::sym("id"))
         combined$variable <- factor(combined$variable, levels=params)
     }
     
