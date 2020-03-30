@@ -49,24 +49,24 @@ properties from DNA sequences found in the `junction` column of the previously l
 Translation of the DNA sequences to amino acid sequences is accomplished by 
 specifying the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
 sequence we specify the argument `trim=TRUE` which will strip the first and last
-codon (the conserved residues) prior to analysis. The prefix `CDR3` is added
-to the output column names using the `label="CDR3"` argument.
+codon (the conserved residues) prior to analysis. The prefix `cdr3` is added
+to the output column names using the `label="cdr3"` argument.
 
 
 ```r
 db_props <- aminoAcidProperties(db, seq="junction", nt=TRUE, trim=TRUE, 
-                                label="CDR3")
+                                label="cdr3")
 
 # The full set of properties are calculated by default
-dplyr::select(db_props[1:3, ], starts_with("CDR3"))
+dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
 ```
-##   CDR3_AA_LENGTH CDR3_AA_GRAVY CDR3_AA_BULK CDR3_AA_ALIPHATIC CDR3_AA_POLARITY
+##   cdr3_aa_length cdr3_aa_gravy cdr3_aa_bulk cdr3_aa_aliphatic cdr3_aa_polarity
 ## 1             29     0.1724138     14.12345         0.8034483         8.168966
 ## 2             29    -0.3482759     14.69034         0.6724138         8.255172
 ## 3             26    -0.9884615     13.96154         0.5653846         8.873077
-##   CDR3_AA_CHARGE CDR3_AA_BASIC CDR3_AA_ACIDIC CDR3_AA_AROMATIC
+##   cdr3_aa_charge cdr3_aa_basic cdr3_aa_acidic cdr3_aa_aromatic
 ## 1     0.03902939     0.1034483     0.06896552       0.06896552
 ## 2     2.21407038     0.2068966     0.06896552       0.27586207
 ## 3     1.11045407     0.2307692     0.15384615       0.19230769
@@ -77,23 +77,23 @@ dplyr::select(db_props[1:3, ], starts_with("CDR3"))
 tmp_theme <- theme_bw() + theme(legend.position="bottom")
 
 # Generate plots for all four of the properties
-g1 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_LENGTH)) + tmp_theme +
+g1 <- ggplot(db_props, aes(x=c_call, y=cdr3_aa_length)) + tmp_theme +
     ggtitle("CDR3 length") + 
     xlab("Isotype") + ylab("Amino acids") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
     geom_boxplot(aes(fill=c_call))
-g2 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_GRAVY)) + tmp_theme + 
+g2 <- ggplot(db_props, aes(x=c_call, y=cdr3_aa_gravy)) + tmp_theme + 
     ggtitle("CDR3 hydrophobicity") + 
     xlab("Isotype") + ylab("GRAVY") +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
     geom_boxplot(aes(fill=c_call))
-g3 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_BASIC)) + tmp_theme +
+g3 <- ggplot(db_props, aes(x=c_call, y=cdr3_aa_basic)) + tmp_theme +
     ggtitle("CDR3 basic residues") + 
     xlab("Isotype") + ylab("Basic residues") +
     scale_y_continuous(labels=scales::percent) +
     scale_fill_manual(name="Isotype", values=IG_COLORS) +
     geom_boxplot(aes(fill=c_call))
-g4 <- ggplot(db_props, aes(x=c_call, y=CDR3_AA_ACIDIC)) + tmp_theme +
+g4 <- ggplot(db_props, aes(x=c_call, y=cdr3_aa_acidic)) + tmp_theme +
     ggtitle("CDR3 acidic residues") + 
     xlab("Isotype") + ylab("Acidic residues") +
     scale_y_continuous(labels=scales::percent) +
@@ -116,12 +116,12 @@ grand average of hydrophobicity (`gravy`) index and normalized net charge
 
 ```r
 db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"),
-                                nt=TRUE, trim=TRUE, label="CDR3")
-dplyr::select(db_props[1:3, ], starts_with("CDR3"))
+                                nt=TRUE, trim=TRUE, label="cdr3")
+dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
 ```
-##   CDR3_AA_GRAVY CDR3_AA_CHARGE
+##   cdr3_aa_gravy cdr3_aa_charge
 ## 1     0.1724138     0.03902939
 ## 2    -0.3482759     2.21407038
 ## 3    -0.9884615     1.11045407
@@ -146,13 +146,13 @@ p <- setNames(pK[["Murray"]], rownames(pK))
 # Rename the hydrophobicity vector to use single-letter codes
 names(h) <- translateStrings(names(h), ABBREV_AA)
 db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"), 
-                                nt=TRUE, trim=TRUE, label="CDR3", 
+                                nt=TRUE, trim=TRUE, label="cdr3", 
                                 hydropathy=h, pK=p)
-dplyr::select(db_props[1:3, ], starts_with("CDR3"))
+dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
 ```
-##   CDR3_AA_GRAVY CDR3_AA_CHARGE
+##   cdr3_aa_gravy cdr3_aa_charge
 ## 1   -0.06551724     -0.0661116
 ## 2    0.10482759      2.0664863
 ## 3    0.13807692      1.0370349
@@ -243,11 +243,11 @@ charge(cdr3, normalize=FALSE)
 ```r
 # Count of acidic amino acids
 # Takes a named list of regular expressions
-countPatterns(cdr3, c(ACIDIC="[DE]"), label="CDR3")
+countPatterns(cdr3, c(ACIDIC="[DE]"), label="cdr3")
 ```
 
 ```
-##   CDR3_ACIDIC
+##   cdr3_ACIDIC
 ## 1  0.06896552
 ## 2  0.06896552
 ## 3  0.15384615

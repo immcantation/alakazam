@@ -9,10 +9,20 @@ Description
 Usage
 --------------------
 ```
-plotDiversityCurve(data, colors = NULL, main_title = "Diversity",
-legend_title = "Group", log_x = FALSE, log_y = FALSE,
-xlim = NULL, ylim = NULL, annotate = c("none", "depth"),
-score = c("diversity", "evenness"), silent = FALSE, ...)
+plotDiversityCurve(
+data,
+colors = NULL,
+main_title = "Diversity",
+legend_title = "Group",
+log_x = FALSE,
+log_y = FALSE,
+xlim = NULL,
+ylim = NULL,
+annotate = c("none", "depth"),
+score = c("diversity", "evenness"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments

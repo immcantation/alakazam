@@ -10,8 +10,7 @@ in a set of sequences.
 Usage
 --------------------
 ```
-countPatterns(seq, patterns, nt = FALSE, trim = FALSE,
-label = "REGION")
+countPatterns(seq, patterns, nt = FALSE, trim = FALSE, label = "region")
 ```
 
 Arguments
@@ -57,13 +56,13 @@ seq <- c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
 "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
 "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
 patterns <- c("A", "V", "[LI]")
-names(patterns) <- c("ARG", "VAL", "ISO_LEU")
-countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="CDR3")
+names(patterns) <- c("arg", "val", "iso_leu")
+countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
 ```
 
 
 ```
-   CDR3_ARG CDR3_VAL CDR3_ISO_LEU
+   cdr3_arg cdr3_val cdr3_iso_leu
 1 0.1250000        0    0.0000000
 2 0.1111111        0    0.1111111
 3 0.1111111        0    0.0000000

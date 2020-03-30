@@ -10,8 +10,13 @@ dnapars application of the PHYLIP package.
 Usage
 --------------------
 ```
-buildPhylipLineage(clone, dnapars_exec, dist_mat = getDNAMatrix(gap = 0),
-rm_temp = FALSE, verbose = FALSE)
+buildPhylipLineage(
+clone,
+dnapars_exec,
+dist_mat = getDNAMatrix(gap = 0),
+rm_temp = FALSE,
+verbose = FALSE
+)
 ```
 
 Arguments
@@ -55,12 +60,12 @@ object has the following attributes.
 
 Vertex attributes:
 
-+ `name`:      value in the `SEQUENCE_ID` column of the `data` 
++ `name`:      value in the `sequence_id` column of the `data` 
 slot of the input `clone` for observed sequences. 
 The germline (root) vertex is assigned the name 
 "Germline" and inferred intermediates are assigned
 names with the format "Inferred1", "Inferred2", ....
-+ `sequence`:  value in the `SEQUENCE` column of the `data` 
++ `sequence`:  value in the `sequence` column of the `data` 
 slot of the input `clone` for observed sequences.
 The germline (root) vertex is assigned the sequence
 in the `germline` slot of the input `clone`.

@@ -3,7 +3,7 @@
 Description
 --------------------
 
-`gravy` calculates the Grand Average of Hydrophobicity (GRAVY) index 
+`gravy` calculates the Grand Average of Hydrophobicity (gravy) index 
 of amino acid sequences using the method of Kyte & Doolittle. Non-informative
 positions are excluded, where non-informative is defined as any character in 
 `c("X", "-", ".", "*")`.
@@ -33,7 +33,7 @@ scale is used.
 Value
 -------------------
 
-A vector of GRAVY scores for the sequence(s).
+A vector of gravy scores for the sequence(s).
 
 
 References

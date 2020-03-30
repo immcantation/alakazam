@@ -10,8 +10,14 @@ the significance of an annotation's association with parent-child relationships.
 Usage
 --------------------
 ```
-testEdges(graphs, field, indirect = FALSE, exclude = c("Germline", NA),
-nperm = 200, progress = FALSE)
+testEdges(
+graphs,
+field,
+indirect = FALSE,
+exclude = c("Germline", NA),
+nperm = 200,
+progress = FALSE
+)
 ```
 
 Arguments
@@ -64,17 +70,17 @@ print(x)
 
 
 ```
-      PARENT     CHILD COUNT EXPECTED PVALUE
-1       IGHA      IGHA    39     61.1    0.9
-2       IGHA IGHA,IGHG     3      3.5    0.5
-3       IGHA      IGHG     2      5.0    0.9
-4  IGHA,IGHG      IGHA    29     11.6    0.0
-5  IGHA,IGHG IGHA,IGHG     1      2.5    1.0
-6  IGHA,IGHG      IGHG    24      2.9    0.0
-7  IGHD,IGHG      IGHG     8      1.0    0.0
-8       IGHG      IGHA     1      3.7    0.9
-9       IGHG IGHD,IGHG     1      1.0    0.0
-10      IGHG      IGHG   112    134.7    1.0
+      parent     child count   expected    pvalue
+1       IGHA      IGHA    39  60.500000 0.9000000
+2       IGHA IGHA,IGHG     3   3.800000 0.7000000
+3       IGHA      IGHG     2   4.300000 0.8000000
+4  IGHA,IGHG      IGHA    29   9.333333 0.0000000
+5  IGHA,IGHG IGHA,IGHG     1   1.666667 0.3333333
+6  IGHA,IGHG      IGHG    24   2.555556 0.0000000
+7  IGHD,IGHG      IGHG     8   1.000000 0.0000000
+8       IGHG      IGHA     1   4.300000 1.0000000
+9       IGHG IGHD,IGHG     1   1.000000 0.0000000
+10      IGHG      IGHG   112 135.900000 1.0000000
 
 ```
 

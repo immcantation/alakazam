@@ -11,8 +11,7 @@ IMGT numbering scheme.
 Usage
 --------------------
 ```
-extractVRegion(sequences, region = c("FWR1", "CDR1", "FWR2", "CDR2",
-"FWR3"))
+extractVRegion(sequences, region = c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3"))
 ```
 
 Arguments

@@ -11,8 +11,14 @@ trees.
 Usage
 --------------------
 ```
-testMRCA(graphs, field, root = "Germline", exclude = c("Germline", NA),
-nperm = 200, progress = FALSE)
+testMRCA(
+graphs,
+field,
+root = "Germline",
+exclude = c("Germline", NA),
+nperm = 200,
+progress = FALSE
+)
 ```
 
 Arguments
@@ -73,10 +79,10 @@ print(x)
 
 
 ```
-  ANNOTATION COUNT EXPECTED PVALUE
-1       IGHA    16     13.5      0
-2  IGHA,IGHG     1      1.0      0
-3       IGHG    31     33.6      1
+  annotation count expected pvalue
+1       IGHA    16   13.300  0.000
+2  IGHA,IGHG     1    1.125  0.125
+3       IGHG    31   33.700  1.000
 
 ```
 

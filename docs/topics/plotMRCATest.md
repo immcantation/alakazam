@@ -10,8 +10,14 @@ Description
 Usage
 --------------------
 ```
-plotMRCATest(data, color = "black", main_title = "MRCA Test",
-style = c("histogram", "cdf"), silent = FALSE, ...)
+plotMRCATest(
+data,
+color = "black",
+main_title = "MRCA Test",
+style = c("histogram", "cdf"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments

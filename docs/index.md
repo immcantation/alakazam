@@ -34,7 +34,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 **Depends:** ggplot2  
 **Imports:** ape, dplyr, graphics, grid, igraph, lazyeval, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils  
-**Suggests:** knitr, rmarkdown, testthat
+**Suggests:** knitr, rmarkdown, testthat  
+**Extends:** FALSE
 
 
 # Authors
@@ -59,7 +60,7 @@ Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G, Kleinstein
 S (2015). “Change-O: a toolkit for analyzing large-scale B cell
 immunoglobulin repertoire sequencing data.” _Bioinformatics_, 1-3. doi:
 10.1093/bioinformatics/btv359 (URL:
-http://doi.org/10.1093/bioinformatics/btv359).
+https://doi.org/10.1093/bioinformatics/btv359).
 
 To cite the Ig-specific lineage reconstruction and diversity methods,
 please use:
@@ -70,6 +71,6 @@ Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells
 populating the multiple sclerosis brain mature in the draining cervical
 lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107.
 doi: 10.1126/scitranslmed.3008879 (URL:
-http://doi.org/10.1126/scitranslmed.3008879).
+https://doi.org/10.1126/scitranslmed.3008879).
 
 

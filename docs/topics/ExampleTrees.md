@@ -18,12 +18,14 @@ ExampleTrees
 
 Format
 -------------------
+
 A list of igraph objects output by [buildPhylipLineage](buildPhylipLineage.md).
 Each node of each tree has the following annotations (vertex attributes):
 
 + `sample_id`:          Sample identifier(s). Time in relation to vaccination.
 + `c_call`:             Isotype assignment(s). 
 + `duplication_count`:  Copy count (number of duplicates) of the sequence.
+
 
 
 

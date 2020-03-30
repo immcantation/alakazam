@@ -11,9 +11,17 @@ distribution.
 Usage
 --------------------
 ```
-plotAbundanceCurve(data, colors = NULL, main_title = "Rank Abundance",
-legend_title = NULL, xlim = NULL, ylim = NULL,
-annotate = c("none", "depth"), silent = FALSE, ...)
+plotAbundanceCurve(
+data,
+colors = NULL,
+main_title = "Rank Abundance",
+legend_title = NULL,
+xlim = NULL,
+ylim = NULL,
+annotate = c("none", "depth"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments

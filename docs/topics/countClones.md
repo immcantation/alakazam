@@ -40,13 +40,13 @@ Value
 A data.frame summarizing clone counts and frequencies with columns:
 
 +  `CLONE`:    	 clone identifier.
-+  `SEQ_COUNT`:   total number of sequences for the clone.
-+  `SEQ_FREQ`:    frequency of the clone as a fraction of the total
++  `seq_count`:   total number of sequences for the clone.
++  `seq_freq`:    frequency of the clone as a fraction of the total
 number of sequences within each group.
-+  `COPY_COUNT`:  sum of the copy counts in the `copy` column.
++  `copy_count`:  sum of the copy counts in the `copy` column.
 Only present if the `copy` argument is 
 specified.
-+  `COPY_FREQ`:   frequency of the clone as a fraction of the total
++  `copy_freq`:   frequency of the clone as a fraction of the total
 copy number within each group. Only present if 
 the `copy` argument is specified.
 

@@ -53,7 +53,7 @@ Examples
 clones <- countClones(ExampleDb, groups="sample_id")
 
 # Calculate 1first order coverage for a single sample
-calcCoverage(clones$SEQ_COUNT[clones$sample_id == "+7d"])
+calcCoverage(clones$seq_count[clones$sample_id == "+7d"])
 ```
 
 

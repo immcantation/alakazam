@@ -10,8 +10,7 @@ diversity scores (<code class = 'eq'>D</code>) over an interval of diversity ord
 Usage
 --------------------
 ```
-alphaDiversity(data, min_q = 0, max_q = 4, step_q = 0.1, ci = 0.95,
-...)
+alphaDiversity(data, min_q = 0, max_q = 4, step_q = 0.1, ci = 0.95, ...)
 ```
 
 Arguments

@@ -39,12 +39,12 @@ Slots
 :   data.frame with relative clonal abundance data and confidence intervals,
 containing the following columns:
 
-+ `GROUP`:  group identifier.
-+ `CLONE`:  clone identifier.
-+ `P`:      relative abundance of the clone.
-+ `LOWER`:  lower confidence inverval bound.
-+ `UPPER`:  upper confidence interval bound.
-+ `RANK`:   the rank of the clone abundance.
++ `group`:  group identifier.
++ `clone_id` or `CLONE`:  clone identifier. 
++ `p`:      relative abundance of the clone.
++ `lower`:  lower confidence inverval bound.
++ `upper`:  upper confidence interval bound.
++ `rank`:   the rank of the clone abundance.
 
 
 `bootstrap`

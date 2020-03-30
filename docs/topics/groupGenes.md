@@ -15,9 +15,16 @@ analagous to single-linkage clustering (i.e., allowing for chaining).
 Usage
 --------------------
 ```
-groupGenes(data, v_call = "v_call", j_call = "j_call",
-junc_len = NULL, cell_id = NULL, locus = NULL, only_igh = TRUE,
-first = FALSE)
+groupGenes(
+data,
+v_call = "v_call",
+j_call = "j_call",
+junc_len = NULL,
+cell_id = NULL,
+locus = NULL,
+only_igh = TRUE,
+first = FALSE
+)
 ```
 
 Arguments
@@ -63,11 +70,11 @@ Value
 -------------------
 
 Returns a modified data.frame with disjoint union indices 
-in a new `VJ_GROUP` column. 
+in a new `vj_group` column. 
 
-Note that if `junc_len` is supplied, the grouping this `VJ_GROUP` 
+Note that if `junc_len` is supplied, the grouping this `vj_group` 
 will have been based on V, J, and L simultaneously despite the column name 
-being `VJ_GROUP`.
+being `vj_group`.
 
 Note that the output `v_call`, `j_call`, `cell_id`, and `locus`
 columns will be converted to `character` if they were `factor` in the 

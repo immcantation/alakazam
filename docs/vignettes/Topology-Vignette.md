@@ -9,7 +9,7 @@ that focus on quantifying annotation relationships within lineages.
 A small set of annotated example trees, `ExampleTrees`, are included in the `alakazam` package.
 The trees are `igraph` objects with the following tree annotations (graph attributes):
 
-* `clone`: An identifier for the clonal group. These entries correspond to the `CLONE`
+* `clone`: An identifier for the clonal group. These entries correspond to the `clone_id`
            column in the `ExampleDb` data.frame from which the trees were generated.
 * `v_gene`: IGHV gene name. 
 * `j_gene`: IGHJ gene name. 
@@ -101,7 +101,7 @@ calculates distances from the root (germline) *to child nodes*, whereas
 
 To determine the shortest path from the germline sequence to any node, 
 we use `getPathLengths`, which returns the distance both as the number
-of "hops" (`STEPS`) and the number of mutational events (`DISTANCE`).
+of "hops" (`steps`) and the number of mutational events (`distance`).
 
 
 ```r
@@ -110,7 +110,7 @@ getPathLengths(graph, root="Germline")
 ```
 
 ```
-##             NAME STEPS DISTANCE
+##             name steps distance
 ## 1      Inferred1     1       20
 ## 2 GN5SHBT04CW57C     2       26
 ## 3      Inferred2     3       28
@@ -136,7 +136,7 @@ getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 ```
 
 ```
-##             NAME STEPS DISTANCE
+##             name steps distance
 ## 1      Inferred1     0       20
 ## 2 GN5SHBT04CW57C     1       26
 ## 3      Inferred2     1       28
@@ -148,24 +148,24 @@ getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 ## 9 GN5SHBT05HEG2J     2       33
 ```
 
-Note, `STEPS` has changed with respect to the previous example, but 
-`DISTANCE` remains the same.
+Note, `steps` has changed with respect to the previous example, but 
+`distance` remains the same.
 
 ### Calculating subtree properties
 
 The `summarizeSubtrees` function returns a table of each node with the 
 following properties for each node:
 
-* `NAME`: The node identifier.
-* `PARENT`: The identifier of the node's parent.
-* `OUTDEGREE`: The number of edges leading from the node.
-* `SIZE`: The total number of nodes within the subtree rooted at the node.
-* `DEPTH`: The depth of the subtree that is rooted at the node.
-* `PATHLENGTH`: The maximum path length beneath the node.
-* `OUTDEGREE_NORM`: The `OUTDEGREE` normalized by the total number of edges.
-* `SIZE_NORM`: The `SIZE` normalized by the total tree size.
-* `DEPTH_NORM`: The `DEPTH` normalized by the total tree depth.
-* `PATHLENGTH_NORM`: The `PATHLENGTH` normalized by the longest path.
+* `name`: The node identifier.
+* `parent`: The identifier of the node's parent.
+* `outdegree`: The number of edges leading from the node.
+* `size`: The total number of nodes within the subtree rooted at the node.
+* `depth`: The depth of the subtree that is rooted at the node.
+* `pathlength`: The maximum path length beneath the node.
+* `outdegree_norm`: The `outdegree` normalized by the total number of edges.
+* `size_norm`: The `size` normalized by the total tree size.
+* `depth_norm`: The `depth` normalized by the total tree depth.
+* `pathlength_norm`: The `pathlength` normalized by the longest path.
 
 The `fields=c("sample_id", "c_call")` argument in the example below simply
 defines which annotations we wish to retain in the output. This argument
@@ -179,7 +179,7 @@ print(df[1:4])
 ```
 
 ```
-##             NAME sample_id c_call         PARENT
+##             name sample_id c_call         parent
 ## 1      Inferred1      <NA>   <NA>       Germline
 ## 2 GN5SHBT04CW57C       -1h   IGHM      Inferred1
 ## 3      Inferred2      <NA>   <NA> GN5SHBT04CW57C
@@ -196,7 +196,7 @@ print(df[c(1, 5:8)])
 ```
 
 ```
-##             NAME OUTDEGREE SIZE DEPTH PATHLENGTH
+##             name outdegree size depth pathlength
 ## 1      Inferred1         2    8     6         13
 ## 2 GN5SHBT04CW57C         1    6     5          7
 ## 3      Inferred2         2    5     4          5
@@ -213,7 +213,7 @@ print(df[c(1, 9:12)])
 ```
 
 ```
-##             NAME OUTDEGREE_NORM SIZE_NORM DEPTH_NORM PATHLENGTH_NORM
+##             name outdegree_norm size_norm depth_norm pathlength_norm
 ## 1      Inferred1          0.250 0.8888889  0.8571429      0.39393939
 ## 2 GN5SHBT04CW57C          0.125 0.6666667  0.7142857      0.21212121
 ## 3      Inferred2          0.250 0.5555556  0.5714286      0.15151515
@@ -249,13 +249,31 @@ p2 <- plotSubtrees(graph_list, "sample_id", "size", colors=sample_colors,
 p3 <- plotSubtrees(graph_list, "c_call", "pathlength", colors=IG_COLORS, 
                    main_title="Subtree path length", legend_title="Isotype", 
                    style="violin", silent=TRUE)
+```
+
+```
+## Warning: Ignoring unknown parameters: fun.y
+```
+
+```r
 # Violin plots of subtree depth by isotype
 p4 <- plotSubtrees(graph_list,  "c_call", "depth", colors=IG_COLORS, 
                    main_title="Subtree depth", legend_title="Isotype", 
                    style="violin", silent=TRUE)
+```
 
+```
+## Warning: Ignoring unknown parameters: fun.y
+```
+
+```r
 # Plot in a 2x2 grid
 gridPlot(p1, p2, p3, p4, ncol=2)
+```
+
+```
+## No summary function supplied, defaulting to `mean_se()`
+## No summary function supplied, defaulting to `mean_se()`
 ```
 
 ![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-1.png)
@@ -281,8 +299,8 @@ tableEdges(graph, "c_call")
 
 ```
 ## # A tibble: 5 x 3
-## # Groups:   PARENT [3]
-##   PARENT CHILD COUNT
+## # Groups:   parent [3]
+##   parent child count
 ##   <chr>  <chr> <int>
 ## 1 IGHG   IGHG      2
 ## 2 IGHM   <NA>      1
@@ -303,8 +321,8 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 ```
 ## # A tibble: 1 x 3
-## # Groups:   PARENT [1]
-##   PARENT CHILD COUNT
+## # Groups:   parent [1]
+##   parent child count
 ##   <chr>  <chr> <int>
 ## 1 IGHG   IGHG      2
 ```
@@ -322,8 +340,8 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 
 ```
 ## # A tibble: 2 x 3
-## # Groups:   PARENT [2]
-##   PARENT CHILD COUNT
+## # Groups:   parent [2]
+##   parent child count
 ##   <chr>  <chr> <int>
 ## 1 IGHG   IGHG      2
 ## 2 IGHM   IGHG      2
@@ -350,11 +368,11 @@ print(edge_test)
 ```
 
 ```
-##   PARENT CHILD COUNT  EXPECTED    PVALUE
-## 1   IGHA  IGHA    36 34.600000 0.0500000
-## 2   IGHA  IGHG     2  3.250000 0.5000000
-## 3   IGHG  IGHA     1  2.578947 0.8421053
-## 4   IGHG  IGHG    99 99.000000 0.4500000
+##   parent child count  expected    pvalue
+## 1   IGHA  IGHA    36 34.750000 0.0000000
+## 2   IGHA  IGHG     2  2.933333 0.6000000
+## 3   IGHG  IGHA     1  2.631579 0.8421053
+## 4   IGHG  IGHG    99 98.550000 0.2500000
 ```
 
 ```r
@@ -388,11 +406,11 @@ without any node exclusion:
 mrca_df <- getMRCA(graph, path="steps", root="Germline")
 
 # Print subset of the annotation data.frame
-print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
+print(mrca_df[c("name", "sample_id", "c_call", "steps", "distance")])
 ```
 
 ```
-##                NAME sample_id c_call STEPS DISTANCE
+##                name sample_id c_call steps distance
 ## Inferred1 Inferred1      <NA>   <NA>     1       20
 ```
 
@@ -407,11 +425,11 @@ mrca_df <- getMRCA(graph, path="distance", root="Germline",
                    field="c_call", exclude=NA)
 
 # Print excluding sequence, label, color, shape and size annotations
-print(mrca_df[c("NAME", "sample_id", "c_call", "STEPS", "DISTANCE")])
+print(mrca_df[c("name", "sample_id", "c_call", "steps", "distance")])
 ```
 
 ```
-##                          NAME sample_id c_call STEPS DISTANCE
+##                          name sample_id c_call steps distance
 ## GN5SHBT01D6X0W GN5SHBT01D6X0W       -1h   IGHM     1       22
 ```
 
@@ -434,9 +452,9 @@ print(mrca_test)
 ```
 
 ```
-##   ANNOTATION COUNT EXPECTED PVALUE
-## 1       IGHA    12    11.15   0.00
-## 2       IGHG    31    31.85   0.85
+##   annotation count expected pvalue
+## 1       IGHA    12    11.35   0.00
+## 2       IGHG    31    31.65   0.65
 ```
 
 ```r

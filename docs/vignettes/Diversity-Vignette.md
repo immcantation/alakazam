@@ -58,20 +58,20 @@ head(clones, 5)
 ```
 ## # A tibble: 5 x 4
 ## # Groups:   sample_id [1]
-##   sample_id CLONE SEQ_COUNT SEQ_FREQ
-##   <chr>     <dbl>     <int>    <dbl>
-## 1 +7d        3128       100    0.1  
-## 2 +7d        3100        50    0.05 
-## 3 +7d        3141        44    0.044
-## 4 +7d        3177        30    0.03 
-## 5 +7d        3170        28    0.028
+##   sample_id clone_id seq_count seq_freq
+##   <chr>        <dbl>     <int>    <dbl>
+## 1 +7d           3128       100    0.1  
+## 2 +7d           3100        50    0.05 
+## 3 +7d           3141        44    0.044
+## 4 +7d           3177        30    0.03 
+## 5 +7d           3170        28    0.028
 ```
 
 You may also specify a column containing the abundance count of each sequence 
 (usually copy numbers), that will including weighting of each clone size by the 
 corresponding abundance count. Furthermore, multiple grouping columns may be
-specified such that `SEQ_FREQ` (unwieghted clone size as a fraction
-of total sequences in the group) and `COPY_FREQ` (weighted faction) are 
+specified such that `seq_freq` (unwieghted clone size as a fraction
+of total sequences in the group) and `copy_freq` (weighted faction) are 
 normalized to within multiple group data partitions.
 
 
@@ -85,13 +85,13 @@ head(clones, 5)
 ```
 ## # A tibble: 5 x 7
 ## # Groups:   sample_id, c_call [2]
-##   sample_id c_call CLONE SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
-##   <chr>     <chr>  <dbl>     <int>      <dbl>    <dbl>     <dbl>
-## 1 +7d       IGHA    3128        88        651   0.331     0.497 
-## 2 +7d       IGHG    3100        49        279   0.0928    0.173 
-## 3 +7d       IGHA    3141        44        240   0.165     0.183 
-## 4 +7d       IGHG    3192        19        141   0.0360    0.0874
-## 5 +7d       IGHG    3177        29        130   0.0549    0.0806
+##   sample_id c_call clone_id seq_count copy_count seq_freq copy_freq
+##   <chr>     <chr>     <dbl>     <int>      <dbl>    <dbl>     <dbl>
+## 1 +7d       IGHA       3128        88        651   0.331     0.497 
+## 2 +7d       IGHG       3100        49        279   0.0928    0.173 
+## 3 +7d       IGHA       3141        44        240   0.165     0.183 
+## 4 +7d       IGHG       3192        19        141   0.0360    0.0874
+## 5 +7d       IGHG       3177        29        130   0.0549    0.0806
 ```
 
 While `countClones` will report observed abundances, it will not provide confidence 
@@ -181,26 +181,26 @@ print(isotype_test@tests)
 
 ```
 ## # A tibble: 18 x 5
-##    TEST         Q     DELTA_MEAN DELTA_SD PVALUE
+##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         138.       8.34   0   
-##  2 IGHA != IGHD 1         183.       8.77   0   
-##  3 IGHA != IGHD 2         189.      11.5    0   
-##  4 IGHA != IGHG 0           4.14     8.73   0.65
-##  5 IGHA != IGHG 1          24.7      6.82   0   
-##  6 IGHA != IGHG 2          27.1      4.73   0   
-##  7 IGHA != IGHM 0         158.       6.70   0   
-##  8 IGHA != IGHM 1         211.       5.98   0   
-##  9 IGHA != IGHM 2         229.       6.72   0   
-## 10 IGHD != IGHG 0         134.       7.64   0   
-## 11 IGHD != IGHG 1         159.       8.87   0   
-## 12 IGHD != IGHG 2         162.      12.1    0   
-## 13 IGHD != IGHM 0          20.0      6.19   0   
-## 14 IGHD != IGHM 1          27.9      8.85   0   
-## 15 IGHD != IGHM 2          39.7     13.6    0   
-## 16 IGHG != IGHM 0         154.       6.35   0   
-## 17 IGHG != IGHM 1         187.       6.60   0   
-## 18 IGHG != IGHM 2         202.       7.76   0
+##  1 IGHA != IGHD 0         139.       7.46   0   
+##  2 IGHA != IGHD 1         184.       8.43   0   
+##  3 IGHA != IGHD 2         191.      11.6    0   
+##  4 IGHA != IGHG 0           3.59     7.64   0.7 
+##  5 IGHA != IGHG 1          24.0      6.04   0   
+##  6 IGHA != IGHG 2          26.6      4.40   0   
+##  7 IGHA != IGHM 0         159.       6.23   0   
+##  8 IGHA != IGHM 1         212.       5.96   0   
+##  9 IGHA != IGHM 2         230.       7.00   0   
+## 10 IGHD != IGHG 0         135.       7.51   0   
+## 11 IGHD != IGHG 1         160.       8.54   0   
+## 12 IGHD != IGHG 2         164.      11.7    0   
+## 13 IGHD != IGHM 0          19.7      5.64   0   
+## 14 IGHD != IGHM 1          27.5      8.03   0   
+## 15 IGHD != IGHM 2          39.1     12.5    0.01
+## 16 IGHG != IGHM 0         155.       6.20   0   
+## 17 IGHG != IGHM 1         188.       6.34   0   
+## 18 IGHG != IGHM 2         203.       7.79   0
 ```
 
 ```r

@@ -47,7 +47,6 @@ vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 
 ```
 
-![2](permuteLabels-2.png)
 
 ```R
 
@@ -57,7 +56,7 @@ plot(g, layout=layout_as_tree, vertex.label=V(g)$c_call,
 vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 ```
 
-![4](permuteLabels-4.png)
+![3](permuteLabels-3.png)
 
 
 See also

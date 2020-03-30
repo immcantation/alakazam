@@ -17,6 +17,7 @@ ExampleDbChangeo
 
 Format
 -------------------
+
 A data.frame with the following Change-O style columns:
 
 + `SEQUENCE_ID`:           Sequence identifier
@@ -37,6 +38,7 @@ to the J region.
 + `ISOTYPE`:               Isotype assignment.
 + `DUPCOUNT`:              Copy count (number of duplicates) of the sequence.
 + `CLONE`:                 Change-O assignment clonal group identifier.
+
 
 
 References

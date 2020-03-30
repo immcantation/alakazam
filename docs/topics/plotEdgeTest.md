@@ -10,8 +10,14 @@ Description
 Usage
 --------------------
 ```
-plotEdgeTest(data, color = "black", main_title = "Edge Test",
-style = c("histogram", "cdf"), silent = FALSE, ...)
+plotEdgeTest(
+data,
+color = "black",
+main_title = "Edge Test",
+style = c("histogram", "cdf"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments

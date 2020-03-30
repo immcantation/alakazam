@@ -17,6 +17,7 @@ ExampleDb
 
 Format
 -------------------
+
 A data.frame with the following AIRR style columns:
 
 + `sequence_id`:                Sequence identifier
@@ -38,6 +39,7 @@ to the J region.
 + `duplicate_count`:            Copy count (number of duplicates) of the sequence.
 + `clone_id`:                   Change-O assignment clonal group identifier.
 + `sample_id`:                  Sample identifier. Time in relation to vaccination.
+
 
 
 References

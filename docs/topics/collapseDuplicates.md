@@ -10,10 +10,19 @@ characters, removes the duplicate entries, and combines any associated annotatio
 Usage
 --------------------
 ```
-collapseDuplicates(data, id = "sequence_id",
-seq = "sequence_alignment", text_fields = NULL, num_fields = NULL,
-seq_fields = NULL, add_count = FALSE, ignore = c("N", "-", ".",
-"?"), sep = ",", dry = FALSE, verbose = FALSE)
+collapseDuplicates(
+data,
+id = "sequence_id",
+seq = "sequence_alignment",
+text_fields = NULL,
+num_fields = NULL,
+seq_fields = NULL,
+add_count = FALSE,
+ignore = c("N", "-", ".", "?"),
+sep = ",",
+dry = FALSE,
+verbose = FALSE
+)
 ```
 
 Arguments
@@ -246,7 +255,7 @@ DISCARDED> 1
   sequence_id sequence_alignment    c_call sample_id duplicate_count
 1           C           NAACTGGN      IGHG        S2               3
 2           A           CCCCTGGG IGHG,IGHM        S1               3
-  COLLAPSE_COUNT
+  collapse_count
 1              1
 2              2
 
@@ -277,7 +286,7 @@ DISCARDED> 0
 ```
   sequence_id sequence_alignment         c_call sample_id duplicate_count
 1           A           NNNCTGNN IGHA,IGHG,IGHM     S1,S2              10
-  COLLAPSE_COUNT
+  collapse_count
 1              4
 
 ```

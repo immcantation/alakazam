@@ -11,9 +11,18 @@ rarefaction and bootstrapping.
 Usage
 --------------------
 ```
-testDiversity(data, q, group, clone = "CLONE", copy = NULL,
-min_n = 30, max_n = NULL, nboot = 2000, progress = FALSE,
-ci = 0.95)
+testDiversity(
+data,
+q,
+group,
+clone = "CLONE",
+copy = NULL,
+min_n = 30,
+max_n = NULL,
+nboot = 2000,
+progress = FALSE,
+ci = 0.95
+)
 ```
 
 Arguments

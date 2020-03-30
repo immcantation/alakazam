@@ -10,8 +10,15 @@ groups.
 Usage
 --------------------
 ```
-countGenes(data, gene, groups = NULL, copy = NULL, clone = NULL,
-fill = FALSE, mode = c("gene", "allele", "family", "asis"))
+countGenes(
+data,
+gene,
+groups = NULL,
+copy = NULL,
+clone = NULL,
+fill = FALSE,
+mode = c("gene", "allele", "family", "asis")
+)
 ```
 
 Arguments
@@ -62,18 +69,18 @@ Value
 A data.frame summarizing family, gene or allele counts and frequencies 
 with columns:
 
-+  `GENE`:         name of the family, gene or allele
-+  `SEQ_COUNT`:    total number of sequences for the gene.
-+  `SEQ_FREQ`:     frequency of the gene as a fraction of the total
++  `gene`:         name of the family, gene or allele
++  `seq_count`:    total number of sequences for the gene.
++  `seq_freq`:     frequency of the gene as a fraction of the total
 number of sequences within each grouping.
-+  `COPY_COUNT`:   sum of the copy counts in the `copy` column.
++  `copy_count`:   sum of the copy counts in the `copy` column.
 for each gene. Only present if the `copy` 
 argument is specified.
-+  `COPY_FREQ`:    frequency of the gene as a fraction of the total
++  `copy_freq`:    frequency of the gene as a fraction of the total
 copy number within each group. Only present if 
 the `copy` argument is specified.
-+  `CLONE_COUNT`:  total number of clones for the gene.
-+  `CLONE_FREQ`:   frequency of the gene as a fraction of the total
++  `clone_count`:  total number of clones for the gene.
++  `clone_freq`:   frequency of the gene as a fraction of the total
 number of clones within each grouping.
 
 Additional columns defined by the `groups` argument will also be present.
@@ -102,10 +109,7 @@ genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id",
 mode="allele", fill=TRUE)
 ```
 
-*Warning*:`complete_()` is deprecated as of tidyr 1.0.0.
-Please use `complete()` instead.
-This warning is displayed once per session.
-Call `lifecycle::last_warnings()` to see where this warning was generated.
+
 
 
 

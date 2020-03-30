@@ -12,12 +12,24 @@ object which serves as input for lineage reconstruction.
 Usage
 --------------------
 ```
-makeChangeoClone(data, id = "sequence_id", seq = "sequence_alignment",
-germ = "germline_alignment", vcall = "v_call", jcall = "j_call",
-junc_len = "junction_length", clone = "clone_id", mask_char = "N",
-max_mask = 0, pad_end = FALSE, text_fields = NULL,
-num_fields = NULL, seq_fields = NULL, add_count = TRUE,
-verbose = FALSE)
+makeChangeoClone(
+data,
+id = "sequence_id",
+seq = "sequence_alignment",
+germ = "germline_alignment",
+vcall = "v_call",
+jcall = "j_call",
+junc_len = "junction_length",
+clone = "clone_id",
+mask_char = "N",
+max_mask = 0,
+pad_end = FALSE,
+text_fields = NULL,
+num_fields = NULL,
+seq_fields = NULL,
+add_count = TRUE,
+verbose = FALSE
+)
 ```
 
 Arguments
@@ -159,7 +171,7 @@ stringsAsFactors=FALSE)
 ```
 An object of class "ChangeoClone"
 Slot "data":
-  SEQUENCE_ID SEQUENCE    c_call duplicate_count COLLAPSE_COUNT
+  sequence_id sequence    c_call duplicate_count collapse_count
 1           C NAACTGGN      IGHG               3              1
 2           A CCCCTGGG IGHG,IGHM               3              2
 
@@ -192,7 +204,7 @@ Slot "junc_len":
 ```
 An object of class "ChangeoClone"
 Slot "data":
-  SEQUENCE_ID SEQUENCE         c_call duplicate_count COLLAPSE_COUNT
+  sequence_id sequence         c_call duplicate_count collapse_count
 1           A NNNCTGNN IGHA,IGHG,IGHM              10              4
 
 Slot "clone":

@@ -23,6 +23,7 @@ TR_COLORS
 
 Format
 -------------------
+
 Named character vectors with hexcode colors as values.
 
 + `DNA_COLORS`:  DNA character colors 
@@ -31,6 +32,13 @@ Named character vectors with hexcode colors as values.
 `c("IGHA", "IGHD", "IGHE", "IGHG", "IGHM", "IGHK", "IGHL")`.
 + `TR_COLORS`:   TCR chain colors 
 `c("TRA", "TRB", "TRD", "TRG")`.
+
+
+An object of class `character` of length 4.
+
+An object of class `character` of length 7.
+
+An object of class `character` of length 4.
 
 
 

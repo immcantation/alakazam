@@ -41,9 +41,9 @@ Value
 
 A data.frame defining total annotation connections in the tree with columns:
 
-+ `PARENT`:  parent annotation
-+ `CHILD`:   child annotation
-+ `COUNT`:   count of edges for the parent-child relationship
++ `parent`:  parent annotation
++ `child`:   child annotation
++ `count`:   count of edges for the parent-child relationship
 
 
 
@@ -63,8 +63,8 @@ tableEdges(graph, "c_call")
 
 ```
 # A tibble: 4 x 3
-# Groups:   PARENT [3]
-  PARENT    CHILD     COUNT
+# Groups:   parent [3]
+  parent    child     count
   <chr>     <chr>     <int>
 1 IGHA      IGHA,IGHG     1
 2 IGHA,IGHG IGHA          1
@@ -84,8 +84,8 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 ```
 # A tibble: 3 x 3
-# Groups:   PARENT [2]
-  PARENT    CHILD     COUNT
+# Groups:   parent [2]
+  parent    child     count
   <chr>     <chr>     <int>
 1 IGHA      IGHA,IGHG     1
 2 IGHA,IGHG IGHA          1
@@ -103,8 +103,8 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 
 ```
 # A tibble: 3 x 3
-# Groups:   PARENT [2]
-  PARENT    CHILD     COUNT
+# Groups:   parent [2]
+  parent    child     count
   <chr>     <chr>     <int>
 1 IGHA      IGHA,IGHG     1
 2 IGHA,IGHG IGHA          1

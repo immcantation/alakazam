@@ -10,8 +10,7 @@ path lengths from the root of a lineage tree.
 Usage
 --------------------
 ```
-getPathLengths(graph, root = "Germline", field = NULL,
-exclude = NULL)
+getPathLengths(graph, root = "Germline", field = NULL, exclude = NULL)
 ```
 
 Arguments
@@ -39,9 +38,9 @@ Value
 
 A data.frame with columns:
 
-+ `NAME`:      node name
-+ `STEPS`:     path length as the number of nodes traversed
-+ `DISTANCE`:  path length as the sum of edge weights
++ `name`:      node name
++ `steps`:     path length as the number of nodes traversed
++ `distance`:  path length as the sum of edge weights
 
 
 
@@ -60,7 +59,7 @@ getPathLengths(graph, root="Germline")
 
 
 ```
-            NAME STEPS DISTANCE
+            name steps distance
 1      Inferred1     1       20
 2 GN5SHBT04CW57C     2       26
 3      Inferred2     3       28
@@ -82,7 +81,7 @@ getPathLengths(graph, root="Germline", field="c_call", exclude=NA)
 
 
 ```
-            NAME STEPS DISTANCE
+            name steps distance
 1      Inferred1     0       20
 2 GN5SHBT04CW57C     1       26
 3      Inferred2     1       28

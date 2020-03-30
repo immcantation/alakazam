@@ -10,10 +10,19 @@ set of lineage trees, broken down by annotation value.
 Usage
 --------------------
 ```
-plotSubtrees(graphs, field, stat, root = "Germline",
-exclude = c("Germline", NA), colors = NULL,
-main_title = "Subtrees", legend_title = "Annotation",
-style = c("box", "violin"), silent = FALSE, ...)
+plotSubtrees(
+graphs,
+field,
+stat,
+root = "Germline",
+exclude = c("Germline", NA),
+colors = NULL,
+main_title = "Subtrees",
+legend_title = "Annotation",
+style = c("box", "violin"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments
@@ -98,7 +107,7 @@ plotSubtrees(graphs, "sample_id", "out", style="v")
 
 ```
 
-![2](plotSubtrees-2.png)
+*Warning*:Ignoring unknown parameters: fun.y*No summary function supplied, defaulting to `mean_se()`*![4](plotSubtrees-4.png)
 
 ```R
 
@@ -107,7 +116,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 
 ```
 
-![4](plotSubtrees-4.png)
+*Warning*:Ignoring unknown parameters: fun.y*No summary function supplied, defaulting to `mean_se()`*![8](plotSubtrees-8.png)
 
 ```R
 
@@ -115,7 +124,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 plotSubtrees(graphs, "c_call", "depth", style="b")
 ```
 
-![6](plotSubtrees-6.png)
+![10](plotSubtrees-10.png)
 
 
 See also

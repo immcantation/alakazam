@@ -10,8 +10,7 @@ B cell repertoires
 Usage
 --------------------
 ```
-readIgphyml(file, id = NULL, format = c("graph", "phylo"),
-collapse = TRUE)
+readIgphyml(file, id = NULL, format = c("graph", "phylo"), collapse = TRUE)
 ```
 
 Arguments

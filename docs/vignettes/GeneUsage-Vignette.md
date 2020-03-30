@@ -46,7 +46,7 @@ head(gene, n=4)
 ```
 ## # A tibble: 4 x 4
 ## # Groups:   sample_id [2]
-##   sample_id GENE     SEQ_COUNT SEQ_FREQ
+##   sample_id gene     seq_count seq_freq
 ##   <chr>     <chr>        <int>    <dbl>
 ## 1 +7d       IGHV3-49       699    0.699
 ## 2 -1h       IGHV3-9         83    0.083
@@ -54,13 +54,13 @@ head(gene, n=4)
 ## 4 -1h       IGHV3-30        58    0.058
 ```
 
-In the resultant `data.frame`, the `SEQ_COUNT` column is the number of raw sequences within each `sample_id` 
-group for the given `GENE`. `SEQ_FREQ` is the frequency of each `GENE` within the given `sample_id`.
+In the resultant `data.frame`, the `seq_count` column is the number of raw sequences within each `sample_id` 
+group for the given `gene`. `seq_freq` is the frequency of each `gene` within the given `sample_id`.
 
-Below we plot only the IGHV1 abundance by filtering on the `GENE` column to only rows 
+Below we plot only the IGHV1 abundance by filtering on the `gene` column to only rows 
 containing IGHV1 family genes. We extract the family portion of the gene name using the 
 `getFamily` function. Also, we take advantage of the `sortGenes` function to convert the 
-`GENE` column to a factor with gene name lexicographically ordered in the factor levels 
+`gene` column to a factor with gene name lexicographically ordered in the factor levels 
 (`method="name"`) for axis ordering using the `ggplot2` package. Alternatively, we could have 
 ordered the genes by genomic position by passing `method="position"` to `sortGenes`.
 
@@ -68,11 +68,11 @@ ordered the genes by genomic position by passing `method="position"` to `sortGen
 ```r
 # Assign sorted levels and subset to IGHV1
 ighv1 <- gene %>%
-    mutate(GENE=factor(GENE, levels=sortGenes(unique(GENE), method="name"))) %>%
-    filter(getFamily(GENE) == "IGHV1")
+    mutate(gene=factor(gene, levels=sortGenes(unique(gene), method="name"))) %>%
+    filter(getFamily(gene) == "IGHV1")
 
 # Plot V gene usage in the IGHV1 family by sample
-g1 <- ggplot(ighv1, aes(x=GENE, y=SEQ_FREQ)) +
+g1 <- ggplot(ighv1, aes(x=gene, y=seq_freq)) +
     theme_bw() +
     ggtitle("IGHV1 Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -95,7 +95,7 @@ family level (`mode="family"`):
 family <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="family")
 
 # Plot V family usage by sample
-g2 <- ggplot(family, aes(x=GENE, y=SEQ_FREQ)) +
+g2 <- ggplot(family, aes(x=gene, y=seq_freq)) +
     theme_bw() +
     ggtitle("Family Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -133,7 +133,7 @@ head(family, n=4)
 ```
 ## # A tibble: 4 x 5
 ## # Groups:   sample_id, c_call [3]
-##   sample_id c_call GENE  CLONE_COUNT CLONE_FREQ
+##   sample_id c_call gene  clone_count clone_freq
 ##   <chr>     <chr>  <chr>       <int>      <dbl>
 ## 1 -1h       IGHA   IGHV2           1     0.0149
 ## 2 -1h       IGHG   IGHV6           1     0.0156
@@ -142,7 +142,7 @@ head(family, n=4)
 ```
 
 The output `data.frame` contains the additional grouping column (`c_call`) along with the 
-`CLONE_COUNT` and `CLONE_FREQ` columns that represent the count of clones for each V family 
+`clone_count` and `clone_freq` columns that represent the count of clones for each V family 
 and the frequencies within the given `sample_id` and `c_call` pair, respectively.
 
 
@@ -150,7 +150,7 @@ and the frequencies within the given `sample_id` and `c_call` pair, respectively
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family clonal usage by sample and isotype
-g3 <- ggplot(family, aes(x=GENE, y=CLONE_FREQ)) +
+g3 <- ggplot(family, aes(x=gene, y=clone_freq)) +
     theme_bw() +
     ggtitle("Clonal Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -182,7 +182,7 @@ head(family, n=4)
 ```
 ## # A tibble: 4 x 7
 ## # Groups:   sample_id, c_call [3]
-##   sample_id c_call GENE  SEQ_COUNT COPY_COUNT SEQ_FREQ COPY_FREQ
+##   sample_id c_call gene  seq_count copy_count seq_freq copy_freq
 ##   <chr>     <chr>  <chr>     <int>      <dbl>    <dbl>     <dbl>
 ## 1 +7d       IGHG   IGHV3       516       1587    0.977     0.984
 ## 2 +7d       IGHA   IGHV3       240       1224    0.902     0.935
@@ -190,16 +190,16 @@ head(family, n=4)
 ## 4 -1h       IGHM   IGHV4       110        162    0.195     0.25
 ```
 
-The output `data.frame` includes the `SEQ_COUNT` and `SEQ_FREQ` columns as previously defined, 
-as well as the additional copy number columns `COPY_COUNT` and `COPY_FREQ` reflected the summed 
-copy number (`duplicate_count`) for each sequence within the given `GENE`, `sample_id` and `c_call`.
+The output `data.frame` includes the `seq_count` and `seq_freq` columns as previously defined, 
+as well as the additional copy number columns `copy_count` and `copy_freq` reflected the summed 
+copy number (`duplicate_count`) for each sequence within the given `gene`, `sample_id` and `c_call`.
 
 
 ```r
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family copy abundance by sample and isotype
-g4 <- ggplot(family, aes(x=GENE, y=COPY_FREQ)) +
+g4 <- ggplot(family, aes(x=gene, y=copy_freq)) +
     theme_bw() +
     ggtitle("Copy Number") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +

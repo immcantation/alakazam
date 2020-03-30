@@ -19,9 +19,11 @@ IMGT_REGIONS
 
 Format
 -------------------
+
 A list with regions named one of `c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")` 
 with values containing a numeric vector of length two defining the 
 `c(start, end)` positions of the named region.
+
 
 References
 -------------------

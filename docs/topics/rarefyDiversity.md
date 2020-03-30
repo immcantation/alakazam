@@ -11,9 +11,21 @@ scores (<code class = 'eq'>D</code>) over an interval of diversity orders (<code
 Usage
 --------------------
 ```
-rarefyDiversity(data, group, clone = "CLONE", copy = NULL, min_q = 0,
-max_q = 4, step_q = 0.05, min_n = 30, max_n = NULL, ci = 0.95,
-nboot = 2000, uniform = TRUE, progress = FALSE)
+rarefyDiversity(
+data,
+group,
+clone = "CLONE",
+copy = NULL,
+min_q = 0,
+max_q = 4,
+step_q = 0.05,
+min_n = 30,
+max_n = NULL,
+ci = 0.95,
+nboot = 2000,
+uniform = TRUE,
+progress = FALSE
+)
 ```
 
 Arguments

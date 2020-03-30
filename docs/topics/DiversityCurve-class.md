@@ -42,29 +42,29 @@ Slots
 `diversity`
 :   data.frame defining the diversity curve with the following columns:
 
-+ `GROUP`:    group label.
-+ `Q`:        diversity order.
-+ `D`:        mean diversity index over all bootstrap 
++ `group`:    group label.
++ `q`:        diversity order.
++ `d`:        mean diversity index over all bootstrap 
 realizations.
-+ `D_SD`:     standard deviation of the diversity index 
++ `d_sd`:     standard deviation of the diversity index 
 over all bootstrap realizations.
-+ `D_LOWER`:  diversity lower confidence inverval bound.
-+ `D_UPPER`:  diversity upper confidence interval bound.
-+ `E`:        evenness index calculated as `D` 
++ `d_lower`:  diversity lower confidence inverval bound.
++ `d_upper`:  diversity upper confidence interval bound.
++ `e`:        evenness index calculated as `D` 
 divided by `D` at `Q=0`.
-+ `E_LOWER`:  evenness lower confidence inverval bound.
-+ `E_UPPER`:  eveness upper confidence interval bound.
++ `e_lower`:  evenness lower confidence inverval bound.
++ `e_upper`:  eveness upper confidence interval bound.
 
 
 `tests`
 :   data.frame describing the significance test results with columns:
 
-+ `TEST`:        string listing the two groups tested.
-+ `DELTA_MEAN`:  mean of the <code class = 'eq'>D</code> bootstrap delta 
++ `test`:        string listing the two groups tested.
++ `delta_mean`:  mean of the <code class = 'eq'>D</code> bootstrap delta 
 distribution for the test.
-+ `DELTA_SD`:    standard deviation of the <code class = 'eq'>D</code> 
++ `delta_sd`:    standard deviation of the <code class = 'eq'>D</code> 
 bootstrap delta distribution for the test.
-+ `PVALUE`:      p-value for the test.
++ `pvalue`:      p-value for the test.
 
 
 `group_by`

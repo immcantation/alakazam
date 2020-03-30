@@ -11,8 +11,13 @@ exclusion of specific groups of nodes.
 Usage
 --------------------
 ```
-getMRCA(graph, path = c("distance", "steps"), root = "Germline",
-field = NULL, exclude = NULL)
+getMRCA(
+graph,
+path = c("distance", "steps"),
+root = "Germline",
+field = NULL,
+exclude = NULL
+)
 ```
 
 Arguments
@@ -45,9 +50,9 @@ Value
 
 A data.frame of the MRCA node(s) containing the columns:
 
-+ `NAME`:      node name
-+ `STEPS`:     path length as the number of nodes traversed
-+ `DISTANCE`:  path length as the sum of edge weights
++ `name`:      node name
++ `steps`:     path length as the number of nodes traversed
++ `distance`:  path length as the sum of edge weights
 
 Along with additional columns corresponding to the 
 annotations of the input graph.
@@ -68,11 +73,11 @@ getMRCA(graph, path="steps", root="Germline")
 
 
 ```
-                         NAME
+                         name
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               sample_id c_call duplicate_count          label STEPS DISTANCE
+               sample_id c_call duplicate_count          label steps distance
 GN5SHBT06HH3QD       +7d   IGHA              10 GN5SHBT06HH3QD     1       20
 
 ```
@@ -86,11 +91,11 @@ getMRCA(graph, path="distance", root="Germline", field="c_call", exclude=NA)
 
 
 ```
-                         NAME
+                         name
 GN5SHBT06HH3QD GN5SHBT06HH3QD
                                                                                                                                                                                                                                                                                                                                                                                                                        sequence
 GN5SHBT06HH3QD GAGGTGCAGCTGGTGGTATCTGGGGGANNNGGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCTGGATTCACCTTTNNNNNNNNNNNNGGTGATTATGCTATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTCATTAGAAGCAAAACTTTTGGTGGGACAGCAGATTACGCCGCGTTTGTGAGANNNGGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGTGGTAGGGATCTCGCCGTAAGTGACACAATAGGTGGTACTAACTGGTTCGACCCCTGGGGCCAGGGGACCCCGGTCACCGTCTCCTCAG
-               sample_id c_call duplicate_count          label STEPS DISTANCE
+               sample_id c_call duplicate_count          label steps distance
 GN5SHBT06HH3QD       +7d   IGHA              10 GN5SHBT06HH3QD     1       20
 
 ```

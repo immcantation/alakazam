@@ -10,9 +10,18 @@ and confidence intervals on clone sizes using bootstrapping.
 Usage
 --------------------
 ```
-estimateAbundance(data, clone = "clone_id", copy = NULL,
-group = NULL, min_n = 30, max_n = NULL, uniform = TRUE,
-ci = 0.95, nboot = 200, progress = FALSE)
+estimateAbundance(
+data,
+clone = "clone_id",
+copy = NULL,
+group = NULL,
+min_n = 30,
+max_n = NULL,
+uniform = TRUE,
+ci = 0.95,
+nboot = 200,
+progress = FALSE
+)
 ```
 
 Arguments
@@ -33,7 +42,7 @@ copy numbers within each clonal group.
 
 group
 :   name of the `data` column containing group identifiers. 
-If `NULL` then no grouping is performed and the `GROUP` 
+If `NULL` then no grouping is performed and the `group` 
 column of the output will contain the value `NA` for each row.
 
 min_n

@@ -10,9 +10,17 @@ with mean and a line range indicating plus/minus one standard deviation.
 Usage
 --------------------
 ```
-plotDiversityTest(data, q, colors = NULL, main_title = "Diversity",
-legend_title = "Group", log_d = FALSE, annotate = c("none",
-"depth"), silent = FALSE, ...)
+plotDiversityTest(
+data,
+q,
+colors = NULL,
+main_title = "Diversity",
+legend_title = "Group",
+log_d = FALSE,
+annotate = c("none", "depth"),
+silent = FALSE,
+...
+)
 ```
 
 Arguments
