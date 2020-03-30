@@ -39,12 +39,12 @@ Slots
 `tests`
 :   data.frame describing the significance test results with columns:
 
-+ `ANNOTATION`:  annotation value.
-+ `COUNT`:       observed count of MRCA positions 
++ `annotation`:  annotation value.
++ `count`:       observed count of MRCA positions 
 with the given annotation.
-+ `EXPECTED`:    expected mean count of MRCA occurance
++ `expected`:    expected mean count of MRCA occurance
 for the annotation.
-+ `PVALUE`:      one-sided p-value for the hypothesis that 
++ `pvalue`:      one-sided p-value for the hypothesis that 
 the observed annotation abundance is greater 
 than expected.
 
@@ -52,10 +52,10 @@ than expected.
 `permutations`
 :   data.frame containing the raw permutation test data with columns:
 
-+ `ANNOTATION`:  annotation value.
-+ `COUNT`:       count of MRCA positions with the 
++ `annotation`:  annotation value.
++ `count`:       count of MRCA positions with the 
 given annotation.
-+ `ITER`:        numerical index define which 
++ `iter`:        numerical index define which 
 permutation realization each 
 observation corresponds to.
 

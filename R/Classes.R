@@ -181,21 +181,21 @@ setClass("ChangeoClone",
 #' 
 #' @slot  tests         data.frame describing the significance test results with columns:
 #'                      \itemize{
-#'                        \item  \code{ANNOTATION}:  annotation value.
-#'                        \item  \code{COUNT}:       observed count of MRCA positions 
+#'                        \item  \code{annotation}:  annotation value.
+#'                        \item  \code{count}:       observed count of MRCA positions 
 #'                                                   with the given annotation.
-#'                        \item  \code{EXPECTED}:    expected mean count of MRCA occurance
+#'                        \item  \code{expected}:    expected mean count of MRCA occurance
 #'                                                   for the annotation.
-#'                        \item  \code{PVALUE}:      one-sided p-value for the hypothesis that 
+#'                        \item  \code{pvalue}:      one-sided p-value for the hypothesis that 
 #'                                                   the observed annotation abundance is greater 
 #'                                                   than expected.
 #'                      }
 #' @slot  permutations  data.frame containing the raw permutation test data with columns:
 #'                      \itemize{
-#'                        \item  \code{ANNOTATION}:  annotation value.
-#'                        \item  \code{COUNT}:       count of MRCA positions with the 
+#'                        \item  \code{annotation}:  annotation value.
+#'                        \item  \code{count}:       count of MRCA positions with the 
 #'                                                   given annotation.
-#'                        \item  \code{ITER}:        numerical index define which 
+#'                        \item  \code{iter}:        numerical index define which 
 #'                                                   permutation realization each 
 #'                                                   observation corresponds to.
 #'                      }
@@ -217,23 +217,23 @@ setClass("MRCATest",
 #' 
 #' @slot  tests         data.frame describing the significance test results with columns:
 #'                      \itemize{
-#'                        \item  \code{PARENT}:    parent node annotation.
-#'                        \item  \code{CHILD}:     child node annotation
-#'                        \item  \code{COUNT}:     count of observed edges with the given 
+#'                        \item  \code{parent}:    parent node annotation.
+#'                        \item  \code{child}:     child node annotation
+#'                        \item  \code{count}:     count of observed edges with the given 
 #'                                                 parent-child annotation set.
-#'                        \item  \code{EXPECTED}:  mean count of expected edges for the 
+#'                        \item  \code{expected}:  mean count of expected edges for the 
 #'                                                 given parent-child relationship.
-#'                        \item  \code{PVALUE}:    one-sided p-value for the hypothesis that 
+#'                        \item  \code{pvalue}:    one-sided p-value for the hypothesis that 
 #'                                                  the observed edge abundance is greater 
 #'                                                  than expected.
 #'                      }
 #' @slot  permutations  data.frame containing the raw permutation test data with columns:
 #'                      \itemize{
-#'                        \item  \code{PARENT}:  parent node annotation.
-#'                        \item  \code{CHILD}:   child node annotation
-#'                        \item  \code{COUNT}:   count of edges with the given parent-child 
+#'                        \item  \code{parent}:  parent node annotation.
+#'                        \item  \code{child}:   child node annotation
+#'                        \item  \code{count}:   count of edges with the given parent-child 
 #'                                               annotation set.
-#'                        \item  \code{ITER}:    numerical index define which permutation
+#'                        \item  \code{iter}:    numerical index define which permutation
 #'                                               realization each observation corresponds 
 #'                                               to.
 #'                      }

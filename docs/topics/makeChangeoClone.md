@@ -131,7 +131,7 @@ arguments: `id`, `seq`, `germ`, `vcall`, `jcall`,
 Additional annotation columns specified in the `text_fields`, `num_fields` 
 or `seq_fields` arguments will be retained in the `data` slot of the return 
 object, but are not required. If the input data.frame `data` already contains a 
-column named `SEQUENCE`, which is not used as the `seq` argument, then that 
+column named `sequence`, which is not used as the `seq` argument, then that 
 column will not be retained.
 
 The default columns are IMGT-gapped sequence columns, but this is not a requirement. 

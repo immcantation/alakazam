@@ -69,7 +69,7 @@ NULL
 #' Additional annotation columns specified in the \code{text_fields}, \code{num_fields} 
 #' or \code{seq_fields} arguments will be retained in the \code{data} slot of the return 
 #' object, but are not required. If the input data.frame \code{data} already contains a 
-#' column named \code{SEQUENCE}, which is not used as the \code{seq} argument, then that 
+#' column named \code{sequence}, which is not used as the \code{seq} argument, then that 
 #' column will not be retained.
 #' 
 #' The default columns are IMGT-gapped sequence columns, but this is not a requirement. 
