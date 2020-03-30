@@ -96,7 +96,7 @@ and should not be repeated in this argument.
 
 add_count
 :   if `TRUE` add an additional annotation column called 
-`COLLAPSE_COUNT` during duplicate removal that indicates the 
+`collapse_count` during duplicate removal that indicates the 
 number of sequences that were collapsed.
 
 verbose

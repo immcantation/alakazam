@@ -307,7 +307,7 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #'                        retained. Where a non-informative character is one of 
 #'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
-#' @param    add_count    if \code{TRUE} add the column \code{COLLAPSE_COUNT} that 
+#' @param    add_count    if \code{TRUE} add the column \code{collpase_count} that 
 #'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
 #' @param    ignore       vector of characters to ignore when testing for equality.
@@ -346,20 +346,20 @@ padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
 #' vary across sequences, and are discarded along with their annotations when \code{dry=FALSE}. 
 #' Thus, ambiguous sequences are removed as duplicates of some sequence, but do not create a potential
 #' false-positive annotation merger. Ambiguous sequences are not included in the 
-#' \code{COLLAPSE_COUNT} annotation that is added when \code{add_count=TRUE}.
+#' \code{collapse_count} annotation that is added when \code{add_count=TRUE}.
 #' 
 #' If \code{dry=TRUE} sequences will not be removed from the input. Instead, the following columns
 #' will be appended to the input defining the collapse action that would have been performed in the
 #' \code{dry=FALSE} case.
 #' 
 #' \itemize{
-#'   \item  \code{COLLAPSE_ID}:     an identifer for the group of identical sequences.
-#'   \item  \code{COLLAPSE_CLASS}:  string defining how the sequence matches to the other in the set.
+#'   \item  \code{collapse_id}:     an identifer for the group of identical sequences.
+#'   \item  \code{collapse_class}:  string defining how the sequence matches to the other in the set.
 #'                                  one of \code{"duplicated"} (has duplicates),
 #'                                  \code{"unique"} (no duplicates), \code{"ambiguous_duplicate"} 
 #'                                  (no duplicates after ambiguous sequences are removed), 
 #'                                  or \code{"ambiguous"} (matches multiple non-duplicate sequences).
-#'   \item  \code{COLLAPSE_PASS}:   \code{TRUE} for the sequences that would be retained.
+#'   \item  \code{collapse_pass}:   \code{TRUE} for the sequences that would be retained.
 #' }
 #' 
 #' @seealso  Equality is tested with \link{seqEqual} and \link{pairwiseEqual}. 
@@ -541,7 +541,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         
         # Skip taxa if previously assigned to a cluster
         # or if ambiguous
-        # (ambiguous taxa don't get their own COLLAPSE_ID)
+        # (ambiguous taxa don't get their own collapse_id)
         if (taxa %in% done_taxa) { next }
         if (dry & taxa_i %in% ambig_rows) { next }
         
@@ -578,7 +578,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
             # Assign clusters of duplicates to duplicate list            
             dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
             if (dry) {
-                # Keep COLLAPSE_PASS==TRUE for the sequence with the
+                # Keep collpase_pass==TRUE for the sequence with the
                 # larger number of informative positions 
                 # (the first one if ties)
                 max_info_idx <- which.max(.informativeLength(data[[seq]][idx]))[1]

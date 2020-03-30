@@ -57,7 +57,7 @@ retained. Where a non-informative character is one of
 `seq` parameter which is used to determine duplicates.
 
 add_count
-:   if `TRUE` add the column `COLLAPSE_COUNT` that 
+:   if `TRUE` add the column `collpase_count` that 
 indicates the number of sequences that were collapsed to build 
 each unique entry.
 
@@ -113,20 +113,20 @@ non-equivalent. Ambiguous sequences arise due to ambiguous characters at positio
 vary across sequences, and are discarded along with their annotations when `dry=FALSE`. 
 Thus, ambiguous sequences are removed as duplicates of some sequence, but do not create a potential
 false-positive annotation merger. Ambiguous sequences are not included in the 
-`COLLAPSE_COUNT` annotation that is added when `add_count=TRUE`.
+`collapse_count` annotation that is added when `add_count=TRUE`.
 
 If `dry=TRUE` sequences will not be removed from the input. Instead, the following columns
 will be appended to the input defining the collapse action that would have been performed in the
 `dry=FALSE` case.
 
 
-+ `COLLAPSE_ID`:     an identifer for the group of identical sequences.
-+ `COLLAPSE_CLASS`:  string defining how the sequence matches to the other in the set.
++ `collapse_id`:     an identifer for the group of identical sequences.
++ `collapse_class`:  string defining how the sequence matches to the other in the set.
 one of `"duplicated"` (has duplicates),
 `"unique"` (no duplicates), `"ambiguous_duplicate"` 
 (no duplicates after ambiguous sequences are removed), 
 or `"ambiguous"` (matches multiple non-duplicate sequences).
-+ `COLLAPSE_PASS`:   `TRUE` for the sequences that would be retained.
++ `collapse_pass`:   `TRUE` for the sequences that would be retained.
 
 
 
