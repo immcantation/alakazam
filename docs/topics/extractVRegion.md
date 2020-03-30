@@ -11,7 +11,7 @@ IMGT numbering scheme.
 Usage
 --------------------
 ```
-extractVRegion(sequences, region = c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3"))
+extractVRegion(sequences, region = c("fwr1", "cdr1", "fwr2", "cdr2", "fwr3"))
 ```
 
 Arguments
@@ -23,7 +23,7 @@ sequences
 region
 :   string defining the region(s) of the V segment to extract. 
 May be a single region or multiple regions (as a vector) from
-`c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")`.  By default, all
+`c("fwr1", "cdr1", "fwr2", "cdr2" ,"fwr3")`.  By default, all
 regions will be returned.
 
 
@@ -64,7 +64,7 @@ extractVRegion(clone$sequence_alignment)
 
 
 ```
-      FWR1                                                                            
+      fwr1                                                                            
  [1,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
  [2,] "GAAGTGCAACTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
  [3,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
@@ -85,7 +85,7 @@ extractVRegion(clone$sequence_alignment)
 [18,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
 [19,] "GAAGTGCAACTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
 [20,] "GAGGTGCAGCTGGTGGTATCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
-      CDR1                                  
+      cdr1                                  
  [1,] "GGATTCACCTTT............GGTGATTATGCT"
  [2,] "GGATTCACCTTT............GCTGATTATGCT"
  [3,] "GGATTCACCTTT............GGTGATTATGCT"
@@ -106,7 +106,7 @@ extractVRegion(clone$sequence_alignment)
 [18,] "GGATTCACCTTT............GGTGATTATGCT"
 [19,] "GGATTCACCTTT............GCTGATTATGCT"
 [20,] "GGATTCACCTTT............GGTGATTATGCT"
-      FWR2                                                 
+      fwr2                                                 
  [1,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
  [2,] "ATGACTTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
  [3,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
@@ -127,7 +127,7 @@ extractVRegion(clone$sequence_alignment)
 [18,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
 [19,] "ATGACTTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
 [20,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTC"
-      CDR2                            
+      cdr2                            
  [1,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
  [2,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
  [3,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
@@ -148,7 +148,7 @@ extractVRegion(clone$sequence_alignment)
 [18,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
 [19,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
 [20,] "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
-      FWR3                                                                                                                   
+      fwr3                                                                                                                   
  [1,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGT"
  [2,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAGCATCGCCTATCTGCAATTGAACAGCCTGGAAACCGACGACACAGGCGTCTATTACTGT"
  [3,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGT"
@@ -176,7 +176,7 @@ extractVRegion(clone$sequence_alignment)
 ```R
 
 # Get single region
-extractVRegion(clone$sequence_alignment, "FWR1")
+extractVRegion(clone$sequence_alignment, "fwr1")
 
 ```
 
@@ -209,13 +209,13 @@ extractVRegion(clone$sequence_alignment, "FWR1")
 ```R
 
 # Get all CDRs
-extractVRegion(clone$sequence_alignment, c("CDR1", "CDR2"))
+extractVRegion(clone$sequence_alignment, c("cdr1", "cdr2"))
 
 ```
 
 
 ```
-      CDR1                                   CDR2                            
+      cdr1                                   cdr2                            
  [1,] "GGATTCACCTTT............GGTGATTATGCT" "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
  [2,] "GGATTCACCTTT............GCTGATTATGCT" "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
  [3,] "GGATTCACCTTT............GGTGATTATGCT" "ATTAGAAGCAAAACTTTTGGTGGGACAGCA"
@@ -243,12 +243,12 @@ extractVRegion(clone$sequence_alignment, c("CDR1", "CDR2"))
 ```R
 
 # Get all FWRs
-extractVRegion(clone$sequence_alignment, c("FWR1", "FWR2", "FWR3"))
+extractVRegion(clone$sequence_alignment, c("fwr1", "fwr2", "fwr3"))
 ```
 
 
 ```
-      FWR1                                                                            
+      fwr1                                                                            
  [1,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
  [2,] "GAAGTGCAACTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
  [3,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
@@ -269,7 +269,7 @@ extractVRegion(clone$sequence_alignment, c("FWR1", "FWR2", "FWR3"))
 [18,] "GAGGTGCAGCTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
 [19,] "GAAGTGCAACTGGTGGTCTCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
 [20,] "GAGGTGCAGCTGGTGGTATCTGGGGGA...GGCTTGGTACAGCCAGGGCGGTCCCTAAGACTCTCCTGTACAGTTTCT"
-      FWR2                                                 
+      fwr2                                                 
  [1,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
  [2,] "ATGACTTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
  [3,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
@@ -290,7 +290,7 @@ extractVRegion(clone$sequence_alignment, c("FWR1", "FWR2", "FWR3"))
 [18,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
 [19,] "ATGACTTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTCGGGTTC"
 [20,] "ATGACCTGGATCCGCCAGGCTCCTGGGAAGGGGCTGGAGTGGGTAGGTTTC"
-      FWR3                                                                                                                   
+      fwr3                                                                                                                   
  [1,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGT"
  [2,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAGCATCGCCTATCTGCAATTGAACAGCCTGGAAACCGACGACACAGGCGTCTATTACTGT"
  [3,] "GATTACGCCGCGTTTGTGAGA...GGCAGATTCACCATCTCAAGAGATGATTCCAAAAACATCGCCTATCTGCAATTGAACAGCCTGAAAACCGAGGACACAGGCGTCTATTACTGT"

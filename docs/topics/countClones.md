@@ -39,7 +39,11 @@ Value
 
 A data.frame summarizing clone counts and frequencies with columns:
 
-+  `CLONE`:    	 clone identifier.
++  `clone_id`:    clone identifier. This is the default column
+name, specified with `clone='clone_id'`.
+If the function call uses Change-O 
+formatted data and `clone='CLONE'`, this
+column will have name `CLONE`.
 +  `seq_count`:   total number of sequences for the clone.
 +  `seq_freq`:    frequency of the clone as a fraction of the total
 number of sequences within each group.
