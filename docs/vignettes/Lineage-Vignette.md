@@ -20,7 +20,7 @@ in the AIRR file:
 * `junction_length`
 * `clone_id`
 
-For details about the AIRR format, visit the AIRR Community documentation site \url{https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields}
+For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
 
 
 ```r

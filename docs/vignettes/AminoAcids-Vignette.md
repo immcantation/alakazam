@@ -28,7 +28,7 @@ data(ExampleDb)
 db <- ExampleDb[ExampleDb$sample_id == "+7d", ]
 ```
 
-For details about the AIRR format, visit the AIRR Community documentation site \url{https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields}
+For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
 
 ## Calculate the properties of amino acid sequences
 
