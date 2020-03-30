@@ -210,7 +210,11 @@ inferCompleteAbundance <- function(x) {
 #' 
 #' @return   A data.frame summarizing clone counts and frequencies with columns:
 #'           \itemize{
-#'             \item \code{CLONE}:    	 clone identifier.
+#'             \item \code{clone_id}:    clone identifier. This is the default column
+#'                                       name, specified with \code{clone='clone_id'}.
+#'                                       If the function call uses Change-O 
+#'                                       formatted data and \code{clone='CLONE'}, this
+#'                                       column will have name \code{CLONE}.
 #'             \item \code{seq_count}:   total number of sequences for the clone.
 #'             \item \code{seq_freq}:    frequency of the clone as a fraction of the total
 #'                                       number of sequences within each group.

@@ -273,7 +273,7 @@ ABBREV_AA <- c("A"="Ala",
 #' determining regions (CDRs) for IMGT-gapped immunoglobulin (Ig) nucleotide sequences 
 #' according to the IMGT numbering scheme.
 #' 
-#' @format  A list with regions named one of \code{c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")} 
+#' @format  A list with regions named one of \code{c("fwr1", "cdr1", "fwr2", "cdr2", "fwr3")} 
 #'          with values containing a numeric vector of length two defining the 
 #'          \code{c(start, end)} positions of the named region.
 #'          
@@ -281,8 +281,8 @@ ABBREV_AA <- c("A"="Ala",
 #'   \url{http://imgt.org}
 #' 
 #' @export
-IMGT_REGIONS <- list("FWR1"=c(1, 78),
-                     "CDR1"=c(79, 114),
-                     "FWR2"=c(115, 165),
-                     "CDR2"=c(166, 195),
-                     "FWR3"=c(196, 312))
+IMGT_REGIONS <- list("fwr1"=c(1, 78),
+                     "cdr1"=c(79, 114),
+                     "fwr2"=c(115, 165),
+                     "cdr2"=c(166, 195),
+                     "fwr3"=c(196, 312))

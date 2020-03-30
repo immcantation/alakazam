@@ -87,20 +87,17 @@ test_that("seqDist: long IMGT-gapped sequences", {
     germ_n <- gsub(".", "N", germ, fixed=TRUE)
     
     # Region ranges
-    regions <- list("SEQ"=c(1, 312),
-                    "FWR1"=c(79, 114),
-                    "CDR1"=c(115, 165),
-                    "FWR2"=c(115, 165),
-                    "CDR2"=c(166, 195),
-                    "FWR3"=c(196, 312))
+    regions <- c(list("SEQ"=c(1, 312)),
+                     IMGT_REGIONS)
+    
     
     # Expected mutations
     expected <- list("SEQ"=c(13, 19, 19, 55),
-                     "FWR1"=c(2, 6, 6, 4),
-                     "CDR1"=c(1, 5, 5, 3),
-                     "FWR2"=c(2, 1, 1, 3),
-                     "CDR2"=c(3, 3, 3, 6),
-                     "FWR3"=c(5, 4, 4, 39))
+                     "fwr1"=c(2, 6, 6, 4),
+                     "cdr1"=c(1, 5, 5, 3),
+                     "fwr2"=c(2, 1, 1, 3),
+                     "cdr2"=c(3, 3, 3, 6),
+                     "fwr3"=c(5, 4, 4, 39))
     
     # Test full V region sequence
     #cat("Full V-region (", paste(regions[["SEQ"]], collapse=":"), ") distance:\n", sep="")
@@ -118,7 +115,7 @@ test_that("seqDist: long IMGT-gapped sequences", {
     expect_equal(d, expected[["SEQ"]], info="Full V-region with Ns")
     
     # Test by region
-    for (n in c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")) {
+    for (n in c("fwr1", "cdr1", "fwr2", "cdr2", "fwr3")) {
         #cat(n, " (", paste(regions[[n]], collapse=":"), ") distance:\n", sep="")
         
         # Define substrings
@@ -428,14 +425,14 @@ test_that("extractVRegion", {
     obs <- extractVRegion(clone$SEQUENCE_IMGT)
     expect_equal(dim(unique(obs)), c(7, 5))
     expect_equal(colnames(obs),
-                 c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3"))
+                 c("fwr1", "cdr1", "fwr2", "cdr2", "fwr3"))
     
     fwr1 <- c(
         "GAGGTGCAGCTGGTGGAGTCTGG.GGA...GGCTTGGTACAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCT",
         "GAGGTGCAGCTGGTGGAGTCTGG.GGA...GGCTTGGTACAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCT",
         "GAGGTGCAGCTGGTGGAGTCTGG.GGA...GGCTTGGTACAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCT"                     
     )
-    expect_equal(obs[1:3,"FWR1"], fwr1)
+    expect_equal(obs[1:3,"fwr1"], fwr1)
     
     cdr1 <- c(
         "GGATTCACCTTC............AGTAGTTATGAA",
@@ -443,14 +440,14 @@ test_that("extractVRegion", {
         "GGATTCACCTTC............AGTAGTTATGAA",
         "GGATTCACCTTC............AGTAGTTATGAA"
     )
-    expect_equal(obs[4:7,"CDR1"], cdr1)
+    expect_equal(obs[4:7,"cdr1"], cdr1)
     
     fwr2 <- c(
         "ATGAACTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATAC",
         "ATGAACTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATAC",
         "ATGAACTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATAC"
     )
-    expect_equal(obs[8:10,"FWR2"], fwr2)
+    expect_equal(obs[8:10,"fwr2"], fwr2)
     
     cdr2 <- c(
         "ATTAGTAGTAGT......GGTAGTACCATA",
@@ -458,27 +455,27 @@ test_that("extractVRegion", {
         "ATTAGTAGTAGT......GGTAGTACCATA",
         "ATTAGTAGTAGT......GGTAGTACCATA"
     )
-    expect_equal(obs[11:14,"CDR2"], cdr2)
+    expect_equal(obs[11:14,"cdr2"], cdr2)
     
     fwr3 <- c(
         "TACTACGCAGACTCTGTGAAG...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCTGTTTATTACTGT",
         "TACTACGCAGACTCTGTGAAG...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCTGTTTATTACTGT",
         "TACTACGCAGACTCTGTGAAG...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCTGTTTATTACTGT"
     )
-    expect_equal(obs[15:17,"FWR3"], fwr3)
+    expect_equal(obs[15:17,"fwr3"], fwr3)
     
     # Get single region
-    obs <- extractVRegion(clone$SEQUENCE_IMGT[1:3], "FWR1")
+    obs <- extractVRegion(clone$SEQUENCE_IMGT[1:3], "fwr1")
     expect_equal(obs[1:3], fwr1)
     
     # Get all CDRs
-    obs <- extractVRegion(clone$SEQUENCE_IMGT, c("CDR1", "CDR2"))
-    expect_equal(obs[1:4,"CDR1"],cdr1)
-    expect_equal(obs[11:14,"CDR2"],cdr2)
+    obs <- extractVRegion(clone$SEQUENCE_IMGT, c("cdr1", "cdr2"))
+    expect_equal(obs[1:4,"cdr1"],cdr1)
+    expect_equal(obs[11:14,"cdr2"],cdr2)
     
     # Get all FWRs
-    obs <- extractVRegion(clone$SEQUENCE_IMGT, c("FWR1", "FWR2", "FWR3"))
-    expect_equal(obs[1:3,"FWR1"],fwr1)
-    expect_equal(obs[8:10,"FWR2"],fwr2)
-    expect_equal(obs[15:17,"FWR3"],fwr3)
+    obs <- extractVRegion(clone$SEQUENCE_IMGT, c("fwr1", "fwr2", "fwr3"))
+    expect_equal(obs[1:3,"fwr1"],fwr1)
+    expect_equal(obs[8:10,"fwr2"],fwr2)
+    expect_equal(obs[15:17,"fwr3"],fwr3)
 })

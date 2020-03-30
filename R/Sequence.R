@@ -673,7 +673,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
 #' @param     sequences  character vector of IMGT-gapped nucleotide sequences.
 #' @param     region     string defining the region(s) of the V segment to extract. 
 #'                       May be a single region or multiple regions (as a vector) from
-#'                       \code{c("FWR1", "CDR1", "FWR2", "CDR2" ,"FWR3")}.  By default, all
+#'                       \code{c("fwr1", "cdr1", "fwr2", "cdr2" ,"fwr3")}.  By default, all
 #'                       regions will be returned.
 #'                       
 #' @return    If only one region is specified in the \code{region} argument, a character 
@@ -699,16 +699,16 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
 #' extractVRegion(clone$sequence_alignment)
 #' 
 #' # Get single region
-#' extractVRegion(clone$sequence_alignment, "FWR1")
+#' extractVRegion(clone$sequence_alignment, "fwr1")
 #' 
 #' # Get all CDRs
-#' extractVRegion(clone$sequence_alignment, c("CDR1", "CDR2"))
+#' extractVRegion(clone$sequence_alignment, c("cdr1", "cdr2"))
 #' 
 #' # Get all FWRs
-#' extractVRegion(clone$sequence_alignment, c("FWR1", "FWR2", "FWR3"))
+#' extractVRegion(clone$sequence_alignment, c("fwr1", "fwr2", "fwr3"))
 #'
 #' @export
-extractVRegion <- function(sequences, region=c("FWR1", "CDR1", "FWR2", "CDR2", "FWR3")) {
+extractVRegion <- function(sequences, region=c("fwr1", "cdr1", "fwr2", "cdr2", "fwr3")) {
     # Check region argument
     region <- match.arg(region, several.ok=TRUE)
     
