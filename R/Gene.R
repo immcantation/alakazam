@@ -33,18 +33,18 @@
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
 #'           \itemize{
-#'             \item \code{GENE}:         name of the family, gene or allele
-#'             \item \code{SEQ_COUNT}:    total number of sequences for the gene.
-#'             \item \code{SEQ_FREQ}:     frequency of the gene as a fraction of the total
+#'             \item \code{gene}:         name of the family, gene or allele
+#'             \item \code{seq_count}:    total number of sequences for the gene.
+#'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
-#'             \item \code{COPY_COUNT}:   sum of the copy counts in the \code{copy} column.
+#'             \item \code{copy_count}:   sum of the copy counts in the \code{copy} column.
 #'                                        for each gene. Only present if the \code{copy} 
 #'                                        argument is specified.
-#'             \item \code{COPY_FREQ}:    frequency of the gene as a fraction of the total
+#'             \item \code{copy_freq}:    frequency of the gene as a fraction of the total
 #'                                        copy number within each group. Only present if 
 #'                                        the \code{copy} argument is specified.
-#'             \item \code{CLONE_COUNT}:  total number of clones for the gene.
-#'             \item \code{CLONE_FREQ}:   frequency of the gene as a fraction of the total
+#'             \item \code{clone_count}:  total number of clones for the gene.
+#'             \item \code{clone_freq}:   frequency of the gene as a fraction of the total
 #'                                        number of clones within each grouping.
 #'           }
 #'           Additional columns defined by the \code{groups} argument will also be present.
@@ -95,22 +95,22 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Tabulate sequence abundance
         gene_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(SEQ_COUNT=n()) %>%
-            mutate(., SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("SEQ_COUNT")))
+            dplyr::summarize(seq_count=n()) %>%
+            mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("seq_count")))
     } else if (!is.null(clone) & is.null(copy)) {
         # Find count of genes within each clone and keep first with maximum count
         gene_tab <- data %>%
             group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
-            dplyr::mutate(CLONE_GENE_COUNT=n()) %>%
+            dplyr::mutate(clone_gene_count=n()) %>%
             ungroup() %>%
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            slice(which.max(!!rlang::sym("CLONE_GENE_COUNT"))) %>%
+            slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
             ungroup() %>%
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(CLONE_COUNT=n()) %>%
-            mutate(CLONE_FREQ=!!rlang::sym("CLONE_COUNT")/sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
-            arrange(!!rlang::sym("CLONE_COUNT"))
+            dplyr::summarize(clone_count=n()) %>%
+            mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+            arrange(!!rlang::sym("clone_count"))
     } else {
         if (!is.null(clone) & !is.null(copy)) {
             warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
@@ -119,23 +119,23 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         # Tabulate copy abundance
         gene_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, gene))) %>%
-            summarize(SEQ_COUNT=length(!!rlang::sym(gene)),
-                       COPY_COUNT=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
-            mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
-                    COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("COPY_COUNT")))
+            summarize(seq_count=length(!!rlang::sym(gene)),
+                       copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
+            mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                   copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+            arrange(desc(!!rlang::sym("copy_count")))
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
     if (fill) {
         gene_tab <- gene_tab %>%
             ungroup() %>%
-            tidyr::complete_(as.list(c(groups, gene))) %>%
+            tidyr::complete(!!!rlang::syms(as.list(c(groups, gene)))) %>%
             replace(is.na(.), 0)
     }
 
     # Rename gene column
-    gene_tab <- rename(gene_tab, "GENE"=gene)
+    gene_tab <- rename(gene_tab, "gene"=gene)
     
     return(gene_tab)
 }
@@ -438,11 +438,11 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'                                   overlapping gene calls.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
-#'           in a new \code{VJ_GROUP} column. 
+#'           in a new \code{vj_group} column. 
 #'           
-#'           Note that if \code{junc_len} is supplied, the grouping this \code{VJ_GROUP} 
+#'           Note that if \code{junc_len} is supplied, the grouping this \code{vj_group} 
 #'           will have been based on V, J, and L simultaneously despite the column name 
-#'           being \code{VJ_GROUP}.
+#'           being \code{vj_group}.
 #'           
 #'           Note that the output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
 #'           columns will be converted to \code{character} if they were \code{factor} in the 
@@ -1059,16 +1059,16 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     stopifnot( n_cells_or_seqs == length(unique(unlist(cellIdx_byGroup_lst, use.names=FALSE))) )
     
     # assign
-    data$VJ_GROUP <- NA
+    data$vj_group <- NA
     for (i in 1:length(cellIdx_byGroup_lst)) {
-        data[["VJ_GROUP"]][cellIdx_byGroup_lst[[i]]] <- names(VJL_groups)[i]
+        data[["vj_group"]][cellIdx_byGroup_lst[[i]]] <- names(VJL_groups)[i]
     }
-    stopifnot(!any(is.na(data[["VJ_GROUP"]])))
+    stopifnot(!any(is.na(data[["vj_group"]])))
     
     if (!single_cell) {
         return(data)
     } else {
-        data_orig$VJ_GROUP <- NA
+        data_orig$vj_group <- NA
         
         # map back to data_orig
         for (i_cell in 1:nrow(data)) {
@@ -1078,12 +1078,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             # sanity check
             stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
             # grouping
-            data_orig$VJ_GROUP[c(i_orig_h, i_orig_l)] <- data$VJ_GROUP[i_cell]
+            data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
         }
         
-        # remove rows with $VJ_GROUP values of NA
+        # remove rows with $vj_group values of NA
         # these had already been removed by the NA check for `data`
-        data_orig <- data_orig[!is.na(data_orig$VJ_GROUP), ]
+        data_orig <- data_orig[!is.na(data_orig$vj_group), ]
         
         return(data_orig)
     }

@@ -20,12 +20,12 @@ setClassUnion("CharNULL", members=c("character", "NULL"))
 #' @slot  abundance  data.frame with relative clonal abundance data and confidence intervals,
 #'                   containing the following columns:
 #'                   \itemize{
-#'                     \item  \code{GROUP}:  group identifier.
-#'                     \item  \code{CLONE}:  clone identifier.
-#'                     \item  \code{P}:      relative abundance of the clone.
-#'                     \item  \code{LOWER}:  lower confidence inverval bound.
-#'                     \item  \code{UPPER}:  upper confidence interval bound.
-#'                     \item  \code{RANK}:   the rank of the clone abundance.
+#'                     \item  \code{group}:  group identifier.
+#'                     \item  \code{clone_id} or \code{CLONE}:  clone identifier. 
+#'                     \item  \code{p}:      relative abundance of the clone.
+#'                     \item  \code{lower}:  lower confidence inverval bound.
+#'                     \item  \code{upper}:  upper confidence interval bound.
+#'                     \item  \code{rank}:   the rank of the clone abundance.
 #'                   }
 #' @slot  bootstrap  data.frame of bootstrapped clonal distributions. 
 #' @slot  clone_by   string specifying the name of the clone column. 
@@ -57,27 +57,27 @@ setClass("AbundanceCurve",
 #' 
 #' @slot  diversity  data.frame defining the diversity curve with the following columns:
 #'                   \itemize{
-#'                     \item  \code{GROUP}:    group label.
-#'                     \item  \code{Q}:        diversity order.
-#'                     \item  \code{D}:        mean diversity index over all bootstrap 
+#'                     \item  \code{group}:    group label.
+#'                     \item  \code{q}:        diversity order.
+#'                     \item  \code{d}:        mean diversity index over all bootstrap 
 #'                                             realizations.
-#'                     \item  \code{D_SD}:     standard deviation of the diversity index 
+#'                     \item  \code{d_sd}:     standard deviation of the diversity index 
 #'                                             over all bootstrap realizations.
-#'                     \item  \code{D_LOWER}:  diversity lower confidence inverval bound.
-#'                     \item  \code{D_UPPER}:  diversity upper confidence interval bound.
-#'                     \item  \code{E}:        evenness index calculated as \code{D} 
+#'                     \item  \code{d_lower}:  diversity lower confidence inverval bound.
+#'                     \item  \code{d_upper}:  diversity upper confidence interval bound.
+#'                     \item  \code{e}:        evenness index calculated as \code{D} 
 #'                                             divided by \code{D} at \code{Q=0}.
-#'                     \item  \code{E_LOWER}:  evenness lower confidence inverval bound.
-#'                     \item  \code{E_UPPER}:  eveness upper confidence interval bound.
+#'                     \item  \code{e_lower}:  evenness lower confidence inverval bound.
+#'                     \item  \code{e_upper}:  eveness upper confidence interval bound.
 #'                   }
 #' @slot  tests    data.frame describing the significance test results with columns:
 #'                 \itemize{
-#'                   \item  \code{TEST}:        string listing the two groups tested.
-#'                   \item  \code{DELTA_MEAN}:  mean of the \eqn{D} bootstrap delta 
+#'                   \item  \code{test}:        string listing the two groups tested.
+#'                   \item  \code{delta_mean}:  mean of the \eqn{D} bootstrap delta 
 #'                                              distribution for the test.
-#'                   \item  \code{DELTA_SD}:    standard deviation of the \eqn{D} 
+#'                   \item  \code{delta_sd}:    standard deviation of the \eqn{D} 
 #'                                              bootstrap delta distribution for the test.
-#'                   \item  \code{PVALUE}:      p-value for the test.
+#'                   \item  \code{pvalue}:      p-value for the test.
 #'                 }
 #' @slot  group_by   string specifying the name of the grouping column in diversity calculation.
 #' @slot  groups     vector specifying the names of unique groups in group column in diversity calculation.

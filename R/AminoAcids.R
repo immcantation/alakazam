@@ -110,7 +110,7 @@ polar <- function(seq, polarity=NULL) {
 
 #' Calculates the hydrophobicity of amino acid sequences
 #'
-#' \code{gravy} calculates the Grand Average of Hydrophobicity (GRAVY) index 
+#' \code{gravy} calculates the Grand Average of Hydrophobicity (gravy) index 
 #' of amino acid sequences using the method of Kyte & Doolittle. Non-informative
 #' positions are excluded, where non-informative is defined as any character in 
 #' \code{c("X", "-", ".", "*")}.
@@ -121,7 +121,7 @@ polar <- function(seq, polarity=NULL) {
 #'                       character codes. If \code{NULL}, then the Kyte & Doolittle
 #'                       scale is used.
 #' 
-#' @return   A vector of GRAVY scores for the sequence(s).
+#' @return   A vector of gravy scores for the sequence(s).
 #' 
 #' @references
 #' \enumerate{
@@ -156,7 +156,7 @@ gravy <- function(seq, hydropathy=NULL) {
     seq <- gsub("[X\\.\\*-]", "", as.character(seq))
     # Create character vector from string
     aa <- strsplit(seq, "")
-    # Calculate GRAVY
+    # Calculate gravy
     aa_gravy <- sapply(aa, function(x) sum(hydropathy[x]) / length(x))
     
     return(aa_gravy)
@@ -353,11 +353,11 @@ countOccurrences <- function(x, pattern) {
 #'          "TGTCAGCAATATTATATTGCTCCCTTCACTTTC",
 #'          "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
 #' patterns <- c("A", "V", "[LI]")
-#' names(patterns) <- c("ARG", "VAL", "ISO_LEU")
-#' countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="CDR3")
+#' names(patterns) <- c("arg", "val", "iso_leu")
+#' countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
 #'             
 #' @export
-countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
+countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="region") {
     # Translate sequences if nucleotide
     region_aa <- if (nt) { translateDNA(seq, trim=trim) } else { seq }
     
@@ -405,17 +405,17 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' 
 #' @return  A modified \code{data} data.frame with the following columns:
 #'          \itemize{
-#'            \item  \code{*_AA_LENGTH}:     number of amino acids.
-#'            \item  \code{*_AA_GRAVY}:      grand average of hydrophobicity (GRAVY) index.
-#'            \item  \code{*_AA_BULK}:       average bulkiness of amino acids.
-#'            \item  \code{*_AA_ALIPHATIC}:  aliphatic index.
-#'            \item  \code{*_AA_POLARITY}:   average polarity of amino acids.
-#'            \item  \code{*_AA_CHARGE}:     net charge.
-#'            \item  \code{*_AA_BASIC}:      fraction of informative positions that are 
+#'            \item  \code{*_aa_length}:     number of amino acids.
+#'            \item  \code{*_aa_gravy}:      grand average of hydrophobicity (gravy) index.
+#'            \item  \code{*_aa_bulk}:       average bulkiness of amino acids.
+#'            \item  \code{*_aa_aliphatic}:  aliphatic index.
+#'            \item  \code{*_aa_polarity}:   average polarity of amino acids.
+#'            \item  \code{*_aa_charge}:     net charge.
+#'            \item  \code{*_aa_basic}:      fraction of informative positions that are 
 #'                                           Arg, His or Lys.
-#'            \item  \code{*_AA_ACIDIC}:     fraction of informative positions that are 
+#'            \item  \code{*_aa_acidic}:     fraction of informative positions that are 
 #'                                           Asp or Glu.
-#'            \item  \code{*_AA_AROMATIC}:   fraction of informative positions that are 
+#'            \item  \code{*_aa_aromatic}:   fraction of informative positions that are 
 #'                                           His, Phe, Trp or Tyr.
 #'            
 #'          }
@@ -427,7 +427,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' For all properties except for length, non-informative positions are excluded, 
 #' where non-informative is defined as any character in \code{c("X", "-", ".", "*")}.
 #' 
-#' The scores for GRAVY, bulkiness and polarity are calculated as simple averages of the 
+#' The scores for gravy, bulkiness and polarity are calculated as simple averages of the 
 #' scores for each informative positions. The basic, acid and aromatic indices are 
 #' calculated as the fraction of informative positions falling into the given category.
 #' 
@@ -494,7 +494,7 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="REGION") {
 #' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate properties
 #' aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", nt=TRUE, 
-#'                     trim=TRUE, label="CDR3", bulkiness=x, pH=7.0)
+#'                     trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 #'
 #' @export
 aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
@@ -506,15 +506,15 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     
     # Define the data.frame that will be returned with amino acid properties
     prop_colnames <- list(
-        "length"    = "AA_LENGTH",
-        "gravy"     = "AA_GRAVY",
-        "bulk"      = "AA_BULK",
-        "aliphatic" = "AA_ALIPHATIC",
-        "polarity"  = "AA_POLARITY",
-        "charge"    = "AA_CHARGE",
-        "basic"     = "AA_BASIC",
-        "acidic"    = "AA_ACIDIC",
-        "aromatic"  = "AA_AROMATIC"
+        "length"    = "aa_length",
+        "gravy"     = "aa_gravy",
+        "bulk"      = "aa_bulk",
+        "aliphatic" = "aa_aliphatic",
+        "polarity"  = "aa_polarity",
+        "charge"    = "aa_charge",
+        "basic"     = "aa_basic",
+        "acidic"    = "aa_acidic",
+        "aromatic"  = "aa_aromatic"
     )
     # If no label, use sequence column name
     if (is.null(label)) { label <- seq }

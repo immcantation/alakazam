@@ -333,19 +333,19 @@ test_that("collapseDuplicates", {
     expect_equivalent(obs, exp[2:1,])
     
     obs_dry <- collapseDuplicates(db[-5,], verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
-    expect_equal(obs_dry$COLLAPSE_CLASS, c("duplicated", "duplicated", "ambiguous_duplicate", "ambiguous"))
+    expect_equal(obs_dry$collapse_class, c("duplicated", "duplicated", "ambiguous_duplicate", "ambiguous"))
     
-    expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
+    expect_equal(sort(obs_dry[obs_dry$collapse_pass,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
     
     ## Try messing up order
     ## C comes first
     obs_dry <- collapseDuplicates(db, verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
-    expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
+    expect_equal(sort(obs_dry[obs_dry$collapse_pass,"SEQUENCE_ID"]), 
                  sort(obs$SEQUENCE_ID))
     ## E comes first
     obs_dry <- collapseDuplicates(db[nrow(db):1,], verbose=F, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
-    expect_equal(sort(obs_dry[obs_dry$COLLAPSE_PASS,"SEQUENCE_ID"]), 
+    expect_equal(sort(obs_dry[obs_dry$collapse_pass,"SEQUENCE_ID"]), 
                  c("A","E"))
     
     # Unique text_fields annotations are combined into a single string with ","
@@ -368,7 +368,7 @@ test_that("collapseDuplicates", {
     obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
                        add_count=TRUE, verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     exp$TYPE <- c("IgG","IgG,IgM")
-    exp$COLLAPSE_COUNT <- c(1,2)
+    exp$collapse_count <- c(1,2)
     expect_equal(obs, exp)
     
     # Masking ragged ends may impact duplicate removal
@@ -381,7 +381,7 @@ test_that("collapseDuplicates", {
         "TYPE" = "IgA,IgG,IgM",
         "SAMPLE" = "S1,S2",
         "COUNT" = 10,
-        "COLLAPSE_COUNT" = 4,
+        "collapse_count" = 4,
         stringsAsFactors = F
     ) 
     expect_equal(obs, exp)
@@ -415,7 +415,7 @@ test_that("collapseDuplicates", {
     col <- collapseDuplicates(test, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(col$SEQUENCE_ID, expect)
     col_dry <- collapseDuplicates(test, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
-    expect_equal(col_dry$SEQUENCE_ID[col_dry$COLLAPSE_PASS], expect)
+    expect_equal(col_dry$SEQUENCE_ID[col_dry$collapse_pass], expect)
     
 })
 

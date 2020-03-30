@@ -69,24 +69,24 @@ gene <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="gene")
 head(gene, n=4)
 ```
 
-In the resultant `data.frame`, the `SEQ_COUNT` column is the number of raw sequences within each `sample_id` 
-group for the given `GENE`. `SEQ_FREQ` is the frequency of each `GENE` within the given `sample_id`.
+In the resultant `data.frame`, the `seq_count` column is the number of raw sequences within each `sample_id` 
+group for the given `gene`. `seq_freq` is the frequency of each `gene` within the given `sample_id`.
 
-Below we plot only the IGHV1 abundance by filtering on the `GENE` column to only rows 
+Below we plot only the IGHV1 abundance by filtering on the `gene` column to only rows 
 containing IGHV1 family genes. We extract the family portion of the gene name using the 
 `getFamily` function. Also, we take advantage of the `sortGenes` function to convert the 
-`GENE` column to a factor with gene name lexicographically ordered in the factor levels 
+`gene` column to a factor with gene name lexicographically ordered in the factor levels 
 (`method="name"`) for axis ordering using the `ggplot2` package. Alternatively, we could have 
 ordered the genes by genomic position by passing `method="position"` to `sortGenes`.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Assign sorted levels and subset to IGHV1
 ighv1 <- gene %>%
-    mutate(GENE=factor(GENE, levels=sortGenes(unique(GENE), method="name"))) %>%
-    filter(getFamily(GENE) == "IGHV1")
+    mutate(gene=factor(gene, levels=sortGenes(unique(gene), method="name"))) %>%
+    filter(getFamily(gene) == "IGHV1")
 
 # Plot V gene usage in the IGHV1 family by sample
-g1 <- ggplot(ighv1, aes(x=GENE, y=SEQ_FREQ)) +
+g1 <- ggplot(ighv1, aes(x=gene, y=seq_freq)) +
     theme_bw() +
     ggtitle("IGHV1 Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -106,7 +106,7 @@ family level (`mode="family"`):
 family <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="family")
 
 # Plot V family usage by sample
-g2 <- ggplot(family, aes(x=GENE, y=SEQ_FREQ)) +
+g2 <- ggplot(family, aes(x=gene, y=seq_freq)) +
     theme_bw() +
     ggtitle("Family Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -139,14 +139,14 @@ head(family, n=4)
 ```
 
 The output `data.frame` contains the additional grouping column (`c_call`) along with the 
-`CLONE_COUNT` and `CLONE_FREQ` columns that represent the count of clones for each V family 
+`clone_count` and `clone_freq` columns that represent the count of clones for each V family 
 and the frequencies within the given `sample_id` and `c_call` pair, respectively.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family clonal usage by sample and isotype
-g3 <- ggplot(family, aes(x=GENE, y=CLONE_FREQ)) +
+g3 <- ggplot(family, aes(x=gene, y=clone_freq)) +
     theme_bw() +
     ggtitle("Clonal Usage") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +
@@ -172,15 +172,15 @@ family <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"),
 head(family, n=4)
 ```
 
-The output `data.frame` includes the `SEQ_COUNT` and `SEQ_FREQ` columns as previously defined, 
-as well as the additional copy number columns `COPY_COUNT` and `COPY_FREQ` reflected the summed 
-copy number (`duplicate_count`) for each sequence within the given `GENE`, `sample_id` and `c_call`.
+The output `data.frame` includes the `seq_count` and `seq_freq` columns as previously defined, 
+as well as the additional copy number columns `copy_count` and `copy_freq` reflected the summed 
+copy number (`duplicate_count`) for each sequence within the given `gene`, `sample_id` and `c_call`.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family copy abundance by sample and isotype
-g4 <- ggplot(family, aes(x=GENE, y=COPY_FREQ)) +
+g4 <- ggplot(family, aes(x=gene, y=copy_freq)) +
     theme_bw() +
     ggtitle("Copy Number") +
     theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1)) +

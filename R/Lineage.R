@@ -148,12 +148,12 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Define return object
     tmp_names <- names(tmp_df)
-    if ("SEQUENCE" %in% tmp_names & seq != "SEQUENCE") {
-        tmp_df <- tmp_df[, tmp_names != "SEQUENCE"]
+    if ("sequence" %in% tmp_names & seq != "sequence") {
+        tmp_df <- tmp_df[, tmp_names != "sequence"]
         tmp_names <- names(tmp_df)
     }
-    names(tmp_df)[tmp_names == seq] <- "SEQUENCE"
-    names(tmp_df)[tmp_names == id] <- "SEQUENCE_ID"
+    names(tmp_df)[tmp_names == seq] <- "sequence"
+    names(tmp_df)[tmp_names == id] <- "sequence_id"
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
@@ -172,7 +172,7 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
 #
 # @param   clone  a ChangeoClone object
 # @param   path   a directory to store the write the output files to
-# @return  a named vector translating SEQUENCE_ID (names) to PHYLIP taxa (values)
+# @return  a named vector translating sequence_id (names) to PHYLIP taxa (values)
 writePhylipInput <- function(clone, path) {
     # Define PHYLIP columns
     nseq <- nrow(clone@data)
@@ -181,11 +181,11 @@ writePhylipInput <- function(clone, path) {
             sprintf("SAM%-6s", 1:nseq))
     v2 <- c(stringi::stri_length(clone@germline),
             clone@germline, 
-            clone@data[["SEQUENCE"]])
+            clone@data[["sequence"]])
     phy_df <- data.frame(v1, v2, stringsAsFactors=F)
     
     # Define names vector mapping taxa names to original sequence identifiers
-    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["SEQUENCE_ID"]])
+    id_map <- setNames(gsub("^\\s+|\\s+$", "", v1[-(1:2)]), clone@data[["sequence_id"]])
     
     # Create PHYLIP input file
     write.table(phy_df, file=file.path(path, "infile"), 
@@ -287,9 +287,10 @@ getPhylipInferred <- function(phylip_out) {
     inferred_seq <- sapply(inferred_num, function(n) { paste(t(as.matrix(seq_df[seq_df[, 2] == n, -c(1:3)])), collapse="") })
     
     if (length(inferred_num)>0) {
-        return(data.frame(SEQUENCE_ID=paste0("Inferred", inferred_num), SEQUENCE=inferred_seq, stringsAsFactors = FALSE))
+        return(data.frame(sequence_id=paste0("Inferred", inferred_num), 
+                          sequence=inferred_seq, stringsAsFactors = FALSE))
     }
-    data.frame(SEQUENCE_ID=c(), SEQUENCE=c(), stringsAsFactors = FALSE)
+    data.frame(sequence_id=c(), sequence=c(), stringsAsFactors = FALSE)
 }
 
 
@@ -342,9 +343,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
         if (edges$from[i] == "Germline") {
             seq1 <- clone@germline
         } else {
-            seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
+            seq1 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$from[i]]
         }
-        seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
+        seq2 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$to[i]]
         edges$weight[i] <- seqDist(seq1, seq2, dist_mat)        
     }
     
@@ -366,9 +367,9 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
             if (edges$from[i] == "Germline") {
                 seq1 <- clone@germline
             } else {
-                seq1 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$from[i]]
+                seq1 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$from[i]]
             }
-            seq2 <- clone@data[["SEQUENCE"]][clone@data[["SEQUENCE_ID"]] == edges$to[i]]
+            seq2 <- clone@data[["sequence"]][clone@data[["sequence_id"]] == edges$to[i]]
             edges$weight[i] <- seqDist(seq1, seq2, dist_mat)      
         }
         
@@ -382,7 +383,7 @@ modifyPhylipEdges <- function(edges, clone, dist_mat=getDNAMatrix(gap=0)) {
     }
     
     # Remove rows from clone
-    keep_clone <- clone@data[["SEQUENCE_ID"]] %in% unique(c(edges$from, edges$to))
+    keep_clone <- clone@data[["sequence_id"]] %in% unique(c(edges$from, edges$to))
     clone@data <- as.data.frame(clone@data[keep_clone, ])
     
     return(list(edges=edges, clone=clone))
@@ -402,11 +403,11 @@ phylipToGraph <- function(edges, clone) {
     g <- igraph::set_vertex_attr(g, "sequence", index=germ_idx, clone@germline)
     
     # Add sample sequences and names
-    clone_idx <- match(clone@data[["SEQUENCE_ID"]], igraph::V(g)$name) 
-    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[["SEQUENCE"]])
+    clone_idx <- match(clone@data[["sequence_id"]], igraph::V(g)$name) 
+    g <- igraph::set_vertex_attr(g, "sequence", index=clone_idx, clone@data[["sequence"]])
     
     # Add annotations
-    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("SEQUENCE_ID", "SEQUENCE"))]
+    ann_fields <- names(clone@data)[!(names(clone@data) %in% c("sequence_id", "sequence"))]
     for (n in ann_fields) {
         g <- igraph::set_vertex_attr(g, n, index=germ_idx, NA)
         g <- igraph::set_vertex_attr(g, n, index=clone_idx, clone@data[[n]])
@@ -454,12 +455,12 @@ phylipToGraph <- function(edges, clone) {
 #'           
 #'           Vertex attributes:
 #'           \itemize{
-#'             \item  \code{name}:      value in the \code{SEQUENCE_ID} column of the \code{data} 
+#'             \item  \code{name}:      value in the \code{sequence_id} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences. 
 #'                                      The germline (root) vertex is assigned the name 
 #'                                      "Germline" and inferred intermediates are assigned
 #'                                      names with the format {"Inferred1", "Inferred2", ...}.
-#'             \item  \code{sequence}:  value in the \code{SEQUENCE} column of the \code{data} 
+#'             \item  \code{sequence}:  value in the \code{sequence} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences.
 #'                                      The germline (root) vertex is assigned the sequence
 #'                                      in the \code{germline} slot of the input \code{clone}.
@@ -559,7 +560,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     }
     
     # Check fields
-    seq_len = unique(stringi::stri_length(clone@data[["SEQUENCE"]]))
+    seq_len = unique(stringi::stri_length(clone@data[["sequence"]]))
     germ_len = ifelse(length(clone@germline) == 0, 0, stringi::stri_length(clone@germline))
     if(germ_len == 0) {
         stop("Clone ", clone@clone, "does not contain a germline sequence.")
@@ -916,6 +917,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     trees <- list()
     df <- read.table(file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
     params <- df[, !names(df) %in% c("TREE")]
+    names(params) = tolower(names(params))
     out[["param"]] <- params
     out[["command"]] <- df[1, ]$TREE
     for (i in 2:nrow(df)) {
@@ -943,7 +945,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
     out[["trees"]] <- trees
 
     if (!is.null(id)) {
-        out$param$ID <- id
+        out$param$id <- id
     }
     
     return(out)
@@ -955,12 +957,12 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
 #' \code{combineIgphyml} combines IgPhyML object parameters into a data.frame.
 #' 
 #' @param   iglist         list of igphyml objects returned by \link{readIgphyml}. 
-#'                         Each must have an \code{ID} column in its \code{param} attribute, 
+#'                         Each must have an \code{id} column in its \code{param} attribute, 
 #'                         which can be added automatically using the \code{id} option of 
 #'                         \code{readIgphyml}.
 #' @param   format         string specifying whether each column of the resulting data.frame
 #'                         should represent a parameter (\code{wide}) or if 
-#'                         there should only be three columns; i.e. ID, varable, and value
+#'                         there should only be three columns; i.e. id, varable, and value
 #'                         (\code{long}).
 #'                                                
 #' @return   A data.frame containing HLP model parameter estimates for all igphyml objects.
@@ -971,7 +973,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
 #' objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
 #' other hypothesis testing analyses.
 #' 
-#' All igphyml objects used must have an "ID" column in their \code{param} attribute, which
+#' All igphyml objects used must have an "id" column in their \code{param} attribute, which
 #' can be added automatically from the \code{id} flag of \code{readIgphyml}. 
 #' 
 #' @references
@@ -1001,28 +1003,28 @@ combineIgphyml <- function(iglist, format=c("wide", "long")) {
     format <- match.arg(format)
     
     ordered_params <- c(
-        "ID", "NSEQ", "NSITE", "LHOOD", "TREE_LENGTH", 
-        "OMEGA_FWR_MLE", "OMEGA_FWR_LCI", "OMEGA_FWR_UCI", 
-        "OMEGA_CDR_MLE", "OMEGA_CDR_LCI", "OMEGA_CDR_UCI", 
-        "KAPPA_MLE", "KAPPA_LCI", "KAPPA_UCI", 
-        "WRC_2_MLE", "WRC_2_LCI", "WRC_2_UCI", 
-        "GYW_0_MLE", "GYW_0_LCI", "GYW_0_UCI", 
-        "WA_1_MLE", "WA_1_LCI", "WA_1_UCI", 
-        "TW_0_MLE", "TW_0_LCI", "TW_0_UCI", 
-        "SYC_2_MLE", "SYC_2_LCI", "SYC_2_UCI", 
-        "GRS_0_MLE", "GRS_0_LCI", "GRS_0_UCI")
+        "id", "nseq", "nsite", "lhood", "tree_length", 
+        "omega_fwr_mle", "omega_fwr_lci", "omega_fwr_uci", 
+        "omega_cdr_mle", "omega_cdr_lci", "omega_cdr_uci", 
+        "kappa_mle", "kappa_lci", "kappa_uci", 
+        "wrc_2_mle", "wrc_2_lci", "wrc_2_uci", 
+        "gyw_0_mle", "gyw_0_lci", "gyw_0_uci", 
+        "wa_1_mle", "wa_1_lci", "wa_1_uci", 
+        "tw_0_mle", "tw_0_lci", "tw_0_uci", 
+        "syc_2_mle", "syc_2_lci", "syc_2_uci", 
+        "grs_0_mle", "grs_0_lci", "grs_0_uci")
     paramCount <- table(unlist(lapply(iglist, function(x) names(x$param))))
     params <- names(paramCount[paramCount == max(paramCount)])
     params <- ordered_params[ordered_params %in% params]
-    if (sum(params == "ID") == 0) {
-        message <- "ID not specified in objects. Use 'id' flag in readIgphyml."
+    if (sum(params == "id") == 0) {
+        message <- "id not specified in objects. Use 'id' flag in readIgphyml."
         stop(message)
     }
     
     repertoires <- lapply(iglist, function(x) x$param[1, params])
     combined <- dplyr::bind_rows(repertoires)
     if (format == "long") {
-        combined <- tidyr::gather(combined, "variable", "value", -!!rlang::sym("ID"))
+        combined <- tidyr::gather(combined, "variable", "value", -!!rlang::sym("id"))
         combined$variable <- factor(combined$variable, levels=params)
     }
     

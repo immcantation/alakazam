@@ -8,7 +8,7 @@ test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(db, groups="SAMPLE", clone="CLONE")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$SAMPLE == "RL01"])
+    obs <- calcCoverage(clones$seq_count[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 
@@ -18,17 +18,17 @@ test_that("calcCoverage", {
 test_that("countClones", {
 	# Calculate clone sizes
 	clones <- countClones(db, groups="SAMPLE", clone="CLONE")
-	expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
-	expect_equal(clones$SEQ_FREQ[1:6], 
+	expect_equal(clones$seq_count[1:6], c(31, 15, 5, 4, 4, 4))
+	expect_equal(clones$seq_freq[1:6], 
 	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
 	clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
 
-	expect_equal(clones$SEQ_COUNT[1:6], c(23, 15, 5, 3, 4, 1))
-	expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
-	expect_equal(clones$COPY_FREQ[6:11], 
+	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
+	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
+	expect_equal(clones$copy_freq[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
     
@@ -38,16 +38,16 @@ test_that("countClones", {
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
-	                                 SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
-	                                 COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
-	                                 SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
-	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
+	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
+	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
+	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
+	                                 copy_freq=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
-	                               SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
-	                               COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
-	                               SEQ_FREQ=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
-	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
+	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
+	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
+	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
+	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
 	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
@@ -83,16 +83,16 @@ test_that("calcDiversity", {
 test_that("estimateAbundance-current", {
 	set.seed(90)
 	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
-	expect_equal(abund@abundance$P[1:5], 
+	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001)
-	expect_equal(abund@abundance$LOWER[c(1:3,8:10)],
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$UPPER[45:50],
+	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$RANK[200:203], c(200, 201, 202, 203))
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -110,14 +110,14 @@ test_that("alphaDiversity", {
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9,20), ])
 	exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
-                      "Q" = c(0, 2, 8, 8),
-        	          "D" = c(88.4000, 72.0492, 33.8868, 8.9179),
-	                  "D_SD" = c(3.4902, 9.3973, 11.9207, 2.1954),
-        	          "D_LOWER" = c(81.5592, 53.6307, 10.5224, 4.6149),
-        	          "D_UPPER" = c(95.2407, 90.4677, 57.2511, 13.2210),
-        	          "E" = c(1.0000, 0.8150, 0.3833, 0.1397),
-        	          "E_LOWER" = c(0.9226, 0.6066, 0.1190, 0.0723),
-        	          "E_UPPER" = c(1.0773, 1.0233, 0.6476, 0.2071),
+                      "q" = c(0, 2, 8, 8),
+        	          "d" = c(88.4000, 72.0492, 33.8868, 8.9179),
+	                  "d_sd" = c(3.4902, 9.3973, 11.9207, 2.1954),
+        	          "d_lower" = c(81.5592, 53.6307, 10.5224, 4.6149),
+        	          "d_upper" = c(95.2407, 90.4677, 57.2511, 13.2210),
+        	          "e" = c(1.0000, 0.8150, 0.3833, 0.1397),
+        	          "e_lower" = c(0.9226, 0.6066, 0.1190, 0.0723),
+        	          "e_upper" = c(1.0773, 1.0233, 0.6476, 0.2071),
         	          stringsAsFactors = F)
 	
 	expect_equal(colnames(obs), colnames(exp))
@@ -127,9 +127,9 @@ test_that("alphaDiversity", {
 	set.seed(3)
 	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	div <- alphaDiversity(abund, step_q=1, max_q=4)
-	expect_equal(div@tests$PVALUE[1:5], 
+	expect_equal(div@tests$pvalue[1:5], 
 	             c(0, 0, 0, 0, 0), tolerance=0.001)
-	expect_equal(div@diversity$D[1:5], 
+	expect_equal(div@diversity$d[1:5], 
 	             c(88.5600, 82.4607, 72.2387, 60.0029, 50.0501), tolerance=0.001)
 	
 	# Verify two-steps == one-step
@@ -154,15 +154,15 @@ test_that("betaDiversity", {
 	obs <- data.frame(diversity_obj@diversity[c(1, 5, 12, 72), ])
 
 	exp <- data.frame(
-	        "COMPARISON" = c("1-2", "1-2", "1-2", "1-3"),
-	        "Q" = c(0, 0.4, 1.1, 3.0),
-	        "D" = c(1.790, 1.752, 1.634, 1.275), 
-	        "D_SD" = c(0.2257, 0.1997, 0.1563, 0.3084),
-	        "D_LOWER" = c(1.5643, 1.5524, 1.4775, 0.9664),
-	        "D_UPPER" = c(2.0157, 1.9517, 1.79017, 1.5831),
-	        "E" = c(1.00000000, 0.97879, 0.91273, 0.72458),
-	        "E_LOWER" = c(0.87392, 0.867258, 0.82540, 0.54931),
-	        "E_UPPER" = c(1.126074, 1.090331, 1.000072, 0.899849),
+	        "comparison" = c("1-2", "1-2", "1-2", "1-3"),
+	        "q" = c(0, 0.4, 1.1, 3.0),
+	        "d" = c(1.790, 1.752, 1.634, 1.275), 
+	        "d_sd" = c(0.2257, 0.1997, 0.1563, 0.3084),
+	        "d_lower" = c(1.5643, 1.5524, 1.4775, 0.9664),
+	        "d_upper" = c(2.0157, 1.9517, 1.79017, 1.5831),
+	        "e" = c(1.00000000, 0.97879, 0.91273, 0.72458),
+	        "e_lower" = c(0.87392, 0.867258, 0.82540, 0.54931),
+	        "e_upper" = c(1.126074, 1.090331, 1.000072, 0.899849),
 	        stringsAsFactors = F
 	    )
 
@@ -178,9 +178,9 @@ test_that("betaDiversity", {
 	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
 	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
-	expect_equal(diversity_obj@tests$PVALUE[1:5], 
+	expect_equal(diversity_obj@tests$pvalue[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
-	expect_equal(diversity_obj@diversity$D[1:5], 
+	expect_equal(diversity_obj@diversity$d[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
 })
 
@@ -262,22 +262,22 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     #              c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
     #              tolerance = 0.001)
     # v0.2.11 test results with nboot=1000
-    expect_equal(abund@abundance$P[1:6],
+    expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
                  tolerance=0.005)
-    expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+    expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$UPPER[45:50],
+    expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100, clone="CLONE")
-    expect_equal(abund@abundance$LOWER, c(1, 1))
-    expect_equal(abund@abundance$UPPER, c(1, 1))
-    expect_equal(abund@abundance$RANK, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1))
+    expect_equal(abund@abundance$upper, c(1, 1))
+    expect_equal(abund@abundance$rank, c(1, 1))
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
@@ -299,14 +299,14 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
     #                   stringsAsFactors = FALSE)
     # v0.2.11 test results with nboot=10000
     exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
-                      "Q" = c(0, 2, 8, 8),
-                      "D" = c(88.16, 71.07, 33.07, 8.83),
-                      "D_SD" = c(3.34, 9.78, 11.61, 2.39),
-                      "D_LOWER" = c(81.61, 51.90, 10.32, 4.15),
-                      "D_UPPER" = c(94.72, 90.23, 55.82, 13.53),
-                      "E" = c(1.00, 0.81, 0.38, 0.14),
-                      "E_LOWER" = c(0.93, 0.59, 0.12, 0.063),
-                      "E_UPPER" = c(1.07, 1.02, 0.63, 0.21),
+                      "q" = c(0, 2, 8, 8),
+                      "d" = c(88.16, 71.07, 33.07, 8.83),
+                      "d_sd" = c(3.34, 9.78, 11.61, 2.39),
+                      "d_lower" = c(81.61, 51.90, 10.32, 4.15),
+                      "d_upper" = c(94.72, 90.23, 55.82, 13.53),
+                      "e" = c(1.00, 0.81, 0.38, 0.14),
+                      "e_lower" = c(0.93, 0.59, 0.12, 0.063),
+                      "e_upper" = c(1.07, 1.02, 0.63, 0.21),
                       stringsAsFactors = FALSE)
     
     expect_equal(colnames(obs), colnames(exp))
@@ -330,14 +330,14 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
     #                   stringsAsFactors = FALSE)
     # v0.2.11 test results with nboot=10000
     exp <- data.frame("ISOTYPE" = c("IgA", "IgG", "IgG", "IgM"),
-                      "Q" = c(4, 1, 7, 7),
-                      "D" = c(10.02, 7.26, 2.56, 39.96),
-                      "D_SD" = c(2.83, 1.45, 0.49, 6.87),
-                      "D_LOWER" = c(4.47, 4.41, 1.59, 26.49),
-                      "D_UPPER" = c(15.57, 10.10, 3.52, 53.43),
-                      "E" = c(0.38, 0.52, 0.18, 0.82),
-                      "E_LOWER" = c(0.17, 0.31, 0.11, 0.55),
-                      "E_UPPER" = c(0.60, 0.72, 0.25, 1.10),
+                      "q" = c(4, 1, 7, 7),
+                      "d" = c(10.02, 7.26, 2.56, 39.96),
+                      "d_sd" = c(2.83, 1.45, 0.49, 6.87),
+                      "d_lower" = c(4.47, 4.41, 1.59, 26.49),
+                      "d_upper" = c(15.57, 10.10, 3.52, 53.43),
+                      "e" = c(0.38, 0.52, 0.18, 0.82),
+                      "e_lower" = c(0.17, 0.31, 0.11, 0.55),
+                      "e_upper" = c(0.60, 0.72, 0.25, 1.10),
                       stringsAsFactors = FALSE)
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.05, check.attributes=F)
@@ -352,8 +352,8 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0)
     # expect_equal(div@diversity$D, c(88.10, 63.11), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0, tolerance=0.05)
-    expect_equal(div@diversity$D, c(88.13, 63.57), tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0, tolerance=0.05)
+    expect_equal(div@diversity$d, c(88.13, 63.57), tolerance=0.05)
     
     set.seed(3)
     expect_warning(div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000),
@@ -362,8 +362,8 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0.88)
     # expect_equal(div@diversity$D, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0.88, tolerance=0.05)
-    expect_equal(div@diversity$D, c(78.63, 79.80), tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
+    expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
 
 
@@ -376,7 +376,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
 
 
 
-# example_file <- file.path("tests", "data-tests", "ExampleDb.gz")
+# example_file <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
 example_file <- file.path("..", "data-tests", "ExampleDb_airr.gz")
 db <- readChangeoDb(example_file)
 
@@ -386,7 +386,7 @@ test_that("calcCoverage", {
     # Calculate clone sizes
     clones <- countClones(db, groups="sample")
     # Calculate 1st order coverage for a single sample
-    obs <- calcCoverage(clones$SEQ_COUNT[clones$sample == "RL01"])
+    obs <- calcCoverage(clones$seq_count[clones$sample == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
 })
 
@@ -396,17 +396,17 @@ test_that("calcCoverage", {
 test_that("countClones", {
 	# Calculate clone sizes
 	clones <- countClones(db, groups="sample")
-	expect_equal(clones$SEQ_COUNT[1:6], c(31, 15, 5, 4, 4, 4))
-	expect_equal(clones$SEQ_FREQ[1:6], 
+	expect_equal(clones$seq_count[1:6], c(31, 15, 5, 4, 4, 4))
+	expect_equal(clones$seq_freq[1:6], 
 	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
 	clones <- countClones(db, groups=c("sample", "isotype"), copy="duplicate_count")
 
-	expect_equal(clones$SEQ_COUNT[1:6], c(23, 15, 5, 3, 4, 1))
-	expect_equal(clones$COPY_COUNT[1:6], c(53, 43, 24, 11, 11, 10))
-	expect_equal(clones$COPY_FREQ[6:11], 
+	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
+	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
+	expect_equal(clones$copy_freq[6:11], 
 	             c(0.71, 0.05, 0.47, 0.42, 0.04, 0.04),
 	             tolerance=0.01)
     
@@ -416,16 +416,16 @@ test_that("countClones", {
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
-	                                 SEQ_COUNT=as.integer(c(5, 2, 1, 1, 1)),
-	                                 COPY_COUNT=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
-	                                 SEQ_FREQ=c(5, 2, 1, 1, 1)/10,
-	                                 COPY_FREQ=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
+	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
+	                                 copy_count=as.integer(c(sum(10:6), sum(5:4), 3, 2, 1)),
+	                                 seq_freq=c(5, 2, 1, 1, 1)/10,
+	                                 copy_freq=c(sum(10:6), sum(5:4), 3, 2, 1)/sum(10:1))
 	grouped_toy <- tibble::tibble(GROUP=c("A", rep("B", 5)),
 	                               CLONE=as.character(c(1, 1:5)), 
-	                               SEQ_COUNT=as.integer(c(3, 2, 2, 1, 1, 1)),
-	                               COPY_COUNT=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
-	                               SEQ_FREQ=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
-	                               COPY_FREQ=c(sum(10:8)/sum(10:8), 
+	                               seq_count=as.integer(c(3, 2, 2, 1, 1, 1)),
+	                               copy_count=as.integer(c(sum(10:8), sum(7:6), sum(5:4), 3, 2, 1)),
+	                               seq_freq=c(3/3, 2/7, 2/7, 1/7, 1/7, 1/7),
+	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
 	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
@@ -461,16 +461,16 @@ test_that("calcDiversity", {
 test_that("estimateAbundance-current", {
 	set.seed(90)
 	abund <- estimateAbundance(db, group="sample", nboot=100)
-	expect_equal(abund@abundance$P[1:5], 
+	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001)
-	expect_equal(abund@abundance$LOWER[c(1:3,8:10)],
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$UPPER[45:50],
+	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
 	             tolerance = 0.001)
-	expect_equal(abund@abundance$RANK[200:203], c(200, 201, 202, 203))
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -488,14 +488,14 @@ test_that("alphaDiversity", {
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9,20), ])
 	exp <- data.frame("sample" = c("RL01", "RL01", "RL01", "RL02"),
-                      "Q" = c(0, 2, 8, 8),
-        	          "D" = c(88.4000, 72.0492, 33.8868, 8.9179),
-	                  "D_SD" = c(3.4902, 9.3973, 11.9207, 2.1954),
-        	          "D_LOWER" = c(81.5592, 53.6307, 10.5224, 4.6149),
-        	          "D_UPPER" = c(95.2407, 90.4677, 57.2511, 13.2210),
-        	          "E" = c(1.0000, 0.8150, 0.3833, 0.1397),
-        	          "E_LOWER" = c(0.9226, 0.6066, 0.1190, 0.0723),
-        	          "E_UPPER" = c(1.0773, 1.0233, 0.6476, 0.2071),
+                      "q" = c(0, 2, 8, 8),
+        	          "d" = c(88.4000, 72.0492, 33.8868, 8.9179),
+	                  "d_sd" = c(3.4902, 9.3973, 11.9207, 2.1954),
+        	          "d_lower" = c(81.5592, 53.6307, 10.5224, 4.6149),
+        	          "d_upper" = c(95.2407, 90.4677, 57.2511, 13.2210),
+        	          "e" = c(1.0000, 0.8150, 0.3833, 0.1397),
+        	          "e_lower" = c(0.9226, 0.6066, 0.1190, 0.0723),
+        	          "e_upper" = c(1.0773, 1.0233, 0.6476, 0.2071),
         	          stringsAsFactors = F)
 	
 	expect_equal(colnames(obs), colnames(exp))
@@ -505,9 +505,9 @@ test_that("alphaDiversity", {
 	set.seed(3)
 	abund <- estimateAbundance(db, group="sample", nboot=100)
 	div <- alphaDiversity(abund, step_q=1, max_q=4)
-	expect_equal(div@tests$PVALUE[1:5], 
+	expect_equal(div@tests$pvalue[1:5], 
 	             c(0, 0, 0, 0, 0), tolerance=0.001)
-	expect_equal(div@diversity$D[1:5], 
+	expect_equal(div@diversity$d[1:5], 
 	             c(88.5600, 82.4607, 72.2387, 60.0029, 50.0501), tolerance=0.001)
 	
 	# Verify two-steps == one-step
@@ -532,15 +532,15 @@ test_that("betaDiversity", {
 	obs <- data.frame(diversity_obj@diversity[c(1, 5, 12, 72), ])
 
 	exp <- data.frame(
-	        "COMPARISON" = c("1-2", "1-2", "1-2", "1-3"),
-	        "Q" = c(0, 0.4, 1.1, 3.0),
-	        "D" = c(1.790, 1.752, 1.634, 1.275), 
-	        "D_SD" = c(0.2257, 0.1997, 0.1563, 0.3084),
-	        "D_LOWER" = c(1.5643, 1.5524, 1.4775, 0.9664),
-	        "D_UPPER" = c(2.0157, 1.9517, 1.79017, 1.5831),
-	        "E" = c(1.00000000, 0.97879, 0.91273, 0.72458),
-	        "E_LOWER" = c(0.87392, 0.867258, 0.82540, 0.54931),
-	        "E_UPPER" = c(1.126074, 1.090331, 1.000072, 0.899849),
+	        "comparison" = c("1-2", "1-2", "1-2", "1-3"),
+	        "q" = c(0, 0.4, 1.1, 3.0),
+	        "d" = c(1.790, 1.752, 1.634, 1.275), 
+	        "d_sd" = c(0.2257, 0.1997, 0.1563, 0.3084),
+	        "d_lower" = c(1.5643, 1.5524, 1.4775, 0.9664),
+	        "d_upper" = c(2.0157, 1.9517, 1.79017, 1.5831),
+	        "e" = c(1.00000000, 0.97879, 0.91273, 0.72458),
+	        "e_lower" = c(0.87392, 0.867258, 0.82540, 0.54931),
+	        "e_upper" = c(1.126074, 1.090331, 1.000072, 0.899849),
 	        stringsAsFactors = F
 	    )
 
@@ -556,9 +556,9 @@ test_that("betaDiversity", {
 	    dplyr::mutate(RANDOM = sample(1:4, 1, replace=TRUE)) %>% 
 	    ungroup()
 	diversity_obj  <- betaDiversity(beta_db, comparisons=list("1-2"=c("1", "2"), "1-3"=c("1", "3")), group="RANDOM")
-	expect_equal(diversity_obj@tests$PVALUE[1:5], 
+	expect_equal(diversity_obj@tests$pvalue[1:5], 
 	        c(0.5,0.5,0.5,0.5,0.5), tolerance=0.001)
-	expect_equal(diversity_obj@diversity$D[1:5], 
+	expect_equal(diversity_obj@diversity$d[1:5], 
 	        c(1.40, 1.39, 1.38, 1.37, 1.36), tolerance=0.01)
 })
 
@@ -640,22 +640,22 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     #              c(0.00758, 0.00598, 0.00932, 0.00630, 0.00659, 0.00834),
     #              tolerance = 0.001)
     # v0.2.11 test results with nboot=1000
-    expect_equal(abund@abundance$P[1:6],
+    expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
                  tolerance=0.005)
-    expect_equal(abund@abundance$LOWER[c(1:3, 8:10)],
+    expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$UPPER[45:50],
+    expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
                  tolerance = 0.005)
-    expect_equal(abund@abundance$RANK[1000:1005], c(36, 37, 38, 39, 40, 41))
+    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="sample", min_n=1, uniform=FALSE, nboot=100)
-    expect_equal(abund@abundance$LOWER, c(1, 1))
-    expect_equal(abund@abundance$UPPER, c(1, 1))
-    expect_equal(abund@abundance$RANK, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1))
+    expect_equal(abund@abundance$upper, c(1, 1))
+    expect_equal(abund@abundance$rank, c(1, 1))
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
@@ -677,14 +677,14 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
     #                   stringsAsFactors = FALSE)
     # v0.2.11 test results with nboot=10000
     exp <- data.frame("sample" = c("RL01", "RL01", "RL01", "RL02"),
-                      "Q" = c(0, 2, 8, 8),
-                      "D" = c(88.16, 71.07, 33.07, 8.83),
-                      "D_SD" = c(3.34, 9.78, 11.61, 2.39),
-                      "D_LOWER" = c(81.61, 51.90, 10.32, 4.15),
-                      "D_UPPER" = c(94.72, 90.23, 55.82, 13.53),
-                      "E" = c(1.00, 0.81, 0.38, 0.14),
-                      "E_LOWER" = c(0.93, 0.59, 0.12, 0.063),
-                      "E_UPPER" = c(1.07, 1.02, 0.63, 0.21),
+                      "q" = c(0, 2, 8, 8),
+                      "d" = c(88.16, 71.07, 33.07, 8.83),
+                      "d_sd" = c(3.34, 9.78, 11.61, 2.39),
+                      "d_lower" = c(81.61, 51.90, 10.32, 4.15),
+                      "d_upper" = c(94.72, 90.23, 55.82, 13.53),
+                      "e" = c(1.00, 0.81, 0.38, 0.14),
+                      "e_lower" = c(0.93, 0.59, 0.12, 0.063),
+                      "e_upper" = c(1.07, 1.02, 0.63, 0.21),
                       stringsAsFactors = FALSE)
     
     expect_equal(colnames(obs), colnames(exp))
@@ -708,14 +708,14 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
     #                   stringsAsFactors = FALSE)
     # v0.2.11 test results with nboot=10000
     exp <- data.frame("isotype" = c("IgA", "IgG", "IgG", "IgM"),
-                      "Q" = c(4, 1, 7, 7),
-                      "D" = c(10.02, 7.26, 2.56, 39.96),
-                      "D_SD" = c(2.83, 1.45, 0.49, 6.87),
-                      "D_LOWER" = c(4.47, 4.41, 1.59, 26.49),
-                      "D_UPPER" = c(15.57, 10.10, 3.52, 53.43),
-                      "E" = c(0.38, 0.52, 0.18, 0.82),
-                      "E_LOWER" = c(0.17, 0.31, 0.11, 0.55),
-                      "E_UPPER" = c(0.60, 0.72, 0.25, 1.10),
+                      "q" = c(4, 1, 7, 7),
+                      "d" = c(10.02, 7.26, 2.56, 39.96),
+                      "d_sd" = c(2.83, 1.45, 0.49, 6.87),
+                      "d_lower" = c(4.47, 4.41, 1.59, 26.49),
+                      "d_upper" = c(15.57, 10.10, 3.52, 53.43),
+                      "e" = c(0.38, 0.52, 0.18, 0.82),
+                      "e_lower" = c(0.17, 0.31, 0.11, 0.55),
+                      "e_upper" = c(0.60, 0.72, 0.25, 1.10),
                       stringsAsFactors = FALSE)
     expect_equal(colnames(obs), colnames(exp))
     expect_equal(obs, exp, tolerance=0.05, check.attributes=F)
@@ -730,8 +730,8 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0)
     # expect_equal(div@diversity$D, c(88.10, 63.11), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0, tolerance=0.05)
-    expect_equal(div@diversity$D, c(88.13, 63.57), tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0, tolerance=0.05)
+    expect_equal(div@diversity$d, c(88.13, 63.57), tolerance=0.05)
     
     set.seed(3)
     expect_warning(div <- testDiversity(rbind(db, db), "sample", q=0, min_n=30, nboot=1000, clone="clone_id"),
@@ -740,6 +740,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     # expect_equal(div@tests$PVALUE, 0.88)
     # expect_equal(div@diversity$D, c(78.63, 79.58), tolerance=0.001)
     # v0.2.11 test results with nboot=10000
-    expect_equal(div@tests$PVALUE, 0.88, tolerance=0.05)
-    expect_equal(div@diversity$D, c(78.63, 79.80), tolerance=0.05)
+    expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
+    expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
+

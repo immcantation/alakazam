@@ -33,7 +33,7 @@ NULL
 #' clones <- countClones(ExampleDb, groups="sample_id")
 #' 
 #' # Calculate 1first order coverage for a single sample
-#' calcCoverage(clones$SEQ_COUNT[clones$sample_id == "+7d"])
+#' calcCoverage(clones$seq_count[clones$sample_id == "+7d"])
 #'
 #' @export
 calcCoverage <- function(x, r=1) {
@@ -211,13 +211,13 @@ inferCompleteAbundance <- function(x) {
 #' @return   A data.frame summarizing clone counts and frequencies with columns:
 #'           \itemize{
 #'             \item \code{CLONE}:    	 clone identifier.
-#'             \item \code{SEQ_COUNT}:   total number of sequences for the clone.
-#'             \item \code{SEQ_FREQ}:    frequency of the clone as a fraction of the total
+#'             \item \code{seq_count}:   total number of sequences for the clone.
+#'             \item \code{seq_freq}:    frequency of the clone as a fraction of the total
 #'                                       number of sequences within each group.
-#'             \item \code{COPY_COUNT}:  sum of the copy counts in the \code{copy} column.
+#'             \item \code{copy_count}:  sum of the copy counts in the \code{copy} column.
 #'                                       Only present if the \code{copy} argument is 
 #'                                       specified.
-#'             \item \code{COPY_FREQ}:   frequency of the clone as a fraction of the total
+#'             \item \code{copy_freq}:   frequency of the clone as a fraction of the total
 #'                                       copy number within each group. Only present if 
 #'                                       the \code{copy} argument is specified.
 #'           }
@@ -240,19 +240,17 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
     if (is.null(copy)) {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            dplyr::summarize(SEQ_COUNT=n()) %>%
-            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("SEQ_COUNT"))) %>%
-			dplyr::rename("CLONE"=clone)
+            dplyr::summarize(seq_count=n()) %>%
+            dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("seq_count")))
     } else {
         clone_tab <- data %>% 
             group_by(!!!rlang::syms(c(groups, clone))) %>%
-            dplyr::summarize(SEQ_COUNT=length(.data[[clone]]),
-                              COPY_COUNT=sum(.data[[copy]], na.rm=TRUE)) %>%
-            dplyr::mutate(SEQ_FREQ=!!rlang::sym("SEQ_COUNT")/sum(!!rlang::sym("SEQ_COUNT"), na.rm=TRUE),
-                           COPY_FREQ=!!rlang::sym("COPY_COUNT")/sum(!!rlang::sym("COPY_COUNT"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("COPY_COUNT"))) %>%
-			dplyr::rename("CLONE"=clone)
+            dplyr::summarize(seq_count=length(.data[[clone]]),
+                              copy_count=sum(.data[[copy]], na.rm=TRUE)) %>%
+            dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                          copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+            dplyr::arrange(desc(!!rlang::sym("copy_count"))) 
     }
     return(clone_tab)
 }
@@ -316,7 +314,7 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #'                     is specified, then clone abundances is determined by the sum of 
 #'                     copy numbers within each clonal group.
 #' @param    group     name of the \code{data} column containing group identifiers. 
-#'                     If \code{NULL} then no grouping is performed and the \code{GROUP} 
+#'                     If \code{NULL} then no grouping is performed and the \code{group} 
 #'                     column of the output will contain the value \code{NA} for each row.
 #' @param    min_n     minimum number of observations to sample.
 #'                     A group with less observations than the minimum is excluded.
@@ -376,31 +374,31 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     ci_x <- qnorm(ci_z)
     
     # Tabulate clonal abundance
-    count_col <- if (!is.null(copy)) { "COPY_COUNT" } else { "SEQ_COUNT" }
+    count_col <- if (!is.null(copy)) { "copy_count" } else { "seq_count" }
     clone_tab <- countClones(data, copy=copy, clone=clone, groups=group) %>%
-        dplyr::mutate(CLONE_COUNT=!!rlang::sym(count_col))
+        dplyr::mutate(clone_count=!!rlang::sym(count_col))
 
     # Tabulate group sizes
     if (!is.null(group)) {
         # Summarize groups
         group_tab <- clone_tab %>%
             group_by(!!rlang::sym(group)) %>%
-            dplyr::summarize(COUNT=sum(!!rlang::sym("CLONE_COUNT"), na.rm=TRUE)) %>%
-            rename(GROUP=!!rlang::sym(group))
+            dplyr::summarize(count=sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+            rename(group=!!rlang::sym(group))
     } else {
-        group_tab <- data.frame(V="All", COUNT=sum(clone_tab$CLONE_COUNT, na.rm=T))
-        names(group_tab)[1] <- "GROUP"
+        group_tab <- data.frame(v="All", count=sum(clone_tab$clone_count, na.rm=T))
+        names(group_tab)[1] <- "group"
     }
-    group_all <- as.character(group_tab$GROUP)
-    group_tab <- group_tab[group_tab$COUNT >= min_n, ]
-    group_keep <- as.character(group_tab$GROUP)
+    group_all <- as.character(group_tab$group)
+    group_tab <- group_tab[group_tab$count >= min_n, ]
+    group_keep <- as.character(group_tab$group)
     
     # Set number of sampled sequence
     if (uniform) {
-        nsam <- min(group_tab$COUNT, max_n)
+        nsam <- min(group_tab$count, max_n)
         nsam <- setNames(rep(nsam, length(group_keep)), group_keep)
     } else {
-        nsam <- if (is.null(max_n)) { group_tab$COUNT } else { pmin(group_tab$COUNT, max_n) }
+        nsam <- if (is.null(max_n)) { group_tab$count } else { pmin(group_tab$count, max_n) }
         nsam <- setNames(nsam, group_keep)
     }
     
@@ -421,12 +419,12 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         
         # Extract abundance vector
         if (!is.null(group)) {
-            abund_obs <- clone_tab$CLONE_COUNT[clone_tab[[group]] == g]
-            names(abund_obs) <- clone_tab[["CLONE"]][clone_tab[[group]] == g]
+            abund_obs <- clone_tab$clone_count[clone_tab[[group]] == g]
+            names(abund_obs) <- clone_tab[[clone]][clone_tab[[group]] == g]
         } else {
             # Extract abundance vector
-            abund_obs <- clone_tab$CLONE_COUNT
-            names(abund_obs) <- clone_tab[["CLONE"]]
+            abund_obs <- clone_tab$clone_count
+            names(abund_obs) <- clone_tab[[clone]]
         } 
         
         # Infer complete abundance distribution
@@ -440,21 +438,21 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         p_upper <- p_mean + p_err
         
         # Assemble and sort abundance data.frame
-	    abund_df <- tibble::tibble(CLONE=rownames(boot_mat), P=p_mean, P_SD=p_sd,
-	                           LOWER=p_lower, UPPER=p_upper) %>%
-	        dplyr::arrange(desc(!!rlang::sym("P"))) %>%
-	        dplyr::mutate(RANK=1:n())
+	    abund_df <- tibble::tibble(!!clone := rownames(boot_mat), p=p_mean, p_sd=p_sd,
+	                           lower=p_lower, upper=p_upper) %>%
+	        dplyr::arrange(desc(!!rlang::sym("p"))) %>%
+	        dplyr::mutate(rank=1:n())
 			
         # Save summary
         abund_list[[g]] <- abund_df
         
         # Save bootstrap
         boot_list[[g]] <- as.data.frame(boot_mat) %>%
-          tibble::rownames_to_column("CLONE")
+          tibble::rownames_to_column(clone)
         
         if (progress) { pb$tick() }
     }
-    id_col <- if_else(is.null(group), "GROUP", group)
+    id_col <- if_else(is.null(group), "group", group)
     abundance_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
     bootstrap_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
@@ -462,7 +460,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     abund_obj <- new("AbundanceCurve",
                      bootstrap=bootstrap_df, 
                      abundance=abundance_df,
-                     clone_by="CLONE",
+                     clone_by=clone,
                      group_by=id_col,
                      #groups=if_else(is.null(group), as.character(NA), group_keep),
                      groups=group_keep,
@@ -643,7 +641,7 @@ inferRarefiedDiversity <- function(x, q, m) {
 #                        diversity calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL) {
+helperAlpha <- function(boot_output, q, clone="clone_id", group=NULL) {
     ## DEBUG
     # abundance <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
     # clone <- abundance@clone_by
@@ -656,7 +654,7 @@ helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL) {
         as.matrix() %>% 
         apply(2, calcDiversity, q=q) %>%
         data.frame() %>% 
-        mutate(Q=q)
+        mutate(q=q)
 
     return(output)
 }
@@ -677,7 +675,7 @@ helperAlpha <- function(boot_output, q, clone="CLONE", group=NULL) {
 #                         calculation.
 #
 # @return   data.frame containing diversity calculations for each bootstrap iteration.
-helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") { 
+helperBeta <- function(boot_output, q, ci_x, clone="clone_id", group="group") { 
     # Hack for visibility of dplyr variables
     . <- NULL
         
@@ -687,27 +685,27 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(sum) %>%
         dplyr::do(helperAlpha(., q=q, clone=clone)) %>%
-        tidyr::gather(key="N", value="GAMMA", -!!rlang::sym("Q")) %>%
-        dplyr::mutate(GAMMA=as.numeric(!!rlang::sym("GAMMA")))
+        tidyr::gather(key="n", value="gamma", -!!rlang::sym("q")) %>%
+        dplyr::mutate(gamma=as.numeric(!!rlang::sym("gamma")))
 
     # Compute alpha diversity metrics
     alpha <- boot_output %>%
         dplyr::group_by(!!rlang::sym(group)) %>%
         dplyr::do(helperAlpha(., q=q, clone=clone, group=group)) %>%
-        dplyr::group_by(!!rlang::sym("Q")) %>%
+        dplyr::group_by(!!rlang::sym("q")) %>%
         dplyr::select(-one_of(c(group))) %>%
         dplyr::summarize_all(mean) %>%
-        tidyr::gather(key="N", value="ALPHA", -!!rlang::sym("Q")) %>%
-        dplyr::mutate(ALPHA=as.numeric(!!rlang::sym("ALPHA")))
+        tidyr::gather(key="n", value="alpha", -!!rlang::sym("q")) %>%
+        dplyr::mutate(alpha=as.numeric(!!rlang::sym("alpha")))
 
     # Perform comparisons of alpha and gamma to extract beta
     beta <- bind_cols(gamma, alpha) %>%
-        dplyr::group_by(!!rlang::sym("Q")) %>%
-        dplyr::mutate(X=!!rlang::sym("GAMMA") / !!rlang::sym("ALPHA")) %>%
-        dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
-                         D_SD=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
-        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
-                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
+        dplyr::group_by(!!rlang::sym("q")) %>%
+        dplyr::mutate(X=!!rlang::sym("gamma") / !!rlang::sym("alpha")) %>%
+        dplyr::summarize(d=mean(!!rlang::sym("X"), na.rm=TRUE),
+                         d_sd=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
+        dplyr::mutate(d_lower=pmax(!!rlang::sym("d") - !!rlang::sym("d_sd") * ci_x, 0), 
+                      d_upper=!!rlang::sym("d") + !!rlang::sym("d_sd") * ci_x)
 
     return(beta)
 }
@@ -726,7 +724,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="CLONE", group="GROUP") {
 # @param    q       vector of Hill Diversity indices to test for diversity calculations.
 #
 # @return   data.frame containing test results for each value of q.
-helperTest <- function(div_df, q, group="GROUP") {
+helperTest <- function(div_df, q, group="group") {
     # Hack for visibility of dplyr variables
     . <- NULL
     
@@ -739,11 +737,11 @@ helperTest <- function(div_df, q, group="GROUP") {
             
             # Currently just testing for one diversity order
             mat1 <- div_df %>%
-                dplyr::filter(!!rlang::sym(group) == group_pair[1], !!rlang::sym("Q") == q_i) %>%
-                dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
+                dplyr::filter(!!rlang::sym(group) == group_pair[1], !!rlang::sym("q") == q_i) %>%
+                dplyr::select(-one_of(c(group, "q"))) %>% unlist()
             mat2 <- div_df %>%
-                dplyr::filter(!!rlang::sym(group) == group_pair[2], !!rlang::sym("Q") == q_i) %>%
-                dplyr::select(-one_of(c(group, "Q"))) %>% unlist()
+                dplyr::filter(!!rlang::sym(group) == group_pair[2], !!rlang::sym("q") == q_i) %>%
+                dplyr::select(-one_of(c(group, "q"))) %>% unlist()
 
             if (mean(mat1) >= mean(mat2)) { 
                 g_delta <- mat1 - mat2 
@@ -755,14 +753,14 @@ helperTest <- function(div_df, q, group="GROUP") {
             p <- ecdf(g_delta)(0)
             p <- ifelse(p <= 0.5, p * 2, (1 - p) * 2)
             
-            pair_list[[as.character(q_i)]] <- list(DELTA_MEAN=mean(g_delta), 
-                                                   DELTA_SD=sd(g_delta), 
-                                                   PVALUE=p)
+            pair_list[[as.character(q_i)]] <- list(delta_mean=mean(g_delta), 
+                                                   delta_sd=sd(g_delta), 
+                                                   pvalue=p)
         }
-        pvalue_list[[paste(group_pair, collapse=" != ")]] <- bind_rows(pair_list, .id="Q")
+        pvalue_list[[paste(group_pair, collapse=" != ")]] <- bind_rows(pair_list, .id="q")
 
     }
-    test_df <- bind_rows(pvalue_list, .id="TEST")
+    test_df <- bind_rows(pvalue_list, .id="test")
 
     return(test_df)
 }
@@ -870,24 +868,24 @@ alphaDiversity <- function(data, min_q=0, max_q=4, step_q=0.1, ci=0.95, ...) {
     
     # Summarize diversity
     div_df <- boot_df %>%
-        tidyr::gather(key="N", value="X", -one_of(c(group, "Q"))) %>%
+        tidyr::gather(key="n", value="X", -one_of(c(group, "q"))) %>%
         dplyr::mutate(X=as.numeric(!!rlang::sym("X"))) %>%
-        dplyr::group_by(!!!rlang::syms(c(group, "Q"))) %>%
-        dplyr::summarize(D=mean(!!rlang::sym("X"), na.rm=TRUE),
-                         D_SD=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
-        dplyr::mutate(D_LOWER=pmax(!!rlang::sym("D") - !!rlang::sym("D_SD") * ci_x, 0), 
-                      D_UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD") * ci_x)
+        dplyr::group_by(!!!rlang::syms(c(group, "q"))) %>%
+        dplyr::summarize(d=mean(!!rlang::sym("X"), na.rm=TRUE),
+                         d_sd=sd(!!rlang::sym("X"), na.rm=TRUE)) %>%
+        dplyr::mutate(d_lower=pmax(!!rlang::sym("d") - !!rlang::sym("d_sd") * ci_x, 0), 
+                      d_upper=!!rlang::sym("d") + !!rlang::sym("d_sd") * ci_x)
     
     # Compute evenness
     div_qi <- div_df %>%
-        filter(!!rlang::sym("Q") == 0) %>%
-        select(one_of(c(group, "D")))
+        filter(!!rlang::sym("q") == 0) %>%
+        select(one_of(c(group, "d")))
     div_df <- div_df %>%
         dplyr::right_join(div_qi, by=group, suffix=c("", "_0")) %>%
-        mutate(E=!!rlang::sym("D")/!!rlang::sym("D_0"), 
-               E_LOWER=!!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
-               E_UPPER=!!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
-        select(-!!rlang::sym("D_0"))
+        mutate(e=!!rlang::sym("d")/!!rlang::sym("d_0"), 
+               e_lower=!!rlang::sym("d_lower")/!!rlang::sym("d_0"), 
+               e_upper=!!rlang::sym("d_upper")/!!rlang::sym("d_0")) %>%
+        select(-!!rlang::sym("d_0"))
     
     # Test
     if (length(abundance@groups) > 1) {
@@ -993,26 +991,26 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
     }
 
     # Generate summary diversity output
-    div_df <- bind_rows(beta_diversity_list, .id = "COMPARISON")
+    div_df <- bind_rows(beta_diversity_list, .id = "comparison")
     
     # Beta groups
-    group_set <- unique(div_df[["COMPARISON"]])
+    group_set <- unique(div_df[["comparison"]])
     
     # Compute evenness
     div_qi <- div_df %>%
-        filter(!!rlang::sym("Q") == 0) %>%
-        select(one_of(c("COMPARISON", "D")))
+        filter(!!rlang::sym("q") == 0) %>%
+        select(one_of(c("comparison", "D")))
 
     div <- div_df %>%
-        right_join(div_qi, by = "COMPARISON", suffix = c("", "_0")) %>%
-        mutate(E = !!rlang::sym("D")/!!rlang::sym("D_0"), 
-            E_LOWER = !!rlang::sym("D_LOWER")/!!rlang::sym("D_0"), 
-            E_UPPER = !!rlang::sym("D_UPPER")/!!rlang::sym("D_0")) %>%
-        select(-!!rlang::sym("D_0"))
+        right_join(div_qi, by = "comparison", suffix = c("", "_0")) %>%
+        mutate(d = !!rlang::sym("d")/!!rlang::sym("d_0"), 
+            e_lower = !!rlang::sym("d_lower")/!!rlang::sym("d_0"), 
+            e_upper = !!rlang::sym("d_upper")/!!rlang::sym("d_0")) %>%
+        select(-!!rlang::sym("d_0"))
         
     # Test
     if (length(group_set) > 1) {
-       test_df <- helperTest(div_df, q=q, group="COMPARISON")
+       test_df <- helperTest(div_df, q=q, group="comparison")
     } else {
        test_df <- NULL
     }
@@ -1022,7 +1020,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
                    diversity=div, 
                    tests=test_df,
                    method="beta",
-                   group_by="COMPARISON",
+                   group_by="comparison",
                    groups=group_set,
                    n=abundance@n,
                    q=q,  
@@ -1097,7 +1095,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     
     if (!all(is.na(group_labels))) {
         # Define grouped plot
-        p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P", group=data@group_by)) + 
+        p1 <- ggplot(data@abundance, aes_string(x="rank", y="p", group=data@group_by)) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
@@ -1106,7 +1104,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER", fill=data@group_by), alpha=0.4) +
+            geom_ribbon(aes_string(ymin="lower", ymax="upper", fill=data@group_by), alpha=0.4) +
             geom_line(aes_string(color=data@group_by))
         
         # Set colors and legend
@@ -1125,7 +1123,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             line_color <- "black"
         }
         # Define plot
-        p1 <- ggplot(data@abundance, aes_string(x="RANK", y="P")) + 
+        p1 <- ggplot(data@abundance, aes_string(x="rank", y="p")) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
@@ -1134,7 +1132,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes_string(ymin="LOWER", ymax="UPPER"), fill=line_color, alpha=0.4) +
+            geom_ribbon(aes_string(ymin="lower", ymax="upper"), fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
     }
     
@@ -1208,21 +1206,21 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     } else if (annotate == "none") {
         group_labels <- setNames(data@groups, data@groups)
     } else if (annotate == "depth") {
-        group_labels <- setNames(paste0(data@groups, " (N=", data@n, ")"),
+        group_labels <- setNames(paste0(data@groups, " (n=", data@n, ")"),
                                  data@groups)
     }
     
     # Define y-axis scores
     if (score == "diversity") {
-        y_value <- "D"
-        y_min <- "D_LOWER"
-        y_max <- "D_UPPER"
+        y_value <- "d"
+        y_min <- "d_lower"
+        y_max <- "d_upper"
         y_label <- expression(''^q * D)
     } else if (score == "evenness") {
-        y_value <- "E"
-        y_min <- "E_LOWER"
-        y_max <- "E_UPPER"
-        y_label <- expression(''^q * E)
+        y_value <- "e"
+        y_min <- "e_lower"
+        y_max <- "e_upper"
+        y_label <- expression(''^q * e)
     }
     
     # Stupid hack for check NOTE about `.x` in math_format
@@ -1230,7 +1228,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     if (!all(is.na(group_labels))) {
         # Define grouped plot
-        p1 <- ggplot(data@diversity, aes_string(x="Q", y=y_value, group=data@group_by)) + 
+        p1 <- ggplot(data@diversity, aes_string(x="q", y=y_value, group=data@group_by)) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('q') +
@@ -1255,7 +1253,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
         }
       
         # Define ungrouped plot
-        p1 <- ggplot(data@diversity, aes_string(x="Q", y=y_value)) + 
+        p1 <- ggplot(data@diversity, aes_string(x="q", y=y_value)) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('q') +
@@ -1358,9 +1356,9 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     }
     # Define plot values
     df <- data@diversity %>%
-        dplyr::filter(!!rlang::sym("Q") == q) %>%
-        dplyr::mutate(LOWER=!!rlang::sym("D") - !!rlang::sym("D_SD"), 
-                      UPPER=!!rlang::sym("D") + !!rlang::sym("D_SD"))
+        dplyr::filter(!!rlang::sym("q") == q) %>%
+        dplyr::mutate(lower=!!rlang::sym("d") - !!rlang::sym("d_sd"), 
+                      upper=!!rlang::sym("d") + !!rlang::sym("d_sd"))
     
     # Define base plot elements
     p1 <- ggplot(df, aes_string(x=data@group_by)) + 
@@ -1368,8 +1366,8 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
         baseTheme() + 
         xlab("") +
         ylab(bquote("Mean " ^ .(q) * D %+-% "SD")) +
-        geom_linerange(aes_string(ymin="LOWER", ymax="UPPER", color=data@group_by), alpha=0.8) +
-        geom_point(aes_string(y="D", color=data@group_by))
+        geom_linerange(aes_string(ymin="lower", ymax="upper", color=data@group_by), alpha=0.8) +
+        geom_point(aes_string(y="d", color=data@group_by))
     
     # Set colors and legend
     if (!is.null(colors)) {

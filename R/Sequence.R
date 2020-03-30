@@ -444,17 +444,17 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
     
-    # Initialize COLLAPSE_COUNT with 1 for each sequence
+    # Initialize collapse_count with 1 for each sequence
     if(add_count) {
-        data[["COLLAPSE_COUNT"]] <- rep(1, nrow(data))
-        num_fields <- c(num_fields, "COLLAPSE_COUNT")
+        data[["collapse_count"]] <- rep(1, nrow(data))
+        num_fields <- c(num_fields, "collapse_count")
     }
     
     # Initialize dry run columns 
     if (dry) {
-        data$COLLAPSE_ID <- NA
-        data$COLLAPSE_CLASS <- NA
-        data$COLLAPSE_PASS <- TRUE
+        data$collapse_id <- NA
+        data$collapse_class <- NA
+        data$collapse_pass <- TRUE
     }
     
     # Return input if there are no sequences to collapse
@@ -462,9 +462,9 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     if (nseq <= 1) { 
         if (verbose) { .printVerbose(nseq, 1, 0) }
         if (dry) {
-            data$COLLAPSE_ID <- 1
-            data$COLLAPSE_CLASS <- "unique"
-            data$COLLAPSE_PASS <- TRUE            
+            data$collapse_id <- 1
+            data$collapse_class <- "unique"
+            data$collapse_pass <- TRUE            
         }
         return(data)
     }
@@ -477,9 +477,9 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     if (!any(d_mat[lower.tri(d_mat, diag=F)])) {
         if (verbose) { .printVerbose(nseq, nseq, 0) }
         if (dry) {
-            data$COLLAPSE_ID <- 1:nrow(data)
-            data$COLLAPSE_CLASS <- "unique"
-            data$COLLAPSE_PASS <- TRUE            
+            data$collapse_id <- 1:nrow(data)
+            data$collapse_class <- "unique"
+            data$collapse_pass <- TRUE            
         }
         return(data)
     }        
@@ -496,8 +496,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     discard_count <- length(ambig_rows)
     
     if (dry & length(ambig_rows)>0) {
-        data[["COLLAPSE_CLASS"]][ambig_rows] <- "ambiguous"
-        data[["COLLAPSE_PASS"]][ambig_rows] <- FALSE
+        data[["collapse_class"]][ambig_rows] <- "ambiguous"
+        data[["collapse_pass"]][ambig_rows] <- FALSE
     }
     
     # Return single sequence if all or all but one sequence belong to ambiguous clusters 
@@ -515,8 +515,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {
-            data[["COLLAPSE_ID"]] <- inform_len$clusters
-            data[["COLLAPSE_PASS"]][selected] <- TRUE
+            data[["collapse_id"]] <- inform_len$clusters
+            data[["collapse_pass"]][selected] <- TRUE
         } else {
             return(data[selected, ])
         }
@@ -553,7 +553,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         
         # Update collapse group
         if (dry) {
-            data[["COLLAPSE_ID"]][idx] <- paste(data[["COLLAPSE_ID"]][idx], collapse_id, sep=",")
+            data[["collapse_id"]][idx] <- paste(data[["collapse_id"]][idx], collapse_id, sep=",")
         }
         
         if (dry) {
@@ -567,12 +567,12 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
             if (dry) {
                 if (length(idx_copy)==1) {
                     ## 'truly' unique
-                    data[["COLLAPSE_CLASS"]][taxa_i] <- "unique"    
+                    data[["collapse_class"]][taxa_i] <- "unique"    
                 } else {
                     ## unique after ambiguous removal
-                    data[["COLLAPSE_CLASS"]][taxa_i] <- "ambiguous_duplicate"
+                    data[["collapse_class"]][taxa_i] <- "ambiguous_duplicate"
                 }
-                data[["COLLAPSE_PASS"]][taxa_i] <- TRUE
+                data[["collapse_pass"]][taxa_i] <- TRUE
             }
         } else if (length(idx) > 1) {
             # Assign clusters of duplicates to duplicate list            
@@ -582,8 +582,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
                 # larger number of informative positions 
                 # (the first one if ties)
                 max_info_idx <- which.max(.informativeLength(data[[seq]][idx]))[1]
-                data[["COLLAPSE_CLASS"]][idx] <- "duplicated"
-                data[["COLLAPSE_PASS"]][idx[-max_info_idx]] <- FALSE
+                data[["collapse_class"]][idx] <- "duplicated"
+                data[["collapse_pass"]][idx[-max_info_idx]] <- FALSE
             }
         } else {
             # Report error (should never occur)
@@ -594,7 +594,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     }
    
     if (dry) {
-        data[["COLLAPSE_ID"]] <-  sub("^NA,","",data[["COLLAPSE_ID"]])
+        data[["collapse_id"]] <-  sub("^NA,","",data[["collapse_id"]])
         return(data)
     }
     
