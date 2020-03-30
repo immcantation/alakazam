@@ -42,6 +42,8 @@ library(alakazam)
 data(ExampleDb)
 ```
 
+For details about the AIRR format, visit the AIRR Community documentation site \url{https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields}
+
 ## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
@@ -183,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.46   0   
-##  2 IGHA != IGHD 1         184.       8.43   0   
-##  3 IGHA != IGHD 2         191.      11.6    0   
-##  4 IGHA != IGHG 0           3.59     7.64   0.7 
-##  5 IGHA != IGHG 1          24.0      6.04   0   
-##  6 IGHA != IGHG 2          26.6      4.40   0   
-##  7 IGHA != IGHM 0         159.       6.23   0   
-##  8 IGHA != IGHM 1         212.       5.96   0   
-##  9 IGHA != IGHM 2         230.       7.00   0   
-## 10 IGHD != IGHG 0         135.       7.51   0   
-## 11 IGHD != IGHG 1         160.       8.54   0   
-## 12 IGHD != IGHG 2         164.      11.7    0   
-## 13 IGHD != IGHM 0          19.7      5.64   0   
-## 14 IGHD != IGHM 1          27.5      8.03   0   
-## 15 IGHD != IGHM 2          39.1     12.5    0.01
-## 16 IGHG != IGHM 0         155.       6.20   0   
-## 17 IGHG != IGHM 1         188.       6.34   0   
-## 18 IGHG != IGHM 2         203.       7.79   0
+##  1 IGHA != IGHD 0         139.       7.95   0   
+##  2 IGHA != IGHD 1         183.       8.28   0   
+##  3 IGHA != IGHD 2         189.      11.5    0   
+##  4 IGHA != IGHG 0           4.22     8.45   0.69
+##  5 IGHA != IGHG 1          24.7      6.53   0   
+##  6 IGHA != IGHG 2          27.1      4.75   0   
+##  7 IGHA != IGHM 0         159.       6.62   0   
+##  8 IGHA != IGHM 1         212.       6.01   0   
+##  9 IGHA != IGHM 2         230.       6.87   0   
+## 10 IGHD != IGHG 0         134.       7.16   0   
+## 11 IGHD != IGHG 1         158.       8.33   0   
+## 12 IGHD != IGHG 2         162.      11.8    0   
+## 13 IGHD != IGHM 0          20.2      5.62   0   
+## 14 IGHD != IGHM 1          28.5      8.16   0   
+## 15 IGHD != IGHM 2          40.8     12.8    0   
+## 16 IGHG != IGHM 0         155.       6.08   0   
+## 17 IGHG != IGHM 1         187.       6.22   0   
+## 18 IGHG != IGHM 2         202.       7.67   0
 ```
 
 ```r

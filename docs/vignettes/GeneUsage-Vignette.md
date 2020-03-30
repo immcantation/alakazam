@@ -7,7 +7,10 @@ are also provided.
 
 ## Example data
 
-A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. 
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package.
+
+For details about the AIRR format, visit the AIRR Community documentation site \url{https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields}
+
 Gene usage analysis requires only the following columns:
 
 * `v_call`

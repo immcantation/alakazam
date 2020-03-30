@@ -17,14 +17,14 @@ Arguments
 
 iglist
 :   list of igphyml objects returned by [readIgphyml](readIgphyml.md). 
-Each must have an `ID` column in its `param` attribute, 
+Each must have an `id` column in its `param` attribute, 
 which can be added automatically using the `id` option of 
 `readIgphyml`.
 
 format
 :   string specifying whether each column of the resulting data.frame
 should represent a parameter (`wide`) or if 
-there should only be three columns; i.e. ID, varable, and value
+there should only be three columns; i.e. id, varable, and value
 (`long`).
 
 
@@ -44,7 +44,7 @@ Details
 objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
 other hypothesis testing analyses.
 
-All igphyml objects used must have an "ID" column in their `param` attribute, which
+All igphyml objects used must have an "id" column in their `param` attribute, which
 can be added automatically from the `id` flag of `readIgphyml`.
 
 

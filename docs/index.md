@@ -40,7 +40,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 # Authors
 
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (aut, cre)  
+[Immcantation](mailto:immcantation@gmail.com) (cre)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (aut)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  

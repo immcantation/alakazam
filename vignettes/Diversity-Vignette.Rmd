@@ -69,6 +69,8 @@ library(alakazam)
 data(ExampleDb)
 ```
 
+For details about the AIRR format, visit the AIRR Community documentation site \url{https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields}
+
 ## Generate a clonal abundance curve
 
 A simple table of the observed clonal abundance counts and frequencies may be
