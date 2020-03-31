@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 1.0.0
-Date: 2020-03-30
+Date: 2020-03-31
 Authors@R: c(person("Immcantation", "", role=c("cre"), 
                     email="immcantation@gmail.com"),
              person("Jason", "Vander Heiden", role=c("aut"), 

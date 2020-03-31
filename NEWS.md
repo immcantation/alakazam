@@ -28,13 +28,18 @@ Backwards Incompatible Changes:
        `parent`, `child`, `outdegree`, `steps`, `annotation`, `pvalue`)
 + `IG_COLOR` names converted to official C region identifiers 
    (IGHA, IGHD, IGHE, IGHG, IGHM, IGHK, IGHL).
-   
+
+General:
+
++ `baseTheme` looks is now consistent across `sizing` options.
++ `cpuCount` will now return `1` if the core count cannot be determined.
+
 Diversity:
 
 + Fixed documentation error in diversity vignette for viewing test results.
-+ `estimateAbundance` slot `clone_by` returns the actual name of the column
++ `estimateAbundance` slot `clone_by` now contains the name of the column
    with the clonal group identifier, as specified in the function call. For 
-   example, if the function is called with `clone="clone_id"`, 
+   example, if the function was called with `clone="clone_id"`, 
    then `abundace@clone_by` will be `clone_id`.
 
 
