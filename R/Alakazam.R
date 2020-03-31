@@ -152,3 +152,8 @@
 #' @importFrom  Rcpp        evalCpp
 #' @useDynLib   alakazam, .registration=TRUE
 NULL
+
+# Package loading actions
+.onAttach <- function(libname, pkgname) {
+    packageStartupMessage("AIRR Rearrangement schema is now the default format")
+}
