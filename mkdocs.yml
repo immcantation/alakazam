@@ -104,4 +104,8 @@ pages:
       - topics/IUPAC_CODES.md
       - topics/DEFAULT_COLORS.md
       - topics/IMGT_REGIONS.md
+    - 'Deprecated':
+      - topics/rarefyDiversity.md
+      - topics/testDiversity.md
+
       
