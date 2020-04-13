@@ -253,6 +253,7 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #'                     the data in \code{seq}.
 #' @param    start     if \code{TRUE} pad the beginning of each sequence instead of the end. 
 #' @param    pad_char  character to use for padding.
+#' @param    triple    pad sequences to be of length multiple three
 #' 
 #' @return   A modified \code{seq} vector with padded sequences.
 #' 
@@ -271,15 +272,18 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #' padSeqEnds(seq, len=15, start=TRUE)
 #' 
 #' @export
-padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N") {
+padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N", triple=FALSE) {
     # Set length to max input length
-    width <- max(stri_length(seq),len)
+    width <- max(stringi::stri_length(seq),len)
+    if (triple) {
+        width <- width + (3 - width %% 3)
+    }
     
     # Pad
     if (!start) { 
-        seq <- stri_pad_right(seq, width=width, pad=pad_char)
+        seq <- stringi::stri_pad_right(seq, width=width, pad=pad_char)
     } else {
-        seq <- stri_pad_left(seq, width=width, pad=pad_char)
+        seq <- stringi::stri_pad_left(seq, width=width, pad=pad_char)
     }
 
     return(seq)

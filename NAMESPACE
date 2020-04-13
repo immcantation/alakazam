@@ -2,6 +2,7 @@
 
 export(ABBREV_AA)
 export(DNA_COLORS)
+export(DNA_IUPAC)
 export(IG_COLORS)
 export(IMGT_REGIONS)
 export(IUPAC_AA)

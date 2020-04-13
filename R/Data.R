@@ -176,6 +176,7 @@ TR_COLORS <- c("TRA"="#CBD5E8",
 #' \itemize{
 #'   \item  \code{IUPAC_DNA}:  DNA ambiguous character translations.
 #'   \item  \code{IUPAC_AA}:   Amino acid ambiguous character translations.
+#'   \item  \code{DNA_IUPAC}:  Ordered DNA to ambiguous characters
 #' }
 #' 
 #' @name    IUPAC_CODES
@@ -230,6 +231,24 @@ IUPAC_AA <-  list("A"="A",
                   "Z"=c("E","Q"),
                   "*"="*")
 
+#' @rdname    IUPAC_CODES
+#' @export
+DNA_IUPAC <- list(
+                  "A"="A", 
+                  "C"="C", 
+                  "G"="G", 
+                  "T"="T",
+                  "AC"="M", 
+                  "AG"="R", 
+                  "AT"="W", 
+                  "CG"="S", 
+                  "CT"="Y", 
+                  "GT"="K", 
+                  "ACG"="V", 
+                  "ACT"="H", 
+                  "AGT"="D", 
+                  "CGT"="B",
+                  "ACGT"="N")
 
 #' Amino acid abbreviation translations
 #' 
