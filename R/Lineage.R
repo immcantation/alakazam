@@ -200,8 +200,9 @@ writePhylipInput <- function(clone, path) {
 # @param   path          temporary directory containing infile.
 # @param   dnapars_exec  path to the dnapars or dnaml executable.
 # @param   verbose       if TRUE suppress phylip console output.
+# @param   onetree       if TRUE save only one tree
 # @return  TRUE if phylip ran successfully and FALSE otherwise
-runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
+runPhylip <- function(path, dnapars_exec, verbose=FALSE, onetree=FALSE) {
     # Expand shell variables
     dnapars_exec <- path.expand(dnapars_exec)
     
@@ -225,6 +226,9 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
         phy_options <- c("S", "Y", "I", "4", "5", ".")
     }else{
         stop("Executable not recognized! Must end with dnapars or dnaml")
+    }
+    if (onetree) {
+        phy_options <- c(phy_options, "V", "1")
     }
 
     params <- list(dnapars_exec, input=c(phy_options, "Y"), wait=TRUE)
@@ -535,7 +539,8 @@ makePhylo <- function(edges, clone, inf_df){
 #'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
 #'                         the console.
 #' @param    phylo         return tree as a \code{phylo} object
-#' @param    temp_path     specific path to temp directory if desired  
+#' @param    temp_path     specific path to temp directory if desired
+#' @param    onetree       if TRUE save only one tree  
 #'                                                
 #' @return   An igraph \code{graph} object defining the Ig lineage tree. Each unique input 
 #'           sequence in \code{clone} is a vertex of the tree, with additional vertices being
@@ -645,7 +650,7 @@ makePhylo <- function(edges, clone, inf_df){
 #' @export
 buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0), 
                                rm_temp=FALSE, verbose=FALSE, phylo=FALSE,
-                               temp_path=NULL) {
+                               temp_path=NULL, onetree=FALSE) {
     # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
@@ -685,7 +690,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
-    runPhylip(temp_path, dnapars_exec, verbose=verbose)
+    runPhylip(temp_path, dnapars_exec, verbose=verbose, onetree=onetree)
     phylip_out <- readPhylipOutput(temp_path)
     
     # Remove temporary directory

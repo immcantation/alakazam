@@ -11,7 +11,7 @@ characters to create a sequence vector with uniform lengths.
 Usage
 --------------------
 ```
-padSeqEnds(seq, len = NULL, start = FALSE, pad_char = "N")
+padSeqEnds(seq, len = NULL, start = FALSE, pad_char = "N", triple = FALSE)
 ```
 
 Arguments
@@ -29,6 +29,9 @@ start
 
 pad_char
 :   character to use for padding.
+
+triple
+:   pad sequences to be of length multiple three
 
 
 

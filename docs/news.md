@@ -1,4 +1,4 @@
-Version 0.3.0.999:  March 18, 2020
+Version 1.0.0:  March 30, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -18,28 +18,29 @@ Backwards Incompatible Changes:
 + For consistency with the style of the new data format default, other field 
   names have been updated to use the same capitalization. This change affects:
      - amino acid physicochemical properties (e.g. `GRAVY` to `gravy`); 
-     - `countGenes`, `countClones` (e.g. `SEQ_COUNT` to `seq_count`)
-     - `estimateAbundance` (in slot `abundance`, `RANK` to `rank`)
-     - `groupGenes` (e.g. `VJ_GROUP` to `vj_group`)
-     - `collapseDuplicates` and `makeChangeoClone` (e.g. `SEQUENCE_ID` to 
+     - `countGenes`, `countClones` (e.g., `SEQ_COUNT` to `seq_count`)
+     - `estimateAbundance` (e.g., `RANK` to `rank`)
+     - `groupGenes` (e.g., `VJ_GROUP` to `vj_group`)
+     - `collapseDuplicates` and `makeChangeoClone` (e.g., `SEQUENCE_ID` to 
        `sequence_id`, `COLLAPSE_COUNT` to `collapse_count`)
      - lineage tree functions (`summarizeTrees`, `getPathLengths`, `getMRCA`, 
-       `tableEdges`, `testEdges`) also return columns in lower case (e.g. 
-       `parent`, `child`, `outdegree`, `steps`, `annotation`, `pvalue`,...)
-
-General:
-
+       `tableEdges`, `testEdges`) also return columns in lower case (e.g., 
+       `parent`, `child`, `outdegree`, `steps`, `annotation`, `pvalue`)
 + `IG_COLOR` names converted to official C region identifiers 
    (IGHA, IGHD, IGHE, IGHG, IGHM, IGHK, IGHL).
 
-+ `estimateAbundance` slot `clone_by` retuns the actual name of the column
-   with clones identifier, as specified in the function call. Example: if the 
-   function is called with `clone = "clone_id"`, `abundace@clone_by` will be 
-   `clone_id`.
-   
+General:
+
++ `baseTheme` looks is now consistent across `sizing` options.
++ `cpuCount` will now return `1` if the core count cannot be determined.
+
 Diversity:
 
 + Fixed documentation error in diversity vignette for viewing test results.
++ `estimateAbundance` slot `clone_by` now contains the name of the column
+   with the clonal group identifier, as specified in the function call. For 
+   example, if the function was called with `clone="clone_id"`, 
+   then `abundace@clone_by` will be `clone_id`.
 
 
 Version 0.3.0:  July 17, 2019

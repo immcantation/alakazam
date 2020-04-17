@@ -15,6 +15,9 @@ IUPAC_DNA
 ```
 IUPAC_AA
 ```
+```
+DNA_IUPAC
+```
 
 
 
@@ -28,11 +31,14 @@ ambiguous character.
 
 + `IUPAC_DNA`:  DNA ambiguous character translations.
 + `IUPAC_AA`:   Amino acid ambiguous character translations.
++ `DNA_IUPAC`:  Ordered DNA to ambiguous characters
 
 
 An object of class `list` of length 15.
 
 An object of class `list` of length 25.
+
+An object of class `list` of length 15.
 
 
 

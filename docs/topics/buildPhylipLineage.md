@@ -4,7 +4,7 @@ Description
 --------------------
 
 `buildPhylipLineage` reconstructs an Ig lineage via maximum parsimony using the 
-dnapars application of the PHYLIP package.
+dnapars application, or maximum liklihood using the dnaml application of the PHYLIP package.
 
 
 Usage
@@ -15,7 +15,9 @@ clone,
 dnapars_exec,
 dist_mat = getDNAMatrix(gap = 0),
 rm_temp = FALSE,
-verbose = FALSE
+verbose = FALSE,
+phylo = FALSE,
+temp_path = NULL
 )
 ```
 
@@ -26,7 +28,7 @@ clone
 :   [ChangeoClone](ChangeoClone-class.md) object containing clone data.
 
 dnapars_exec
-:   absolute path to the PHYLIP dnapars executable.
+:   absolute path to the PHYLIP dnapars or dnaml executable.
 
 dist_mat
 :   Character distance matrix to use for reassigning edge weights. 
@@ -46,6 +48,12 @@ verbose
 :   if `FALSE` suppress the output of dnapars; 
 if `TRUE` STDOUT and STDERR of dnapars will be passed to 
 the console.
+
+phylo
+:   return tree as a `phylo` object
+
+temp_path
+:   specific path to temp directory if desired
 
 
 
@@ -94,6 +102,10 @@ the input `ChangeoClone`.
 the input `ChangeoClone`.
 + `junc_len`:  junction length (nucleotide count) from the 
 `junc_len` slot of the input `ChangeoClone`.
+
+Alternatively, this function will return an `phylo` object, which is compatible
+with the ape package. This object will contain reconstructed ancestral sequences in
+`nodes` attribute.
 
 
 
