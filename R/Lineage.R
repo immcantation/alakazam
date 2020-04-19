@@ -286,7 +286,9 @@ getPhylipInferred <- function(phylip_out) {
         seq_empty <- grep("^\\s*$", phylip_out[seq_start:length(phylip_out)], perl=T, fixed=F)
         seq_len <- seq_empty[min(which(seq_empty[-1] == (seq_empty[-length(seq_empty)] + 1)))]
         seq_block <- paste(phylip_out[(seq_start + 2):(seq_start + seq_len - 2)], collapse="\n")
-        seq_df <- read.table(textConnection(seq_block), as.is=T, fill=T, blank.lines.skip=F)
+        tc <- textConnection(seq_block)
+        seq_df <- read.table(tc, as.is=T, fill=T, blank.lines.skip=F)
+        close(tc)
         
         # Correct first line of block and remove blank rows
         fix.row <- c(1, which(is.na(seq_df[,1])) + 1)
@@ -305,8 +307,10 @@ getPhylipInferred <- function(phylip_out) {
         seq_empty <- grep("^\\s*$", phylip_out[seq_start:length(phylip_out)], perl=T, fixed=F)
         seq_len <- max(seq_empty)
         seq_block <- paste(phylip_out[(seq_start + 2):(seq_start + seq_len - 2)], collapse="\n")
-        seq_df <- read.table(textConnection(seq_block), as.is=T, fill=T, blank.lines.skip=F)
-    
+        textConnection(seq_block)
+        seq_df <- read.table(tc, as.is=T, fill=T, blank.lines.skip=F)
+        close(tc)
+
         # Correct first line of block and remove blank rows
         fix.row <- c(which(seq_df[,1]==""))
         if (length(fix.row)>1) {
@@ -350,8 +354,10 @@ getPhylipEdges <- function(phylip_out, id_map=NULL) {
         edge_len <- min(grep('^\\s*$', phylip_out[edge_start:length(phylip_out)], 
                              perl=TRUE, fixed=FALSE))
         edge_block <- paste(phylip_out[(edge_start + 2):(edge_start + edge_len - 2)], collapse='\n')
-        edge_df <- read.table(textConnection(edge_block), col.names=c('from', 'to', 'weight'), 
+        tc <- textConnection(edge_block)
+        edge_df <- read.table(tc, col.names=c('from', 'to', 'weight'), 
                               as.is=TRUE)
+        close(tc)
     }else if(length(ml_start) > 0){
         edge_start <- min(ml_start)+3
         edge_len <- min(grep('^\\s*$', phylip_out[edge_start:length(phylip_out)], 
@@ -361,8 +367,10 @@ getPhylipEdges <- function(phylip_out, id_map=NULL) {
             paste(x[1:(min(which(x == "("))-1)],collapse=" ")
         }))
         edge_block <- paste(block, collapse='\n')
-        edge_df <- read.table(textConnection(edge_block), col.names=c('from', 'to', 'weight'), 
+        tc <- textConnection(edge_block)
+        edge_df <- read.table(tc, col.names=c('from', 'to', 'weight'), 
                               as.is=TRUE)
+        close(tc)
     }
     # Modify inferred taxa names to include "Inferred"
     inf_map <- unique(grep("^[0-9]+$", c(edge_df$from, edge_df$to), value=T))
