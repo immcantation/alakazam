@@ -672,13 +672,13 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     if (any( sapply(cols_for_grouping_heavy, function(x){class(data[[x]]) == "factor"}) )) {
         stop("one or more of { ", v_call, ", ", j_call,  
              ifelse(is.null(junc_len), " ", ", "), junc_len, 
-             "} is factor. Must be character.\n")
+             "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
     }
     if (single_cell & !only_igh) {
         if (any( sapply(cols_for_grouping_light, function(x) {class(data[[x]]) == "factor"}) )) {
             stop("one or more of { ", v_call_light, ", ", j_call_light,  
                  ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
-                 "} is factor. Must be character.\n")
+                 "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
         }  
     }
     
