@@ -820,7 +820,7 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
     rootanc <- edges[edges[, 2] == rootnode, 1]
     mrcaedge <- which(edges[, 1] == rootanc & edges[, 2] != rootnode)
     if(length(mrcaedge) > 1){
-            print("POLYTOMY AT ROOT?!")
+            print("POLYTOMY AT ROOT!")
             quit(save="no", status=1, runLast=FALSE)
     }
     tree$edge.length[mrcaedge] <- tree$edge.length[mrcaedge] + tree$edge.length[rootedge]
@@ -840,9 +840,12 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' @param    id            ID to assign to output object.
 #' @param    format        if \code{"graph"} return trees as igraph \code{graph} objects. 
 #'                         if \code{"phylo"} return trees as ape \code{phylo} objects.
+#' @param    branches        if \code{"distance"} branch lengths are in expected mutations per
+#'                         site. If \code{"mutations"} branches are in expected mutations.
 #' @param    collapse      if \code{TRUE} transform branch lengths to units of substitutions, 
 #'                         rather than substitutions per site, and collapse internal nodes
-#'                         separated by branches < 0.1 substitutions.
+#'                         separated by branches < 0.1 substitutions. Will also remove all
+#'                         internal node labels, as it makes them inconsistent.
 #'                                                
 #' @return   A list containing IgPhyML model parameters and estimated lineage trees. 
 #'           
@@ -909,9 +912,11 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=FALSE,
+    branches=c("distance","mutations")) {
     # Check arguments
     format <- match.arg(format)
+    branches <- match.arg(branches)
     
     out <- list()
     trees <- list()
@@ -927,10 +932,23 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
         if(length(germ_id) > 1){
             stop("Can only be one tip of the form '<cloneid>_GERM'")
         }
-        rtree <- rerootGermline(tree,germ_id,resolve=TRUE)
-        if (collapse) {
+        if(!ape::is.rooted(tree)){
+            warning(paste("Tree",germ_base,"is not rooted and should be!"))
+            tree <- rerootGermline(tree,germ_id,resolve=TRUE)
+            tree$node.label <- NULL
+        }
+        rtree <- ape::ladderize(tree)
+        rtree$germid <- germ_id
+        if (branches == "mutations") {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
-            rtree <- ape::di2multi(rtree, tol=0.1)
+        }
+        if (collapse) {
+            rtree$node.label <- NULL
+            if(branches == "mutations"){
+                rtree <- ape::di2multi(rtree, tol=0.1)
+            }else{
+                rtree <- ape::di2multi(rtree, tol=0.0001)
+            }
         }
         if (format == "graph") {
             ig <- phyloToGraph(rtree, germline=rtree$germid)
