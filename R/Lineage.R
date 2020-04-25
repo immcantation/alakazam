@@ -954,7 +954,7 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=FALS
             ig <- phyloToGraph(rtree, germline=rtree$germid)
             trees[[df[["CLONE"]][i]]] <- ig
         } else if (format == "phylo") {
-            trees[[df[["CLONE"]][i]]] <- tree
+            trees[[df[["CLONE"]][i]]] <- rtree
         } else {
             stop("Format must be either 'graph' or 'phylo'.")
         }
