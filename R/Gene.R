@@ -503,17 +503,13 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        cell_id=NULL, locus=NULL, only_igh=TRUE,
                        first=FALSE) {
-    
-    # calling `data` `data` is hugely problematic b/c `data` is a default R function
-    # data_orig <- data will cause downstream errors
-    
     # Check input
     check <- checkColumns(data, c(v_call, j_call, junc_len, cell_id, locus))
     if (check != TRUE) { stop(check) }
     
     # if necessary, cast select columns to character (factor not allowed later on)
-    if (class(v_call)=="factor") { db[[v_call]] <- as.character(db[[v_call]]) }
-    if (class(j_call)=="factor") { db[[j_call]] <- as.character(db[[j_call]]) }
+    if (!is(db[[v_call]], "character")) { db[[v_call]] <- as.character(db[[v_call]]) }
+    if (!is(db[[j_call]], "character")) { db[[j_call]] <- as.character(db[[j_call]]) }
     
     # e.g.: "Homsap IGHV3-7*01 F,Homsap IGHV3-6*01 F;Homsap IGHV1-4*01 F"
     separator_within_seq <- ","
