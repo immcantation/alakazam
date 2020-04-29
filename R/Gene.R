@@ -508,8 +508,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     if (check != TRUE) { stop(check) }
     
     # if necessary, cast select columns to character (factor not allowed later on)
-    if (!is(db[[v_call]], "character")) { db[[v_call]] <- as.character(db[[v_call]]) }
-    if (!is(db[[j_call]], "character")) { db[[j_call]] <- as.character(db[[j_call]]) }
+    if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
+    if (!is(data[[j_call]], "character")) { data[[j_call]] <- as.character(data[[j_call]]) }
     
     # e.g.: "Homsap IGHV3-7*01 F,Homsap IGHV3-6*01 F;Homsap IGHV1-4*01 F"
     separator_within_seq <- ","
@@ -519,8 +519,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     if ( !is.null(cell_id) & !is.null(locus) ) {
         single_cell <- TRUE
         
-        if (class(cell_id)=="factor") { db[[cell_id]] <- as.character(db[[cell_id]]) }
-        if (class(locus)=="factor") { db[[locus]] <- as.character(db[[locus]]) }
+        if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
+        if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
         
         if (!all(data[[locus]] %in% c("IGH", "IGK", "IGL"))) {
             stop("The locus column must be one of {IGH, IGK, IGL}.")
