@@ -307,7 +307,7 @@ getPhylipInferred <- function(phylip_out) {
         seq_empty <- grep("^\\s*$", phylip_out[seq_start:length(phylip_out)], perl=T, fixed=F)
         seq_len <- max(seq_empty)
         seq_block <- paste(phylip_out[(seq_start + 2):(seq_start + seq_len - 2)], collapse="\n")
-        textConnection(seq_block)
+        tc <- textConnection(seq_block)
         seq_df <- read.table(tc, as.is=T, fill=T, blank.lines.skip=F)
         close(tc)
 
@@ -1027,7 +1027,7 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' }
 #' 
 #' @export
-readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE) {
+readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=FALSE) {
     # Check arguments
     format <- match.arg(format)
     
@@ -1045,7 +1045,9 @@ readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=TRUE
         if(length(germ_id) > 1){
             stop("Can only be one tip of the form '<cloneid>_GERM'")
         }
-        rtree <- rerootGermline(tree,germ_id,resolve=TRUE)
+        #rtree <- rerootGermline(tree,germ_id,resolve=TRUE)
+        rtree <- ape::ladderize(tree)
+        rtree$germid = germ_id
         if (collapse) {
             rtree$edge.length <- round(rtree$edge.length*df[i, ]$NSITE, digits=1)
             rtree <- ape::di2multi(rtree, tol=0.1)
