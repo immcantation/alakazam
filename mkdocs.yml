@@ -1,4 +1,5 @@
 site_name: alakazam
+site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
 theme: readthedocs
 markdown_extensions:
@@ -8,7 +9,7 @@ markdown_extensions:
   - toc:
       permalink: True
 docs_dir: 'docs'
-nav:
+pages:
   - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
