@@ -10,7 +10,13 @@ B cell repertoires
 Usage
 --------------------
 ```
-readIgphyml(file, id = NULL, format = c("graph", "phylo"), collapse = TRUE)
+readIgphyml(
+file,
+id = NULL,
+format = c("graph", "phylo"),
+collapse = FALSE,
+branches = c("distance", "mutations")
+)
 ```
 
 Arguments
@@ -29,7 +35,12 @@ if `"phylo"` return trees as ape `phylo` objects.
 collapse
 :   if `TRUE` transform branch lengths to units of substitutions, 
 rather than substitutions per site, and collapse internal nodes
-separated by branches < 0.1 substitutions.
+separated by branches < 0.1 substitutions. Will also remove all
+internal node labels, as it makes them inconsistent.
+
+branches
+:   if `"distance"` branch lengths are in expected mutations per
+site. If `"mutations"` branches are in expected mutations.
 
 
 

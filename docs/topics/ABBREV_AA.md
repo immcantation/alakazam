@@ -17,10 +17,8 @@ ABBREV_AA
 
 Format
 -------------------
-
 Named character vector defining single-letter character codes to 
 three-letter abbreviation mappings.
-
 
 
 Examples

@@ -17,5 +17,3 @@ Related Projects
   Polymorphism detection and genotyping
 * [SCOPer](https://scoper.readthedocs.io) -
   Spectral clustering of B cells into clonal lineages.
-* [RDI](http://rdi.readthedocs.io) - 
-  Repertoire Dissimilarity Index

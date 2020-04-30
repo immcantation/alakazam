@@ -369,10 +369,10 @@ print(edge_test)
 
 ```
 ##   parent child count  expected    pvalue
-## 1   IGHA  IGHA    36 34.800000 0.0000000
-## 2   IGHA  IGHG     2  3.750000 0.6875000
-## 3   IGHG  IGHA     1  2.588235 0.7647059
-## 4   IGHG  IGHG    99 98.000000 0.1500000
+## 1   IGHA  IGHA    36 34.850000 0.1500000
+## 2   IGHA  IGHG     2  2.636364 0.3636364
+## 3   IGHG  IGHA     1  2.578947 0.7894737
+## 4   IGHG  IGHG    99 99.250000 0.4500000
 ```
 
 ```r
@@ -453,8 +453,8 @@ print(mrca_test)
 
 ```
 ##   annotation count expected pvalue
-## 1       IGHA    12     11.4    0.0
-## 2       IGHG    31     31.6    0.6
+## 1       IGHA    12     11.3    0.0
+## 2       IGHG    31     31.7    0.7
 ```
 
 ```r
