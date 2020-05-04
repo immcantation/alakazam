@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.52   0   
-##  2 IGHA != IGHD 1         183.       8.16   0   
-##  3 IGHA != IGHD 2         189.      11.0    0   
-##  4 IGHA != IGHG 0           3.67     8.00   0.69
-##  5 IGHA != IGHG 1          23.7      6.25   0   
-##  6 IGHA != IGHG 2          26.0      4.64   0   
-##  7 IGHA != IGHM 0         159.       6.78   0   
-##  8 IGHA != IGHM 1         212.       6.12   0   
+##  1 IGHA != IGHD 0         139.       8.02   0   
+##  2 IGHA != IGHD 1         184.       8.22   0   
+##  3 IGHA != IGHD 2         191.      10.5    0   
+##  4 IGHA != IGHG 0           3.88     8.24   0.77
+##  5 IGHA != IGHG 1          24.6      5.87   0   
+##  6 IGHA != IGHG 2          27.0      4.05   0   
+##  7 IGHA != IGHM 0         159.       7.14   0   
+##  8 IGHA != IGHM 1         212.       5.93   0   
 ##  9 IGHA != IGHM 2         230.       6.44   0   
-## 10 IGHD != IGHG 0         135.       7.63   0   
-## 11 IGHD != IGHG 1         160.       8.51   0   
-## 12 IGHD != IGHG 2         163.      11.8    0   
-## 13 IGHD != IGHM 0          20.3      5.87   0   
-## 14 IGHD != IGHM 1          28.4      8.37   0   
-## 15 IGHD != IGHM 2          40.5     13.0    0   
-## 16 IGHG != IGHM 0         156.       6.69   0   
-## 17 IGHG != IGHM 1         188.       6.53   0   
-## 18 IGHG != IGHM 2         204.       7.71   0
+## 10 IGHD != IGHG 0         135.       7.47   0   
+## 11 IGHD != IGHG 1         159.       8.33   0   
+## 12 IGHD != IGHG 2         164.      11.1    0   
+## 13 IGHD != IGHM 0          20.0      5.86   0   
+## 14 IGHD != IGHM 1          27.7      8.26   0   
+## 15 IGHD != IGHM 2          38.9     12.4    0   
+## 16 IGHG != IGHM 0         155.       5.95   0   
+## 17 IGHG != IGHM 1         187.       5.71   0   
+## 18 IGHG != IGHM 2         202.       7.03   0
 ```
 
 ```r
