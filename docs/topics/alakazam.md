@@ -3,17 +3,15 @@
 Description
 --------------------
 
-`alakazam` in a member of the Change-O suite of tools and serves five main 
+`alakazam` in a member of the Immcantation framework of tools and serves four main 
 purposes:
 
-+ Providing core functionality for other R packages in the Change-O suite. This
++ Providing core functionality for other R packages in Immcantation. This
 includes common tasks such as file I/O, basic DNA sequence manipulation, and
 interacting with V(D)J segment and gene annotations.
-+ Providing an R interface for interacting with the output of the pRESTO 
-tool suite.
-+ Performing lineage reconstruction on clonal populations of immunoglobulin 
-(Ig) sequences. 
 + Performing clonal abundance and diversity analysis on lymphocyte repertoires.
++ Performing lineage reconstruction on clonal populations of immunoglobulin 
+(Ig) sequences.
 + Performing physicochemical property analyses of lymphocyte receptor sequences.
 
 For additional details regarding the use of the `alakazam` package see the 
@@ -121,15 +119,6 @@ Amino acid propertes
 sequences.
 + [countPatterns](countPatterns.md):        Count patterns in sequences.
 
-
-
-
-General data manipulation
--------------------
-
-
-
-+ [translateStrings](translateStrings.md):     Perform multiple string replacement operations.
 
 
 

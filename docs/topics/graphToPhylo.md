@@ -68,6 +68,12 @@ library(igraph)
 
 *
 Attaching package: ‘igraph’
+**The following objects are masked from ‘package:purrr’:
+
+    compose, simplify
+**The following objects are masked from ‘package:dplyr’:
+
+    as_data_frame, groups, union
 **The following objects are masked from ‘package:stats’:
 
     decompose, spectrum

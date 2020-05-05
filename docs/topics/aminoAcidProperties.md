@@ -192,6 +192,16 @@ aminoAcidProperties(db, seq="junction", nt=TRUE)
 # Calculate only average volume and charge
 # Remove the head and tail amino acids from the junction, thus making it the CDR3
 library(seqinr)
+
+```
+
+*
+Attaching package: ‘seqinr’
+**The following object is masked from ‘package:dplyr’:
+
+    count
+*
+```R
 data(aaindex)
 x <- aaindex[["GRAR740103"]]$I
 # Rename the score vector to use single-letter codes

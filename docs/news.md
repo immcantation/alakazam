@@ -1,4 +1,4 @@
-Version 1.0.0:  May 5, 2020
+Version 1.0.0:  May 6, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -31,7 +31,7 @@ Backwards Incompatible Changes:
 
 General:
 
-+ License changed to AGPL-3
++ License changed to AGPL-3.
 + `baseTheme` looks is now consistent across `sizing` options.
 + `cpuCount` will now return `1` if the core count cannot be determined.
 
