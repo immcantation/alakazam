@@ -2,12 +2,14 @@
 
 #' The alakazam package
 #' 
-#' \code{alakazam} in a member of the Immcantation framework of tools and serves four main 
+#' \code{alakazam} in a member of the Immcantation framework of tools and serves five main 
 #' purposes:
 #' \itemize{
 #'   \item  Providing core functionality for other R packages in Immcantation. This
 #'          includes common tasks such as file I/O, basic DNA sequence manipulation, and
 #'          interacting with V(D)J segment and gene annotations.
+#'   \item  Providing an R interface for interacting with the output of the pRESTO and 
+#'          Change-O tool suites.
 #'   \item  Performing clonal abundance and diversity analysis on lymphocyte repertoires.
 #'   \item  Performing lineage reconstruction on clonal populations of immunoglobulin 
 #'          (Ig) sequences.

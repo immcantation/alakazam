@@ -145,18 +145,18 @@ aminoAcidProperties(db, seq="junction_aa", label="junction")
 
 
 ```
-     sequence_id                                                                                      junction
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903         14.72194             0.2838710
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037         14.50222             0.2888889
-3             CASACSSGGCYEENWLDPW                 19        -0.3684211         13.18053             0.3105263
-  junction_aa_polarity junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1             8.687097           4.038916        0.25806452         0.09677419            0.2258065
-2             7.874074          -1.233769        0.07407407         0.11111111            0.2962963
-3             8.284211          -3.221436        0.00000000         0.15789474            0.1578947
+     sequence_id                                                                                      junction                     junction_aa
+1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG CARVKRRGWRRNSLWFGESTPSDAHRWFDPW
+2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG     CARDRYYCGGDCYSPLPQYYYYGMDVW
+3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG             CASACSSGGCYEENWLDPW
+  junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic junction_aa_polarity junction_aa_charge junction_aa_basic
+1                 31        -1.2612903         14.72194             0.2838710             8.687097           4.038916        0.25806452
+2                 27        -0.7037037         14.50222             0.2888889             7.874074          -1.233769        0.07407407
+3                 19        -0.3684211         13.18053             0.3105263             8.284211          -3.221436        0.00000000
+  junction_aa_acidic junction_aa_aromatic
+1         0.09677419            0.2258065
+2         0.11111111            0.2962963
+3         0.15789474            0.1578947
 
 ```
 
@@ -169,18 +169,18 @@ aminoAcidProperties(db, seq="junction", nt=TRUE)
 
 
 ```
-     sequence_id                                                                                      junction
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903         14.72194             0.2838710
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037         14.50222             0.2888889
-3             CASACSSGGCYEENWLDPW                 19        -0.3684211         13.18053             0.3105263
-  junction_aa_polarity junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1             8.687097           4.038916        0.25806452         0.09677419            0.2258065
-2             7.874074          -1.233769        0.07407407         0.11111111            0.2962963
-3             8.284211          -3.221436        0.00000000         0.15789474            0.1578947
+     sequence_id                                                                                      junction                     junction_aa
+1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG CARVKRRGWRRNSLWFGESTPSDAHRWFDPW
+2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG     CARDRYYCGGDCYSPLPQYYYYGMDVW
+3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG             CASACSSGGCYEENWLDPW
+  junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic junction_aa_polarity junction_aa_charge junction_aa_basic
+1                 31        -1.2612903         14.72194             0.2838710             8.687097           4.038916        0.25806452
+2                 27        -0.7037037         14.50222             0.2888889             7.874074          -1.233769        0.07407407
+3                 19        -0.3684211         13.18053             0.3105263             8.284211          -3.221436        0.00000000
+  junction_aa_acidic junction_aa_aromatic
+1         0.09677419            0.2258065
+2         0.11111111            0.2962963
+3         0.15789474            0.1578947
 
 ```
 
@@ -192,16 +192,6 @@ aminoAcidProperties(db, seq="junction", nt=TRUE)
 # Calculate only average volume and charge
 # Remove the head and tail amino acids from the junction, thus making it the CDR3
 library(seqinr)
-
-```
-
-*
-Attaching package: ‘seqinr’
-**The following object is masked from ‘package:dplyr’:
-
-    count
-*
-```R
 data(aaindex)
 x <- aaindex[["GRAR740103"]]$I
 # Rename the score vector to use single-letter codes
@@ -213,14 +203,14 @@ trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 
 
 ```
-     sequence_id                                                                                      junction
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa cdr3_aa_bulk cdr3_aa_charge
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW     85.00000       4.242920
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW     79.76000      -1.064488
-3             CASACSSGGCYEENWLDPW     58.79412      -3.058792
+     sequence_id                                                                                      junction                     junction_aa
+1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG CARVKRRGWRRNSLWFGESTPSDAHRWFDPW
+2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG     CARDRYYCGGDCYSPLPQYYYYGMDVW
+3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG             CASACSSGGCYEENWLDPW
+  cdr3_aa_bulk cdr3_aa_charge
+1     85.00000       4.242920
+2     79.76000      -1.064488
+3     58.79412      -3.058792
 
 ```
 

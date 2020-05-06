@@ -21,9 +21,9 @@ NULL
 #' @param    germ         name of the column containing germline DNA sequences. All entries 
 #'                        in this column should be identical for any given clone, and they
 #'                        must be multiple aligned with the data in the \code{seq} column.
-#' @param    vcall        name of the column containing V-segment allele assignments. All 
+#' @param    v_call       name of the column containing V-segment allele assignments. All 
 #'                        entries in this column should be identical to the gene level.
-#' @param    jcall        name of the column containing J-segment allele assignments. All 
+#' @param    j_call        name of the column containing J-segment allele assignments. All 
 #'                        entries in this column should be identical to the gene level.
 #' @param    junc_len     name of the column containing the length of the junction as a 
 #'                        numeric value. All entries in this column should be identical 
@@ -55,14 +55,14 @@ NULL
 #'
 #' @details
 #' The input data.frame (\code{data}) must columns for each of the required column name 
-#' arguments: \code{id}, \code{seq}, \code{germ}, \code{vcall}, \code{jcall}, 
+#' arguments: \code{id}, \code{seq}, \code{germ}, \code{v_call}, \code{j_call}, 
 #' \code{junc_len}, and \code{clone}.  The default values are as follows:
 #' \itemize{
 #'   \item  \code{id       = "sequence_id"}:         unique sequence identifier.
 #'   \item  \code{seq      = "sequence_alignment"}:  IMGT-gapped sample sequence.
 #'   \item  \code{germ     = "germline_alignment"}:  IMGT-gapped germline sequence.
-#'   \item  \code{vcall    = "v_call"}:              V segment allele call.
-#'   \item  \code{jcall    = "j_call"}:              J segment allele call.
+#'   \item  \code{v_call   = "v_call"}:              V segment allele call.
+#'   \item  \code{j_call   = "j_call"}:              J segment allele call.
 #'   \item  \code{junc_len = "junction_length"}:     junction sequence length.
 #'   \item  \code{clone    = "clone_id"}:            clone identifier.
 #' }
@@ -78,7 +78,7 @@ NULL
 #'
 #' The value for the germline sequence, V-segment gene call, J-segment gene call, 
 #' junction length, and clone identifier are determined from the first entry in the 
-#' \code{germ}, \code{vcall}, \code{jcall}, \code{junc_len} and \code{clone} columns, 
+#' \code{germ}, \code{v_call}, \code{j_call}, \code{junc_len} and \code{clone} columns, 
 #' respectively. For any given clone, each value in these columns should be identical.
 #'  
 #' @seealso  Executes in order \link{maskSeqGaps}, \link{maskSeqEnds}, 
@@ -108,12 +108,12 @@ NULL
 #'
 #' @export
 makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
-                             germ="germline_alignment", vcall="v_call", jcall="j_call",
+                             germ="germline_alignment", v_call="v_call", j_call="j_call",
                              junc_len="junction_length", clone="clone_id", mask_char="N",
                              max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
                              add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
-    check <- checkColumns(data, c(id, seq, germ, vcall, jcall, junc_len, clone, 
+    check <- checkColumns(data, c(id, seq, germ, v_call, j_call, junc_len, clone, 
                                   text_fields, num_fields, seq_fields))
     if (check != TRUE) { stop(check) }
     
@@ -158,8 +158,8 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
                  germline=maskSeqGaps(data[[germ]][1], mask_char=mask_char, outer_only=FALSE), 
-                 v_gene=getGene(data[[vcall]][1]), 
-                 j_gene=getGene(data[[jcall]][1]), 
+                 v_gene=getGene(data[[v_call]][1]), 
+                 j_gene=getGene(data[[j_call]][1]), 
                  junc_len=data[[junc_len]][1])
     
     return(clone)
@@ -198,12 +198,12 @@ writePhylipInput <- function(clone, path) {
 # Run PHYLIP dnapars application
 #
 # @param   path          temporary directory containing infile.
-# @param   dnapars_exec  path to the dnapars executable.
+# @param   phylip_exec  path to the dnapars executable.
 # @param   verbose       if TRUE suppress phylip console output.
 # @return  TRUE if phylip ran successfully and FALSE otherwise
-runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
+runPhylip <- function(path, phylip_exec, verbose=FALSE) {
     # Expand shell variables
-    dnapars_exec <- path.expand(dnapars_exec)
+    phylip_exec <- path.expand(phylip_exec)
     
     # Remove old files
     if (file.exists(file.path(path, "outfile"))) { file.remove(file.path(path, "outfile")) }
@@ -220,7 +220,7 @@ runPhylip <- function(path, dnapars_exec, verbose=FALSE) {
     
     # Set dnapars options
     phy_options <- c("S", "Y", "I", "4", "5", ".")
-    params <- list(dnapars_exec, input=c(phy_options, "Y"), wait=TRUE)
+    params <- list(phylip_exec, input=c(phy_options, "Y"), wait=TRUE)
     if (!verbose) {
         params <- append(params, quiet_params)
     }
@@ -433,7 +433,7 @@ phylipToGraph <- function(edges, clone) {
 #' dnapars application of the PHYLIP package.
 #' 
 #' @param    clone         \link{ChangeoClone} object containing clone data.
-#' @param    dnapars_exec  absolute path to the PHYLIP dnapars executable.
+#' @param    phylip_exec   absolute path to the PHYLIP dnapars executable.
 #' @param    dist_mat      Character distance matrix to use for reassigning edge weights. 
 #'                         Defaults to a Hamming distance matrix returned by \link{getDNAMatrix} 
 #'                         with \code{gap=0}. If gap characters, \code{c("-", ".")}, are assigned 
@@ -533,8 +533,8 @@ phylipToGraph <- function(edges, clone) {
 #'                           num_fields="duplicate_count")
 #' 
 #' # Run PHYLIP and process output
-#' dnapars_exec <- "~/apps/phylip-3.69/dnapars"
-#' graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+#' phylip_exec <- "~/apps/phylip-3.695/bin/dnapars"
+#' graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE)
 #' 
 #' # Plot graph with a tree layout
 #' library(igraph)
@@ -545,12 +545,12 @@ phylipToGraph <- function(edges, clone) {
 #' # and distance matrix
 #' clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 #'                           num_fields="duplicate_count", mask_char="-")
-#' graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
+#' graph <- buildPhylipLineage(clone, phylip_exec, dist_mat=getDNAMatrix(gap=-1), 
 #'                             rm_temp=TRUE)
 #' }
 #' 
 #' @export
-buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0), 
+buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0), 
                                rm_temp=FALSE, verbose=FALSE) {
     # Check clone size
     if (nrow(clone@data) < 2) {
@@ -573,8 +573,8 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     }
     
     # Check dnapars access
-    if (file.access(dnapars_exec, mode=1) == -1) {
-        stop("The file ", dnapars_exec, " cannot be executed.")
+    if (file.access(phylip_exec, mode=1) == -1) {
+        stop("The file ", phylip_exec, " cannot be executed.")
     }
     
     # Create temporary directory
@@ -585,7 +585,7 @@ buildPhylipLineage <- function(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=0)
     
     # Run PHYLIP
     id_map <- writePhylipInput(clone, temp_path)
-    runPhylip(temp_path, dnapars_exec, verbose=verbose)
+    runPhylip(temp_path, phylip_exec, verbose=verbose)
     phylip_out <- readPhylipOutput(temp_path)
     
     # Remove temporary directory

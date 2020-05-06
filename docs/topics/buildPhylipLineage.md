@@ -12,7 +12,7 @@ Usage
 ```
 buildPhylipLineage(
 clone,
-dnapars_exec,
+phylip_exec,
 dist_mat = getDNAMatrix(gap = 0),
 rm_temp = FALSE,
 verbose = FALSE
@@ -25,7 +25,7 @@ Arguments
 clone
 :   [ChangeoClone](ChangeoClone-class.md) object containing clone data.
 
-dnapars_exec
+phylip_exec
 :   absolute path to the PHYLIP dnapars executable.
 
 dist_mat
@@ -143,8 +143,8 @@ Examples
 # num_fields="duplicate_count")
 # 
 # # Run PHYLIP and process output
-# dnapars_exec <- "~/apps/phylip-3.69/dnapars"
-# graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+# phylip_exec <- "~/apps/phylip-3.695/bin/dnapars"
+# graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE)
 # 
 # # Plot graph with a tree layout
 # library(igraph)
@@ -155,7 +155,7 @@ Examples
 # # and distance matrix
 # clone <- makeChangeoClone(db, text_fields=c("sample_id", "c_call"), 
 # num_fields="duplicate_count", mask_char="-")
-# graph <- buildPhylipLineage(clone, dnapars_exec, dist_mat=getDNAMatrix(gap=-1), 
+# graph <- buildPhylipLineage(clone, phylip_exec, dist_mat=getDNAMatrix(gap=-1), 
 # rm_temp=TRUE)
 ```
 

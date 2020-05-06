@@ -38,7 +38,7 @@ test_that("makeChangeoClone",{
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
     
     changeoclone <- makeChangeoClone(changeodb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
-           germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL", 
+           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", 
            junc_len="JUNCTION_LENGTH", clone="CLONE", text_fields="TYPE", num_fields="COUNT")
 
     expect_true(inherits(clone, "ChangeoClone"))
@@ -58,7 +58,7 @@ test_that("makeChangeoClone",{
     db_trim <- changeodb
     db_trim$sequence_alignment <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
     changeoclone <- makeChangeoClone(db_trim, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
-           germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", jcall="J_CALL", 
+           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", 
            junc_len="JUNCTION_LENGTH", clone="CLONE",text_fields="TYPE", 
            num_fields="COUNT", pad_end=TRUE)
 
@@ -74,8 +74,8 @@ test_that("makeChangeoClone",{
     # With end masking
     clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
     changeoclone <- makeChangeoClone(changeodb, max_mask=3, id="SEQUENCE_ID",
-            seq="SEQUENCE_IMGT", germ="GERMLINE_IMGT_D_MASK", vcall="V_CALL", 
-            jcall="J_CALL", junc_len="JUNCTION_LENGTH", clone="CLONE", 
+            seq="SEQUENCE_IMGT", germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", 
+            j_call="J_CALL", junc_len="JUNCTION_LENGTH", clone="CLONE", 
             text_fields="TYPE", num_fields="COUNT")
 
     exp <- data.frame("sequence_id"="A",
@@ -104,19 +104,19 @@ test_that("buildPhylipLineage", {
     
     # Run PHYLIP and process output
     
-    # Test for error if dnapars_exec doesn't exist
-    dnapars_exec <- "~/dummy/phylip-3.69/dnapars"
-    if (file.access(dnapars_exec, mode=1) == -1) {
+    # Test for error if phylip_exec doesn't exist
+    phylip_exec <- "~/dummy/phylip-3.69/dnapars"
+    if (file.access(phylip_exec, mode=1) == -1) {
         expect_error(
-            graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE),
+            graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE),
             "The file ~/dummy/phylip-3.69/dnapars cannot be executed"
         )
     }
     
-    dnapars_exec <- Sys.which('dnapars')
+    phylip_exec <- Sys.which('dnapars')
     # If dnapars found, run test, else, skip
-    if (dnapars_exec!="") {
-        graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+    if (phylip_exec!="") {
+        graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE)
         
         expect_true(inherits(graph, "igraph"))
         expect_equal(igraph::vcount(graph), 5)

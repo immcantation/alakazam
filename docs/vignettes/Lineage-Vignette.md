@@ -91,8 +91,8 @@ deleting files is somewhat rude). In most cases, you will want to set
 
 ```r
 # Run PHYLIP and parse output
-dnapars_exec <- "~/apps/phylip-3.69/dnapars"
-graph <- buildPhylipLineage(clone, dnapars_exec, rm_temp=TRUE)
+phylip_exec <- "~/apps/phylip-3.69/dnapars"
+graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE)
 ```
 
 
@@ -189,9 +189,9 @@ clones <- ExampleDb %>%
 
 ```r
 # Build lineages
-dnapars_exec <- "~/apps/phylip-3.69/dnapars"
+phylip_exec <- "~/apps/phylip-3.69/dnapars"
 graphs <- lapply(clones$CHANGEO, buildPhylipLineage, 
-                 dnapars_exec=dnapars_exec, rm_temp=TRUE)
+                 phylip_exec=phylip_exec, rm_temp=TRUE)
 ```
 
 

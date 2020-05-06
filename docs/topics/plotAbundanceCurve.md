@@ -81,7 +81,7 @@ abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 plotAbundanceCurve(abund, legend_title="Sample")
 ```
 
-![2](plotAbundanceCurve-2.png)
+**Error in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y, **: polygon edge not found![3](plotAbundanceCurve-3.png)
 
 
 See also

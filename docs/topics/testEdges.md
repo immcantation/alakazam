@@ -65,26 +65,15 @@ graphs <- ExampleTrees[1-10]
 
 # Perform edge test on isotypes
 x <- testEdges(graphs, "c_call", nperm=10)
+
+```
+
+**Error in ecdf(d)**: 'x' must have 1 or more non-missing values
+```R
 print(x)
 ```
 
-
-```
-      parent     child count   expected    pvalue
-1       IGHA      IGHA    39  58.000000 0.9000000
-2       IGHA IGHA,IGHG     3   3.222222 0.3333333
-3       IGHA      IGHG     2   6.700000 0.8000000
-4  IGHA,IGHG      IGHA    29  10.000000 0.0000000
-5  IGHA,IGHG IGHA,IGHG     1   2.000000 1.0000000
-6  IGHA,IGHG      IGHG    24   2.250000 0.0000000
-7  IGHD,IGHG      IGHG     8   2.750000 0.0000000
-8       IGHG      IGHA     1   6.000000 0.8000000
-9       IGHG IGHD,IGHG     1   1.000000 0.0000000
-10      IGHG      IGHG   112 134.900000 1.0000000
-
-```
-
-
+**Error in print(x)**: object 'x' not found
 
 See also
 -------------------
