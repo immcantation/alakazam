@@ -39,15 +39,14 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 # Authors
 
-[Immcantation](mailto:immcantation@gmail.com) (cre)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (aut)  
+[Jason Vander Heiden](mailto:vanderheiden.jason@gene.com) (cre, aut)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
-[Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
+[Nima Nouri](mailto:nima.nouri@yale.edu) (aut)  
+[Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
+[Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (aut)  
+[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (aut)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
-[Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
-[Nima Nouri](mailto:nima.nouri@yale.edu) (ctb)  
-[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (ctb)  
-[Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 

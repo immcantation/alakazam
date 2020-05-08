@@ -1,25 +1,23 @@
 Package: alakazam
 Type: Package
 Version: 1.0.0
-Date: 2020-05-06
-Authors@R: c(person("Immcantation", "", role=c("cre"), 
-                    email="immcantation@gmail.com"),
-             person("Jason", "Vander Heiden", role=c("aut"), 
-                    email="jason.vanderheiden@yale.edu"),                    
+Date: 2020-05-08
+Authors@R: c(person("Jason", "Vander Heiden", role=c("cre", "aut"), 
+                    email="vanderheiden.jason@gene.com"),                    
              person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
-             person("Susanna", "Marquez", role=c("ctb"), 
+             person("Susanna", "Marquez", role=c("aut"), 
                     email="susanna.marquez@yale.edu"),
+             person("Nima", "Nouri", role=c("aut"), 
+                    email="nima.nouri@yale.edu"),
+             person("Ruoyi", "Jiang", role=c("aut"), 
+                    email="ruoyi.jiang@yale.edu"),
+             person("Julian", "Zhou", role=c("aut"), 
+                    email="julian.zhou@bulldogs.yale.edu"),
+             person("Kenneth", "Hoehn", role=c("aut"), 
+                    email="kenneth.hoehn@yale.edu"),
              person("Daniel", "Gadala-Maria", role=c("ctb"), 
                     email="daniel.gadala-maria@yale.edu"),
-             person("Ruoyi", "Jiang", role=c("ctb"), 
-                    email="ruoyi.jiang@yale.edu"),
-             person("Nima", "Nouri", role=c("ctb"), 
-                    email="nima.nouri@yale.edu"),
-             person("Kenneth", "Hoehn", role=c("ctb"), 
-                    email="kenneth.hoehn@yale.edu"),
-             person("Julian", "Zhou", role=c("ctb"), 
-                    email="julian.zhou@bulldogs.yale.edu"),     
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
