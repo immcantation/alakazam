@@ -17,7 +17,7 @@ Authors@R: c(person("Namita", "Gupta", role=c("aut"),
              person("Daniel", "Gadala-Maria", role=c("ctb"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("cre", "aut"), 
-                    email="vanderheiden.jason@gene.com"), 
+                    email="jason.vanderheiden@gmail.com"), 
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Immunoglobulin Clonal Lineage and Diversity Analysis
