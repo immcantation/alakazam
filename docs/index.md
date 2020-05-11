@@ -45,8 +45,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
 [Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (aut)  
 [Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (aut)  
-[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)
-[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (cre, aut)
+[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (cre, aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
