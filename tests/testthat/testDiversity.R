@@ -55,7 +55,7 @@ test_that("countClones", {
 	             tolerance=0.01)
 
 	# Check toy grouped
-	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY"), 
+	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
 })
@@ -85,14 +85,14 @@ test_that("estimateAbundance-current", {
 	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
-	             tolerance=0.001)
+	             tolerance=0.001, check.attributes = FALSE)
 	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
-	             tolerance = 0.001)
+	             tolerance = 0.001, check.attributes = FALSE)
 	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
-	             tolerance = 0.001)
-	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203), check.attributes = FALSE)
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -264,20 +264,20 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     # v0.2.11 test results with nboot=1000
     expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
-                 tolerance=0.005)
+                 tolerance=0.005, check.attributes = FALSE)
     expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
-                 tolerance = 0.005)
+                 tolerance = 0.005, check.attributes = FALSE)
     expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
-                 tolerance = 0.005)
+                 tolerance = 0.005, check.attributes = FALSE)
     expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100, clone="CLONE")
-    expect_equal(abund@abundance$lower, c(1, 1))
-    expect_equal(abund@abundance$upper, c(1, 1))
-    expect_equal(abund@abundance$rank, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1), check.attributes = FALSE)
+    expect_equal(abund@abundance$upper, c(1, 1), check.attributes = FALSE)
+    expect_equal(abund@abundance$rank, c(1, 1), check.attributes = FALSE)
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
@@ -428,12 +428,12 @@ test_that("countClones", {
 	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
-	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
+	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY") %>% ungroup(), 
 	             ungrouped_toy, 
 	             tolerance=0.01)
 
 	# Check toy grouped
-	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY"), 
+	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
 })
@@ -463,14 +463,15 @@ test_that("estimateAbundance-current", {
 	abund <- estimateAbundance(db, group="sample", nboot=100)
 	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
-	             tolerance=0.001)
+	             tolerance=0.001, check.attributes = FALSE)
 	expect_equal(abund@abundance$lower[c(1:3,8:10)],
 	             c(0.0041, 0.0004, 0, 0, 0, 0),
-	             tolerance = 0.001)
+	             tolerance = 0.001, check.attributes = FALSE)
 	expect_equal(abund@abundance$upper[45:50],
 	             c(0.0085, 0.0091, 0.0085, 0.0085, 0.0085, 0.0085),
-	             tolerance = 0.001)
-	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203))
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203), 
+	             check.attributes = FALSE)
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
@@ -642,20 +643,21 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     # v0.2.11 test results with nboot=1000
     expect_equal(abund@abundance$p[1:6],
                  c(0.03808, 0.03808, 0.01293, 0.01293, 0.01293, 0.01293),
-                 tolerance=0.005)
+                 tolerance=0.005, check.attributes = FALSE)
     expect_equal(abund@abundance$lower[c(1:3, 8:10)],
                  c(0.00049, 0, 0, 0, 0, 0),
-                 tolerance = 0.005)
+                 tolerance = 0.005, check.attributes = FALSE)
     expect_equal(abund@abundance$upper[45:50],
                  c(0.00739, 0.00757, 0.00703, 0.00711,0.00662, 0.00709),
-                 tolerance = 0.005)
-    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
+                 tolerance = 0.005, check.attributes = FALSE)
+    expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41), 
+                 check.attributes = FALSE)
     
     set.seed(90)
     abund <- estimateAbundance(db[c(1, 289), ], group="sample", min_n=1, uniform=FALSE, nboot=100)
-    expect_equal(abund@abundance$lower, c(1, 1))
-    expect_equal(abund@abundance$upper, c(1, 1))
-    expect_equal(abund@abundance$rank, c(1, 1))
+    expect_equal(abund@abundance$lower, c(1, 1), check.attributes = FALSE)
+    expect_equal(abund@abundance$upper, c(1, 1), check.attributes = FALSE)
+    expect_equal(abund@abundance$rank, c(1, 1), check.attributes = FALSE)
 })
 
 test_that("rarefyDiversity reproduces v0.2.11 results", {
