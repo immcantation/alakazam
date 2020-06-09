@@ -1,0 +1,10 @@
+syntax: glob
+.*
+vignettes/*.pdf
+vignettes/*.R
+*.Rproj
+man/*.Rd
+inst/doc/*
+*.so
+*.o
+.Rproj.user
