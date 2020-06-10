@@ -139,7 +139,8 @@ getAllele(kappa_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01" "IGKJ5*01"                            
+[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01"
+[2] "IGKJ5*01"                            
 
 ```
 
@@ -255,7 +256,8 @@ getAllele(heavy_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"               "IGHJ1*01"                
+[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"              
+[3] "IGHJ1*01"                
 
 ```
 
@@ -298,7 +300,8 @@ getAllele(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```
-[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"               ""                         
+[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"              
+[3] ""                         
 
 ```
 
