@@ -1,6 +1,7 @@
 site_name: alakazam
 site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
+edit_uri: src/master/docs/
 theme: readthedocs
 markdown_extensions:
   - def_list
