@@ -1,6 +1,7 @@
 site_name: alakazam
-site_favicon: img/immcantation.ico
+site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
+edit_uri: src/master/docs/
 theme: readthedocs
 markdown_extensions:
   - def_list
@@ -37,10 +38,10 @@ pages:
       - topics/isValidAASeq.md
     - 'Lineage Reconstruction':
       - topics/buildPhylipLineage.md
+      - topics/graphToPhylo.md
+      - topics/phyloToGraph.md
       - topics/makeChangeoClone.md
       - topics/ChangeoClone-class.md
-      - topics/phyloToGraph.md
-      - topics/graphToPhylo.md
     - 'Lineage Topology Analysis':
       - topics/getMRCA.md
       - topics/getPathLengths.md
@@ -107,5 +108,3 @@ pages:
     - 'Deprecated':
       - topics/rarefyDiversity.md
       - topics/testDiversity.md
-
-      

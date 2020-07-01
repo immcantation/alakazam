@@ -15,10 +15,10 @@ Alakazam serves five main purposes:
 2. Providing an R interface for interacting with the output of the 
    [pRESTO](http://presto.readthedocs.io) and 
    [Change-O](http://changeo.readthedocs.io) tool suites.
-3. Performing lineage reconstruction on clonal populations of Ig sequences 
-   and analyzing the topology of the resultant lineage trees. 
-4. Performing clonal abundance and diversity analysis on lymphocyte 
+3. Performing clonal abundance and diversity analysis on lymphocyte 
    repertoires.
+4. Performing lineage reconstruction on clonal populations of Ig sequences 
+   and analyzing the topology of the resultant lineage trees. 
 5. Performing physicochemical property analyses of lymphocyte receptor 
    sequences.
 
@@ -34,21 +34,19 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 **Depends:** ggplot2  
 **Imports:** ape, dplyr, graphics, grid, igraph, lazyeval, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils  
-**Suggests:** knitr, rmarkdown, testthat  
-**Extends:** FALSE
+**Suggests:** knitr, rmarkdown, testthat
 
 
 # Authors
 
-[Immcantation](mailto:immcantation@gmail.com) (cre)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (aut)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
-[Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
+[Nima Nouri](mailto:nima.nouri@yale.edu) (aut)  
+[Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
+[Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (aut)  
+[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (aut)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
-[Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (ctb)  
-[Nima Nouri](mailto:nima.nouri@yale.edu) (ctb)  
-[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (ctb)  
-[Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (ctb)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (cre, aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
@@ -75,3 +73,8 @@ doi: 10.1126/scitranslmed.3008879 (URL:
 https://doi.org/10.1126/scitranslmed.3008879).
 
 
+
+
+# License
+
+AGPL-3

@@ -42,9 +42,9 @@ clones <- ExampleDb %>%
                                 germ="germline_alignment", text_fields=c("sample_id", "c_call"),
                                 num_fields="duplicate_count", add_count=FALSE))
 # Build lineages
-dnapars_exec <- "~/local/apps/phylip-3.695/bin/dnapars"
+phylip_exec <- "~/local/apps/phylip-3.695/bin/dnapars"
 graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
-                 dnapars_exec=dnapars_exec, rm_temp=TRUE)
+                 phylip_exec=phylip_exec, rm_temp=TRUE)
 
 # Subset to trees with at least 5 nodes
 graphs[sapply(graphs, is.null)] <- NULL

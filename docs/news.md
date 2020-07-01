@@ -1,4 +1,4 @@
-Version 1.0.0:  March 30, 2020
+Version 1.0.1:  May 8, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -31,8 +31,11 @@ Backwards Incompatible Changes:
 
 General:
 
++ License changed to AGPL-3.
 + `baseTheme` looks is now consistent across `sizing` options.
 + `cpuCount` will now return `1` if the core count cannot be determined.
++ Fixed a bug in `padSeqEnds` wherein the `pad_char` argument was being 
+  ignored.
 
 Diversity:
 
@@ -40,7 +43,12 @@ Diversity:
 + `estimateAbundance` slot `clone_by` now contains the name of the column
    with the clonal group identifier, as specified in the function call. For 
    example, if the function was called with `clone="clone_id"`, 
-   then `abundace@clone_by` will be `clone_id`.
+   then the `clone_by` slot will be `clone_id`.
+
+Lineage:
+
++ Renamed the `buildPhylipLineage` arguments `vcall`, `jcall` and 
+  `dnapars_exec` to `v_call`, `j_call` and `phylip_exec`, respectively.
 
 
 Version 0.3.0:  July 17, 2019

@@ -503,17 +503,13 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        cell_id=NULL, locus=NULL, only_igh=TRUE,
                        first=FALSE) {
-    
-    # calling `data` `data` is hugely problematic b/c `data` is a default R function
-    # data_orig <- data will cause downstream errors
-    
     # Check input
     check <- checkColumns(data, c(v_call, j_call, junc_len, cell_id, locus))
     if (check != TRUE) { stop(check) }
     
     # if necessary, cast select columns to character (factor not allowed later on)
-    if (class(v_call)=="factor") { db[[v_call]] <- as.character(db[[v_call]]) }
-    if (class(j_call)=="factor") { db[[j_call]] <- as.character(db[[j_call]]) }
+    if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
+    if (!is(data[[j_call]], "character")) { data[[j_call]] <- as.character(data[[j_call]]) }
     
     # e.g.: "Homsap IGHV3-7*01 F,Homsap IGHV3-6*01 F;Homsap IGHV1-4*01 F"
     separator_within_seq <- ","
@@ -523,8 +519,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     if ( !is.null(cell_id) & !is.null(locus) ) {
         single_cell <- TRUE
         
-        if (class(cell_id)=="factor") { db[[cell_id]] <- as.character(db[[cell_id]]) }
-        if (class(locus)=="factor") { db[[locus]] <- as.character(db[[locus]]) }
+        if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
+        if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
         
         if (!all(data[[locus]] %in% c("IGH", "IGK", "IGL"))) {
             stop("The locus column must be one of {IGH, IGK, IGL}.")
@@ -672,13 +668,13 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     if (any( sapply(cols_for_grouping_heavy, function(x){class(data[[x]]) == "factor"}) )) {
         stop("one or more of { ", v_call, ", ", j_call,  
              ifelse(is.null(junc_len), " ", ", "), junc_len, 
-             "} is factor. Must be character.\n")
+             "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
     }
     if (single_cell & !only_igh) {
         if (any( sapply(cols_for_grouping_light, function(x) {class(data[[x]]) == "factor"}) )) {
             stop("one or more of { ", v_call_light, ", ", j_call_light,  
                  ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
-                 "} is factor. Must be character.\n")
+                 "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
         }  
     }
     
