@@ -1,10 +1,12 @@
-syntax: glob
-.*
-vignettes/*.pdf
-vignettes/*.R
+.RData
+.Rhistory
+.Rproj.user
 *.Rproj
 man/*.Rd
-inst/doc/*
-*.so
-*.o
-.Rproj.user
+vignettes/*.R
+vignettes/*.html
+vignettes/*.pdf
+vignettes/*.tree
+src/*.o
+src/*.so
+src/*.dll
