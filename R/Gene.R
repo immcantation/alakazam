@@ -455,13 +455,13 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' value in the \code{locus} column.
 #' 
 #' Values in the \code{locus} column must be one of \code{c("IGH", "IGI", "IGK", "IGL"} for BCR 
-#' data or \code{"TRA", "TRB", "TRD", "TRG")} for TCR data. Otherwise, the function returns an 
+#' or \code{"TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an 
 #' error message and stops.
 #' 
 #' Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
-#' should be done using \code{IGH} for BCR data or \code{TRB/TRD} for TCR data 
-#' sequences only, or using both \code{IGH and IGK/IGL} for BCR data or 
-#' \code{TRB/TRD and TRA/TRG} for TCR data sequences. This is governed by \code{only_heavy}.
+#' should be done using \code{IGH} for BCR or \code{TRB/TRD} for TCR sequences only, or using 
+#' both \code{IGH, IGK/IGL} for BCR or \code{TRB/TRD, TRA/TRG} for TCR sequences. 
+#' This is governed by \code{only_heavy}.
 #' 
 #' By supplying \code{junc_len}, the call amounts to a 1-stage partitioning of the sequences/cells 
 #' based on V annotation, J annotation, and junction length simultaneously. Without supplying this 

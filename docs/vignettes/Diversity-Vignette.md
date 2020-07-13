@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.42   0   
-##  2 IGHA != IGHD 1         184.       8.86   0   
-##  3 IGHA != IGHD 2         190.      13.0    0   
-##  4 IGHA != IGHG 0           4.41     7.92   0.61
-##  5 IGHA != IGHG 1          24.5      6.70   0   
-##  6 IGHA != IGHG 2          26.8      4.73   0   
-##  7 IGHA != IGHM 0         158.       6.33   0   
-##  8 IGHA != IGHM 1         211.       6.26   0   
-##  9 IGHA != IGHM 2         229.       7.95   0   
-## 10 IGHD != IGHG 0         135.       7.73   0   
-## 11 IGHD != IGHG 1         160.       9.22   0   
-## 12 IGHD != IGHG 2         163.      13.4    0   
-## 13 IGHD != IGHM 0          19.2      6.41   0   
-## 14 IGHD != IGHM 1          26.9      9.33   0   
-## 15 IGHD != IGHM 2          38.4     14.8    0   
-## 16 IGHG != IGHM 0         154.       6.88   0   
-## 17 IGHG != IGHM 1         186.       7.21   0   
-## 18 IGHG != IGHM 2         202.       8.99   0
+##  1 IGHA != IGHD 0         139.       7.24   0   
+##  2 IGHA != IGHD 1         183.       8.05   0   
+##  3 IGHA != IGHD 2         189.      11.4    0   
+##  4 IGHA != IGHG 0           3.49     8.35   0.67
+##  5 IGHA != IGHG 1          24.0      6.53   0   
+##  6 IGHA != IGHG 2          26.8      4.89   0   
+##  7 IGHA != IGHM 0         158.       6.59   0   
+##  8 IGHA != IGHM 1         211.       6.05   0   
+##  9 IGHA != IGHM 2         229.       6.67   0   
+## 10 IGHD != IGHG 0         135.       6.97   0   
+## 11 IGHD != IGHG 1         159.       8.34   0   
+## 12 IGHD != IGHG 2         163.      12.1    0   
+## 13 IGHD != IGHM 0          19.7      5.66   0   
+## 14 IGHD != IGHM 1          27.7      8.11   0   
+## 15 IGHD != IGHM 2          39.5     12.9    0   
+## 16 IGHG != IGHM 0         155.       6.32   0   
+## 17 IGHG != IGHM 1         187.       6.36   0   
+## 18 IGHG != IGHM 2         202.       7.57   0
 ```
 
 ```r
