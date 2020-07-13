@@ -66,22 +66,22 @@ summarizeSubtrees(graph, fields="c_call", root="Germline")
 
 
 ```
-            name    c_call         parent outdegree size depth pathlength
-1 GN5SHBT06HH3QD      IGHA       Germline         1    6     3         10
-2 GN5SHBT08F45HV IGHA,IGHG GN5SHBT06HH3QD         4    5     2          7
-3       Germline      <NA>           <NA>         1    7     4         30
-4 GN5SHBT06IFV0R      IGHG GN5SHBT08F45HV         0    1     1          0
-5 GN5SHBT08I3P11      IGHG GN5SHBT08F45HV         0    1     1          0
-6 GN5SHBT01BXJY7      IGHG GN5SHBT08F45HV         0    1     1          0
-7 GN5SHBT01EGEU6      IGHA GN5SHBT08F45HV         0    1     1          0
-  outdegree_norm size_norm depth_norm pathlength_norm
-1      0.1666667 0.8571429       0.75       0.3333333
-2      0.6666667 0.7142857       0.50       0.2333333
-3      0.1666667 1.0000000       1.00       1.0000000
-4      0.0000000 0.1428571       0.25       0.0000000
-5      0.0000000 0.1428571       0.25       0.0000000
-6      0.0000000 0.1428571       0.25       0.0000000
-7      0.0000000 0.1428571       0.25       0.0000000
+            name    c_call         parent outdegree size depth pathlength outdegree_norm
+1 GN5SHBT06HH3QD      IGHA       Germline         1    6     3         10      0.1666667
+2 GN5SHBT08F45HV IGHA,IGHG GN5SHBT06HH3QD         4    5     2          7      0.6666667
+3       Germline      <NA>           <NA>         1    7     4         30      0.1666667
+4 GN5SHBT06IFV0R      IGHG GN5SHBT08F45HV         0    1     1          0      0.0000000
+5 GN5SHBT08I3P11      IGHG GN5SHBT08F45HV         0    1     1          0      0.0000000
+6 GN5SHBT01BXJY7      IGHG GN5SHBT08F45HV         0    1     1          0      0.0000000
+7 GN5SHBT01EGEU6      IGHA GN5SHBT08F45HV         0    1     1          0      0.0000000
+  size_norm depth_norm pathlength_norm
+1 0.8571429       0.75       0.3333333
+2 0.7142857       0.50       0.2333333
+3 1.0000000       1.00       1.0000000
+4 0.1428571       0.25       0.0000000
+5 0.1428571       0.25       0.0000000
+6 0.1428571       0.25       0.0000000
+7 0.1428571       0.25       0.0000000
 
 ```
 

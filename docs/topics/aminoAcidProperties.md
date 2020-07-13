@@ -153,18 +153,18 @@ aminoAcidProperties(db, seq="junction_aa", label="junction")
 1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
 2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
 3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa junction_aa_length junction_aa_gravy
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037
-3             CASACSSGGCYEENWLDPW                 19        -0.3684211
-  junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
-1         14.72194             0.2838710             8.687097
-2         14.50222             0.2888889             7.874074
-3         13.18053             0.3105263             8.284211
-  junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1           4.038916        0.25806452         0.09677419            0.2258065
-2          -1.233769        0.07407407         0.11111111            0.2962963
-3          -3.221436        0.00000000         0.15789474            0.1578947
+                      junction_aa junction_aa_length junction_aa_gravy junction_aa_bulk
+1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903         14.72194
+2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037         14.50222
+3             CASACSSGGCYEENWLDPW                 19        -0.3684211         13.18053
+  junction_aa_aliphatic junction_aa_polarity junction_aa_charge junction_aa_basic
+1             0.2838710             8.687097           4.038916        0.25806452
+2             0.2888889             7.874074          -1.233769        0.07407407
+3             0.3105263             8.284211          -3.221436        0.00000000
+  junction_aa_acidic junction_aa_aromatic
+1         0.09677419            0.2258065
+2         0.11111111            0.2962963
+3         0.15789474            0.1578947
 
 ```
 
@@ -185,18 +185,18 @@ aminoAcidProperties(db, seq="junction", nt=TRUE)
 1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
 2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
 3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa junction_aa_length junction_aa_gravy
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037
-3             CASACSSGGCYEENWLDPW                 19        -0.3684211
-  junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
-1         14.72194             0.2838710             8.687097
-2         14.50222             0.2888889             7.874074
-3         13.18053             0.3105263             8.284211
-  junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1           4.038916        0.25806452         0.09677419            0.2258065
-2          -1.233769        0.07407407         0.11111111            0.2962963
-3          -3.221436        0.00000000         0.15789474            0.1578947
+                      junction_aa junction_aa_length junction_aa_gravy junction_aa_bulk
+1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903         14.72194
+2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037         14.50222
+3             CASACSSGGCYEENWLDPW                 19        -0.3684211         13.18053
+  junction_aa_aliphatic junction_aa_polarity junction_aa_charge junction_aa_basic
+1             0.2838710             8.687097           4.038916        0.25806452
+2             0.2888889             7.874074          -1.233769        0.07407407
+3             0.3105263             8.284211          -3.221436        0.00000000
+  junction_aa_acidic junction_aa_aromatic
+1         0.09677419            0.2258065
+2         0.11111111            0.2962963
+3         0.15789474            0.1578947
 
 ```
 

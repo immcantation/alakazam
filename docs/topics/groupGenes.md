@@ -22,7 +22,7 @@ j_call = "j_call",
 junc_len = NULL,
 cell_id = NULL,
 locus = NULL,
-only_igh = TRUE,
+only_heavy = TRUE,
 first = FALSE
 )
 ```
@@ -52,9 +52,9 @@ locus
 :   name of the column containing locus information. 
 Only applicable and required for single-cell mode.
 
-only_igh
-:   use only heavy chain (`IGH`) sequences for grouping,
-disregarding light chains. Only applicable and required for
+only_heavy
+:   use only `IGH` (for BCR data) or `TRB/TRD` (for TCR data) 
+sequences for grouping. Only applicable and required for 
 single-cell mode. Default is `TRUE`.
 
 first
@@ -88,12 +88,14 @@ To invoke single-cell mode, both `cell_id` and `locus` must be supplied. Otherwi
 the function will run under non-single-cell mode, using all input sequences regardless of the
 value in the `locus` column.
 
-Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
-should be done using only heavy chain (`IGH`) sequences only, or using both heavy chain
-(`IGH`) and light chain (`IGK`, `IGL`) sequences. This is governed by 
-`only_igh`.
+Values in the `locus` column must be one of `c("IGH", "IGI", "IGK", "IGL"` for BCR 
+data or `"TRA", "TRB", "TRD", "TRG")` for TCR data. Otherwise, the function returns an 
+error message and stops.
 
-Values in the `locus` column must be one of `"IGH"`, `"IGK"`, and `"IGL"`.
+Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
+should be done using `IGH` for BCR data or `TRB/TRD` for TCR data 
+sequences only, or using both `IGH and IGK/IGL` for BCR data or 
+`TRB/TRD and TRA/TRG` for TCR data sequences. This is governed by `only_heavy`.
 
 By supplying `junc_len`, the call amounts to a 1-stage partitioning of the sequences/cells 
 based on V annotation, J annotation, and junction length simultaneously. Without supplying this 
