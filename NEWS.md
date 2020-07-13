@@ -1,7 +1,8 @@
 Version 1.0.1.999: July 13, 2020
 -------------------------------------------------------------------------------
 
-+ Added the TCR grouping option to the `groupGenes` function.
++ Added the TCR grouping option to the `groupGenes` function. Changed the `only_igh` 
+argument to `only_heavy` in `groupGenes` function. 
 
 
 Version 1.0.1:  May 8, 2020

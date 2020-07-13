@@ -80,9 +80,9 @@ print(x)
 
 ```
   annotation count  expected    pvalue
-1       IGHA    16 13.600000 0.0000000
-2  IGHA,IGHG     1  1.142857 0.1428571
-3       IGHG    31 33.400000 1.0000000
+1       IGHA    16 13.400000 0.0000000
+2  IGHA,IGHG     1  1.166667 0.1666667
+3       IGHG    31 33.900000 1.0000000
 
 ```
 

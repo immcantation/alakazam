@@ -253,11 +253,11 @@ test_that("groupGenes, single-cell mode, heavy and light", {
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_igh=FALSE, first=FALSE)
+                     only_heavy=FALSE, first=FALSE)
     
     gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_igh=FALSE, first=TRUE)
+                     only_heavy=FALSE, first=TRUE)
                      
     expect_equal(gg1[["vj_group"]], gg1_expect)
     expect_equal(gg2[["vj_group"]], gg2_expect)
@@ -297,7 +297,7 @@ test_that("groupGenes, single-cell mode, heavy only", {
     
     gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_igh=TRUE, first=FALSE)
+                     only_heavy=TRUE, first=FALSE)
     
     expect_equal(gg1[["vj_group"]], gg1_expect)
     
@@ -354,30 +354,30 @@ test_that("groupGenes, AIRR-format migration", {
     
     newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                           junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_igh=FALSE, first=FALSE)
+                          only_heavy=FALSE, first=FALSE)
     newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
                           junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_igh=FALSE, first=FALSE)
+                          only_heavy=FALSE, first=FALSE)
     
     expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     # 3
     newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                           junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_igh=FALSE, first=TRUE)
+                          only_heavy=FALSE, first=TRUE)
     newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
                           junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_igh=FALSE, first=TRUE)
+                          only_heavy=FALSE, first=TRUE)
     
     expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     # 4
     newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
                           junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_igh=TRUE, first=FALSE)
+                          only_heavy=TRUE, first=FALSE)
     newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
                           junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_igh=TRUE, first=FALSE)
+                          only_heavy=TRUE, first=FALSE)
     
     expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
