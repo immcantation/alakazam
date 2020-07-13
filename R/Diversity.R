@@ -809,25 +809,32 @@ helperTest <- function(div_df, q, group="group") {
 #' Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
 #' proposed by Hill (Hill, 1973). See \link{calcDiversity} for further details.
 #'
-#' Diversity is calculated on the estimated complete clonal abundance distribution.
-#' This distribution is inferred by using the Chao1 estimator to estimate the number
-#' of seen clones, and applying the relative abundance correction and unseen clone
-#' frequency described in Chao et al, 2015.
-#'
 #' To generate a smooth curve, \eqn{D} is calculated for each value of \eqn{q} from
 #' \code{min_q} to \code{max_q} incremented by \code{step_q}.  When \code{uniform=TRUE}
 #' variability in total sequence counts across unique values in the \code{group} column 
 #' is corrected by repeated resampling from the estimated complete clonal distribution to a 
-#' common number of sequences.
+#' common number of sequences. The complete clonal abundance distribution that is resampled 
+#' from is inferred by using the Chao1 estimator to infer the number of unseen clones, 
+#' followed by applying the relative abundance correction and unseen clone frequencies 
+#' described in Chao et al, 2015.
 #' 
 #' The diversity index (\eqn{D}) for each group is the mean value of over all resampling 
 #' realizations. Confidence intervals are derived using the standard deviation of the 
 #' resampling realizations, as described in Chao et al, 2015.
-#' 
-#' Of note, the complete clonal abundance distribution is inferred by using the Chao1 
-#' estimator to estimate the number of seen clones, and then applying the relative abundance 
-#' correction and unseen clone frequencies described in Chao et al, 2015.
 #'
+#' Significance of the difference in diversity index (\code{D}) between groups is tested by 
+#' constructing a bootstrap delta distribution for each pair of unique values in the 
+#' \code{group} column. The bootstrap delta distribution is built by subtracting the diversity 
+#' index \code{Da} in group \code{a} from the corresponding value \eqn{Db} in group \code{b}, 
+#' for all bootstrap realizations, yielding a distribution of \code{nboot} total deltas; where 
+#' group \code{a} is the group with the greater mean \code{D}. The p-value for hypothesis 
+#' \code{Da  !=  Db} is the value of \code{P(0)} from the empirical cumulative distribution 
+#' function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.
+#' 
+#' Note, this method may inflate statistical significance when clone sizes are uniformly small,
+#' such as when most clones sizes are 1, sample size is small, and \code{max_n} is near
+#' the total count of the smallest data group. Use caution when interpreting the results 
+#' in such cases.
 #'
 #' @examples
 #' # Group by sample identifier in two steps
