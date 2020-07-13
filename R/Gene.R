@@ -581,7 +581,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 # heavy chain V, J, junc_len
                 data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
                                                collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
+                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
                                                collapse=separator_between_seq)
                 if (!is.null(junc_len)) {
                     data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
@@ -616,7 +616,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 # heavy chain V, J, junc_len
                 data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
                                                collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
+                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
                                                collapse=separator_between_seq)
                 if (!is.null(junc_len)) {
                     data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 

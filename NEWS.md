@@ -1,8 +1,10 @@
 Version 1.0.1.999: July 13, 2020
 -------------------------------------------------------------------------------
-
++ Fixed a major bug in `groupGenes` functuion for single-cell mode. The bug were 
+  found in both `only_heavy` cases `TRUE` and `FALSE`. The code were mistakenly 
+  feeding a `j_call` column using a `v_call` column.
 + Added the TCR grouping option to the `groupGenes` function. Changed the `only_igh` 
-argument to `only_heavy` in `groupGenes` function. 
+  argument to `only_heavy` in `groupGenes` function. 
 
 
 Version 1.0.1:  May 8, 2020
