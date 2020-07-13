@@ -1360,7 +1360,7 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
     }
     # Define plot values
     df <- data@diversity %>%
-        dplyr::filter(!!rlang::sym("q") == q) %>%
+        dplyr::filter(!!rlang::sym("q") == !!enquo(q)) %>%
         dplyr::mutate(lower=!!rlang::sym("d") - !!rlang::sym("d_sd"), 
                       upper=!!rlang::sym("d") + !!rlang::sym("d_sd"))
     
