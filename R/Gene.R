@@ -425,8 +425,9 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' @param    j_call                  name of the column containing the heavy/long chain 
 #'                                   J-segment allele calls.
 #' @param    junc_len                name of column containing the junction length.
-#'                                   if \code{NULL} then 1-stage partitioning is perform. 
-#'                                   See Details for further description.
+#'                                   if \code{NULL} then 1-stage partitioning is perform
+#'                                   considering only the V and J genes is performed. 
+#'                                   See Details for further clarification.
 #' @param    cell_id                 name of the column containing cell identifiers or barcodes. 
 #'                                   If specified, grouping will be performed in single-cell mode
 #'                                   with the behavior governed by the \code{locus} and 
@@ -469,21 +470,22 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' This is governed by \code{only_heavy}.
 #' 
 #' Specifying \code{junc_len} will force \code{groupGenes} to perform a 1-stage partitioning of the 
-#' sequences/cells based on V annotation, J annotation, and junction length simultaneously. 
-#' If \code{junc_len=NULL} (no column specified), then \code{groupGenes} performs the first stage of a 
-#' 2-stage partitioning in which sequences/cells are partitioned in the first stage based on V annotation 
-#' and J annotation, and then in the second stage further split based on junction length.
-#' 
-#' It is assumed that ambiguous gene assignments are separated by commas.
+#' sequences/cells based on V gene, J gene, and junction length simultaneously. 
+#' If \code{junc_len=NULL} (no column specified), then \code{groupGenes} performs only the first 
+#' stage of a 2-stage partitioning in which sequences/cells are partitioned in the first stage 
+#' based on V gene and J gene, and then in the second stage further splits the groups based on 
+#' junction length.
 #' 
 #' In the input \code{data}, the \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus} 
-#' columns, if present, must be of type \code{character} (as opposed to \code{factor}).
+#' columns, if present, must be of type \code{character} (as opposed to \code{factor}). 
+#' 
+#' It is assumed that ambiguous gene assignments are separated by commas.
 #' 
 #' All rows containing \code{NA} values in any of the \code{v_call}, \code{j_call}, and \code{junc_len} 
 #' (if \code{junc_len != NULL}) columns will be removed. A warning will be issued when a row 
 #' containing an \code{NA} is removed.
 #' 
-#' @section Expectation for single-cell input:
+#' @section Expectations for single-cell input
 #' 
 #' For single-cell paired-chain data it is assumed that :
 #'   \itemize{
