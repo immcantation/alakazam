@@ -419,30 +419,30 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' ambiguous V and J gene pairs, analogous to single-linkage clustering 
 #' (i.e., allowing for chaining).
 #'
-#' @param    data                    data.frame containing sequence data.
-#' @param    v_call                  name of the column containing the heavy/long chain 
-#'                                   V-segment allele calls.
-#' @param    j_call                  name of the column containing the heavy/long chain 
-#'                                   J-segment allele calls.
-#' @param    junc_len                name of column containing the junction length.
-#'                                   if \code{NULL} then 1-stage partitioning is perform
-#'                                   considering only the V and J genes is performed. 
-#'                                   See Details for further clarification.
-#' @param    cell_id                 name of the column containing cell identifiers or barcodes. 
-#'                                   If specified, grouping will be performed in single-cell mode
-#'                                   with the behavior governed by the \code{locus} and 
-#'                                   \code{only_heavy} arguments. If set to \code{NULL} then the 
-#'                                   bulk sequencing data is assumed.
-#' @param    locus                   name of the column containing locus information. 
-#'                                   Only applicable to single-cell data.
-#'                                   Ignored if \code{cell_id=NULL}.
-#' @param    only_heavy              use only the IGH (BCR or TRB/TRD (TCR) sequences 
-#'                                   for grouping. Only applicable to single-cell data.
-#'                                   Ignored if \code{cell_id=NULL}.
-#' @param    first                   if \code{TRUE} only the first call of the gene assignments 
-#'                                   is used. if \code{FALSE} the union of ambiguous gene 
-#'                                   assignments is used to group all sequences with any 
-#'                                   overlapping gene calls.
+#' @param    data          data.frame containing sequence data.
+#' @param    v_call        name of the column containing the heavy/long chain 
+#'                         V-segment allele calls.
+#' @param    j_call        name of the column containing the heavy/long chain 
+#'                         J-segment allele calls.
+#' @param    junc_len      name of column containing the junction length.
+#'                         If \code{NULL} then 1-stage partitioning is perform
+#'                         considering only the V and J genes is performed. 
+#'                         See Details for further clarification.
+#' @param    cell_id       name of the column containing cell identifiers or barcodes. 
+#'                         If specified, grouping will be performed in single-cell mode
+#'                         with the behavior governed by the \code{locus} and 
+#'                         \code{only_heavy} arguments. If set to \code{NULL} then the 
+#'                         bulk sequencing data is assumed.
+#' @param    locus         name of the column containing locus information. 
+#'                         Only applicable to single-cell data.
+#'                         Ignored if \code{cell_id=NULL}.
+#' @param    only_heavy    use only the IGH (BCR or TRB/TRD (TCR) sequences 
+#'                         for grouping. Only applicable to single-cell data.
+#'                         Ignored if \code{cell_id=NULL}.
+#' @param    first         if \code{TRUE} only the first call of the gene assignments 
+#'                         is used. if \code{FALSE} the union of ambiguous gene 
+#'                         assignments is used to group all sequences with any 
+#'                         overlapping gene calls.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{vj_group} column. 
@@ -485,28 +485,28 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' (if \code{junc_len != NULL}) columns will be removed. A warning will be issued when a row 
 #' containing an \code{NA} is removed.
 #' 
-#' @section Expectations for single-cell input
+#' @section Expectations for single-cell data
 #' 
-#' For single-cell paired-chain data it is assumed that :
+#' Single-cell paired chain data assumptions:
 #'   \itemize{
-#'      \item every row represents a sequence (chain)
-#'      \item heavy/long and light/short chains of the same cell are linked by \code{cell_id}
+#'      \item every row represents a sequence (chain).
+#'      \item heavy/long and light/short chains of the same cell are linked by \code{cell_id}.
 #'      \item the value in \code{locus} column indicates whether the chain is the heavy/long or light/short chain.
 #'      \item each cell possibly contains multiple heavy/long and/or light/short chains.
 #'      \item every chain has its own V(D)J annotation, in which ambiguous V(D)J 
 #'            annotations, if any, are separated by a comma.
 #'   }
 #'   
-#' An example:
+#' Single-cell example:
 #'   \itemize{
-#'      \item A cell has 1 heavy chain and 2 light chains 
-#'      \item There should be 3 rows corresponding to this cell
-#'      \item One of the light chains has an ambiguous V annotation, which looks like \code{Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F}.
+#'      \item A cell has 1 heavy chain and 2 light chains.
+#'      \item There should be 3 rows corresponding to this cell.
+#'      \item One of the light chains may have an ambiguous V annotation which looks like \code{"Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F"}.
 #'   }
 #' 
 #' @examples
 #' # Group by genes
-#' db <- groupGenes(ExampleDb, v_call="v_call", j_call="j_call")
+#' db <- groupGenes(ExampleDb)
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
