@@ -52,24 +52,32 @@ Details
 Clonal diversity is calculated using the generalized diversity index (Hill numbers) 
 proposed by Hill (Hill, 1973). See [calcDiversity](calcDiversity.md) for further details.
 
-Diversity is calculated on the estimated complete clonal abundance distribution.
-This distribution is inferred by using the Chao1 estimator to estimate the number
-of seen clones, and applying the relative abundance correction and unseen clone
-frequency described in Chao et al, 2015.
-
 To generate a smooth curve, <code class = 'eq'>D</code> is calculated for each value of <code class = 'eq'>q</code> from
 `min_q` to `max_q` incremented by `step_q`.  When `uniform=TRUE`
 variability in total sequence counts across unique values in the `group` column 
 is corrected by repeated resampling from the estimated complete clonal distribution to a 
-common number of sequences.
+common number of sequences. The complete clonal abundance distribution that is resampled 
+from is inferred by using the Chao1 estimator to infer the number of unseen clones, 
+followed by applying the relative abundance correction and unseen clone frequencies 
+described in Chao et al, 2015.
 
 The diversity index (<code class = 'eq'>D</code>) for each group is the mean value of over all resampling 
 realizations. Confidence intervals are derived using the standard deviation of the 
 resampling realizations, as described in Chao et al, 2015.
 
-Of note, the complete clonal abundance distribution is inferred by using the Chao1 
-estimator to estimate the number of seen clones, and then applying the relative abundance 
-correction and unseen clone frequencies described in Chao et al, 2015.
+Significance of the difference in diversity index (`D`) between groups is tested by 
+constructing a bootstrap delta distribution for each pair of unique values in the 
+`group` column. The bootstrap delta distribution is built by subtracting the diversity 
+index `Da` in group `a` from the corresponding value <code class = 'eq'>Db</code> in group `b`, 
+for all bootstrap realizations, yielding a distribution of `nboot` total deltas; where 
+group `a` is the group with the greater mean `D`. The p-value for hypothesis 
+`Da  !=  Db` is the value of `P(0)` from the empirical cumulative distribution 
+function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.
+
+Note, this method may inflate statistical significance when clone sizes are uniformly small,
+such as when most clones sizes are 1, sample size is small, and `max_n` is near
+the total count of the smallest data group. Use caution when interpreting the results 
+in such cases.
 
 
 References

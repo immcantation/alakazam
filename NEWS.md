@@ -1,13 +1,17 @@
-Version 1.0.1.999: July 13, 2020
+Version 1.0.2: July 16, 2020
 -------------------------------------------------------------------------------
 
-+ Fixed a major bug in `groupGenes` functuion for single-cell mode. The bug were 
-  found in both `only_heavy` cases `TRUE` and `FALSE`. The code were mistakenly 
-  feeding a `j_call` column using a `v_call` column.
-+ Added the TCR grouping option to the `groupGenes` function. Changed the `only_igh` 
-  argument to `only_heavy` in `groupGenes` function. 
+Diversity:
+
 + Fixed a bug in `plotDiversityTest` that caused all values of `q` to appear on
   the plot rather than just the specified one.
+
+Gene Usage:
+
++ Fixed a major bug in the single-cell mode of `groupGenes` where the `v_call`  
+  column was being used in instead of the `j_call` column for J gene grouping.
++ Added support for TCR genes to `groupGenes`.
++ Changed the `only_igh` argument to `only_heavy` in `groupGenes`. 
 
 
 Version 1.0.1:  May 8, 2020

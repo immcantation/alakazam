@@ -89,13 +89,13 @@ the function will run under non-single-cell mode, using all input sequences rega
 value in the `locus` column.
 
 Values in the `locus` column must be one of `c("IGH", "IGI", "IGK", "IGL"` for BCR 
-data or `"TRA", "TRB", "TRD", "TRG")` for TCR data. Otherwise, the function returns an 
+or `"TRA", "TRB", "TRD", "TRG")` for TCR sequences. Otherwise, the function returns an 
 error message and stops.
 
 Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
-should be done using `IGH` for BCR data or `TRB/TRD` for TCR data 
-sequences only, or using both `IGH and IGK/IGL` for BCR data or 
-`TRB/TRD and TRA/TRG` for TCR data sequences. This is governed by `only_heavy`.
+should be done using `IGH` for BCR or `TRB/TRD` for TCR sequences only, or using 
+both `IGH, IGK/IGL` for BCR or `TRB/TRD, TRA/TRG` for TCR sequences. 
+This is governed by `only_heavy`.
 
 By supplying `junc_len`, the call amounts to a 1-stage partitioning of the sequences/cells 
 based on V annotation, J annotation, and junction length simultaneously. Without supplying this 
