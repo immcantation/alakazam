@@ -512,9 +512,15 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        cell_id=NULL, locus="locus", only_heavy=TRUE,
                        first=FALSE) {
-    # Check input
-    check <- checkColumns(data, c(v_call, j_call, junc_len, cell_id, locus))
+    # Check base input
+    check <- checkColumns(data, c(v_call, j_call, junc_len))
     if (check != TRUE) { stop(check) }
+    
+    # Check single-cell input
+    if (!is.null(cell_id)) {
+        check <- checkColumns(data, c(cell_id, locus))
+        if (check != TRUE) { stop(check) }
+    }
     
     # if necessary, cast select columns to character (factor not allowed later on)
     if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
@@ -525,7 +531,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     separator_between_seq <- ";"
     
     # single-cell mode?
-    if ( !is.null(cell_id) & !is.null(locus) ) {
+    if (!is.null(cell_id) & !is.null(locus)) {
         single_cell <- TRUE
         
         if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
