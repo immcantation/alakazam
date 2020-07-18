@@ -451,12 +451,12 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'           will have been based on V, J, and junction length simultaneously. However, 
 #'           the output column name will remain \code{vj_group}.
 #'           
-#'           Yhe output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
-#'           columns will be converted to the type \code{character} if they were of type 
+#'           The output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
+#'           columns will be converted to type \code{character} if they were of type 
 #'           \code{factor} in the input \code{data}.
 #'
 #' @details
-#' To invoke single-cell mode the \code{cell_id} argument must be specified and \code{locus} 
+#' To invoke single-cell mode the \code{cell_id} argument must be specified and the \code{locus} 
 #' column must be correct. Otherwise, \code{groupGenes} will be run with bulk sequencing assumptions, 
 #' using all input sequences regardless of the values in the \code{locus} column.
 #' 
@@ -464,17 +464,18 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an 
 #' error message and stops.
 #' 
-#' Under single-cell mode with paired chained sequences, there is a choice of whether (a) 
-#' grouping should be done using IGH (BCR) or TRB/TRD (TCR) sequences only or
-#' (b) whether grouping should be performed using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
-#' This is governed by \code{only_heavy}.
+#' Under single-cell mode with paired chained sequences, there is a choice of whether 
+#' grouping should be done by (a) using IGH (BCR) or TRB/TRD (TCR) sequences only or
+#' (b) using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
+#' This is governed by the \code{only_heavy} argument.
 #' 
 #' Specifying \code{junc_len} will force \code{groupGenes} to perform a 1-stage partitioning of the 
 #' sequences/cells based on V gene, J gene, and junction length simultaneously. 
 #' If \code{junc_len=NULL} (no column specified), then \code{groupGenes} performs only the first 
 #' stage of a 2-stage partitioning in which sequences/cells are partitioned in the first stage 
 #' based on V gene and J gene, and then in the second stage further splits the groups based on 
-#' junction length.
+#' junction length (the second stage must be performed independently, as this only returns the
+#' first stage results).
 #' 
 #' In the input \code{data}, the \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus} 
 #' columns, if present, must be of type \code{character} (as opposed to \code{factor}). 
@@ -485,7 +486,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' (if \code{junc_len != NULL}) columns will be removed. A warning will be issued when a row 
 #' containing an \code{NA} is removed.
 #' 
-#' @section Expectations for single-cell data
+#' @section Expectations for single-cell data:
 #' 
 #' Single-cell paired chain data assumptions:
 #'   \itemize{
@@ -507,6 +508,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' @examples
 #' # Group by genes
 #' db <- groupGenes(ExampleDb)
+#' head(db$vj_group)
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,

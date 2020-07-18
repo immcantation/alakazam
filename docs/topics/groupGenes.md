@@ -83,15 +83,15 @@ If `junc_len` is supplied, the grouping this `vj_group`
 will have been based on V, J, and junction length simultaneously. However, 
 the output column name will remain `vj_group`.
 
-Yhe output `v_call`, `j_call`, `cell_id`, and `locus`
-columns will be converted to the type `character` if they were of type 
+The output `v_call`, `j_call`, `cell_id`, and `locus`
+columns will be converted to type `character` if they were of type 
 `factor` in the input `data`.
 
 
 Details
 -------------------
 
-To invoke single-cell mode the `cell_id` argument must be specified and `locus` 
+To invoke single-cell mode the `cell_id` argument must be specified and the `locus` 
 column must be correct. Otherwise, `groupGenes` will be run with bulk sequencing assumptions, 
 using all input sequences regardless of the values in the `locus` column.
 
@@ -99,17 +99,18 @@ Values in the `locus` column must be one of `c("IGH", "IGI", "IGK", "IGL")` for 
 or `c("TRA", "TRB", "TRD", "TRG")` for TCR sequences. Otherwise, the function returns an 
 error message and stops.
 
-Under single-cell mode with paired chained sequences, there is a choice of whether (a) 
-grouping should be done using IGH (BCR) or TRB/TRD (TCR) sequences only or
-(b) whether grouping should be performed using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
-This is governed by `only_heavy`.
+Under single-cell mode with paired chained sequences, there is a choice of whether 
+grouping should be done by (a) using IGH (BCR) or TRB/TRD (TCR) sequences only or
+(b) using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
+This is governed by the `only_heavy` argument.
 
 Specifying `junc_len` will force `groupGenes` to perform a 1-stage partitioning of the 
 sequences/cells based on V gene, J gene, and junction length simultaneously. 
 If `junc_len=NULL` (no column specified), then `groupGenes` performs only the first 
 stage of a 2-stage partitioning in which sequences/cells are partitioned in the first stage 
 based on V gene and J gene, and then in the second stage further splits the groups based on 
-junction length.
+junction length (the second stage must be performed independently, as this only returns the
+first stage results).
 
 In the input `data`, the `v_call`, `j_call`, `cell_id`, and `locus` 
 columns, if present, must be of type `character` (as opposed to `factor`). 
@@ -121,6 +122,29 @@ All rows containing `NA` values in any of the `v_call`, `j_call`, and `junc_len`
 containing an `NA` is removed.
 
 
+Expectations for single-cell data
+-------------------
+
+
+
+Single-cell paired chain data assumptions:
+
++  every row represents a sequence (chain).
++  heavy/long and light/short chains of the same cell are linked by `cell_id`.
++  the value in `locus` column indicates whether the chain is the heavy/long or light/short chain.
++  each cell possibly contains multiple heavy/long and/or light/short chains.
++  every chain has its own V(D)J annotation, in which ambiguous V(D)J 
+annotations, if any, are separated by a comma.
+
+
+Single-cell example:
+
++  A cell has 1 heavy chain and 2 light chains.
++  There should be 3 rows corresponding to this cell.
++  One of the light chains may have an ambiguous V annotation which looks like `"Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F"`.
+
+
+
 
 Examples
 -------------------
@@ -128,6 +152,13 @@ Examples
 ```R
 # Group by genes
 db <- groupGenes(ExampleDb)
+head(db$vj_group)
+```
+
+
+```
+[1] "G28" "G50" "G36" "G36" "G86" "G61"
+
 ```
 
 
