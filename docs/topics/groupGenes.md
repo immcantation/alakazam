@@ -130,7 +130,7 @@ Examples
 db <- groupGenes(ExampleDb)
 ```
 
-**Error in groupGenes(ExampleDb)**: The column locus was not found
+
 
 
 
