@@ -436,7 +436,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' @param    locus         name of the column containing locus information. 
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
-#' @param    only_heavy    use only the IGH (BCR or TRB/TRD (TCR) sequences 
+#' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 #'                         for grouping. Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
 #' @param    first         if \code{TRUE} only the first call of the gene assignments 

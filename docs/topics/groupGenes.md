@@ -60,7 +60,7 @@ Only applicable to single-cell data.
 Ignored if `cell_id=NULL`.
 
 only_heavy
-:   use only the IGH (BCR or TRB/TRD (TCR) sequences 
+:   use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 for grouping. Only applicable to single-cell data.
 Ignored if `cell_id=NULL`.
 
