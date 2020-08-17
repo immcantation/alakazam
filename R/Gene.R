@@ -217,16 +217,22 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
     # Define boundaries of individual segment calls
     edge_regex <- paste0("[^", sep, "]*")
     
+    # Remove NL genes
+    if (omit_nl) {
+        # Clean segment_call to keep only the name (remove species)
+        allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
+        segment_call <- gsub(paste0(edge_regex, "(", allele_regex, ")", edge_regex), "\\1", 
+                  segment_call, perl=T)
+        # non-localized regex
+        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
+                           sep, "|$)")
+        # delete non-localized calls
+        segment_call <- gsub(nl_regex, "", segment_call, perl=TRUE)
+    }
+
     # Extract calls
     r <- gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), "\\1", 
               segment_call, perl=T)
-    
-    # Remove NL genes
-    if (omit_nl) {
-        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
-                           sep, "|$)")
-        r <- gsub(nl_regex, "", r, perl=TRUE)
-    }
     
     # Strip D from gene names if required
     if (strip_d) {

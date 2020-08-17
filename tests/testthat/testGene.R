@@ -134,17 +134,17 @@ test_that("getSegment", {
     
     # Filtering non-localized genes
     nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
-                 "Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
+                 "Homosap IGHV2-30*01 F,Homsap IGHV3-NL1*01 F",
                  "IGHV1-NL1*01")
     
     expect_equal(getAllele(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3-30-3*01,IGHV3-30*01", "IGHV3-30*01", ""))
+                 c("IGHV3-30-3*01,IGHV3-30*01", "IGHV2-30*01", ""))
                  
     expect_equal(getGene(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3-30-3,IGHV3-30", "IGHV3-30", ""))
+                 c("IGHV3-30-3,IGHV3-30", "IGHV2-30", ""))
     
     expect_equal(getFamily(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3", "IGHV3", "IGHV1"))
+                 c("IGHV3", "IGHV2", ""))
     
     # Test for issue found in TIgGER
     # If there's no allele info,

@@ -1,3 +1,12 @@
+Version 1.0.2.999: August 17, 2020
+-------------------------------------------------------------------------------
+
+Gene:
+
++ Fixed a bug in `getSegment` where filtering of non-localized genes was not 
+  being applied when called from `getFamily`, because the 'NL' part of the name
+  was removed before the filtering step.
+
 Version 1.0.2: July 17, 2020
 -------------------------------------------------------------------------------
 
