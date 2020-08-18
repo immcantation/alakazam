@@ -132,6 +132,9 @@ test_that("getSegment", {
     expect_equal(getGene(heavy_call, first=FALSE, strip_d=FALSE),
                  c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1"))
     
+    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE,collapse=FALSE),
+                 c("IGH,IGH", "IGH", "IGH"))    
+    
     # Filtering non-localized genes
     nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
                  "Homosap IGHV2-30*01 F,Homsap IGHV3-NL1*01 F",

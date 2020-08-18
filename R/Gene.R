@@ -287,6 +287,18 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 }
 
 
+#' @rdname getSegment
+#' @export
+getLocus <- function(segment_call, first=TRUE, collapse=TRUE, 
+                      strip_d=TRUE, omit_nl=FALSE, sep=",") {
+    locus_regex <- '((IG[HLK]|TR[ABGD]))'
+    r <- getSegment(segment_call, locus_regex, first=first, collapse=collapse, 
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
+    
+    return(r)
+}
+
+
 #### Utility functions ####
 
 # Get all VJ(L) combinations from one or more chains of the same type
