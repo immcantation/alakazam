@@ -87,53 +87,67 @@ test_that("countGenes",{
 ### getSegment ####
 
 test_that("getSegment", {
+    # Light chain tests
     kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
                     "Homsap IGKJ5*01 F")
     
-    expect_equal(getAllele(kappa_call),c("IGKV1-39*01", "IGKJ5*01" ))
-    
+    expect_equal(getAllele(kappa_call), 
+                 c("IGKV1-39*01", "IGKJ5*01"))
     expect_equal(getAllele(kappa_call, first=FALSE),
                  c("IGKV1-39*01,IGKV1-39*02", "IGKJ5*01"))
-    
     expect_equal(getAllele(kappa_call, first=FALSE, strip_d=FALSE),
                  c("IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01", "IGKJ5*01" ))
     
-    expect_equal(getGene(kappa_call), c("IGKV1-39", "IGKJ5" ))
-    
+    expect_equal(getGene(kappa_call), 
+                 c("IGKV1-39", "IGKJ5" ))
     expect_equal(getGene(kappa_call, first=FALSE),
                  c("IGKV1-39", "IGKJ5"))
-    
     expect_equal(getGene(kappa_call, first=FALSE, strip_d=FALSE),
                  c("IGKV1D-39,IGKV1-39", "IGKJ5"))
     
-    expect_equal(getFamily(kappa_call), c("IGKV1", "IGKJ5"))
-    
-    expect_equal(getFamily(kappa_call, first=FALSE), c("IGKV1", "IGKJ5"))
-    
+    expect_equal(getFamily(kappa_call), 
+                 c("IGKV1", "IGKJ5"))
+    expect_equal(getFamily(kappa_call, first=FALSE), 
+                 c("IGKV1", "IGKJ5"))
     expect_equal(getFamily(kappa_call, first=FALSE, collapse=FALSE),
                  c("IGKV1,IGKV1,IGKV1", "IGKJ5"))
-    
     expect_equal(getFamily(kappa_call, first=FALSE, strip_d=FALSE),
                  c("IGKV1D,IGKV1", "IGKJ5"))
+
+    expect_equal(getLocus(kappa_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
+                 c("IGK", "IGK"))    
+    expect_equal(getLocus(kappa_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
+                 c("IGK,IGK,IGK", "IGK"))
     
+    expect_equal(getChain(kappa_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
+                 c("VL", "VL"))
+    expect_equal(getChain(kappa_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
+                 c("VL,VL,VL", "VL"))
+    
+    # Heavy chain tests
     heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
                     "Homsap IGHD1-1*01 F", 
                     "Homsap IGHJ1*01 F")
     
     expect_equal(getAllele(heavy_call, first=FALSE),
                  c("IGHV1-69*01", "IGHD1-1*01", "IGHJ1*01" ))
-    
     expect_equal(getAllele(heavy_call, first=FALSE, strip_d=FALSE),
                  c("IGHV1-69*01,IGHV1-69D*01", "IGHD1-1*01", "IGHJ1*01"))
     
     expect_equal(getGene(heavy_call, first=FALSE), 
                  c("IGHV1-69", "IGHD1-1", "IGHJ1"))
-    
     expect_equal(getGene(heavy_call, first=FALSE, strip_d=FALSE),
                  c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1"))
     
-    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE,collapse=FALSE),
+    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
+                 c("IGH", "IGH", "IGH"))    
+    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
                  c("IGH,IGH", "IGH", "IGH"))    
+
+    expect_equal(getChain(heavy_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
+                 c("VH", "VH", "VH"))        
+    expect_equal(getChain(heavy_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
+                 c("VH,VH", "VH", "VH"))    
     
     # Filtering non-localized genes
     nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
@@ -148,6 +162,12 @@ test_that("getSegment", {
     
     expect_equal(getFamily(nl_call, first=FALSE, omit_nl=TRUE),
                  c("IGHV3", "IGHV2", ""))
+    
+    expect_equal(getLocus(nl_call, first=FALSE, omit_nl=TRUE),
+                 c("IGH", "IGH", ""))
+    
+    expect_equal(getChain(nl_call, first=FALSE, omit_nl=TRUE),
+                 c("VH", "VH", ""))
     
     # Test for issue found in TIgGER
     # If there's no allele info,

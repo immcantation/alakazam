@@ -191,6 +191,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #' getFamily(kappa_call, first=FALSE, collapse=FALSE)
 #' getFamily(kappa_call, first=FALSE, strip_d=FALSE)
 #' 
+#' getLocus(kappa_call)
+#' getChain(kappa_call)
+#' 
 #' # Heavy chain examples
 #' heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
 #'                 "Homsap IGHD1-1*01 F", 
@@ -201,6 +204,10 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #'
 #' getGene(heavy_call, first=FALSE)
 #' getGene(heavy_call, first=FALSE, strip_d=FALSE)
+#' 
+#' getFamily(heavy_call)
+#' getLocus(heavy_call)
+#' getChain(heavy_call)
 #'
 #' # Filtering non-localized genes
 #' nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
@@ -298,6 +305,18 @@ getLocus <- function(segment_call, first=TRUE, collapse=TRUE,
     return(r)
 }
 
+
+#' @rdname getSegment
+#' @export
+getChain <- function(segment_call, first=TRUE, collapse=TRUE, 
+                     strip_d=TRUE, omit_nl=FALSE, sep=",") {
+    r <- getLocus(segment_call, first=first, collapse=collapse, 
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
+    r <- gsub("(IGH)|(TR[BD])", "VH", r)
+    r <- gsub("(IG[KL])|(TR[AG])", "VL", r)
+    
+    return(r)
+}
 
 #### Utility functions ####
 

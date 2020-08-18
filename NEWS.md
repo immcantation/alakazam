@@ -5,7 +5,8 @@ Gene:
 
 + Added the function `getLocus` to extract the locus information from the
   segment call.
-
++ Added the function `getChain` to define the chain from the segment or 
+  locus call.
 + Fixed a bug in `getSegment` where filtering of non-localized genes was not 
   being applied when called from `getFamily`, because the 'NL' part of the name
   was removed before the filtering step.
