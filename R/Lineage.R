@@ -490,44 +490,6 @@ phylipToGraph <- function(edges, clone) {
 }
 
 
-# Convert phylip output to phylo object while mapping reconstructed
-# sequences to appropriate internal nodes
-#
-# @param   edges  data.frame of edges returned by getPhylipEdges
-# @param   clone  a ChangeoClone object containg sequence data
-# @param   inf_df  data.frame of inferred sequences from getPhylipInferred
-# @return  an ape phylo tree object
-makePhylo <- function(edges, clone, inf_df){
-    nodes <- unique(c(edges[,1],edges[,2]))
-    tips <- nodes[!nodes %in% inf_df$sequence_id]
-    inodes <- nodes[nodes %in% inf_df$sequence_id]
-    node_map <- 1:length(nodes)
-    names(node_map) <- c(tips,inodes)
-    phylo <- list()
-    colnames(edges) <- NULL
-    edge <- edges[,1:2]
-    edge[,1] <- node_map[edge[,1]]
-    edge[,2] <- node_map[edge[,2]]
-    phylo$edge <- as.matrix(edge)
-    phylo$tip.label <- tips
-    phylo$edge.length <- edges[,3]
-    phylo$Nnode <- length(inodes)
-    phylo$order <- "cladewise"
-    class(phylo) <- "phylo"
-    seqs <- c(clone@data[["sequence"]],clone@germline,inf_df$sequence)
-    names(seqs) <- c(clone@data$sequence_id,"Germline",inf_df$sequence_id)
-    seqs <- seqs[order(node_map[names(seqs)])]
-    names(seqs) <- as.character(node_map[names(seqs)])
-    nnodes <- length(unique(c(phylo$edge[,1],phylo$edge[,2])))
-    phylo$nodes <- lapply(1:nnodes,function(x){
-        n <- list()
-        n$sequence <- seqs[x]
-        n
-    })
-    return(phylo)
-}
-
-
 #' Infer an Ig lineage using PHYLIP
 #' 
 #' \code{buildPhylipLineage} reconstructs an Ig lineage via maximum parsimony using the 
@@ -548,7 +510,9 @@ makePhylo <- function(edges, clone, inf_df){
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
 #'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
 #'                         the console.
-#' @param    phylo         return tree as a \code{phylo} object
+#' @param    branch_length if \code{mutations} (default) branch lengths represent the number of 
+#'                         mutations between nodes. If \code{distance} branch lengths represent
+#'                         the expected number of mutations per site, unaltered from PHYLIP output
 #' @param    temp_path     specific path to temp directory if desired
 #' @param    onetree       if TRUE save only one tree  
 #'                                                
@@ -659,8 +623,8 @@ makePhylo <- function(edges, clone, inf_df){
 #' 
 #' @export
 buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0), 
-                               rm_temp=FALSE, verbose=FALSE, phylo=FALSE,
-                               temp_path=NULL, onetree=FALSE) {
+                               rm_temp=FALSE, verbose=FALSE, temp_path=NULL, onetree=FALSE,
+                               branch_length=c("mutations","distance")) {
     # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
@@ -668,6 +632,9 @@ buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0),
         return(NULL)
     }
     
+    # determine branch length type
+	branch_length <- match.arg(branch_length)
+
     # Check fields
     seq_len <- unique(stringi::stri_length(clone@data[["sequence"]]))
     germ_len <- ifelse(length(clone@germline) == 0, 0, stringi::stri_length(clone@germline))
@@ -722,18 +689,19 @@ buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0),
     # Extract edge table from PHYLIP output 
     edges <- getPhylipEdges(phylip_out, id_map=id_map)
 
-    if (phylo) {
-        #make phylo-formatted return object
-        graph <- makePhylo(edges, clone, inf_df)
-    }else{
+    clone@data <- as.data.frame(dplyr::bind_rows(clone@data, inf_df))
 
-        # Modify PHYLIP tree to remove 0 distance edges
-        clone@data <- as.data.frame(dplyr::bind_rows(clone@data, inf_df))
+    # Convert edges and clone data to igraph graph object
+    if( branch_length == "mutations" ){
         mod_list <- modifyPhylipEdges(edges, clone, dist_mat=dist_mat)
-    
-        # Convert edges and clone data to igraph graph object
         graph <- phylipToGraph(mod_list$edges, mod_list$clone)
+    }else{
+        # or just keep everything the same	
+    	germ_idx <- which(edges$to == "Germline")
+    	edges[germ_idx, c('from', 'to')] <- edges[germ_idx, c('to', 'from')]
+        graph <- phylipToGraph(edges, clone)
     }
+   
     return(graph)
 }
 
@@ -789,7 +757,7 @@ buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0),
 #' }
 #' 
 #' @export
-phyloToGraph <- function(phylo, germline=NULL) {
+phyloToGraph <- function(phylo, germline="Germline") {
     names <- 1:length(unique(c(phylo$edge[, 1],phylo$edge[, 2])))
     for(i in 1:length(phylo$tip.label)){
         names[i] <- phylo$tip.label[i]
@@ -802,10 +770,14 @@ phyloToGraph <- function(phylo, germline=NULL) {
     }
     d <- data.frame(cbind(phylo$edge,phylo$edge.length))
     names(d)=c("from", "to", "weight")
-
+    
+    if(!is.null(phylo$nodes)){
+    	seqs <- unlist(lapply(phylo$nodes,function(x)x$sequence))
+    	names(seqs) <- lapply(phylo$nodes,function(x)x$id)
+    }
     if(!is.null(germline)){
         germnode <- which(phylo$tip.label == germline)
-        phylo$uca = phylo$edge[phylo$edge[,2] == germnode,1]
+        phylo$uca <- phylo$edge[phylo$edge[,2] == germnode,1]
         if(sum(d$from == phylo$uca) == 2){
             d[d$from == phylo$uca, ]$from <- germnode
             d <- d[!(d$from == germnode & d$to == germnode),] 
@@ -821,6 +793,9 @@ phyloToGraph <- function(phylo, germline=NULL) {
     g <- igraph::graph_from_data_frame(d)
     igraph::V(g)$name <- names[as.numeric(igraph::V(g)$name)]
     igraph::E(g)$label <- igraph::E(g)$weight
+    if(!is.null(phylo$nodes)){
+    	igraph::V(g)$sequence <- seqs[igraph::V(g)$name]
+    }
     return(g)
 }
 
@@ -886,6 +861,9 @@ graphToPhylo <- function(graph) {
     node_counts <- table(c(df$to,df$from))
     tips <- names(node_counts)[node_counts == 1]
     nodes <- names(node_counts)[node_counts > 1]
+    attr <- igraph::vertex_attr(graph)
+    seqs <- attr$sequence
+    names(seqs) <- attr$name
 
     germline <- tips[tips %in% df$from]
     if(length(germline) > 0){
@@ -895,6 +873,8 @@ graphToPhylo <- function(graph) {
         row <- c(ucanode,germline,0.0)
         names(row) <- c("from","to","weight")
         df <- rbind(df, row)
+        seqs <- c(seqs,seqs["Germline"])
+        names(seqs)[length(seqs)] = paste0(germline,"_UCA")
     }
     tipn <- 1:length(tips)
     names(tipn) <- tips
@@ -909,13 +889,18 @@ graphToPhylo <- function(graph) {
     phylo$edge <- matrix(cbind(df$from,df$to),ncol=2)
     phylo$edge.length <- as.numeric(df$weight)
     phylo$tip.label <- tips
+    phylo$node.label <- nodes
     phylo$Nnode <- length(nodes)
     phylo$node.label <- nodes
     class(phylo) <- "phylo"
 
-    if(length(germline) > 0){
-        phylo <- rerootGermline(phylo, germline)
-    }
+    nnodes <- length(renumber)
+    phylo$nodes <- lapply(1:nnodes,function(x){
+        n <- list()
+        n$id <- names(renumber[renumber == x])
+        n$sequence <- seqs[n$id]
+        n
+    })
 
     phylo = ape::ladderize(phylo, right=FALSE)
     
