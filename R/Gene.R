@@ -191,6 +191,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #' getFamily(kappa_call, first=FALSE, collapse=FALSE)
 #' getFamily(kappa_call, first=FALSE, strip_d=FALSE)
 #' 
+#' getLocus(kappa_call)
+#' getChain(kappa_call)
+#' 
 #' # Heavy chain examples
 #' heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
 #'                 "Homsap IGHD1-1*01 F", 
@@ -201,6 +204,10 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #'
 #' getGene(heavy_call, first=FALSE)
 #' getGene(heavy_call, first=FALSE, strip_d=FALSE)
+#' 
+#' getFamily(heavy_call)
+#' getLocus(heavy_call)
+#' getChain(heavy_call)
 #'
 #' # Filtering non-localized genes
 #' nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
@@ -217,16 +224,22 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
     # Define boundaries of individual segment calls
     edge_regex <- paste0("[^", sep, "]*")
     
+    # Remove NL genes
+    if (omit_nl) {
+        # Clean segment_call to keep only the name (remove species)
+        allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
+        segment_call <- gsub(paste0(edge_regex, "(", allele_regex, ")", edge_regex), "\\1", 
+                  segment_call, perl=T)
+        # non-localized regex
+        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
+                           sep, "|$)")
+        # delete non-localized calls
+        segment_call <- gsub(nl_regex, "", segment_call, perl=TRUE)
+    }
+
     # Extract calls
     r <- gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), "\\1", 
               segment_call, perl=T)
-    
-    # Remove NL genes
-    if (omit_nl) {
-        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
-                           sep, "|$)")
-        r <- gsub(nl_regex, "", r, perl=TRUE)
-    }
     
     # Strip D from gene names if required
     if (strip_d) {
@@ -280,6 +293,30 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
     return(r)
 }
 
+
+#' @rdname getSegment
+#' @export
+getLocus <- function(segment_call, first=TRUE, collapse=TRUE, 
+                      strip_d=TRUE, omit_nl=FALSE, sep=",") {
+    locus_regex <- '((IG[HLK]|TR[ABGD]))'
+    r <- getSegment(segment_call, locus_regex, first=first, collapse=collapse, 
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
+    
+    return(r)
+}
+
+
+#' @rdname getSegment
+#' @export
+getChain <- function(segment_call, first=TRUE, collapse=TRUE, 
+                     strip_d=TRUE, omit_nl=FALSE, sep=",") {
+    r <- getLocus(segment_call, first=first, collapse=collapse, 
+                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
+    r <- gsub("(IGH)|(TR[BD])", "VH", r)
+    r <- gsub("(IG[KL])|(TR[AG])", "VL", r)
+    
+    return(r)
+}
 
 #### Utility functions ####
 
@@ -412,100 +449,117 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' Group sequences by gene assignment
 #'
 #' \code{groupGenes} will group rows by shared V and J gene assignments, 
-#' and optionally also by junction lengths.
-#' Both VH:VL paired single-cell BCR-seq and unpaired bulk-seq (heavy chain-only)
-#' are supported.
-#' In the case of ambiguous (multiple) gene assignments, the grouping may
-#' be specified to be a union across all ambiguous V and J gene pairs, 
-#' analagous to single-linkage clustering (i.e., allowing for chaining).
+#' and optionally also by junction lengths. IGH:IGK/IGL, TRB:TRA, and TRD:TRG 
+#' paired single-cell BCR/TCR sequencing and unpaired bulk sequencing 
+#' (IGH, TRB, TRD chain only) are supported. In the case of ambiguous (multiple) 
+#' gene assignments, the grouping may be specified to be a union across all 
+#' ambiguous V and J gene pairs, analogous to single-linkage clustering 
+#' (i.e., allowing for chaining).
 #'
-#' @param    data                    data.frame containing sequence data.
-#' @param    v_call                  name of the column containing the heavy chain 
-#'                                   V-segment allele calls.
-#' @param    j_call                  name of the column containing the heavy chain 
-#'                                   J-segment allele calls.
-#' @param    junc_len                name of column containing the junction length. Optional.
-#' @param    cell_id                 name of the column containing cell IDs. Only 
-#'                                   applicable and required for single-cell mode.
-#' @param    locus                   name of the column containing locus information. 
-#'                                   Only applicable and required for single-cell mode.
-#' @param    only_igh                use only heavy chain (\code{IGH}) sequences for grouping,
-#'                                   disregarding light chains. Only applicable and required for
-#'                                   single-cell mode. Default is \code{TRUE}.
-#' @param    first                   if \code{TRUE} only the first call of the gene assignments 
-#'                                   is used. if \code{FALSE} the union of ambiguous gene 
-#'                                   assignments is used to group all sequences with any 
-#'                                   overlapping gene calls.
+#' @param    data          data.frame containing sequence data.
+#' @param    v_call        name of the column containing the heavy/long chain 
+#'                         V-segment allele calls.
+#' @param    j_call        name of the column containing the heavy/long chain 
+#'                         J-segment allele calls.
+#' @param    junc_len      name of column containing the junction length.
+#'                         If \code{NULL} then 1-stage partitioning is perform
+#'                         considering only the V and J genes is performed. 
+#'                         See Details for further clarification.
+#' @param    cell_id       name of the column containing cell identifiers or barcodes. 
+#'                         If specified, grouping will be performed in single-cell mode
+#'                         with the behavior governed by the \code{locus} and 
+#'                         \code{only_heavy} arguments. If set to \code{NULL} then the 
+#'                         bulk sequencing data is assumed.
+#' @param    locus         name of the column containing locus information. 
+#'                         Only applicable to single-cell data.
+#'                         Ignored if \code{cell_id=NULL}.
+#' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
+#'                         for grouping. Only applicable to single-cell data.
+#'                         Ignored if \code{cell_id=NULL}.
+#' @param    first         if \code{TRUE} only the first call of the gene assignments 
+#'                         is used. if \code{FALSE} the union of ambiguous gene 
+#'                         assignments is used to group all sequences with any 
+#'                         overlapping gene calls.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{vj_group} column. 
 #'           
-#'           Note that if \code{junc_len} is supplied, the grouping this \code{vj_group} 
-#'           will have been based on V, J, and L simultaneously despite the column name 
-#'           being \code{vj_group}.
+#'           If \code{junc_len} is supplied, the grouping this \code{vj_group} 
+#'           will have been based on V, J, and junction length simultaneously. However, 
+#'           the output column name will remain \code{vj_group}.
 #'           
-#'           Note that the output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
-#'           columns will be converted to \code{character} if they were \code{factor} in the 
-#'           input \code{data}.
+#'           The output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
+#'           columns will be converted to type \code{character} if they were of type 
+#'           \code{factor} in the input \code{data}.
 #'
 #' @details
+#' To invoke single-cell mode the \code{cell_id} argument must be specified and the \code{locus} 
+#' column must be correct. Otherwise, \code{groupGenes} will be run with bulk sequencing assumptions, 
+#' using all input sequences regardless of the values in the \code{locus} column.
 #' 
-#' To invoke single-cell mode, both \code{cell_id} and \code{locus} must be supplied. Otherwise,
-#' the function will run under non-single-cell mode, using all input sequences regardless of the
-#' value in the \code{locus} column.
+#' Values in the \code{locus} column must be one of \code{c("IGH", "IGI", "IGK", "IGL")} for BCR 
+#' or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an 
+#' error message and stops.
 #' 
-#' Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
-#' should be done using only heavy chain (\code{IGH}) sequences only, or using both heavy chain
-#' (\code{IGH}) and light chain (\code{IGK}, \code{IGL}) sequences. This is governed by 
-#' \code{only_igh}.
+#' Under single-cell mode with paired chained sequences, there is a choice of whether 
+#' grouping should be done by (a) using IGH (BCR) or TRB/TRD (TCR) sequences only or
+#' (b) using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
+#' This is governed by the \code{only_heavy} argument.
 #' 
-#' Values in the \code{locus} column must be one of \code{"IGH"}, \code{"IGK"}, and \code{"IGL"}.
+#' Specifying \code{junc_len} will force \code{groupGenes} to perform a 1-stage partitioning of the 
+#' sequences/cells based on V gene, J gene, and junction length simultaneously. 
+#' If \code{junc_len=NULL} (no column specified), then \code{groupGenes} performs only the first 
+#' stage of a 2-stage partitioning in which sequences/cells are partitioned in the first stage 
+#' based on V gene and J gene, and then in the second stage further splits the groups based on 
+#' junction length (the second stage must be performed independently, as this only returns the
+#' first stage results).
 #' 
-#' By supplying \code{junc_len}, the call amounts to a 1-stage partitioning of the sequences/cells 
-#' based on V annotation, J annotation, and junction length simultaneously. Without supplying this 
-#' columns, the call amounts to the first stage of a 2-stage partitioning, in which sequences/cells 
-#' are partitioned in the first stage based on V annotation and J annotation, and then in the second 
-#' stage further split based on junction length.
+#' In the input \code{data}, the \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus} 
+#' columns, if present, must be of type \code{character} (as opposed to \code{factor}). 
 #' 
 #' It is assumed that ambiguous gene assignments are separated by commas.
 #' 
-#' In the input \code{data}, the \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus} 
-#' columns, if present, must be \code{character}, as opposed to \code{factor}.
-#' 
-#' All rows containing \code{NA} values in their any of the \code{v_call}, \code{j_call}, and, 
-#' if specified, \code{junc_len}, columns will be removed. A warning will be issued when a row 
+#' All rows containing \code{NA} values in any of the \code{v_call}, \code{j_call}, and \code{junc_len} 
+#' (if \code{junc_len != NULL}) columns will be removed. A warning will be issued when a row 
 #' containing an \code{NA} is removed.
 #' 
-#' @section Expectation for single-cell input:
+#' @section Expectations for single-cell data:
 #' 
-#' For single-cell BCR data with VH:VL pairing, it is assumed that 
+#' Single-cell paired chain data assumptions:
 #'   \itemize{
-#'      \item every row represents a sequence (chain)
-#'      \item heavy and light chains of the same cell are linked by \code{cell_id}
-#'      \item value in \code{locus} column indicates whether the chain is heavy or light
-#'      \item each cell possibly contains multiple heavy and/or light chains
+#'      \item every row represents a sequence (chain).
+#'      \item heavy/long and light/short chains of the same cell are linked by \code{cell_id}.
+#'      \item the value in \code{locus} column indicates whether the chain is the heavy/long or light/short chain.
+#'      \item each cell possibly contains multiple heavy/long and/or light/short chains.
 #'      \item every chain has its own V(D)J annotation, in which ambiguous V(D)J 
-#'            annotations, if any, are separated by \code{,} (comma)
+#'            annotations, if any, are separated by a comma.
 #'   }
 #'   
-#' An example:
+#' Single-cell example:
 #'   \itemize{
-#'      \item A cell has 1 heavy chain and 2 light chains 
-#'      \item There should be 3 rows corresponding to this cell
-#'      \item One of the light chain has ambiguous V annotation, which looks like \code{Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F}.
+#'      \item A cell has 1 heavy chain and 2 light chains.
+#'      \item There should be 3 rows corresponding to this cell.
+#'      \item One of the light chains may have an ambiguous V annotation which looks like \code{"Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F"}.
 #'   }
 #' 
 #' @examples
 #' # Group by genes
-#' db <- groupGenes(ExampleDb, v_call="v_call", j_call="j_call")
+#' db <- groupGenes(ExampleDb)
+#' head(db$vj_group)
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       cell_id=NULL, locus=NULL, only_igh=TRUE,
+                       cell_id=NULL, locus="locus", only_heavy=TRUE,
                        first=FALSE) {
-    # Check input
-    check <- checkColumns(data, c(v_call, j_call, junc_len, cell_id, locus))
+    # Check base input
+    check <- checkColumns(data, c(v_call, j_call, junc_len))
     if (check != TRUE) { stop(check) }
+    
+    # Check single-cell input
+    if (!is.null(cell_id)) {
+        check <- checkColumns(data, c(cell_id, locus))
+        if (check != TRUE) { stop(check) }
+    }
     
     # if necessary, cast select columns to character (factor not allowed later on)
     if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
@@ -516,20 +570,23 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     separator_between_seq <- ";"
     
     # single-cell mode?
-    if ( !is.null(cell_id) & !is.null(locus) ) {
+    if (!is.null(cell_id) & !is.null(locus)) {
         single_cell <- TRUE
         
         if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
         if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
         
-        if (!all(data[[locus]] %in% c("IGH", "IGK", "IGL"))) {
-            stop("The locus column must be one of {IGH, IGK, IGL}.")
+        # check locus column
+        valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+        check <- !all(unique(data[[locus]]) %in% valid_loci)
+        if (check) {
+            stop("The locus column contains invalid loci annotations.")
         }
     } else {
         single_cell <- FALSE
     }
     
-    # only set if `single_cell` & `only_igh`
+    # only set if `single_cell` & `only_heavy`
     v_call_light <- NULL
     j_call_light <- NULL
     junc_len_light <- NULL
@@ -544,9 +601,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         cell_id_uniq <- unique(data[[cell_id]])
         cell_seq_idx <- sapply(cell_id_uniq, function(x){
             # heavy chain
-            idx_h <- which( data[[cell_id]]==x & data[[locus]]=="IGH" )
+            idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
             # light chain
-            idx_l <- which( data[[cell_id]]==x & data[[locus]]!="IGH" )
+            idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
             
             return(list(heavy=idx_h, light=idx_l))
         }, USE.NAMES=FALSE, simplify=FALSE)
@@ -554,7 +611,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         # make a copy
         data_orig <- data; rm(data)
         
-        if (only_igh) {
+        if (only_heavy) {
             
             # use heavy chains only
             
@@ -576,7 +633,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 # heavy chain V, J, junc_len
                 data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
                                                collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
+                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
                                                collapse=separator_between_seq)
                 if (!is.null(junc_len)) {
                     data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
@@ -611,7 +668,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 # heavy chain V, J, junc_len
                 data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
                                                collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
+                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
                                                collapse=separator_between_seq)
                 if (!is.null(junc_len)) {
                     data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
@@ -670,7 +727,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
              ifelse(is.null(junc_len), " ", ", "), junc_len, 
              "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
     }
-    if (single_cell & !only_igh) {
+    if (single_cell & !only_heavy) {
         if (any( sapply(cols_for_grouping_light, function(x) {class(data[[x]]) == "factor"}) )) {
             stop("one or more of { ", v_call_light, ", ", j_call_light,  
                  ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
@@ -707,7 +764,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     
     # unique combinations of VJL
     # heavy chain seqs only
-    if ( (!single_cell) | (single_cell & only_igh) ) {
+    if ( (!single_cell) | (single_cell & only_heavy) ) {
         combo_unique <- unique(data[, cols_for_grouping_heavy])
         
         # unique components
@@ -753,7 +810,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         }
         
     } else {
-        # single_cell & !only_igh
+        # single_cell & !only_heavy
         
         # important: do not do this separately for heavy and light
         # must keep the pairing structure

@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.45    0  
-##  2 IGHA != IGHD 1         183.       8.07    0  
-##  3 IGHA != IGHD 2         188.      11.9     0  
-##  4 IGHA != IGHG 0           4.49     7.98    0.6
-##  5 IGHA != IGHG 1          24.5      6.24    0  
-##  6 IGHA != IGHG 2          26.6      4.43    0  
-##  7 IGHA != IGHM 0         159.       6.63    0  
-##  8 IGHA != IGHM 1         211.       5.98    0  
-##  9 IGHA != IGHM 2         228.       6.87    0  
-## 10 IGHD != IGHG 0         135.       7.08    0  
-## 11 IGHD != IGHG 1         159.       8.20    0  
-## 12 IGHD != IGHG 2         162.      12.5     0  
-## 13 IGHD != IGHM 0          19.7      5.57    0  
-## 14 IGHD != IGHM 1          27.7      8.35    0  
-## 15 IGHD != IGHM 2          39.7     13.8     0  
-## 16 IGHG != IGHM 0         154.       6.63    0  
-## 17 IGHG != IGHM 1         186.       6.60    0  
-## 18 IGHG != IGHM 2         202.       8.16    0
+##  1 IGHA != IGHD 0         139.       7.94   0   
+##  2 IGHA != IGHD 1         184.       8.27   0   
+##  3 IGHA != IGHD 2         190.      11.1    0   
+##  4 IGHA != IGHG 0           4.07     7.94   0.68
+##  5 IGHA != IGHG 1          24.5      6.38   0   
+##  6 IGHA != IGHG 2          26.8      4.55   0   
+##  7 IGHA != IGHM 0         159.       6.43   0   
+##  8 IGHA != IGHM 1         212.       5.64   0   
+##  9 IGHA != IGHM 2         229.       6.64   0   
+## 10 IGHD != IGHG 0         135.       7.52   0   
+## 11 IGHD != IGHG 1         159.       8.54   0   
+## 12 IGHD != IGHG 2         163.      11.6    0   
+## 13 IGHD != IGHM 0          19.9      5.81   0   
+## 14 IGHD != IGHM 1          27.8      8.24   0   
+## 15 IGHD != IGHM 2          39.6     12.9    0   
+## 16 IGHG != IGHM 0         155.       5.79   0   
+## 17 IGHG != IGHM 1         187.       5.96   0   
+## 18 IGHG != IGHM 2         203.       7.52   0
 ```
 
 ```r

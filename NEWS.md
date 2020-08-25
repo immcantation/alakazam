@@ -1,3 +1,32 @@
+Version 1.0.2.999: August 18, 2020
+-------------------------------------------------------------------------------
+
+Gene:
+
++ Added the function `getLocus` to extract the locus information from the
+  segment call.
++ Added the function `getChain` to define the chain from the segment or 
+  locus call.
++ Fixed a bug in `getSegment` where filtering of non-localized genes was not 
+  being applied when called from `getFamily`, because the 'NL' part of the name
+  was removed before the filtering step.
+
+Version 1.0.2: July 17, 2020
+-------------------------------------------------------------------------------
+
+Diversity:
+
++ Fixed a bug in `plotDiversityTest` that caused all values of `q` to appear on
+  the plot rather than just the specified one.
+
+Gene Usage:
+
++ Fixed a major bug in the single-cell mode of `groupGenes` where the `v_call`  
+  column was being used in instead of the `j_call` column for J gene grouping.
++ Added support for TCR genes to `groupGenes`.
++ Changed the `only_igh` argument of `groupGenes` to `only_heavy`.
+
+
 Version 1.0.1:  May 8, 2020
 -------------------------------------------------------------------------------
 

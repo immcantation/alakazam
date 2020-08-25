@@ -4,12 +4,12 @@ Description
 --------------------
 
 `groupGenes` will group rows by shared V and J gene assignments, 
-and optionally also by junction lengths.
-Both VH:VL paired single-cell BCR-seq and unpaired bulk-seq (heavy chain-only)
-are supported.
-In the case of ambiguous (multiple) gene assignments, the grouping may
-be specified to be a union across all ambiguous V and J gene pairs, 
-analagous to single-linkage clustering (i.e., allowing for chaining).
+and optionally also by junction lengths. IGH:IGK/IGL, TRB:TRA, and TRD:TRG 
+paired single-cell BCR/TCR sequencing and unpaired bulk sequencing 
+(IGH, TRB, TRD chain only) are supported. In the case of ambiguous (multiple) 
+gene assignments, the grouping may be specified to be a union across all 
+ambiguous V and J gene pairs, analogous to single-linkage clustering 
+(i.e., allowing for chaining).
 
 
 Usage
@@ -21,8 +21,8 @@ v_call = "v_call",
 j_call = "j_call",
 junc_len = NULL,
 cell_id = NULL,
-locus = NULL,
-only_igh = TRUE,
+locus = "locus",
+only_heavy = TRUE,
 first = FALSE
 )
 ```
@@ -34,28 +34,35 @@ data
 :   data.frame containing sequence data.
 
 v_call
-:   name of the column containing the heavy chain 
+:   name of the column containing the heavy/long chain 
 V-segment allele calls.
 
 j_call
-:   name of the column containing the heavy chain 
+:   name of the column containing the heavy/long chain 
 J-segment allele calls.
 
 junc_len
-:   name of column containing the junction length. Optional.
+:   name of column containing the junction length.
+If `NULL` then 1-stage partitioning is perform
+considering only the V and J genes is performed. 
+See Details for further clarification.
 
 cell_id
-:   name of the column containing cell IDs. Only 
-applicable and required for single-cell mode.
+:   name of the column containing cell identifiers or barcodes. 
+If specified, grouping will be performed in single-cell mode
+with the behavior governed by the `locus` and 
+`only_heavy` arguments. If set to `NULL` then the 
+bulk sequencing data is assumed.
 
 locus
 :   name of the column containing locus information. 
-Only applicable and required for single-cell mode.
+Only applicable to single-cell data.
+Ignored if `cell_id=NULL`.
 
-only_igh
-:   use only heavy chain (`IGH`) sequences for grouping,
-disregarding light chains. Only applicable and required for
-single-cell mode. Default is `TRUE`.
+only_heavy
+:   use only the IGH (BCR) or TRB/TRD (TCR) sequences 
+for grouping. Only applicable to single-cell data.
+Ignored if `cell_id=NULL`.
 
 first
 :   if `TRUE` only the first call of the gene assignments 
@@ -72,65 +79,69 @@ Value
 Returns a modified data.frame with disjoint union indices 
 in a new `vj_group` column. 
 
-Note that if `junc_len` is supplied, the grouping this `vj_group` 
-will have been based on V, J, and L simultaneously despite the column name 
-being `vj_group`.
+If `junc_len` is supplied, the grouping this `vj_group` 
+will have been based on V, J, and junction length simultaneously. However, 
+the output column name will remain `vj_group`.
 
-Note that the output `v_call`, `j_call`, `cell_id`, and `locus`
-columns will be converted to `character` if they were `factor` in the 
-input `data`.
+The output `v_call`, `j_call`, `cell_id`, and `locus`
+columns will be converted to type `character` if they were of type 
+`factor` in the input `data`.
 
 
 Details
 -------------------
 
-To invoke single-cell mode, both `cell_id` and `locus` must be supplied. Otherwise,
-the function will run under non-single-cell mode, using all input sequences regardless of the
-value in the `locus` column.
+To invoke single-cell mode the `cell_id` argument must be specified and the `locus` 
+column must be correct. Otherwise, `groupGenes` will be run with bulk sequencing assumptions, 
+using all input sequences regardless of the values in the `locus` column.
 
-Under single-cell mode for VH:VL paired sequences, there is a choice of whether grouping
-should be done using only heavy chain (`IGH`) sequences only, or using both heavy chain
-(`IGH`) and light chain (`IGK`, `IGL`) sequences. This is governed by 
-`only_igh`.
+Values in the `locus` column must be one of `c("IGH", "IGI", "IGK", "IGL")` for BCR 
+or `c("TRA", "TRB", "TRD", "TRG")` for TCR sequences. Otherwise, the function returns an 
+error message and stops.
 
-Values in the `locus` column must be one of `"IGH"`, `"IGK"`, and `"IGL"`.
+Under single-cell mode with paired chained sequences, there is a choice of whether 
+grouping should be done by (a) using IGH (BCR) or TRB/TRD (TCR) sequences only or
+(b) using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR). 
+This is governed by the `only_heavy` argument.
 
-By supplying `junc_len`, the call amounts to a 1-stage partitioning of the sequences/cells 
-based on V annotation, J annotation, and junction length simultaneously. Without supplying this 
-columns, the call amounts to the first stage of a 2-stage partitioning, in which sequences/cells 
-are partitioned in the first stage based on V annotation and J annotation, and then in the second 
-stage further split based on junction length.
+Specifying `junc_len` will force `groupGenes` to perform a 1-stage partitioning of the 
+sequences/cells based on V gene, J gene, and junction length simultaneously. 
+If `junc_len=NULL` (no column specified), then `groupGenes` performs only the first 
+stage of a 2-stage partitioning in which sequences/cells are partitioned in the first stage 
+based on V gene and J gene, and then in the second stage further splits the groups based on 
+junction length (the second stage must be performed independently, as this only returns the
+first stage results).
+
+In the input `data`, the `v_call`, `j_call`, `cell_id`, and `locus` 
+columns, if present, must be of type `character` (as opposed to `factor`). 
 
 It is assumed that ambiguous gene assignments are separated by commas.
 
-In the input `data`, the `v_call`, `j_call`, `cell_id`, and `locus` 
-columns, if present, must be `character`, as opposed to `factor`.
-
-All rows containing `NA` values in their any of the `v_call`, `j_call`, and, 
-if specified, `junc_len`, columns will be removed. A warning will be issued when a row 
+All rows containing `NA` values in any of the `v_call`, `j_call`, and `junc_len` 
+(if `junc_len != NULL`) columns will be removed. A warning will be issued when a row 
 containing an `NA` is removed.
 
 
-Expectation for single-cell input
+Expectations for single-cell data
 -------------------
 
 
 
-For single-cell BCR data with VH:VL pairing, it is assumed that 
+Single-cell paired chain data assumptions:
 
-+  every row represents a sequence (chain)
-+  heavy and light chains of the same cell are linked by `cell_id`
-+  value in `locus` column indicates whether the chain is heavy or light
-+  each cell possibly contains multiple heavy and/or light chains
++  every row represents a sequence (chain).
++  heavy/long and light/short chains of the same cell are linked by `cell_id`.
++  the value in `locus` column indicates whether the chain is the heavy/long or light/short chain.
++  each cell possibly contains multiple heavy/long and/or light/short chains.
 +  every chain has its own V(D)J annotation, in which ambiguous V(D)J 
-annotations, if any, are separated by `,` (comma)
+annotations, if any, are separated by a comma.
 
 
-An example:
+Single-cell example:
 
-+  A cell has 1 heavy chain and 2 light chains 
-+  There should be 3 rows corresponding to this cell
-+  One of the light chain has ambiguous V annotation, which looks like `Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F`.
++  A cell has 1 heavy chain and 2 light chains.
++  There should be 3 rows corresponding to this cell.
++  One of the light chains may have an ambiguous V annotation which looks like `"Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F"`.
 
 
 
@@ -140,7 +151,14 @@ Examples
 
 ```R
 # Group by genes
-db <- groupGenes(ExampleDb, v_call="v_call", j_call="j_call")
+db <- groupGenes(ExampleDb)
+head(db$vj_group)
+```
+
+
+```
+[1] "G28" "G50" "G36" "G36" "G86" "G61"
+
 ```
 
 
