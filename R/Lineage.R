@@ -121,10 +121,12 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
     tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, outer_only=FALSE)
     tmp_df[[seq]] <- maskSeqEnds(tmp_df[[seq]], mask_char=mask_char, max_mask=max_mask, trim=FALSE)
-    
+    germline <- maskSeqGaps(data[[germ]][1], mask_char=mask_char, outer_only=FALSE)
+
     # Pad ends
     if (pad_end) {
         tmp_df[[seq]] <- padSeqEnds(tmp_df[[seq]], pad_char=mask_char)
+        germline      <- padSeqEnds(germline, pad_char=mask_char)
     }
     
     seq_len <- stringi::stri_length(tmp_df[[seq]])
@@ -157,7 +159,7 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
-                 germline=maskSeqGaps(data[[germ]][1], mask_char=mask_char, outer_only=FALSE), 
+                 germline=germline, 
                  v_gene=getGene(data[[v_call]][1]), 
                  j_gene=getGene(data[[j_call]][1]), 
                  junc_len=data[[junc_len]][1])
