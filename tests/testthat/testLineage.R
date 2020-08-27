@@ -33,6 +33,13 @@ test_that("makeChangeoClone",{
                       "COUNT"=c(3, 3),
                       "collapse_count"=c(1, 2),
                       stringsAsFactors=FALSE)
+
+    exp_pad <- data.frame("sequence_id"=c("C", "A"),
+                      "sequence"=c("NAACTGGNN", "CCCCTGGGN"),
+                      "TYPE"=c("IgG", "IgG,IgM"),
+                      "COUNT"=c(3, 3),
+                      "collapse_count"=c(1, 2),
+                      stringsAsFactors=FALSE)
     
     # Without end masking
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
@@ -64,12 +71,12 @@ test_that("makeChangeoClone",{
 
     expect_true(inherits(clone, "ChangeoClone"))
     expect_equal(clone@clone, "1")
-    expect_equal(clone@germline, "CCCCAGGG")
+    expect_equal(clone@germline, "CCCCAGGGN")
     expect_equal(clone@v_gene, "IGKV1-39")
     expect_equal(clone@j_gene, "IGKJ5")
     expect_equal(clone@junc_len, 2)
-    expect_equal(clone@data, exp, tolerance=0.001)
-    expect_equal(changeoclone@data, exp, tolerance=0.001)
+    expect_equal(clone@data, exp_pad, tolerance=0.001)
+    expect_equal(changeoclone@data, exp_pad, tolerance=0.001)
 
     # With end masking
     clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")

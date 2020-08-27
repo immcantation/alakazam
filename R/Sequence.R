@@ -275,7 +275,7 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N", mod3=TRUE) {
     # Set length to max input length
     width <- max(stringi::stri_length(seq),len)
-    if (mod3) {
+    if (mod3 && width %% 3 != 0) {
         width <- width + (3 - width %% 3)
     }
     

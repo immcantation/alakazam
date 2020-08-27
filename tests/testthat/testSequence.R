@@ -288,11 +288,11 @@ test_that("padSeqEnds", {
     
     # Default behavior pads ends to longest length
     expect_equal(padSeqEnds(seq), 
-                 c("CCCCTGGG", "ACCCTGNN", "CCCCNNNN"))
+                 c("CCCCTGGGN", "ACCCTGNNN", "CCCCNNNNN"))
     
     # start argument pads beginning instead of end
     expect_equal(padSeqEnds(seq, start=TRUE), 
-                 c("CCCCTGGG", "NNACCCTG", "NNNNCCCC"))
+                 c("NCCCCTGGG", "NNNACCCTG", "NNNNNCCCC"))
     
     # len argument pads to defined length
     expect_equal(padSeqEnds(seq, len=15), 
@@ -302,7 +302,7 @@ test_that("padSeqEnds", {
 
     # Invalid length same as default
     expect_equal(padSeqEnds(seq, len=2), 
-                 c("CCCCTGGG", "ACCCTGNN", "CCCCNNNN"))
+                 c("CCCCTGGGN", "ACCCTGNNN", "CCCCNNNNN"))
 })
 
 #### collapseDuplicates ####
