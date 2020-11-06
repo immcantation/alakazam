@@ -1023,7 +1023,7 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' @export
 
 readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=FALSE,
-    branches=c("distance","mutations")) {
+    branches=c("mutations","distance")) {
     # Check arguments
     format <- match.arg(format)
     branches <- match.arg(branches)
