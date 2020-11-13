@@ -1,0 +1,124 @@
+---
+title: 'Alakazam: Load sequencing quality scores'
+author: "Susanna Marquez"
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes  
+    toc_depth: 3
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
+    toc: yes
+    toc_depth: 3
+  html_document:
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+    toc_depth: 3
+geometry: margin=1in
+fontsize: 11pt
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Fastq}
+  %\usepackage[utf8]{inputenc}
+---
+
+The `alakazam` package includes a set of functions to inspect the sequencing quality.
+
+## Example data
+
+Load example data:
+
+```{r, eval=TRUE, warning=FALSE, message=FALSE}
+library(alakazam)
+library(dplyr)
+
+db <- readChangeoDb(file.path("..", "inst", "example_files", "test_seq.tsv"))
+fastq_file <- file.path("..", "inst", "example_files", "test_seq.fastq")
+```
+
+## Load quality scores
+
+### As new fields in the repertoire `data.frame` 
+
+This method allows to add the quality scores to the repertoire `data.base` as strings.
+
+```{r}
+original_cols <- colnames(db)
+db <- alakazam::readFastqDb(db, fastq_file)
+new_cols <- setdiff(colnames(db), original_cols)
+db[,new_cols] %>% head()
+```
+
+The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
+a path to the corresponding `.fastq` file (`fastq_file`). The sequencing quality scores will
+be merged into the `data.frame` by `sequence_id`. The newly added columns are :
+`r paste(new_cols, collapse=", ")`. 
+
+The fields with names like `*_quality`, contain the numeric quality scores in the 
+form of a vector, where values are comma separated, and `-` or `.` positions 
+have value `NA`.
+
+
+The fields with names like `*_phred`, contain the ASCII quality scores in the 
+form of a vector, where values are comma separated, and `-` or `.` positions 
+have value `" "` (blank).
+
+
+### As a new `data.frame` suitable ready to be analyzed
+
+After you have run `readFastqDb`, you can use `sequenceAlignmentQuality` with 
+the argument `raw=T` to obtain a `data.frame` of the sequencing quality values 
+per position. Positions are numbered relative to the original sequence 
+(field `sequence_position`) and to `sequence_alignment` 
+(field `sequence_alignment_position`). Sequence qualities
+are reported as numeric values (field `sequence_quality`. The nucleotide at each 
+position is also reported (field `sequence_alignment_nt`).
+
+```{r}
+quality <- sequenceAlignmentQuality(db, raw=T)
+head(quality)
+```
+
+```{r, fig.cap="Sequence quality per IMGT position for one sequence.", fig.asp=0.25}
+min_pos <- min(quality$sequence_alignment_position)
+max_pos <- max(quality$sequence_alignment_position)
+
+ggplot(quality, aes(x=sequence_alignment_position,
+                    y=sequence_quality,
+                    color=sequence_alignment_nt)) +
+  geom_point() +
+  coord_cartesian(xlim=c(110,120)) +
+  xlab("IMGT position") +
+  ylab("Sequencing quality") +
+  scale_fill_gradient(low = "light blue",  high = "dark red") +
+  scale_x_continuous(breaks=c(min_pos:max_pos)) +
+  alakazam::baseTheme() 
+```
+
+You can add use the quality `data.frame` to complement analysis performed
+with other tools from the Immcantation framework. For example, you could inspect
+the sequencing quality of novel polymorphisms identified with `tigger`, or
+the sequencing quality in mutated/unmutated regions.
+
+### Mask low quality positions
+
+Use `maskPositionsByQu<lity` to mask low quality positions. Positions with
+a sequencing quality < `min_quality` with be replaced with an 'N'. A message
+will show the number of sequences in `db` that had at least one position
+masked.
+
+```{r}
+db <- maskPositionsByQuality(db, min_quality = 70, 
+                       sequence = "sequence_alignment",
+                       quality = "sequence_alignment_quality")
+```
+

@@ -109,8 +109,9 @@
 #' @import      methods
 #' @import      utils
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root ladderize
+#' @importFrom  Biostrings  BString extractAt
 #' @importFrom  dplyr       do n desc %>%
-#'                          bind_cols bind_rows combine arrange 
+#'                          bind_cols bind_rows combine arrange left_join
 #'                          group_by ungroup
 #'                          filter slice select 
 #'                          mutate mutate_at 
@@ -118,11 +119,13 @@
 #'							right_join rowwise
 #'                          summarize summarize_at
 #'                          transmute rename
+#' @importFrom  GenomicAlignments explodeCigarOps explodeCigarOpLengths                       
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
 #'                          vertex_attr set_vertex_attr
 #'                          degree shortest_paths all_shortest_paths distances
 #'                          graph_from_adjacency_matrix components groups
+#' @importFrom  IRanges     IRanges
 #' @importFrom  lazyeval    interp
 #' @importFrom  Matrix      sparseMatrix rowSums
 #' @importFrom  progress    progress_bar
