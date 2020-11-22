@@ -65,7 +65,7 @@ form of a vector, where values are comma separated, and `-` or `.` positions
 have value `" "` (blank).
 
 After loading the quality scores with `readFastqDb`,  `getPositionQuality`
-can be use to generate a `data.frame` of sequencing quality values 
+can be used to generate a `data.frame` of sequencing quality values 
 per position.
 
 ```{r}
@@ -96,7 +96,7 @@ with other tools from the Immcantation framework. For example, you could inspect
 the sequencing quality of novel polymorphisms identified with `tigger`, or
 the sequencing quality in mutated/unmutated regions.
 
-### Mask low quality positions
+## Mask low quality positions
 
 Use `maskPositionsByQuality` to mask low quality positions. Positions with
 a sequencing quality < `min_quality` will be replaced with an 'N'. A message
