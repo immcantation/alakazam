@@ -47,13 +47,12 @@ fastq_file <- file.path("..", "inst", "example_files", "test_seq.fastq")
 
 ## Load quality scores
 
-### As new fields in the repertoire `data.frame` 
 
 This method allows to add the quality scores to the repertoire `data.base` as strings.
 
 ```{r}
 original_cols <- colnames(db)
-db <- alakazam::readFastqDb(db, fastq_file)
+db <- readFastqDb(db, fastq_file, style="both", quality_sequence = TRUE)
 new_cols <- setdiff(colnames(db), original_cols)
 db[,new_cols] %>% head()
 ```
@@ -61,47 +60,35 @@ db[,new_cols] %>% head()
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
 a path to the corresponding `.fastq` file (`fastq_file`). The sequencing quality scores will
 be merged into the `data.frame` by `sequence_id`. The newly added columns are :
-`r paste(new_cols, collapse=", ")`. 
-
-The fields with names like `*_quality`, contain the numeric quality scores in the 
-form of a vector, where values are comma separated, and `-` or `.` positions 
-have value `NA`.
-
-
-The fields with names like `*_phred`, contain the ASCII quality scores in the 
+`r paste(new_cols, collapse=", ")`. The other fields, contain the ASCII quality scores in the 
 form of a vector, where values are comma separated, and `-` or `.` positions 
 have value `" "` (blank).
 
-
-### As a new `data.frame` suitable ready to be analyzed
-
-After you have run `readFastqDb`, you can use `sequenceAlignmentQuality` with 
-the argument `raw=T` to obtain a `data.frame` of the sequencing quality values 
-per position. Positions are numbered relative to the original sequence 
-(field `sequence_position`) and to `sequence_alignment` 
-(field `sequence_alignment_position`). Sequence qualities
-are reported as numeric values (field `sequence_quality`. The nucleotide at each 
-position is also reported (field `sequence_alignment_nt`).
+After loading the quality scores with `readFastqDb`,  `getPositionQuality`
+can be use to generate a `data.frame` of sequencing quality values 
+per position.
 
 ```{r}
-quality <- sequenceAlignmentQuality(db, raw=T)
+quality <- getPositionQuality(db, sequence_id="sequence_id", 
+                              sequence="sequence_alignment",
+                              quality_num="quality_alignment_num")
 head(quality)
 ```
 
 ```{r, fig.cap="Sequence quality per IMGT position for one sequence.", fig.asp=0.25}
-min_pos <- min(quality$sequence_alignment_position)
-max_pos <- max(quality$sequence_alignment_position)
+min_pos <- min(quality$position)
+max_pos <- max(quality$position)
 
-ggplot(quality, aes(x=sequence_alignment_position,
-                    y=sequence_quality,
-                    color=sequence_alignment_nt)) +
+ggplot(quality, aes(x=position,
+                    y=quality_alignment_num,
+                    color=nt)) +
   geom_point() +
   coord_cartesian(xlim=c(110,120)) +
   xlab("IMGT position") +
   ylab("Sequencing quality") +
   scale_fill_gradient(low = "light blue",  high = "dark red") +
   scale_x_continuous(breaks=c(min_pos:max_pos)) +
-  alakazam::baseTheme() 
+  alakazam::baseTheme()
 ```
 
 You can add use the quality `data.frame` to complement analysis performed
@@ -111,14 +98,14 @@ the sequencing quality in mutated/unmutated regions.
 
 ### Mask low quality positions
 
-Use `maskPositionsByQu<lity` to mask low quality positions. Positions with
-a sequencing quality < `min_quality` with be replaced with an 'N'. A message
+Use `maskPositionsByQuality` to mask low quality positions. Positions with
+a sequencing quality < `min_quality` will be replaced with an 'N'. A message
 will show the number of sequences in `db` that had at least one position
 masked.
 
 ```{r}
-db <- maskPositionsByQuality(db, min_quality = 70, 
+db <- maskPositionsByQuality(db, min_quality = 70,
                        sequence = "sequence_alignment",
-                       quality = "sequence_alignment_quality")
+                       quality = "quality_alignment_num")
 ```
 
