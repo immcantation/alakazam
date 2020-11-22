@@ -9,17 +9,17 @@
 #'                       the value to be added to the quality scores 
 #'                       (the default -33 applies to the Sanger format and 
 #'                       should work for most recent FASTQ files).
-#' @param    format      Use \code{presto} to specify that the fastq file headers 
-#'                       are using the pRESTO format and can be parsed to extract 
+#' @param    header      Fastq file header format. Use \code{presto} to specify 
+#'                       that the fastq file headers are using the pRESTO
+#'                       format and can be parsed to extract 
 #'                       the sequence_id. Use \code{asis} to skip any processing
 #'                       and use the sequence names as they are.
 #' @param    sequence_id Name of the column in \code{db} that contains sequence 
 #'                       identifiers to be matched to sequence identifiers in 
-#'                       \code{fastq_file}.                      
+#'                       \code{fastq_file}. 
+#' @param    quality_format                           
 #' @return   \code{db} with additional fields:
 #'           \enumerate{
-#'                 \item sequence_mean_quality: Mean sequencing quality
-#'                 \item sequence_median_quality: Median sequence quality
 #'                 \item sequence_quality: A character vector, with comma separated 
 #'                                         numerical quality values for each 
 #'                                         position in \code{sequence}.
@@ -35,7 +35,7 @@
 #' }
 #' @export
 readFastqDb <- function(db, fastq_file, quality_offset=-33, 
-                        format=c("presto", "asis"), 
+                        header=c("presto", "asis"), 
                         sequence_id = "sequence_id",
                         sequence="sequence",
                         sequence_alignment="sequence_alignment",
@@ -45,14 +45,13 @@ readFastqDb <- function(db, fastq_file, quality_offset=-33,
                         np1_length="np1_length",
                         np2_length="np2_length",
                         v_sequence_end="v_sequence_end",
-                        d_sequence_end="d_sequence_end") {
+                        d_sequence_end="d_sequence_end",
+                        quality=c("num","ascii", "both")) {
    
-   # Process the fasqt file
-   format <- match.arg(format)
+   # Process the fastq file
+   header <- match.arg(header)
    fastq <- ape::read.fastq(fastq_file, offset=quality_offset) #default: -33 (pRESTO)
    fastq_db <- data.frame(
-      "sequence_mean_quality"=as.vector(sapply(attr(fastq, "QUAL"), mean)),
-      "sequence_median_quality"=as.vector(sapply(attr(fastq, "QUAL"), median)),
       "sequence_quality"=as.vector(sapply(attr(fastq, "QUAL"), paste0, collapse=",")),
       stringsAsFactors = F)
    
@@ -65,7 +64,7 @@ readFastqDb <- function(db, fastq_file, quality_offset=-33,
                                      }, quality_offset)
    
    fastq_db[[sequence_id]] <- attr(fastq, "names")
-   if (format=="presto") {
+   if (header=="presto") {
       fastq_db[[sequence_id]] <- gsub("\\|.+","",attr(fastq, "names"))
    }
 
@@ -273,8 +272,6 @@ calcSequenceAlignmentQuality <- function(sequence_db, quality_offset=-33,
 #'                       \code{fastq_file}.                      
 #' @return   \code{db} with additional fields:
 #'           \enumerate{
-#'                 \item sequence_mean_quality: Mean sequencing quality
-#'                 \item sequence_median_quality: Median sequence quality
 #'                 \item sequence_quality: A character vector, with comma separated 
 #'                                         numerical quality values for each 
 #'                                         position in \code{sequence}.
