@@ -1,32 +1,4 @@
----
-title: "Alakazam: How to read and write files"
-author: "Edel Aron"
-date: '`r Sys.Date()`'
-output:
-  html_document:
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    theme: readable
-    toc: yes
-  md_document:
-    fig_height: 4
-    fig_width: 7.5
-    preserve_yaml: no
-    toc: yes
-  pdf_document:
-    dev: pdf
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
-geometry: margin=1in
-fontsize: 11pt
-vignette: >
-  %\VignetteIndexEntry{File input and output}
-  %\usepackage[utf8]{inputenc}
-  %\VignetteEngine{knitr::rmarkdown}
----
+# File input and output
 As part of the Immcantation suite of tools, the `alakazam` package includes a set of 
 built-in functions capable of reading and writing tab-delimited database files created by 
 [Change-O](https://changeo.readthedocs.io/en/stable/) into R data.frames. However, due to 
@@ -46,7 +18,8 @@ Small example databases for both the Change-O format (`ExampleDbChangeo`) and th
 are included in the `alakazam` package. For specific details about the latter, visit the 
 [AIRR Community documentation site ](https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields).
 
-```{r, eval=TRUE, warning=FALSE, message=FALSE}
+
+```r
 # Load required packages
 library(airr)
 library(alakazam)
