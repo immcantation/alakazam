@@ -52,8 +52,8 @@ library(airr)
 library(alakazam)
 
 # Read in the data
-db_changeo <- readChangeoDb("data-raw/ExampleDbChangeo.gz")
-db_airr <- read_rearrangement("data-raw/ExampleDb.gz")
+db_changeo <- readChangeoDb("../data-raw/ExampleDbChangeo.gz")
+db_airr <- read_rearrangement("../data-raw/ExampleDb.gz")
 
 # Write the data to a tab-delimited file
 writeChangeoDb(db_changeo, "changeo.tsv")
