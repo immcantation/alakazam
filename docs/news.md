@@ -1,3 +1,16 @@
+Version 1.0.2.999: August 18, 2020
+-------------------------------------------------------------------------------
+
+Gene:
+
++ Added the function `getLocus` to extract the locus information from the
+  segment call.
++ Added the function `getChain` to define the chain from the segment or 
+  locus call.
++ Fixed a bug in `getSegment` where filtering of non-localized genes was not 
+  being applied when called from `getFamily`, because the 'NL' part of the name
+  was removed before the filtering step.
+
 Version 1.0.2: July 17, 2020
 -------------------------------------------------------------------------------
 

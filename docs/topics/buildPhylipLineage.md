@@ -16,8 +16,9 @@ phylip_exec,
 dist_mat = getDNAMatrix(gap = 0),
 rm_temp = FALSE,
 verbose = FALSE,
-phylo = FALSE,
-temp_path = NULL
+temp_path = NULL,
+onetree = FALSE,
+branch_length = c("mutations", "distance")
 )
 ```
 
@@ -49,11 +50,16 @@ verbose
 if `TRUE` STDOUT and STDERR of dnapars will be passed to 
 the console.
 
-phylo
-:   return tree as a `phylo` object
-
 temp_path
 :   specific path to temp directory if desired
+
+onetree
+:   if TRUE save only one tree
+
+branch_length
+:   if `mutations` (default) branch lengths represent the number of 
+mutations between nodes. If `distance` branch lengths represent
+the expected number of mutations per site, unaltered from PHYLIP output
 
 
 

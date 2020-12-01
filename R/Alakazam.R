@@ -103,11 +103,12 @@
 #'            large-scale B cell immunoglobulin repertoire sequencing data.
 #'            Bioinformatics. 2015 Oct 15;31(20):3356-8.
 #' }
-#' 
+#'
 #' @import      ggplot2
 #' @import      graphics
 #' @import      methods
 #' @import      utils
+#' @importFrom  airr        read_rearrangement write_rearrangement
 #' @importFrom	ape 		read.tree di2multi reorder.phylo root ladderize
 #' @importFrom  Biostrings  BString extractAt
 #' @importFrom  dplyr       do n desc %>%

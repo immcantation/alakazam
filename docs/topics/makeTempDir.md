@@ -38,7 +38,7 @@ makeTempDir("Clone50")
 
 
 ```
-[1] "/var/folders/dv/8ryjx62x2dxfsb1zp8_9zl0m0000gp/T//Rtmp1Jb7Ku/Clone50-temp-1483c27d9c8b9"
+[1] "/tmp/RtmpVYAgvn/Clone50-temp-3fcc7ab50f50"
 
 ```
 
