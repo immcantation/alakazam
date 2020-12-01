@@ -10,7 +10,7 @@ Description
 Usage
 --------------------
 ```
-phyloToGraph(phylo, germline = NULL)
+phyloToGraph(phylo, germline = "Germline")
 ```
 
 Arguments

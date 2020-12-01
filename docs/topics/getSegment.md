@@ -52,6 +52,26 @@ omit_nl = FALSE,
 sep = ","
 )
 ```
+```
+getLocus(
+segment_call,
+first = TRUE,
+collapse = TRUE,
+strip_d = TRUE,
+omit_nl = FALSE,
+sep = ","
+)
+```
+```
+getChain(
+segment_call,
+first = TRUE,
+collapse = TRUE,
+strip_d = TRUE,
+omit_nl = FALSE,
+sep = ","
+)
+```
 
 Arguments
 -------------------
@@ -139,7 +159,8 @@ getAllele(kappa_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01" "IGKJ5*01"                            
+[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01"
+[2] "IGKJ5*01"                            
 
 ```
 
@@ -232,6 +253,31 @@ getFamily(kappa_call, first=FALSE, strip_d=FALSE)
 
 ```R
 
+getLocus(kappa_call)
+
+```
+
+
+```
+[1] "IGK" "IGK"
+
+```
+
+
+```R
+getChain(kappa_call)
+
+```
+
+
+```
+[1] "VL" "VL"
+
+```
+
+
+```R
+
 # Heavy chain examples
 heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
 "Homsap IGHD1-1*01 F", 
@@ -255,7 +301,8 @@ getAllele(heavy_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"               "IGHJ1*01"                
+[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"              
+[3] "IGHJ1*01"                
 
 ```
 
@@ -287,6 +334,43 @@ getGene(heavy_call, first=FALSE, strip_d=FALSE)
 
 ```R
 
+getFamily(heavy_call)
+
+```
+
+
+```
+[1] "IGHV1" "IGHD1" "IGHJ1"
+
+```
+
+
+```R
+getLocus(heavy_call)
+
+```
+
+
+```
+[1] "IGH" "IGH" "IGH"
+
+```
+
+
+```R
+getChain(heavy_call)
+
+```
+
+
+```
+[1] "VH" "VH" "VH"
+
+```
+
+
+```R
+
 # Filtering non-localized genes
 nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
 "Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
@@ -298,7 +382,8 @@ getAllele(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```
-[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"               ""                         
+[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"              
+[3] ""                         
 
 ```
 
@@ -321,7 +406,7 @@ getFamily(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```
-[1] "IGHV3" "IGHV3" "IGHV1"
+[1] "IGHV3" "IGHV3" ""     
 
 ```
 
