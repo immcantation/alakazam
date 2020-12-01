@@ -243,7 +243,7 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
     
     # Strip D from gene names if required
     if (strip_d) {
-        strip_regex <- paste0("(?<=[A-Z0-9])D(?=\\*|-|", sep, "|$)")
+        strip_regex <- paste0("(?<=[A-Z0-9][0-9])D(?=\\*|-|", sep, "|$)")
         r <- gsub(strip_regex, "", r, perl=TRUE)
     }
     

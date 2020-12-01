@@ -179,6 +179,15 @@ test_that("getSegment", {
     # getAllele("IGHV1-01") returned IGHV1-01
     getAllele(getGene("IGHV1-01*02")) == getGene("IGHV1-01*02")
     getAllele(getGene("TRAV38-2/DV8*01")) == getGene("TRAV38-2/DV8*01")
+    
+    # Test that getSegment works well with c_call and strip_d=TRUE
+    # and it doesn't convert IGHD into IGH
+    expect_equal(getGene("IGHD"), "IGHD")
+    expect_equal(getAllele("IGHD"), "IGHD")
+    gene <- countGenes(data.frame("c_call"="IGHD", stringsAsFactors = F),gene="c_call", mode="gene")
+    asis <- countGenes(data.frame("c_call"="IGHD", stringsAsFactors = F),gene="c_call", mode="asis")
+    expect_equal(gene[['gene']], "IGHD")
+    expect_equal(asis[['gene']], "IGHD")
 })
 
 ### sortGenes ####
