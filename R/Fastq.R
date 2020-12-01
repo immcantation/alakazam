@@ -17,7 +17,7 @@
 #' @param    sequence_id Name of the column in \code{data} that contains sequence 
 #'                       identifiers to be matched to sequence identifiers in 
 #'                       \code{fastq_file}. 
-#' @param    sequence Name of the column in \code{data} that contains sequence data.
+#' @param    sequence   Name of the column in \code{data} that contains sequence data.
 #' @param    sequence_alignment Name of the column in \code{data} that contains 
 #'                      IMGT aligned sequence data.      
 #' @param    v_cigar    Name of the column in \code{data} that contains CIGAR 
@@ -237,7 +237,7 @@ calcSequenceAlignmentQuality <- function(sequence_db,
       }
 
       ranges <- ranges %>%
-         filter(operator  %in% c("S","D") == FALSE)
+         filter(!!rlang::sym("operator")  %in% c("S","D") == FALSE)
       ranges
    }))
 
@@ -277,7 +277,7 @@ calcSequenceAlignmentQuality <- function(sequence_db,
    
    if (raw) {
       quality_df %>%
-         select(-reconstructed_sequence_alignment)
+         select(-!!rlang::sym("reconstructed_sequence_alignment"))
    } else {
       qual_num <- rep(NA, length(nt_aln))
       qual_num[quality_df[['sequence_alignment_position']]] <- quality_df[[quality_sequence_num]]
