@@ -395,8 +395,8 @@ sequenceAlignmentQuality <- function(data,
 #' have a sequencing quality score lower that \code{min_quality}.
 #' 
 #' 
-#' @param    data        An AIRR data.frame
-#' @param    min_qual  Minimun quality. Positions with sequencing quality 
+#' @param    data      An AIRR data.frame
+#' @param    min_quality  Minimun quality. Positions with sequencing quality 
 #'                     < \code{min_qual} will be masked.
 #' @param    sequence Name of the column in \code{data} with sequence data to be
 #'                    masked.
