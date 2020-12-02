@@ -24,6 +24,10 @@ Arguments
 data
 :   An AIRR data.frame
 
+min_quality
+:   Minimun quality. Positions with sequencing quality 
+< `min_qual` will be masked.
+
 sequence
 :   Name of the column in `data` with sequence data to be
 masked.
@@ -32,10 +36,6 @@ quality_num
 :   Name of the column in `data` with quality scores (a
 string of numeric values, comma separated) that can
 be used to mask `sequence`.
-
-min_qual
-:   Minimun quality. Positions with sequencing quality 
-< `min_qual` will be masked.
 
 
 

@@ -1,5 +1,10 @@
-Version 1.0.2.999: August 18, 2020
+Version 1.0.2.999: December 2, 2020
 -------------------------------------------------------------------------------
+
+New features:
+
++ `readFastqDb` reads a repertoire's .fastq and imports the sequencing 
+   quality scores for `sequence_alignmet`.
 
 Gene:
 
@@ -7,9 +12,26 @@ Gene:
   segment call.
 + Added the function `getChain` to define the chain from the segment or 
   locus call.
+  
+Sequence:
++ In `padSeqEnds`, argument `triple=FALSE` has been renamed and default value 
+  changed to`mod3=TRUE`.
+
+Lineage:
+
++ Added `branch_length` argument to `buildPhylipLineage`, removed addphylo, 
+  and augmented graphToPhylo and phyloToGraph to track intermediate sequence 
+  in nodes for phylo object.
+
+Bug fixes:
+
 + Fixed a bug in `getSegment` where filtering of non-localized genes was not 
   being applied when called from `getFamily`, because the 'NL' part of the name
   was removed before the filtering step.
++ Updated regular expressions in `getAllele`, `getGene`, `getFamily` and 
+  `getLocus`, to parse `c_call` correctly.
++ Updated regular expression in `getSegment` to be able to parse `c_call` 
+  correctly and not remove the 'D' from 'IGHD', when `strip_d=TRUE`.
 
 Version 1.0.2: July 17, 2020
 -------------------------------------------------------------------------------

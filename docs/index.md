@@ -33,9 +33,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 # Dependencies
 
 **Depends:** ggplot2  
-**Imports:** ape, Biostrings, dplyr, GenomicAlignments, graphics, grid, igraph, IRanges, lazyeval, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils  
-**Suggests:** knitr, rmarkdown, testthat  
-**Extends:** FALSE
+**Imports:** airr, ape, Biostrings, dplyr, GenomicAlignments, graphics, grid, igraph, IRanges, lazyeval, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils  
+**Suggests:** knitr, rmarkdown, testthat
 
 
 # Authors
@@ -75,3 +74,8 @@ doi: 10.1126/scitranslmed.3008879 (URL:
 https://doi.org/10.1126/scitranslmed.3008879).
 
 
+
+
+# License
+
+AGPL-3
