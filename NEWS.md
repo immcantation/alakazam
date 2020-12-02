@@ -20,7 +20,7 @@ Sequence:
 Lineage:
 
 + Added `branch_length` argument to `buildPhylipLineage`, removed addphylo, 
-  and augmented graphToPhylo and phyloToGraph to track intermedidate sequence 
+  and augmented graphToPhylo and phyloToGraph to track intermediate sequence 
   in nodes for phylo object.
 
 Bug fixes:
