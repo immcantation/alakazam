@@ -308,7 +308,7 @@ calcSequenceAlignmentQuality <- function(sequence_db,
 #' contains the fields \code{quality_sequence} and \code{quality_sequence_num},
 #' \code{sequenceAlignmentQuality} can
 #' be used to retrieve the quality scores from the already present field
-#'  \code{sequence_quality}, without requiring again the \code{fastq} file, 
+#'  \code{quality_sequence_num}, without requiring again the \code{fastq} file, 
 #' and report them as a \code{data.frame} with sequencing qualities per position, 
 #' not as a string. This is done setting \code{raw=TRUE}. This \code{data.frame} 
 #' with qualities per position can be used to generate figures, for example.
@@ -320,9 +320,9 @@ calcSequenceAlignmentQuality <- function(sequence_db,
 #' @param    sequence Name of the column in \code{data} that contains sequence data.
 #' @param    sequence_alignment Name of the column in \code{data} that contains 
 #'                      IMGT aligned sequence data.      
-#' @param    sequence_quality Name of the column in \code{data} that contains 
+#' @param    quality_sequence Name of the column in \code{data} that contains 
 #'                      sequencing quality (phred scores).     
-#' @param    sequence_quality_num Name of the column in \code{data} that contains 
+#' @param    quality_sequence_num Name of the column in \code{data} that contains 
 #'                      sequencing quality, as comma separated string.                
 #' @param    v_cigar    Name of the column in \code{data} that contains CIGAR 
 #'                      strings for the V gene alignments.     
