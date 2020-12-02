@@ -6,14 +6,13 @@ New features:
 + `readFastqDb` reads a repertoire's .fastq and imports the sequencing 
    quality scores for `sequence_alignmet`.
 
-Gene:
-
 + Added the function `getLocus` to extract the locus information from the
   segment call.
 + Added the function `getChain` to define the chain from the segment or 
   locus call.
   
 Sequence:
+
 + In `padSeqEnds`, argument `triple=FALSE` has been renamed and default value 
   changed to`mod3=TRUE`.
 
