@@ -32,7 +32,7 @@ Description: Provides methods for high-throughput adaptive immune
     Gupta and Vander Heiden, et al (2017) <doi:10.1093/bioinformatics/btv359>,
     Stern, Yaari and Vander Heiden, et al (2014) <doi:10.1126/scitranslmed.3008879>.
 License: AGPL-3
-URL: http://alakazam.readthedocs.org
+URL: https://alakazam.readthedocs.io/
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
 LazyData: true
 BuildVignettes: true
