@@ -3,6 +3,12 @@ title: "Alakazam: How to read and write files"
 author: "Edel Aron"
 date: '`r Sys.Date()`'
 output:
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
   html_document:
     fig_height: 4
     fig_width: 7.5
@@ -14,18 +20,12 @@ output:
     fig_width: 7.5
     preserve_yaml: no
     toc: yes
-  pdf_document:
-    dev: pdf
-    fig_height: 4
-    fig_width: 7.5
-    highlight: pygments
-    toc: yes
 geometry: margin=1in
 fontsize: 11pt
 vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{File input and output}
   %\usepackage[utf8]{inputenc}
-  %\VignetteEngine{knitr::rmarkdown}
 ---
 As part of the Immcantation suite of tools, the `alakazam` package includes a set of 
 built-in functions capable of reading and writing tab-delimited database files created by 
@@ -47,14 +47,13 @@ are included in the `alakazam` package. For specific details about the latter, v
 [AIRR Community documentation site ](https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields).
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
-# Load required packages
-library(alakazam)
+path_data <- file.path("..", "inst", "example_files")
 
 # Read in the data
-db_changeo <- readChangeoDb("../data-raw/ExampleDbChangeo.gz")
-db_airr <- airr::read_rearrangement("../data-raw/ExampleDb.gz")
+db_changeo <- alakazam::readChangeoDb(file.path(path_data, "db_changeo.gz"))
+db_airr <- airr::read_rearrangement(file.path(path_data, "db_airr.gz"))
 
 # Write the data to a tab-delimited file
-writeChangeoDb(db_changeo, "changeo.tsv")
-airr::write_rearrangement(db_airr, "airr.tsv")
+alakazam::writeChangeoDb(db_changeo, file.path(path_data, "changeo.tsv"))
+airr::write_rearrangement(db_airr, file.path(path_data, "airr.tsv"))
 ```

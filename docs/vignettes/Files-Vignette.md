@@ -20,15 +20,13 @@ are included in the `alakazam` package. For specific details about the latter, v
 
 
 ```r
-# Load required packages
-library(airr)
-library(alakazam)
+path_data <- file.path("..", "inst", "example_files")
 
 # Read in the data
-db_changeo <- readChangeoDb("../data-raw/ExampleDbChangeo.gz")
-db_airr <- read_rearrangement("../data-raw/ExampleDb.gz")
+db_changeo <- alakazam::readChangeoDb(file.path(path_data, "db_changeo.gz"))
+db_airr <- airr::read_rearrangement(file.path(path_data, "db_airr.gz"))
 
 # Write the data to a tab-delimited file
-writeChangeoDb(db_changeo, "changeo.tsv")
-write_rearrangement(db_airr, "airr.tsv")
+alakazam::writeChangeoDb(db_changeo, file.path(path_data, "changeo.tsv"))
+airr::write_rearrangement(db_airr, file.path(path_data, "airr.tsv"))
 ```
