@@ -251,6 +251,9 @@ test_that("translateDNA", {
         translateDNA(db$JUNCTION[1:3], trim=TRUE),
         c("ARDRSTPWRRGIASTTVRTS", "ARDLLWSVLLTGYYSYGMDA", "ARDLLWSVLLTGYYSYGMDA"))
     expect_equal(translateDNA("ACTGACTCGA"), "TDS")
+
+    # test NAs
+    expect_equal(translateDNA(NA), NA)
 })
 
 #### maskSeqGaps ####

@@ -361,7 +361,6 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="region") {
     # Translate sequences if nucleotide
     region_aa <- if (nt) { translateDNA(seq, trim=trim) } else { seq }
     
-    # TODO: Check that NA is passed through correctly.
     # TODO: What is the proper length normalization? With or without non-informative position?
     
     # Calculate region lengths

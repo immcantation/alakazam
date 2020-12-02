@@ -110,7 +110,7 @@ getAAMatrix <- function(gap=0) {
 translateDNA <- function (seq, trim=FALSE) {
     # Function to translate a single string
     .translate <- function(x) {
-        if (stri_length(x) >= 3) {
+        if (stri_length(x) >= 3 & !is.na(x)) {
             stri_join(seqinr::translate(unlist(strsplit(x, "")), ambiguous=TRUE), 
                       collapse="")
         } else {
