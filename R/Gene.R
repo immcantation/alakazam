@@ -227,11 +227,11 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
     # Remove NL genes
     if (omit_nl) {
         # Clean segment_call to keep only the name (remove species)
-        allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
+        allele_regex <- '((IG[HKL][VDJADEGMC]|TR[ABDG])[A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
         segment_call <- gsub(paste0(edge_regex, "(", allele_regex, ")", edge_regex), "\\1", 
                   segment_call, perl=T)
         # non-localized regex
-        nl_regex <- paste0('(IG[HLK]|TR[ABGD])[VDJ][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(', 
+        nl_regex <- paste0('(IG[HKL][VDJADEGMC]|TR[ABDG])[0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(',
                            sep, "|$)")
         # delete non-localized calls
         segment_call <- gsub(nl_regex, "", segment_call, perl=TRUE)
@@ -262,7 +262,7 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
 #' @export
 getAllele <- function(segment_call, first=TRUE, collapse=TRUE, 
                       strip_d=TRUE, omit_nl=FALSE, sep=",") {    
-    allele_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
+    allele_regex <- '((IG[HKL][VDJADEGMC]|TR[ABDG])[A-Z0-9\\(\\)]+[-/\\w]*[-\\*]*[\\.\\w]+)'
     r <- getSegment(segment_call, allele_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
@@ -274,7 +274,7 @@ getAllele <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @export
 getGene <- function(segment_call, first=TRUE, collapse=TRUE, 
                     strip_d=TRUE, omit_nl=FALSE, sep=",") {
-    gene_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+[-/\\w]*)'
+    gene_regex <- '((IG[HKL][VDJADEGMC]|TR[ABDG])[A-Z0-9\\(\\)]+[-/\\w]*)'
     r <- getSegment(segment_call, gene_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
@@ -286,7 +286,7 @@ getGene <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @export
 getFamily <- function(segment_call, first=TRUE, collapse=TRUE, 
                       strip_d=TRUE, omit_nl=FALSE, sep=",") {
-    family_regex <- '((IG[HLK]|TR[ABGD])[VDJ][A-Z0-9\\(\\)]+)'
+    family_regex <- '((IG[HKL][VDJADEGMC]|TR[ABDG])[A-Z0-9\\(\\)]+)'
     r <- getSegment(segment_call, family_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     
@@ -298,7 +298,7 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @export
 getLocus <- function(segment_call, first=TRUE, collapse=TRUE, 
                       strip_d=TRUE, omit_nl=FALSE, sep=",") {
-    locus_regex <- '((IG[HLK]|TR[ABGD]))'
+    locus_regex <- '((IG[HLK]|TR[ABDG]))'
     r <- getSegment(segment_call, locus_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     

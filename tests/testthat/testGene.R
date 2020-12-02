@@ -44,7 +44,7 @@ test_that("countGenes",{
                  c(0.61, 0.72, 0.16, 0.41, 0.40, 0.37, 0.06, 0.20, 0.08, 0.20, 0.50, 0.08),
                  tolerance=0.01)
 
-    #Testing of fill
+    # Testing of fill
 
     # Without copy numbers
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family", fill = T)
