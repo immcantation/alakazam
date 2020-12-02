@@ -13,8 +13,8 @@ New features:
   
 Sequence:
 
-+ In `padSeqEnds`, argument `triple=FALSE` has been renamed and default value 
-  changed to`mod3=TRUE`.
++ In `padSeqEnds`, argument `mod3=TRUE` has been added so that sequences are
+  padded to a length that is a multiple of 3.
 
 Lineage:
 
