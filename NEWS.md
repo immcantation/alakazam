@@ -1,20 +1,36 @@
 Version 1.0.2.999: December 2, 2020
 -------------------------------------------------------------------------------
+  
+General:
 
-New features:
++ Added `readFastqDb`, which reads a repertoire's .fastq and imports the sequencing 
+   quality scores for `sequence_alignment`.
++ Added a vignette describing how to read/write Change-O and AIRR formatted files.
 
-+ `readFastqDb` reads a repertoire's .fastq and imports the sequencing 
-   quality scores for `sequence_alignmet`.
+Gene:
 
 + Added the function `getLocus` to extract the locus information from the
   segment call.
 + Added the function `getChain` to define the chain from the segment or 
   locus call.
-  
++ Added a parameter to `countGenes` (`remove_na`) that will remove all rows with NA 
+  values in the gene column if `TRUE` and issue a warning with how many were removed. 
+  If `FALSE`, those rows will be kept instead.
++ Changed the check for empty columns in `countGenes` to give a warning instead of 
+  an error so as not to disrupt running workflows.
++ Fixed a bug in `getSegment` where filtering of non-localized genes was not 
+  being applied when called from `getFamily`, because the 'NL' part of the name
+  was removed before the filtering step.
++ Updated regular expressions in `getAllele`, `getGene`, `getFamily` and 
+  `getLocus`, to parse `c_call` correctly.
++ Updated regular expressions in `getSegment` to be able to parse `c_call` 
+  correctly and not remove the 'D' from 'IGHD', when `strip_d=TRUE`.
+
 Sequence:
 
-+ In `padSeqEnds`, argument `mod3=TRUE` has been added so that sequences are
++ In `padSeqEnds`, the argument `mod3=TRUE` has been added so that sequences are
   padded to a length that is a multiple of 3.
++ Fixed a bug in `translateDNA` where NA's weren't being translated properly.
 
 Lineage:
 
@@ -22,15 +38,6 @@ Lineage:
   and augmented graphToPhylo and phyloToGraph to track intermediate sequence 
   in nodes for phylo object.
 
-Bug fixes:
-
-+ Fixed a bug in `getSegment` where filtering of non-localized genes was not 
-  being applied when called from `getFamily`, because the 'NL' part of the name
-  was removed before the filtering step.
-+ Updated regular expressions in `getAllele`, `getGene`, `getFamily` and 
-  `getLocus`, to parse `c_call` correctly.
-+ Updated regular expression in `getSegment` to be able to parse `c_call` 
-  correctly and not remove the 'D' from 'IGHD', when `strip_d=TRUE`.
 
 Version 1.0.2: July 17, 2020
 -------------------------------------------------------------------------------
