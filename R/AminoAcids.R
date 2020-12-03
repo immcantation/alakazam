@@ -591,7 +591,7 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     }
     
     # Count of informative positions
-    aa_info <-  stri_length(gsub("[X\\.\\*-]", "", region_aa))
+    aa_info <- stri_length(gsub("[X\\.\\*-]", "", region_aa))
     # Fraction of amino acid that are basic
     if ("basic" %in% property) {
         aa_basic <- countOccurrences(region_aa, "[RHK]") / aa_info
@@ -611,4 +611,3 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     data_cols <- colnames(data) %in% colnames(out_df) == FALSE
     return(cbind(data[, data_cols], out_df))
 }
-

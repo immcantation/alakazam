@@ -3,7 +3,7 @@ db <- readChangeoDb(ExampleDb)
 
 ### countGenes ####
 
-test_that("countGenes",{
+test_that("countGenes", {
     # Without copy numbers
     genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
     expect_equal(genes$seq_freq, 
@@ -82,6 +82,58 @@ test_that("countGenes",{
     expect_equal(genes$seq_freq[1:12], 
                  c(0,0,0,0,0.2,0,0,0,0,0,0.6,0),
                  tolerance=0.01)
+
+    # Testing of how NAs are handled
+    db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 
+                             groups = c("S1", "S2", "S4", "S3", "S2", "S3","S4", "S4", "S3", "S4"),
+                             v_call = c("IGHV1-1", NA, "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2", NA), 
+                             dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1), 
+                             clone = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), 
+                             stringsAsFactors=F)
+    
+    expect_warning(genes <- countGenes(db_some_na, gene="v_call", mode="gene"), NULL)
+    expect_equal(genes$seq_freq, 
+                 c(0.375, 0.375, 0.25),
+                 tolerance=0.001)
+    
+    genes <- countGenes(db_some_na, gene="v_call", mode="gene", remove_na = FALSE)
+    expect_equal(genes$seq_freq, 
+                 c(0.3, 0.3, 0.2, 0.2),
+                 tolerance=0.001)
+    
+    genes <- countGenes(db_some_na, gene="v_call", mode="gene", copy = "clone", remove_na = FALSE)
+    expect_equal(genes$copy_count, 
+                 c(10, 7, 7, 6),
+                 tolerance=0.001)
+    
+    genes <- countGenes(db_some_na, gene="v_call", mode="gene", groups = "groups", fill = TRUE, remove_na = FALSE)
+    expect_equal(genes$seq_count, 
+                 c(1, 0, 0, 0, 0, 1, 0, 1, 0, 2, 1, 0, 2, 0, 1, 1),
+                 tolerance=0.001)
+    
+    db_all_na <- data.frame(sequence_id = c(1,2,3),
+                            groups = c("S1", "S2", "S2"),
+                            v_call = c(NA, NA, NA), 
+                            dupcount = c(1, 1, 1), 
+                            clone = c(1, 1, 1), 
+                            stringsAsFactors=F)
+    
+    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene"), "The column v_call contains no data")
+    expect_equal(nrow(genes), 
+                 0,
+                 tolerance=0.001)
+    
+    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", remove_na=FALSE), "The column v_call contains no data")
+    expect_equal(genes$seq_count, 
+                 3,
+                 tolerance=0.001)
+    
+    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", groups = "groups", copy = "dupcount", fill = TRUE,  remove_na = FALSE), 
+                   "The column v_call contains no data")
+    expect_equal(genes$copy_count, 
+                 c(1, 2),
+                 tolerance=0.001)
+    
 })
 
 ### getSegment ####
@@ -192,7 +244,7 @@ test_that("getSegment", {
 
 ### sortGenes ####
 
-test_that("sortGenes",{
+test_that("sortGenes", {
     genes <- c("IGHV1-69D*01", "IGHV1-69*01", "IGHV4-38-2*01", "IGHV1-69-2*01",
             "IGHV2-5*01", "IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
             "IGHV1-2","IGHV1-2*02","IGHV1-69*02")
@@ -214,7 +266,8 @@ test_that("sortGenes",{
 })
 
 ### groupGenes ####
-test_that("groupGenes heavy only",{
+
+test_that("groupGenes heavy only", {
     # make a data frame
     db <- data.frame(SEQUENCE_ID = c(1,2,3,4,5,6,7,8), 
                      V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"), 
@@ -230,6 +283,7 @@ test_that("groupGenes heavy only",{
     # same underlying spirit as before
     expected <- c("G1","G2","G1","G1","G1","G3","G1","G2")
     expect_equal(db$vj_group, expected)
+
 })
 
 test_that("groupGenes, single-cell mode, heavy and light", {
@@ -414,4 +468,3 @@ test_that("groupGenes, AIRR-format migration", {
     expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
 })
-
