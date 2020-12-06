@@ -28,7 +28,10 @@
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
 #' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
-#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted) 
+#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted)
+#' @param    remove_na    removes rows with NA values in the gene column if TRUE and issues a warning. 
+#'                        Otherwise, keeps those rows and considers 'NA' as a gene in the final counts 
+#'                        and relative abundances.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -69,7 +72,7 @@
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
-                       mode=c("gene", "allele", "family", "asis")) {
+                       mode=c("gene", "allele", "family", "asis"), remove_na=TRUE) {
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)
@@ -79,7 +82,22 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     # Check input
     mode <- match.arg(mode)
     check <- checkColumns(data, c(gene, groups, copy))
-    if (check != TRUE) { stop(check) }
+    if (check != TRUE) { 
+        warning(check) # instead of throwing an error and potentially disrupting a workflow
+    }
+
+    # Handle NAs
+    if (remove_na) {
+        bool_na <- is.na(data[, gene])
+        if (any(bool_na)) {
+            if  (!all(bool_na)){
+                msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", gene, 
+                            " column and excluded from tabulation")
+                warning(msg)
+            }
+            data <- data[!bool_na, ]
+        }
+    }
 
     # Extract gene, allele or family assignments
     if (mode != "asis") {
@@ -130,8 +148,8 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     if (fill) {
         gene_tab <- gene_tab %>%
             ungroup() %>%
-            tidyr::complete(!!!rlang::syms(as.list(c(groups, gene)))) %>%
-            replace(is.na(.), 0)
+            tidyr::complete(!!!rlang::syms(as.list(c(groups, gene))),
+                            fill = list(seq_count = 0, seq_freq = 0, copy_count = 0, copy_freq = 0, clone_count = 0, clone_freq = 0))
     }
 
     # Rename gene column
