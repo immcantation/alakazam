@@ -104,6 +104,8 @@ test_that("getSegment", {
                  c("IGKV1-39", "IGKJ5"))
     expect_equal(getGene(kappa_call, first=FALSE, strip_d=FALSE),
                  c("IGKV1D-39,IGKV1-39", "IGKJ5"))
+    expect_equal(getGene(kappa_call, first=FALSE, strip_d=TRUE),
+                 c("IGKV1-39", "IGKJ5"))    
     
     expect_equal(getFamily(kappa_call), 
                  c("IGKV1", "IGKJ5"))
@@ -138,6 +140,8 @@ test_that("getSegment", {
                  c("IGHV1-69", "IGHD1-1", "IGHJ1"))
     expect_equal(getGene(heavy_call, first=FALSE, strip_d=FALSE),
                  c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1"))
+    expect_equal(getGene(heavy_call, first=FALSE, strip_d=TRUE),
+                 c("IGHV1-69", "IGHD1-1", "IGHJ1"))    
     
     expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
                  c("IGH", "IGH", "IGH"))    
