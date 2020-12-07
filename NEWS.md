@@ -39,9 +39,9 @@ Sequence:
 
 Lineage:
 
-+ Added `branch_length` argument to `buildPhylipLineage`, removed addphylo, 
-  and augmented graphToPhylo and phyloToGraph to track intermediate sequence 
-  in nodes for phylo object.
++ Added `branch_length` argument to `buildPhylipLineage`, and augmented 
+  graphToPhylo and phyloToGraph to track intermediate sequence in nodes 
+  for phylo object.
 
 
 Version 1.0.2: July 17, 2020
