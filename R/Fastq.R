@@ -54,19 +54,18 @@
 #'                 \item \code{quality_alignment_num}: A character vector, with comma separated 
 #'                                                     numerical quality values for each 
 #'                                                     position in \code{sequence_alignment}.
-#'                 \item \code{quality_sequence}:      A character vector with ASCII Phred 
+#'                 \item \code{quality}:      A character vector with ASCII Phred 
 #'                                                     scores for \code{sequence}.
-#'                 \item \code{quality_sequence_num}:  A character vector, with comma separated 
+#'                 \item \code{quality_num}:  A character vector, with comma separated 
 #'                                                     numerical quality values for each 
 #'                                                     position in \code{sequence}.
 #'           }
+#' @seealso \link{maskPositionsByQuality}
 #' 
 #' @examples
-#' \dontrun{
-#' db <- readChangeoDb("db.tsv")
-#' fastq_file <- "db.fastq"
+#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
-#' }
 #' 
 #' @export
 readFastqDb <- function(data, fastq_file, quality_offset=-33, 
@@ -99,10 +98,10 @@ readFastqDb <- function(data, fastq_file, quality_offset=-33,
    header <- match.arg(header)
    fastq <- ape::read.fastq(fastq_file, offset=quality_offset) #default: -33 (pRESTO)
    fastq_db <- data.frame(
-      "quality_sequence_num"=as.vector(sapply(attr(fastq, "QUAL"), paste0, collapse=",")),
+      "quality_num"=as.vector(sapply(attr(fastq, "QUAL"), paste0, collapse=",")),
       stringsAsFactors = F)
    
-   fastq_db$quality_sequence <- sapply(fastq_db[["quality_sequence_num"]], 
+   fastq_db$quality <- sapply(fastq_db[["quality_num"]], 
                                      function(qual, quality_offset) {
                                         paste0(sapply(strsplit(qual, ",")[[1]], function(x,quality_offset) {
                                            y <- as.numeric(x) - quality_offset
@@ -125,8 +124,8 @@ readFastqDb <- function(data, fastq_file, quality_offset=-33,
                                   sequence=sequence,
                                   sequence_id=sequence_id,
                                   sequence_alignment=sequence_alignment,
-                                  quality_sequence="quality_sequence",
-                                  quality_sequence_num="quality_sequence_num",
+                                  quality="quality",
+                                  quality_num="quality_num",
                                   v_cigar=v_cigar,
                                   d_cigar=d_cigar,
                                   j_cigar=j_cigar,
@@ -137,8 +136,8 @@ readFastqDb <- function(data, fastq_file, quality_offset=-33,
                                   raw=FALSE)
    
    if (!quality_sequence) {
-      data[['quality_sequence']] <- NULL
-      data[['quality_sequence_num']] <- NULL
+      data[['quality']] <- NULL
+      data[['quality_num']] <- NULL
    }
    
    if (style != "both") {
@@ -181,8 +180,8 @@ calcSequenceAlignmentQuality <- function(sequence_db,
                                         sequence="sequence",
                                         sequence_id="sequence_id",
                                         sequence_alignment="sequence_alignment",
-                                        quality_sequence="quality_sequence",
-                                        quality_sequence_num="quality_sequence_num",
+                                        quality="quality",
+                                        quality_num="quality_num",
                                         v_cigar="v_cigar",
                                         d_cigar="d_cigar",
                                         j_cigar="j_cigar",
@@ -193,8 +192,8 @@ calcSequenceAlignmentQuality <- function(sequence_db,
                                         raw=FALSE) {
    # query sequence
    sequence <- sequence_db[[sequence]]
-   quality <- strsplit(sequence_db[[quality_sequence]],"")[[1]]
-   quality_num <- strsplit(sequence_db[[quality_sequence_num]],",")[[1]]
+   quality_phred <- strsplit(sequence_db[[quality]],"")[[1]]
+   quality_num_values <- strsplit(sequence_db[[quality_num]],",")[[1]]
    
    v_cigar <- sequence_db[[v_cigar]]
    vd_pseudo_cigar <- NA
@@ -255,8 +254,8 @@ calcSequenceAlignmentQuality <- function(sequence_db,
       stringsAsFactors = F
    ) %>%
    mutate (
-      !!rlang::sym(quality_sequence) := quality[positions],
-      !!rlang::sym(quality_sequence_num) := as.numeric(quality_num)[positions],
+      !!rlang::sym(quality) := quality_phred[positions],
+      !!rlang::sym(quality_num) := as.numeric(quality_num_values)[positions],
       !!rlang::sym(sequence_id) := sequence_db[[sequence_id]])
 
    # Sanity check. Just to be sure reconstruction is working correctly,
@@ -282,11 +281,11 @@ calcSequenceAlignmentQuality <- function(sequence_db,
          select(-!!rlang::sym("reconstructed_sequence_alignment"))
    } else {
       qual_num <- rep(NA, length(nt_aln))
-      qual_num[quality_df[['sequence_alignment_position']]] <- quality_df[[quality_sequence_num]]
+      qual_num[quality_df[['sequence_alignment_position']]] <- quality_df[[quality_num]]
       qual_num <- paste0(qual_num, sep="", collapse=",")
       
       qual_phred <- rep(" ", length(nt_aln))
-      qual_phred[quality_df[['sequence_alignment_position']]] <- quality_df[[quality_sequence]]
+      qual_phred[quality_df[['sequence_alignment_position']]] <- quality_df[[quality]]
       qual_phred <- paste0(qual_phred, sep="", collapse="")
       
       ret <- data.frame(
@@ -301,57 +300,63 @@ calcSequenceAlignmentQuality <- function(sequence_db,
 }
 
 
-#' Retrieve sequencing quality scores from tabular data
-#' 
-#' \code{sequenceAlignmentQuality} is used internally by \code{readFastqDb} to 
-#' process the sequencing quality scores loaded from a \code{fastq} file. 
-#' 
-#' Once a repertoire \code{data.frame} has been processed with \link{readFastqDb} and 
-#' contains the fields \code{quality_sequence} and \code{quality_sequence_num},
-#' \code{sequenceAlignmentQuality} can be used to retrieve the quality scores 
-#' from the already present field \code{quality_sequence_num}, without requiring 
-#' again the \code{fastq} file, and report them as a \code{data.frame} with sequencing 
-#' qualities per position, not as a string. This is done setting \code{raw=TRUE}. 
-#' This \code{data.frame} with qualities per position can be used to generate figures, 
-#' for example.
-#' 
-#' @param    data            \code{data.frame} containing sequence data.
-#' @param    sequence_id     column in \code{data} that contains sequence 
-#'                           identifiers to be matched to sequence identifiers in 
-#'                           \code{fastq_file}. 
-#' @param    sequence        column in \code{data} that contains sequence data.
-#' @param    sequence_alignment     column in \code{data} that contains 
-#'                                  IMGT aligned sequence data.      
-#' @param    quality_sequence       column in \code{data} that contains 
-#'                                  sequencing quality as Phred scores.     
-#' @param    quality_sequence_num   column in \code{data} that contains 
-#'                                  sequencing quality as a comma separated string.                
-#' @param    v_cigar         column in \code{data} that contains CIGAR 
-#'                           strings for the V gene alignments.     
-#' @param    d_cigar         column in \code{data} that contains CIGAR 
-#'                           strings for the D gene alignments.   
-#' @param    j_cigar         column in \code{data} that contains CIGAR 
-#'                           strings for the J gene alignments.     
-#' @param    np1_length      column in \code{data} that contains the number
-#'                           of nucleotides between the V gene and first D gene 
-#'                           alignments or between the V gene and J gene alignments.
-#' @param    np2_length      column in \code{data} that contains the number
-#'                           of nucleotides between either the first D gene and J 
-#'                           gene alignments or the first D gene and second D gene
-#'                           alignments.
-#' @param    v_sequence_end  column in \code{data} that contains the 
-#'                           end position of the V gene in \code{sequence}.
-#' @param    d_sequence_end  column in \code{data} that contains the 
-#'                           end position of the D gene in \code{sequence}.                      
-#' @param    raw             specify how the sequencing quality should be returned. 
-#'                           If \code{TRUE}, return the raw value. 
-#'                           If \code{FALSE}, do WHAT?
+# Retrieve sequencing quality scores from tabular data
+# 
+# \code{sequenceAlignmentQuality} is used internally by \code{readFastqDb} to 
+# process the sequencing quality scores loaded from a \code{fastq} file. 
+# 
+# Once a repertoire \code{data.frame} has been processed with \link{readFastqDb} and 
+# contains the fields \code{quality} and \code{quality_num},
+# \code{sequenceAlignmentQuality} can be used to retrieve the quality scores 
+# from the already present field \code{quality_num}, without requiring 
+# again the \code{fastq} file, and report them as a \code{data.frame} with sequencing 
+# qualities per position, not as a string. This is done setting \code{raw=TRUE}. 
+# This \code{data.frame} with qualities per position can be used to generate figures, 
+# for example.
+# 
+# @param    data            \code{data.frame} containing sequence data.
+# @param    sequence_id     column in \code{data} that contains sequence 
+#                           identifiers to be matched to sequence identifiers in 
+#                           \code{fastq_file}. 
+# @param    sequence        column in \code{data} that contains sequence data.
+# @param    sequence_alignment     column in \code{data} that contains 
+#                                  IMGT aligned sequence data.      
+# @param    quality       column in \code{data} that contains 
+#                                  sequencing quality as Phred scores.     
+# @param    quality_num   column in \code{data} that contains 
+#                                  sequencing quality as a comma separated string.                
+# @param    v_cigar         column in \code{data} that contains CIGAR 
+#                           strings for the V gene alignments.     
+# @param    d_cigar         column in \code{data} that contains CIGAR 
+#                           strings for the D gene alignments.   
+# @param    j_cigar         column in \code{data} that contains CIGAR 
+#                           strings for the J gene alignments.     
+# @param    np1_length      column in \code{data} that contains the number
+#                           of nucleotides between the V gene and first D gene 
+#                           alignments or between the V gene and J gene alignments.
+# @param    np2_length      column in \code{data} that contains the number
+#                           of nucleotides between either the first D gene and J 
+#                           gene alignments or the first D gene and second D gene
+#                           alignments.
+# @param    v_sequence_end  column in \code{data} that contains the 
+#                           end position of the V gene in \code{sequence}.
+# @param    d_sequence_end  column in \code{data} that contains the 
+#                           end position of the D gene in \code{sequence}.                      
+# @param    raw             specify how the sequencing quality should be returned. 
+#                           If \code{TRUE}, return a \code{data.frame} with 
+#                           quality information per position, where each row is
+#                           a position. This \code{data.frame} has columns
+#                           "sequence_position", "sequence_alignment_position", 
+#                           "quality", "quality_num", "sequence_id"
+#                           and "sequence_alignment_nt" If \code{FALSE}, for each sequence,
+#                           concatenate the position qualities in a string, and the
+#                           quality information to \code{data}
 sequenceAlignmentQuality <- function(data, 
                                      sequence_id="sequence_id",
                                      sequence="sequence",
                                      sequence_alignment="sequence_alignment",
-                                     quality_sequence="quality_sequence",
-                                     quality_sequence_num="quality_sequence_num",
+                                     quality="quality",
+                                     quality_num="quality_num",
                                      v_cigar="v_cigar",
                                      d_cigar="d_cigar",
                                      j_cigar="j_cigar",
@@ -367,8 +372,8 @@ sequenceAlignmentQuality <- function(data,
       sequence=sequence,
       sequence_id=sequence_id,
       sequence_alignment=sequence_alignment,
-      quality_sequence=quality_sequence,
-      quality_sequence_num=quality_sequence_num,
+      quality=quality,
+      quality_num=quality_num,
       v_cigar=v_cigar,
       d_cigar=d_cigar,
       j_cigar=j_cigar,
@@ -408,14 +413,14 @@ sequenceAlignmentQuality <- function(data,
 #'           concatenating the \code{sequence} name and \code{"_masked"}.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' maskPositionsByQuality(db, min_quality=90)
 #' }
 #' 
 #' @export
 maskPositionsByQuality <- function(data, min_quality=70,
                                    sequence="sequence_alignment",
-                                   quality_num="quality_sequence_num") {
+                                   quality_num="quality_num") {
    
    required_cols <- c(sequence,quality_num)
    checkColumns(data, required_cols)
@@ -445,25 +450,24 @@ maskPositionsByQuality <- function(data, min_quality=70,
 } 
 
 
-#' Get a data.frame with sequencing qualities per position
-#' 
-#' \code{getPositionQuality} takes a data.frame with sequence quality scores 
-#' in the form of a strings of comma separated numeric values, split the quality 
-#' scores values by \code{","},  and returns a data.frame with the values
-#' for each position.
-#' 
-#' 
-#' @param    data          \code{data.frame} containing sequence data.
-#' @param    sequence_id   column in \code{data} with sequence identifiers.
-#' @param    sequence      column in \code{data} with sequence data. 
-#' @param    quality_num   column in \code{data} with quality scores (as
-#'                         strings of numeric values, comma separated) for \code{sequence}.
-#'                         
-#' @return   \code{data} with one additional field with masked sequences. The 
-#'           name of this field is created concatenating \code{sequence} 
-#'           and '_masked'.
-#'           
-#' @export
+# Get a data.frame with sequencing qualities per position
+# 
+# \code{getPositionQuality} takes a data.frame with sequence quality scores 
+# in the form of a strings of comma separated numeric values, split the quality 
+# scores values by \code{","},  and returns a data.frame with the values
+# for each position.
+# 
+# 
+# @param    data          \code{data.frame} containing sequence data.
+# @param    sequence_id   column in \code{data} with sequence identifiers.
+# @param    sequence      column in \code{data} with sequence data. 
+# @param    quality_num   column in \code{data} with quality scores (as
+#                         strings of numeric values, comma separated) for \code{sequence}.
+#                         
+# @return   \code{data} with one additional field with masked sequences. The 
+#           name of this field is created concatenating \code{sequence} 
+#           and '_masked'.
+#           
 getPositionQuality <- function(data, 
                                sequence_id="sequence_id",
                                sequence="sequence_alignment", 
