@@ -59,7 +59,7 @@ db[,new_cols] %>% head()
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
 a path to the corresponding `.fastq` file (`fastq_file`). The sequencing quality scores will
-be merged into the `data.frame` by `sequence_id`. The newly added columns are :
+be merged into the `data.frame` by `sequence_id`. The newly added columns are:
 `r paste(new_cols, collapse=", ")`. The other fields, contain the ASCII quality scores in the 
 form of a vector, where values are comma separated, and `-` or `.` positions 
 have value `" "` (blank).

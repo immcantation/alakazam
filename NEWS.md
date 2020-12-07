@@ -416,7 +416,7 @@ Diversity:
   relative abundance distribution.
 + Added support for inclusion of copy number in clone size determination
   within `rarefyDiversity()` and `testDiversity()`.
-+ Diversity scores and confiderence intervals within `rarefyDiversity()`
++ Diversity scores and confidence intervals within `rarefyDiversity()`
   and `testDiversity()` are now calculated using the mean and standard 
   deviation of the bootstrap realizations, rather than the median and
   upper/lower quantiles.
