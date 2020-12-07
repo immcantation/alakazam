@@ -66,7 +66,7 @@
 #' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
 #' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
-#' 
+#'
 #' @export
 readFastqDb <- function(data, fastq_file, quality_offset=-33, 
                         header=c("presto", "asis"), 
@@ -450,24 +450,26 @@ maskPositionsByQuality <- function(data, min_quality=70,
 } 
 
 
-# Get a data.frame with sequencing qualities per position
-# 
-# \code{getPositionQuality} takes a data.frame with sequence quality scores 
-# in the form of a strings of comma separated numeric values, split the quality 
-# scores values by \code{","},  and returns a data.frame with the values
-# for each position.
-# 
-# 
-# @param    data          \code{data.frame} containing sequence data.
-# @param    sequence_id   column in \code{data} with sequence identifiers.
-# @param    sequence      column in \code{data} with sequence data. 
-# @param    quality_num   column in \code{data} with quality scores (as
-#                         strings of numeric values, comma separated) for \code{sequence}.
-#                         
-# @return   \code{data} with one additional field with masked sequences. The 
-#           name of this field is created concatenating \code{sequence} 
-#           and '_masked'.
-#           
+#' Get a data.frame with sequencing qualities per position
+#' 
+#' \code{getPositionQuality} takes a data.frame with sequence quality scores 
+#' in the form of a strings of comma separated numeric values, split the quality 
+#' scores values by \code{","},  and returns a data.frame with the values
+#' for each position.
+#' 
+#' 
+#' @param    data          \code{data.frame} containing sequence data.
+#' @param    sequence_id   column in \code{data} with sequence identifiers.
+#' @param    sequence      column in \code{data} with sequence data. 
+#' @param    quality_num   column in \code{data} with quality scores (as
+#'                         strings of numeric values, comma separated) for \code{sequence}.
+#'                         
+#' @return   \code{data} with one additional field with masked sequences. The 
+#'           name of this field is created concatenating \code{sequence} 
+#'           and '_masked'.
+#'
+#'          
+#' @export          
 getPositionQuality <- function(data, 
                                sequence_id="sequence_id",
                                sequence="sequence_alignment", 
