@@ -4,7 +4,10 @@ Version 1.1.0: December 7, 2020
 General:
 
 + Added `readFastqDb`, which reads a repertoire's .fastq file and imports the 
-  sequencing quality scores for `sequence_alignment`.
+  sequencing quality scores for `sequence_alignment`. Added `maskPositionsByQuality`
+  masks positions that have a sequencing quality score lower than the specified
+  threshold. The convenience function `getPositionQuality` will create a 
+  `data.frame` with quality scores per position.
 + Added a vignette describing how to read/write Change-O and AIRR Rearrangement
   formatted files.
 + Increased `dplyr` dependency to v1.0.

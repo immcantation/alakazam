@@ -60,7 +60,7 @@
 #'                                                     numerical quality values for each 
 #'                                                     position in \code{sequence}.
 #'           }
-#' @seealso \link{maskPositionsByQuality}
+#' @seealso \link{maskPositionsByQuality} and \link{getPositionQuality}
 #' 
 #' @examples
 #' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
@@ -411,16 +411,19 @@ sequenceAlignmentQuality <- function(data,
 #' @return   Modified \code{data} data.frame with an additional field containing 
 #'           quality masked sequences. The  name of this field is created 
 #'           concatenating the \code{sequence} name and \code{"_masked"}.
+#'           
+#' @seealso \link{readFastqDb} and \link{getPositionQuality}
 #' 
 #' @examples
-#' \donttest{
-#' maskPositionsByQuality(db, min_quality=90)
-#' }
+#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+#' db <- readFastqDb(db, fastq_file, quality_offset=-33)
+#' maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 #' 
 #' @export
 maskPositionsByQuality <- function(data, min_quality=70,
                                    sequence="sequence_alignment",
-                                   quality_num="quality_num") {
+                                   quality_num="quality_alignment_num") {
    
    required_cols <- c(sequence,quality_num)
    checkColumns(data, required_cols)
@@ -468,7 +471,14 @@ maskPositionsByQuality <- function(data, min_quality=70,
 #'           name of this field is created concatenating \code{sequence} 
 #'           and '_masked'.
 #'
-#'          
+#' @seealso \link{readFastqDb} and \link{maskPositionsByQuality}
+#'           
+#' @examples
+#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+#' db <- readFastqDb(db, fastq_file, quality_offset=-33)
+#' head(getPositionQuality(db))
+#
 #' @export          
 getPositionQuality <- function(data, 
                                sequence_id="sequence_id",
