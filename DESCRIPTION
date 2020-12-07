@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
-Version: 1.0.2.999
-Date: 2020-12-02
+Version: 1.1.0
+Date: 2020-12-06
 Authors@R: c(person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -47,7 +47,7 @@ Imports:
     airr,
     ape,
     Biostrings,
-    dplyr (>= 0.8.3),
+    dplyr (>= 1.0),
     GenomicAlignments,
     graphics,
     grid,

@@ -1,11 +1,13 @@
-Version 1.0.2.999: December 2, 2020
+Version 1.1.0: December 3, 2020
 -------------------------------------------------------------------------------
   
 General:
 
-+ Added `readFastqDb`, which reads a repertoire's .fastq and imports the sequencing 
-   quality scores for `sequence_alignment`.
-+ Added a vignette describing how to read/write Change-O and AIRR formatted files.
++ Added `readFastqDb`, which reads a repertoire's .fastq file and imports the 
+  sequencing quality scores for `sequence_alignment`.
++ Added a vignette describing how to read/write Change-O and AIRR Rearrangement
+  formatted files.
++ Increased `dplyr` dependency to v1.0.
 
 Gene:
 
@@ -19,18 +21,19 @@ Gene:
 + Changed the check for empty columns in `countGenes` to give a warning instead of 
   an error so as not to disrupt running workflows.
 + Fixed a bug in `getSegment` where filtering of non-localized genes was not 
-  being applied when called from `getFamily`, because the 'NL' part of the name
+  being applied when called from `getFamily`, because the "NL" part of the name
   was removed before the filtering step.
 + Updated regular expressions in `getAllele`, `getGene`, `getFamily` and 
-  `getLocus`, to parse `c_call` correctly.
-+ Updated regular expressions in `getSegment` to be able to parse `c_call` 
-  correctly and not remove the 'D' from 'IGHD', when `strip_d=TRUE`.
+  `getLocus`, to parse constant region gene names correctly.
++ Updated regular expressions in `getSegment` to be able to parse 
+  constant region gene names correctly and not remove the "D" from 
+  "IGHD" when `strip_d=TRUE`.
 
 Sequence:
 
 + In `padSeqEnds`, the argument `mod3=TRUE` has been added so that sequences are
   padded to a length that is a multiple of 3.
-+ Fixed a bug in `translateDNA` where NA's weren't being translated properly.
++ Fixed a bug in `translateDNA` where NAs weren't being translated properly.
 
 Lineage:
 
