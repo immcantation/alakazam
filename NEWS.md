@@ -1,4 +1,4 @@
-Version 1.1.0: December 3, 2020
+Version 1.1.0: December 7, 2020
 -------------------------------------------------------------------------------
   
 General:
@@ -8,6 +8,8 @@ General:
 + Added a vignette describing how to read/write Change-O and AIRR Rearrangement
   formatted files.
 + Increased `dplyr` dependency to v1.0.
++ Added the BioConductor dependencies Biostrings, GenomicAlignments, 
+  and IRanges.
 
 Gene:
 

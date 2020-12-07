@@ -1,62 +1,64 @@
-#' Load into \code{data} sequencing quality scores from a fastq file
+#' Load sequencing quality scores from a FASTQ file
 #' 
-#' \code{readFastqDb} adds to a db data.frame the sequencing quality scores
-#' from a fastq file. Matching is done by `sequence_id`.
+#' \code{readFastqDb} adds the sequencing quality scores to a data.frame
+#' from a FASTQ file. Matching is done by `sequence_id`.
 #'
-#' @param    data        An AIRR data.frame
-#' @param    fastq_file  Path to the fastq file
-#' @param    quality_offset The offset value to be used by ape::read.fastq. It is 
-#'                       the value to be added to the quality scores 
-#'                       (the default -33 applies to the Sanger format and 
-#'                       should work for most recent FASTQ files).
-#' @param    header      Fastq file header format. Use \code{presto} to specify 
-#'                       that the fastq file headers are using the pRESTO
-#'                       format and can be parsed to extract 
-#'                       the sequence_id. Use \code{asis} to skip any processing
-#'                       and use the sequence names as they are.
-#' @param    sequence_id Name of the column in \code{data} that contains sequence 
-#'                       identifiers to be matched to sequence identifiers in 
-#'                       \code{fastq_file}. 
-#' @param    sequence   Name of the column in \code{data} that contains sequence data.
-#' @param    sequence_alignment Name of the column in \code{data} that contains 
-#'                      IMGT aligned sequence data.      
-#' @param    v_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the V gene alignments.     
-#' @param    d_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the D gene alignments.   
-#' @param    j_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the J gene alignments.     
-#' @param    np1_length Name of the column in \code{data} that contains the number
-#'                      of nucleotides between the V gene and first D gene 
-#'                      alignments or between the V gene and J gene alignments.
-#' @param    np2_length Name of the column in \code{data} that contains the number
-#'                      of nucleotides between either the first D gene and J 
-#'                      gene alignments or the first D gene and second D gene
-#'                      alignments.
-#' @param    v_sequence_end  Name of the column in \code{data} that contains the 
-#'                      end position of the V gene in \code{sequence}.
-#' @param    d_sequence_end  Name of the column in \code{data} that contains the 
-#'                      end position of the D gene in \code{sequence}.                      
-#' @param    style      Select how the sequencing quality should be returned. 
-#'                      \code{num} to store the quality scores as strings of 
-#'                      comma separated numeric values. Use \code{phred} to have
-#'                      the function return the scores as phred (ascii) scores. 
-#'                      Use \code{both} to retrieve both.
-#' @param    quality_sequence    Specify TRUE to keep the quality scores for 
-#'                      \code{sequence}. If false, only the quality score
-#'                      for \code{sequence_alignment} will be added to \code{data}.
-#' @return   \code{data} with additional fields:
+#' @param    data            \code{data.frame} containing sequence data.
+#' @param    fastq_file      path to the fastq file
+#' @param    quality_offset  offset value to be used by ape::read.fastq. It is 
+#'                           the value to be added to the quality scores 
+#'                           (the default -33 applies to the Sanger format and 
+#'                           should work for most recent FASTQ files).
+#' @param    header          FASTQ file header format; one of \code{"presto"} or 
+#'                           \code{"asis"}. Use \code{"presto"} to specify 
+#'                           that the fastq file headers are using the pRESTO
+#'                           format and can be parsed to extract 
+#'                           the \code{sequence_id}. Use \code{"asis"} to skip 
+#'                           any processing and use the sequence names as they are.
+#' @param    sequence_id     column in \code{data} that contains sequence 
+#'                           identifiers to be matched to sequence identifiers in 
+#'                           \code{fastq_file}. 
+#' @param    sequence        column in \code{data} that contains sequence data.
+#' @param    sequence_alignment   column in \code{data} that contains IMGT aligned sequence data.      
+#' @param    v_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the V gene alignments.     
+#' @param    d_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the D gene alignments.   
+#' @param    j_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the J gene alignments.     
+#' @param    np1_length      column in \code{data} that contains the number
+#'                           of nucleotides between the V gene and first D gene 
+#'                           alignments or between the V gene and J gene alignments.
+#' @param    np2_length      column in \code{data} that contains the number
+#'                           of nucleotides between either the first D gene and J 
+#'                           gene alignments or the first D gene and second D gene
+#'                           alignments.
+#' @param    v_sequence_end  column in \code{data} that contains the 
+#'                           end position of the V gene in \code{sequence}.
+#' @param    d_sequence_end  column in \code{data} that contains the 
+#'                           end position of the D gene in \code{sequence}.                      
+#' @param    style           how the sequencing quality should be returned;
+#'                           one of \code{"num"}, \code{"phred"}, or \code{"both"}.
+#'                           Specify \code{"num"} to store the quality scores as strings of 
+#'                           comma separated numeric values. Use \code{"phred"} to have
+#'                           the function return the scores as Phred (ASCII) scores. 
+#'                           Use \code{"both"} to retrieve both.
+#' @param    quality_sequence     specify \code{TRUE} to keep the quality scores for 
+#'                                \code{sequence}. If false, only the quality score
+#'                                for \code{sequence_alignment} will be added to \code{data}.
+#'                                
+#' @return   Modified \code{data} with additional fields:
 #'           \enumerate{
-#'                 \item quality_alignment_num: A character vector, with comma separated 
-#'                                         numerical quality values for each 
-#'                                         position in \code{sequence_alignment}.
-#'                 \item quality_alignment: A character vector with ASCII Phred 
-#'                                       scores for \code{sequence_alignment}.
-#'                 \item quality_sequence_num: A character vector, with comma separated 
-#'                                         numerical quality values for each 
-#'                                         position in \code{sequence}.
-#'                 \item quality_sequence: A character vector with ASCII Phred 
-#'                                       scores for \code{sequence}.
+#'                 \item \code{quality_alignment}:     A character vector with ASCII Phred 
+#'                                                     scores for \code{sequence_alignment}.
+#'                 \item \code{quality_alignment_num}: A character vector, with comma separated 
+#'                                                     numerical quality values for each 
+#'                                                     position in \code{sequence_alignment}.
+#'                 \item \code{quality_sequence}:      A character vector with ASCII Phred 
+#'                                                     scores for \code{sequence}.
+#'                 \item \code{quality_sequence_num}:  A character vector, with comma separated 
+#'                                                     numerical quality values for each 
+#'                                                     position in \code{sequence}.
 #'           }
 #' 
 #' @examples
@@ -65,10 +67,11 @@
 #' fastq_file <- "db.fastq"
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
 #' }
+#' 
 #' @export
 readFastqDb <- function(data, fastq_file, quality_offset=-33, 
                         header=c("presto", "asis"), 
-                        sequence_id = "sequence_id",
+                        sequence_id="sequence_id",
                         sequence="sequence",
                         sequence_alignment="sequence_alignment",
                         v_cigar="v_cigar",
@@ -78,7 +81,7 @@ readFastqDb <- function(data, fastq_file, quality_offset=-33,
                         np2_length="np2_length",
                         v_sequence_end="v_sequence_end",
                         d_sequence_end="d_sequence_end",
-                        style=c("num","ascii","both"),
+                        style=c("num", "ascii", "both"),
                         quality_sequence=FALSE) {
    
    check_cols <- c(sequence_id, 
@@ -187,8 +190,7 @@ calcSequenceAlignmentQuality <- function(sequence_db,
                                         np2_length="np2_length",
                                         v_sequence_end="v_sequence_end",
                                         d_sequence_end="d_sequence_end",
-                                        raw=FALSE
-                                        ) {
+                                        raw=FALSE) {
    # query sequence
    sequence <- sequence_db[[sequence]]
    quality <- strsplit(sequence_db[[quality_sequence]],"")[[1]]
@@ -299,53 +301,51 @@ calcSequenceAlignmentQuality <- function(sequence_db,
 }
 
 
-#' Retrieve sequencing quality scores from a db file with \code{sequence_quality} information
+#' Retrieve sequencing quality scores from tabular data
 #' 
 #' \code{sequenceAlignmentQuality} is used internally by \code{readFastqDb} to 
 #' process the sequencing quality scores loaded from a \code{fastq} file. 
 #' 
-#' Once a repertoire \code{data.frame} has been processed with \code{readFasqDb} and 
+#' Once a repertoire \code{data.frame} has been processed with \link{readFastqDb} and 
 #' contains the fields \code{quality_sequence} and \code{quality_sequence_num},
-#' \code{sequenceAlignmentQuality} can
-#' be used to retrieve the quality scores from the already present field
-#'  \code{quality_sequence_num}, without requiring again the \code{fastq} file, 
-#' and report them as a \code{data.frame} with sequencing qualities per position, 
-#' not as a string. This is done setting \code{raw=TRUE}. This \code{data.frame} 
-#' with qualities per position can be used to generate figures, for example.
+#' \code{sequenceAlignmentQuality} can be used to retrieve the quality scores 
+#' from the already present field \code{quality_sequence_num}, without requiring 
+#' again the \code{fastq} file, and report them as a \code{data.frame} with sequencing 
+#' qualities per position, not as a string. This is done setting \code{raw=TRUE}. 
+#' This \code{data.frame} with qualities per position can be used to generate figures, 
+#' for example.
 #' 
-#' @param    data          An AIRR data.frame
-#' @param    sequence_id Name of the column in \code{data} that contains sequence 
-#'                       identifiers to be matched to sequence identifiers in 
-#'                       \code{fastq_file}. 
-#' @param    sequence Name of the column in \code{data} that contains sequence data.
-#' @param    sequence_alignment Name of the column in \code{data} that contains 
-#'                      IMGT aligned sequence data.      
-#' @param    quality_sequence Name of the column in \code{data} that contains 
-#'                      sequencing quality (phred scores).     
-#' @param    quality_sequence_num Name of the column in \code{data} that contains 
-#'                      sequencing quality, as comma separated string.                
-#' @param    v_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the V gene alignments.     
-#' @param    d_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the D gene alignments.   
-#' @param    j_cigar    Name of the column in \code{data} that contains CIGAR 
-#'                      strings for the J gene alignments.     
-#' @param    np1_length Name of the column in \code{data} that contains the number
-#'                      of nucleotides between the V gene and first D gene 
-#'                      alignments or between the V gene and J gene alignments.
-#' @param    np2_length Name of the column in \code{data} that contains the number
-#'                      of nucleotides between either the first D gene and J 
-#'                      gene alignments or the first D gene and second D gene
-#'                      alignments.
-#' @param    v_sequence_end  Name of the column in \code{data} that contains the 
-#'                      end position of the V gene in \code{sequence}.
-#' @param    d_sequence_end  Name of the column in \code{data} that contains the 
-#'                      end position of the D gene in \code{sequence}.                      
-#' @param    raw        Select how the sequencing quality should be returned. 
-#'                      \code{num} to store the quality scores as strings of 
-#'                      comma separated numeric values. Use \code{phred} to have
-#'                      the function return the scores as phred (ascii) scores. 
-#'                      Use \code{both} to retrieve both.
+#' @param    data            \code{data.frame} containing sequence data.
+#' @param    sequence_id     column in \code{data} that contains sequence 
+#'                           identifiers to be matched to sequence identifiers in 
+#'                           \code{fastq_file}. 
+#' @param    sequence        column in \code{data} that contains sequence data.
+#' @param    sequence_alignment     column in \code{data} that contains 
+#'                                  IMGT aligned sequence data.      
+#' @param    quality_sequence       column in \code{data} that contains 
+#'                                  sequencing quality as Phred scores.     
+#' @param    quality_sequence_num   column in \code{data} that contains 
+#'                                  sequencing quality as a comma separated string.                
+#' @param    v_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the V gene alignments.     
+#' @param    d_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the D gene alignments.   
+#' @param    j_cigar         column in \code{data} that contains CIGAR 
+#'                           strings for the J gene alignments.     
+#' @param    np1_length      column in \code{data} that contains the number
+#'                           of nucleotides between the V gene and first D gene 
+#'                           alignments or between the V gene and J gene alignments.
+#' @param    np2_length      column in \code{data} that contains the number
+#'                           of nucleotides between either the first D gene and J 
+#'                           gene alignments or the first D gene and second D gene
+#'                           alignments.
+#' @param    v_sequence_end  column in \code{data} that contains the 
+#'                           end position of the V gene in \code{sequence}.
+#' @param    d_sequence_end  column in \code{data} that contains the 
+#'                           end position of the D gene in \code{sequence}.                      
+#' @param    raw             specify how the sequencing quality should be returned. 
+#'                           If \code{TRUE}, return the raw value. 
+#'                           If \code{FALSE}, do WHAT?
 sequenceAlignmentQuality <- function(data, 
                                      sequence_id="sequence_id",
                                      sequence="sequence",
@@ -385,37 +385,37 @@ sequenceAlignmentQuality <- function(data,
       data %>%
          dplyr::left_join(qual, by=sequence_id)
    }
-   
 }
 
 
-#' Mask positions with lo sequencing quality
+#' Mask sequence positions with low quality
 #' 
-#' \code{maskPositionsByQuality} will replace with an N positions that 
-#' have a sequencing quality score lower that \code{min_quality}.
+#' \code{maskPositionsByQuality} will replace positions that 
+#' have a sequencing quality score lower that \code{min_quality} with an
+#' \code{"N"} character.
 #' 
 #' 
-#' @param    data      An AIRR data.frame
-#' @param    min_quality  Minimun quality. Positions with sequencing quality 
-#'                     < \code{min_qual} will be masked.
-#' @param    sequence Name of the column in \code{data} with sequence data to be
-#'                    masked.
-#' @param    quality_num  Name of the column in \code{data} with quality scores (a
-#'                    string of numeric values, comma separated) that can
-#'                    be used to mask \code{sequence}. 
-#' @return   \code{data} with one additional field with masked sequences. The 
-#'           name of this field is created concatenating \code{sequence} 
-#'           and '_masked'.
+#' @param    data          \code{data.frame} containing sequence data.
+#' @param    min_quality   minimum quality score. Positions with sequencing quality 
+#'                         less than \code{min_qual} will be masked.
+#' @param    sequence      column in \code{data} with sequence data to be masked.
+#' @param    quality_num   column in \code{data} with quality scores (a
+#'                         string of numeric values, comma separated) that can
+#'                         be used to mask \code{sequence}. 
+#'                         
+#' @return   Modified \code{data} data.frame with an additional field containing 
+#'           quality masked sequences. The  name of this field is created 
+#'           concatenating the \code{sequence} name and \code{"_masked"}.
 #' 
 #' @examples
 #' \dontrun{
 #' maskPositionsByQuality(db, min_quality=90)
 #' }
+#' 
 #' @export
 maskPositionsByQuality <- function(data, min_quality=70,
                                    sequence="sequence_alignment",
-                                   quality_num="quality_sequence_num"
-                                   ) {
+                                   quality_num="quality_sequence_num") {
    
    required_cols <- c(sequence,quality_num)
    checkColumns(data, required_cols)
@@ -447,20 +447,22 @@ maskPositionsByQuality <- function(data, min_quality=70,
 
 #' Get a data.frame with sequencing qualities per position
 #' 
-#' Given a data.frame with sequence quality scores in the form of 
-#' a strings of comma separated numeric values, \code{getPositionQuality} 
-#' will split the values by ',' and return a data.frame with the values
+#' \code{getPositionQuality} takes a data.frame with sequence quality scores 
+#' in the form of a strings of comma separated numeric values, split the quality 
+#' scores values by \code{","},  and returns a data.frame with the values
 #' for each position.
 #' 
 #' 
-#' @param    data        An AIRR data.frame
-#' @param    sequence_id Name of the column in \code{data} with sequence identifiers.
-#' @param    sequence Name of the column in \code{data} with sequence data. 
-#' @param    quality_num  Name of the column in \code{data} with quality scores (as
-#'                    strings of numeric values, comma separated) for \code{sequence}.
+#' @param    data          \code{data.frame} containing sequence data.
+#' @param    sequence_id   column in \code{data} with sequence identifiers.
+#' @param    sequence      column in \code{data} with sequence data. 
+#' @param    quality_num   column in \code{data} with quality scores (as
+#'                         strings of numeric values, comma separated) for \code{sequence}.
+#'                         
 #' @return   \code{data} with one additional field with masked sequences. The 
 #'           name of this field is created concatenating \code{sequence} 
 #'           and '_masked'.
+#'           
 #' @export
 getPositionQuality <- function(data, 
                                sequence_id="sequence_id",

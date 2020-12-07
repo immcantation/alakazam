@@ -31,7 +31,7 @@ pad_char
 :   character to use for padding.
 
 mod3
-:   pad sequences to be of length multiple three
+:   if `TRUE` pad sequences to be of length multiple three.
 
 
 

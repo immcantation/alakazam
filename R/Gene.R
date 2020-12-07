@@ -29,8 +29,8 @@
 #'                   \code{gene}, without any processing.
 #' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
 #'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted)
-#' @param    remove_na    removes rows with NA values in the gene column if TRUE and issues a warning. 
-#'                        Otherwise, keeps those rows and considers 'NA' as a gene in the final counts 
+#' @param    remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
+#'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 

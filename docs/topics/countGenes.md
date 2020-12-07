@@ -17,7 +17,8 @@ groups = NULL,
 copy = NULL,
 clone = NULL,
 fill = FALSE,
-mode = c("gene", "allele", "family", "asis")
+mode = c("gene", "allele", "family", "asis"),
+remove_na = TRUE
 )
 ```
 
@@ -59,6 +60,11 @@ to return counts for genes (calling `getGene`),
 families (calling `getFamily`), alleles (calling 
 `getAllele`) or using the value as it is in the column
 `gene`, without any processing.
+
+remove_na
+:   removes rows with `NA` values in the gene column if `TRUE` and issues a warning. 
+Otherwise, keeps those rows and considers `NA` as a gene in the final counts 
+and relative abundances.
 
 
 

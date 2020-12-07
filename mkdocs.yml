@@ -24,12 +24,14 @@ pages:
     - 'Analysis of clonal abundance and diversity': vignettes/Diversity-Vignette.md
     - 'Reconstruction of Ig lineage trees': vignettes/Lineage-Vignette.md
     - 'Topology analysis of lineage trees': vignettes/Topology-Vignette.md
+    - 'Using sequencing quality scores': vignettes/Fastq-Vignette.md
   - 'Help Topics':
     - 'File I/O':
       - topics/readChangeoDb.md
       - topics/writeChangeoDb.md
       - topics/readIgphyml.md
       - topics/combineIgphyml.md
+      - topics/readFastqDb.md
     - 'Sequence Cleaning and Manipulation':
       - topics/collapseDuplicates.md
       - topics/maskSeqEnds.md
@@ -37,6 +39,8 @@ pages:
       - topics/padSeqEnds.md
       - topics/translateDNA.md
       - topics/isValidAASeq.md
+      - topics/getPositionQuality.md
+      - topics/maskPositionsByQuality.md
     - 'Lineage Reconstruction':
       - topics/buildPhylipLineage.md
       - topics/graphToPhylo.md

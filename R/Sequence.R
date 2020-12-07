@@ -253,7 +253,7 @@ maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
 #'                     the data in \code{seq}.
 #' @param    start     if \code{TRUE} pad the beginning of each sequence instead of the end. 
 #' @param    pad_char  character to use for padding.
-#' @param    mod3      pad sequences to be of length multiple three
+#' @param    mod3      if \code{TRUE} pad sequences to be of length multiple three.
 #' 
 #' @return   A modified \code{seq} vector with padded sequences.
 #' 

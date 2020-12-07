@@ -73,7 +73,7 @@ x <- testEdges(graphs, "c_call", nperm=10)
 print(x)
 ```
 
-**Error in print(x)**: object 'x' not found
+**Error in h(simpleError(msg, call))**: error in evaluating the argument 'x' in selecting a method for function 'print': object 'x' not found
 
 See also
 -------------------

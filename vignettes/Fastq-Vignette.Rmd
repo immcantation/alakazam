@@ -1,5 +1,5 @@
 ---
-title: 'Alakazam: Load sequencing quality scores'
+title: 'Alakazam: Using sequencing quality scores'
 author: "Susanna Marquez"
 date: '`r Sys.Date()`'
 output:

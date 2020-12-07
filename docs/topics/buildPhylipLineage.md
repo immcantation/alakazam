@@ -32,7 +32,7 @@ phylip_exec
 :   absolute path to the PHYLIP dnapars executable.
 
 dist_mat
-:   Character distance matrix to use for reassigning edge weights. 
+:   character distance matrix to use for reassigning edge weights. 
 Defaults to a Hamming distance matrix returned by [getDNAMatrix](getDNAMatrix.md) 
 with `gap=0`. If gap characters, `c("-", ".")`, are assigned 
 a value of -1 in `dist_mat` then contiguous gaps of any run length,
@@ -51,15 +51,17 @@ if `TRUE` STDOUT and STDERR of dnapars will be passed to
 the console.
 
 temp_path
-:   specific path to temp directory if desired
+:   specific path to temp directory if desired.
 
 onetree
-:   if TRUE save only one tree
+:   if `TRUE` save only one tree.
 
 branch_length
-:   if `mutations` (default) branch lengths represent the number of 
-mutations between nodes. If `distance` branch lengths represent
-the expected number of mutations per site, unaltered from PHYLIP output
+:   specifies how to define branch lengths; one of `"mutations"` 
+or `"distance"`. If set to `"mutations"` (default), then branch 
+lengths represent the number of mutations between nodes. 
+If set to `"distance"`, then branch lengths represent
+the expected number of mutations per site, unaltered from PHYLIP output.
 
 
 

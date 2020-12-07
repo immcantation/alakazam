@@ -499,7 +499,7 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' @param    clone         \link{ChangeoClone} object containing clone data.
 #' @param    phylip_exec   absolute path to the PHYLIP dnapars executable.
-#' @param    dist_mat      Character distance matrix to use for reassigning edge weights. 
+#' @param    dist_mat      character distance matrix to use for reassigning edge weights. 
 #'                         Defaults to a Hamming distance matrix returned by \link{getDNAMatrix} 
 #'                         with \code{gap=0}. If gap characters, \code{c("-", ".")}, are assigned 
 #'                         a value of -1 in \code{dist_mat} then contiguous gaps of any run length,
@@ -512,11 +512,13 @@ phylipToGraph <- function(edges, clone) {
 #' @param    verbose       if \code{FALSE} suppress the output of dnapars; 
 #'                         if \code{TRUE} STDOUT and STDERR of dnapars will be passed to 
 #'                         the console.
-#' @param    branch_length if \code{mutations} (default) branch lengths represent the number of 
-#'                         mutations between nodes. If \code{distance} branch lengths represent
-#'                         the expected number of mutations per site, unaltered from PHYLIP output
-#' @param    temp_path     specific path to temp directory if desired
-#' @param    onetree       if TRUE save only one tree  
+#' @param    branch_length specifies how to define branch lengths; one of \code{"mutations"} 
+#'                         or \code{"distance"}. If set to \code{"mutations"} (default), then branch 
+#'                         lengths represent the number of mutations between nodes. 
+#'                         If set to \code{"distance"}, then branch lengths represent
+#'                         the expected number of mutations per site, unaltered from PHYLIP output.
+#' @param    temp_path     specific path to temp directory if desired.
+#' @param    onetree       if \code{TRUE} save only one tree.
 #'                                                
 #' @return   An igraph \code{graph} object defining the Ig lineage tree. Each unique input 
 #'           sequence in \code{clone} is a vertex of the tree, with additional vertices being
@@ -626,7 +628,7 @@ phylipToGraph <- function(edges, clone) {
 #' @export
 buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0), 
                                rm_temp=FALSE, verbose=FALSE, temp_path=NULL, onetree=FALSE,
-                               branch_length=c("mutations","distance")) {
+                               branch_length=c("mutations", "distance")) {
     # Check clone size
     if (nrow(clone@data) < 2) {
         warning("Clone ", clone@clone, " was skipped as it does not contain at least 
@@ -635,7 +637,7 @@ buildPhylipLineage <- function(clone, phylip_exec, dist_mat=getDNAMatrix(gap=0),
     }
     
     # determine branch length type
-	branch_length <- match.arg(branch_length)
+	  branch_length <- match.arg(branch_length)
 
     # Check fields
     seq_len <- unique(stringi::stri_length(clone@data[["sequence"]]))

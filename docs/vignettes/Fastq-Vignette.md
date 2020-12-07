@@ -10,29 +10,29 @@ Load example data:
 ```r
 library(alakazam)
 library(dplyr)
+library(airr)
 
-db <- readChangeoDb(file.path("..", "inst", "example_files", "test_seq.tsv"))
-fastq_file <- file.path("..", "inst", "example_files", "test_seq.fastq")
+db <- read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 ```
 
 ## Load quality scores
 
-
-This method allows to add the quality scores to the repertoire `data.base` as strings.
+This method allows to add the quality scores to the repertoire `data.frame` as strings.
 
 
 ```r
 original_cols <- colnames(db)
-db <- readFastqDb(db, fastq_file, style="both", quality_sequence = TRUE)
+db <- readFastqDb(db, fastq_file, style="both", quality_sequence=TRUE)
 new_cols <- setdiff(colnames(db), original_cols)
 db[,new_cols] %>% head()
 ```
 
 ```
 ## # A tibble: 1 x 4
-##   quality_sequence_n… quality_sequence    quality_alignment_… quality_alignment 
-##   <chr>               <chr>               <chr>               <chr>             
-## 1 90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{… 90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{…
+##   quality_sequence_num                                 quality_sequence                                     quality_alignment_num                                quality_alignment                                   
+##   <chr>                                                <chr>                                                <chr>                                                <chr>                                               
+## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{… 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{…
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
@@ -108,9 +108,9 @@ masked.
 
 
 ```r
-db <- maskPositionsByQuality(db, min_quality = 70,
-                       sequence = "sequence_alignment",
-                       quality = "quality_alignment_num")
+db <- maskPositionsByQuality(db, min_quality=70,
+                             sequence="sequence_alignment",
+                             quality="quality_alignment_num")
 ```
 
 ```

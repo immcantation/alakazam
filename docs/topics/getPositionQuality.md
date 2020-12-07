@@ -3,9 +3,9 @@
 Description
 --------------------
 
-Given a data.frame with sequence quality scores in the form of 
-a strings of comma separated numeric values, `getPositionQuality` 
-will split the values by ',' and return a data.frame with the values
+`getPositionQuality` takes a data.frame with sequence quality scores 
+in the form of a strings of comma separated numeric values, split the quality 
+scores values by `","`,  and returns a data.frame with the values
 for each position.
 
 
@@ -24,16 +24,16 @@ Arguments
 -------------------
 
 data
-:   An AIRR data.frame
+:   `data.frame` containing sequence data.
 
 sequence_id
-:   Name of the column in `data` with sequence identifiers.
+:   column in `data` with sequence identifiers.
 
 sequence
-:   Name of the column in `data` with sequence data.
+:   column in `data` with sequence data.
 
 quality_num
-:   Name of the column in `data` with quality scores (as
+:   column in `data` with quality scores (as
 strings of numeric values, comma separated) for `sequence`.
 
 
