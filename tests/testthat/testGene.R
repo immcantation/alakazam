@@ -83,9 +83,9 @@ test_that("countGenes", {
                  c(0,0,0,0,0.2,0,0,0,0,0,0.6,0),
                  tolerance=0.01)
 
-    # Testing of how NAs are handled
+    # Test how NAs are handled
     db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 
-                             groups = c("S1", "S2", "S4", "S3", "S2", "S3","S4", "S4", "S3", "S4"),
+                             sample = c("S1", "S2", "S4", "S3", "S2", "S3", "S4", "S4", "S3", "S4"),
                              v_call = c("IGHV1-1", NA, "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2", NA), 
                              dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1), 
                              clone = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), 
@@ -106,13 +106,13 @@ test_that("countGenes", {
                  c(10, 7, 7, 6),
                  tolerance=0.001)
     
-    genes <- countGenes(db_some_na, gene="v_call", mode="gene", groups = "groups", fill = TRUE, remove_na = FALSE)
+    genes <- countGenes(db_some_na, gene="v_call", mode="gene", groups = "sample", fill = TRUE, remove_na = FALSE)
     expect_equal(genes$seq_count, 
                  c(1, 0, 0, 0, 0, 1, 0, 1, 0, 2, 1, 0, 2, 0, 1, 1),
                  tolerance=0.001)
     
-    db_all_na <- data.frame(sequence_id = c(1,2,3),
-                            groups = c("S1", "S2", "S2"),
+    db_all_na <- data.frame(sequence_id = c(1, 2, 3),
+                            sample = c("S1", "S2", "S2"),
                             v_call = c(NA, NA, NA), 
                             dupcount = c(1, 1, 1), 
                             clone = c(1, 1, 1), 
@@ -128,7 +128,7 @@ test_that("countGenes", {
                  3,
                  tolerance=0.001)
     
-    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", groups = "groups", copy = "dupcount", fill = TRUE,  remove_na = FALSE), 
+    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", groups = "sample", copy = "dupcount", fill = TRUE,  remove_na = FALSE), 
                    "The column v_call contains no data")
     expect_equal(genes$copy_count, 
                  c(1, 2),

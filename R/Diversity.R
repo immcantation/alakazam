@@ -200,13 +200,16 @@ inferCompleteAbundance <- function(x) {
 #' \code{countClones} determines the number of sequences and total copy number of 
 #' clonal groups.
 #'
-#' @param    data    data.frame with Change-O style columns containing clonal assignments.
+#' @param    data    data.frame with columns containing clonal assignments.
 #' @param    groups  character vector defining \code{data} columns containing grouping 
 #'                   variables. If \code{groups=NULL}, then do not group data.
 #' @param    copy    name of the \code{data} column containing copy numbers for each 
 #'                   sequence. If this value is specified, then total copy abundance
 #'                   is determined by the sum of copy numbers within each clonal group.
 #' @param    clone   name of the \code{data} column containing clone identifiers.
+#' @param    remove_na    removes rows with \code{NA} values in the clone column if \code{TRUE} and issues a warning. 
+#'                        Otherwise, keeps those rows and considers \code{NA} as a clone in the final counts 
+#'                        and relative abundances.
 #' 
 #' @return   A data.frame summarizing clone counts and frequencies with columns:
 #'           \itemize{
@@ -235,10 +238,25 @@ inferCompleteAbundance <- function(x) {
 #' clones <- countClones(ExampleDb, groups=c("sample_id", "c_call"), copy="duplicate_count")
 #' 
 #' @export
-countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id") {
+countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_na=TRUE) {
     # Check input
     check <- checkColumns(data, c(clone, copy, groups))
-    if (check != TRUE) { stop(check) }
+    if (check != TRUE) { 
+        warning(check) # instead of throwing an error and potentially disrupting a workflow
+    }
+
+    # Handle NAs
+    if (remove_na) {
+        bool_na <- is.na(data[, clone])
+        if (any(bool_na)) {
+            if  (!all(bool_na)){
+                msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", clone, 
+                            " column and excluded from tabulation")
+                warning(msg)
+            }
+            data <- data[!bool_na, ]
+        }
+    }
     
     # Tabulate clonal abundance
     if (is.null(copy)) {

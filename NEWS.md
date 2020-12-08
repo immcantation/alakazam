@@ -1,4 +1,4 @@
-Version 1.1.0: December 7, 2020
+Version 1.1.0: December 8, 2020
 -------------------------------------------------------------------------------
   
 General:
@@ -14,6 +14,11 @@ General:
 + Added the BioConductor dependencies Biostrings, GenomicAlignments, 
   and IRanges.
 
+Diversity:
++ Added a parameter to `countClones` (`remove_na`) that will remove all rows with NA 
+  values in the clone column if `TRUE` (default) and issue a warning with how many were removed. 
+  If `FALSE`, those rows will be kept instead.
+
 Gene:
 
 + Added the function `getLocus` to extract the locus information from the
@@ -21,7 +26,7 @@ Gene:
 + Added the function `getChain` to define the chain from the segment or 
   locus call.
 + Added a parameter to `countGenes` (`remove_na`) that will remove all rows with NA 
-  values in the gene column if `TRUE` and issue a warning with how many were removed. 
+  values in the gene column if `TRUE` (default) and issue a warning with how many were removed. 
   If `FALSE`, those rows will be kept instead.
 + Changed the check for empty columns in `countGenes` to give a warning instead of 
   an error so as not to disrupt running workflows.
@@ -34,17 +39,17 @@ Gene:
   constant region gene names correctly and not remove the "D" from 
   "IGHD" when `strip_d=TRUE`.
 
-Sequence:
-
-+ In `padSeqEnds`, the argument `mod3=TRUE` has been added so that sequences are
-  padded to a length that is a multiple of 3.
-+ Fixed a bug in `translateDNA` where NAs weren't being translated properly.
-
 Lineage:
 
 + Added `branch_length` argument to `buildPhylipLineage`, and augmented 
   `graphToPhylo` and `phyloToGraph` to track intermediate sequence in nodes 
   for phylo object.
+
+Sequence:
+
++ In `padSeqEnds`, the argument `mod3=TRUE` has been added so that sequences are
+  padded to a length that is a multiple of 3.
++ Fixed a bug in `translateDNA` where NAs weren't being translated properly.
 
 
 Version 1.0.2: July 17, 2020

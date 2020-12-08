@@ -36,7 +36,7 @@
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
 #'           \itemize{
-#'             \item \code{gene}:         name of the family, gene or allele
+#'             \item \code{gene}:         name of the family, gene or allele.
 #'             \item \code{seq_count}:    total number of sequences for the gene.
 #'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
@@ -46,9 +46,11 @@
 #'             \item \code{copy_freq}:    frequency of the gene as a fraction of the total
 #'                                        copy number within each group. Only present if 
 #'                                        the \code{copy} argument is specified.
-#'             \item \code{clone_count}:  total number of clones for the gene.
+#'             \item \code{clone_count}:  total number of clones for the gene. Only present if 
+#'                                        the \code{clone} argument is specified.
 #'             \item \code{clone_freq}:   frequency of the gene as a fraction of the total
-#'                                        number of clones within each grouping.
+#'                                        number of clones within each grouping. Only present if 
+#'                                        the \code{clone} argument is specified.
 #'           }
 #'           Additional columns defined by the \code{groups} argument will also be present.
 #'

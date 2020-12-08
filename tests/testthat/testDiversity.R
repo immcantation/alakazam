@@ -58,6 +58,60 @@ test_that("countClones", {
 	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
+	
+	# Test how NAs are handled
+	db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+	                         sample = c("S1", "S2", "S4", "S3", "S2", "S3", "S4", "S4", "S3", "S4", "S0", "S0"),
+	                         dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), 
+	                         clone_id = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, NA, NA), 
+	                         stringsAsFactors=F)
+	
+	expect_warning(clones <- countClones(db_some_na), NULL)
+	expect_equal(clones$seq_freq, 
+	             c(0.4, 0.3, 0.2, 0.1),
+	             tolerance=0.001)
+	
+	expect_warning(clones <- countClones(db_some_na, groups = "sample"), NULL)
+	expect_equal(clones$seq_count, 
+	             c(3, 2, 1, 1, 1, 1, 1),
+	             tolerance=0.001)
+	
+	clones <- countClones(db_some_na, remove_na = FALSE)
+	expect_equal(clones$seq_count, 
+	             c(4, 3, 2, 2, 1),
+	             tolerance=0.001)
+	
+	clones <- countClones(db_some_na, groups = "sample", remove_na = FALSE)
+	expect_equal(clones$seq_count, 
+	             c(3, 2, 2, 1, 1, 1, 1, 1),
+	             tolerance=0.001)
+	
+	
+	db_all_na <- data.frame(sequence_id = c(1, 2, 3),
+	                        sample = c("S1", "S2", "S2"),
+	                        dupcount = c(1, 1, 1), 
+	                        clone_id = c(NA, NA, NA), 
+	                        stringsAsFactors=F)
+	
+	expect_warning(clones <- countClones(db_all_na), "The column clone_id contains no data")
+	expect_equal(nrow(clones), 
+	             0,
+	             tolerance=0.001)
+	
+	expect_warning(clones <- countClones(db_all_na, groups = "sample"), "The column clone_id contains no data")
+	expect_equal(nrow(clones), 
+	             0,
+	             tolerance=0.001)
+	
+	expect_warning(clones <- countClones(db_all_na, remove_na = FALSE), "The column clone_id contains no data")
+	expect_equal(clones$seq_count, 
+	             3,
+	             tolerance=0.001)
+	
+	expect_warning(clones <- countClones(db_all_na, groups = "sample", remove_na = FALSE), "The column clone_id contains no data")
+	expect_equal(clones$seq_count, 
+	             c(2, 1),
+	             tolerance=0.001)
 })
 
 
