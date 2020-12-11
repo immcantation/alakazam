@@ -69,7 +69,7 @@ library(alakazam)
 data(ExampleDb)
 ```
 
-For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
+For details about the AIRR format, visit the [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 ## Generate a clonal abundance curve
 

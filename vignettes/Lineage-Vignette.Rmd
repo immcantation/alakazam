@@ -48,7 +48,7 @@ in the AIRR file:
 * `junction_length`
 * `clone_id`
 
-For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
+For details about the AIRR format, visit the [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 ```{r, eval=TRUE, warning=FALSE, message=FALSE}
 # Load required packages
@@ -251,4 +251,3 @@ graph_r <- phyloToGraph(phylo_r, germline="Germline")
 #plot converted form using igraph - it's the same as before
 plot(graph_r,layout=layout_as_tree)
 ```
-
