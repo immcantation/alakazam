@@ -1,9 +1,3 @@
-#ensure older version of sample() used
-R_v <- paste(version$major, version$minor,sep=".")
-if ( numeric_version(R_v) >= numeric_version("3.6.0") ) {
-    RNGkind(sample.kind="Round")   
-}
-
 ExampleTrees <- file.path("..", "data-tests", "ExampleTrees.rda")
 load(ExampleTrees)
 
@@ -33,6 +27,7 @@ test_that("Test getPathLengths",{
 })
 
 test_that("Test getMRCA and testMRCA",{
+    
     mrca <- getMRCA(graph, path="steps", root="Germline")
     expect_equal(mrca$name, "Inferred1")
     
@@ -43,7 +38,10 @@ test_that("Test getMRCA and testMRCA",{
     graphs <- ExampleTrees[1-10]
      
     # Perform MRCA test on isotypes
-    set.seed(8)
+    # ensure older version of sample() used 
+    # sample.kind="Rounding"
+    # Will show warning: non-uniform 'Rounding' sampler used
+    expect_warning(set.seed(8, sample.kind="Rounding"),"non-uniform 'Rounding' sampler used")
     x <- testMRCA(graphs, "isotype", nperm=10)
     x_tests <- slot(x, "tests")
     expect_equal(x_tests$annotation, c("IgA","IgA,IgG","IgG"))
@@ -78,9 +76,9 @@ test_that("Test tableEdges",{
 
 test_that("Test permuteLabels",{
     graph <- ExampleTrees[[23]]
- 
+
     # Permute annotations and plot new tree
-    set.seed(43)
+    expect_warning(set.seed(43, sample.kind="Rounding"),"non-uniform 'Rounding' sampler used")
     g <- permuteLabels(graph, "isotype")
     expect_equal(V(g)$isotype,
                  c("IgG", "IgG", NA, "IgA", "IgA", "IgG", "IgA,IgG")
@@ -90,9 +88,9 @@ test_that("Test permuteLabels",{
 test_that("Test testEdges", {
     # Define example tree set
     graphs <- ExampleTrees[1-10]
-    
+
     # Perform edge test on isotypes
-    set.seed(4)
+    expect_warning(set.seed(4, sample.kind="Rounding"),"non-uniform 'Rounding' sampler used")
     x <- slot(testEdges(graphs, "isotype", nperm=10), "tests")
     expect_equal(x$parent[1:5], c("IgA", "IgA", "IgA", "IgA,IgG", "IgA,IgG"))
     expect_equal(x$child[5:10], c("IgA,IgG", "IgG", "IgG", "IgA", "IgD,IgG", "IgG"))
