@@ -7,9 +7,8 @@ are also provided.
 
 ## Example data
 
-A small example AIRR database, `ExampleDb`, is included in the `alakazam` package.
-
-For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
+A small example AIRR database, `ExampleDb`, is included in the `alakazam` package. For details 
+about the AIRR format, visit the [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 Gene usage analysis requires only the following columns:
 
@@ -51,7 +50,7 @@ head(gene, n=4)
 ## # Groups:   sample_id [2]
 ##   sample_id gene     seq_count seq_freq
 ##   <chr>     <chr>        <int>    <dbl>
-## 1 +7d       IGHV3-49       699    0.699
+## 1 +7d       IGHV3-49       698    0.699
 ## 2 -1h       IGHV3-9         83    0.083
 ## 3 -1h       IGHV5-51        60    0.06 
 ## 4 -1h       IGHV3-30        58    0.058
@@ -121,7 +120,7 @@ groupings will be perform by unique sample and isotype pairs
 (`groups=c("sample_id", "c_call")`). Furthermore, instead of quantifying abundance
 by sequence count, we will quantify it by clone count (each clone will
 be counted only once regardless of how many sequences the clone represents).  
-Clonal citeria are added by passing a value to the `clone` argument of `countGenes`
+Clonal criteria are added by passing a value to the `clone` argument of `countGenes`
 (`clone="clone_id"`). For each clonal group, only the most common allele/gene/family will
 be considered for counting.
 
@@ -169,7 +168,7 @@ plot(g3)
 ![plot of chunk GeneUsage-Vignette-6](figure/GeneUsage-Vignette-6-1.png)
 
 Instead of calculating abundance by sequence or clone count, abundance can be calculated
-using copy numbers for the individual sequences.  This is accomplished by passing
+using copy numbers for the individual sequences. This is accomplished by passing
 a copy number column to the `copy` argument (`copy="duplicate_count"`). Specifying both
 `clone` and `copy` arguments is not meaningful and will result in the `clone` argument
 being ignored.

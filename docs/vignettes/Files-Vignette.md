@@ -17,11 +17,12 @@ file format for all functions in Immcantation is the AIRR-C format as of release
 
 Small example databases for both the Change-O format (`ExampleDbChangeo`) and the AIRR format (`ExampleDb`) 
 are included in the `alakazam` package. For specific details about the latter, visit the 
-[AIRR Community documentation site ](https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields).
+[AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 
 ```r
-# Get file paths inside package directory
+# Set the file paths from inside the package directory
+# These files are smaller versions of the example databases previously mentioned
 changeo_file <- system.file("extdata", "db_changeo.gz", package="alakazam")
 airr_file <- system.file("extdata", "db_airr.gz", package="alakazam")
 

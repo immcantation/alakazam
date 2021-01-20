@@ -28,7 +28,7 @@ data(ExampleDb)
 db <- ExampleDb[ExampleDb$sample_id == "+7d", ]
 ```
 
-For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
+For details about the AIRR format, visit the [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 ## Calculate the properties of amino acid sequences
 
@@ -49,14 +49,14 @@ This example demonstrates how to calculate all of the available amino acid
 properties from DNA sequences found in the `junction` column of the previously loaded AIRR file.
 
 Translation of the DNA sequences to amino acid sequences is accomplished by 
-specifying the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
+default with the `nt=TRUE` argument. To reduce the junction sequence to the CDR3 
 sequence we specify the argument `trim=TRUE` which will strip the first and last
 codon (the conserved residues) prior to analysis. The prefix `cdr3` is added
 to the output column names using the `label="cdr3"` argument.
 
 
 ```r
-db_props <- aminoAcidProperties(db, seq="junction", nt=TRUE, trim=TRUE, 
+db_props <- aminoAcidProperties(db, seq="junction", trim=TRUE, 
                                 label="cdr3")
 
 # The full set of properties are calculated by default
@@ -114,7 +114,7 @@ grand average of hydrophobicity (`gravy`) index and normalized net charge
 
 ```r
 db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"),
-                                nt=TRUE, trim=TRUE, label="cdr3")
+                                trim=TRUE, label="cdr3")
 dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
@@ -144,7 +144,7 @@ p <- setNames(pK[["Murray"]], rownames(pK))
 # Rename the hydrophobicity vector to use single-letter codes
 names(h) <- translateStrings(names(h), ABBREV_AA)
 db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"), 
-                                nt=TRUE, trim=TRUE, label="cdr3", 
+                                trim=TRUE, label="cdr3", 
                                 hydropathy=h, pK=p)
 dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
@@ -241,7 +241,7 @@ charge(cdr3, normalize=FALSE)
 ```r
 # Count of acidic amino acids
 # Takes a named list of regular expressions
-countPatterns(cdr3, c(ACIDIC="[DE]"), label="cdr3")
+countPatterns(cdr3, nt=FALSE, c(ACIDIC="[DE]"), label="cdr3")
 ```
 
 ```

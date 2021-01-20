@@ -20,7 +20,7 @@ in the AIRR file:
 * `junction_length`
 * `clone_id`
 
-For details about the AIRR format, visit the AIRR Community documentation site https://docs.airr-community.org/en/latest/datarep/rearrangements.html#fields
+For details about the AIRR format, visit the [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 
 ```r
@@ -270,4 +270,3 @@ plot(graph_r,layout=layout_as_tree)
 ```
 
 ![plot of chunk Lineage-Vignette-14](figure/Lineage-Vignette-14-1.png)
-

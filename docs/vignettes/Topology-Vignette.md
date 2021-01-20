@@ -47,7 +47,7 @@ graph_list <- ExampleTrees[sapply(ExampleTrees, function(x) !any(grepl(",", V(x)
 ## Plotting annotations on a tree
 
 There are many options for configuring how an igraph object is plotted which
-are helpful for visualing annotation topologies. Below is an extensive example of
+are helpful for visualizing annotation topologies. Below is an extensive example of
 how to plot a tree by configuring the colors, labels, shapes and sizes of
 different visual elements according to annotations embedded in the graph.
 
@@ -369,10 +369,10 @@ print(edge_test)
 
 ```
 ##   parent child count  expected    pvalue
-## 1   IGHA  IGHA    36 34.800000 0.0000000
-## 2   IGHA  IGHG     2  3.000000 0.5555556
-## 3   IGHG  IGHA     1  2.368421 0.6315789
-## 4   IGHG  IGHG    99 98.250000 0.1500000
+## 1   IGHA  IGHA    36 34.900000 0.1000000
+## 2   IGHA  IGHG     2  3.615385 0.6153846
+## 3   IGHG  IGHA     1  2.647059 0.7058824
+## 4   IGHG  IGHG    99 98.500000 0.4000000
 ```
 
 ```r

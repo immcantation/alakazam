@@ -10,14 +10,20 @@ clonal groups.
 Usage
 --------------------
 ```
-countClones(data, groups = NULL, copy = NULL, clone = "clone_id")
+countClones(
+data,
+groups = NULL,
+copy = NULL,
+clone = "clone_id",
+remove_na = TRUE
+)
 ```
 
 Arguments
 -------------------
 
 data
-:   data.frame with Change-O style columns containing clonal assignments.
+:   data.frame with columns containing clonal assignments.
 
 groups
 :   character vector defining `data` columns containing grouping 
@@ -30,6 +36,11 @@ is determined by the sum of copy numbers within each clonal group.
 
 clone
 :   name of the `data` column containing clone identifiers.
+
+remove_na
+:   removes rows with `NA` values in the clone column if `TRUE` and issues a warning. 
+Otherwise, keeps those rows and considers `NA` as a clone in the final counts 
+and relative abundances.
 
 
 
