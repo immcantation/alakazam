@@ -79,7 +79,7 @@ test_that("aminoAcidProperties", {
     junction_aliphatic <- aliphatic(seq_aa)
     junction_charge <- charge(seq_aa)
     
-    junction_properties <- aminoAcidProperties(db[1:5, ], seq="JUNCTION", nt=TRUE,
+    junction_properties <- aminoAcidProperties(db[1:5, ], seq="JUNCTION", 
                                                trim=FALSE, label="junction")
     expect_equal(junction_gravy, junction_properties$junction_aa_gravy, tolerance=0.001)
     expect_equal(junction_bulk, junction_properties$junction_aa_bulk, tolerance=0.001)
@@ -94,7 +94,7 @@ test_that("aminoAcidProperties", {
     names(h) <- translateStrings(names(h), ABBREV_AA)
     
     junction_gravy_h <- gravy(seq_aa, hydropathy =  h)
-    junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", nt=TRUE,
+    junction_properties_h <- aminoAcidProperties(db[1:5,], seq="JUNCTION", 
                                             trim=FALSE, label="junction",
                                             hydropathy = h)
     expect_equal(junction_gravy_h, junction_properties_h$junction_aa_gravy, tolerance = .001)
@@ -137,7 +137,7 @@ test_that("countPatterns", {
              "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
     patterns <- c("A", "V", "[LI]")
     names(patterns) <- c("arg", "val", "iso_leu")
-    obs <- countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
+    obs <- countPatterns(seq, patterns, trim=TRUE, label="cdr3")
     expect_equal(obs$cdr3_arg, c(0.1250000, 0.1111111, 0.1111111), tolerance=0.001)
     expect_equal(obs$cdr3_val, c(0, 0, 0))
     expect_equal(obs$cdr3_iso_leu, c(0, 0.1111111, 0), tolerance=0.001)

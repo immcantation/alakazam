@@ -354,10 +354,10 @@ countOccurrences <- function(x, pattern) {
 #'          "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
 #' patterns <- c("A", "V", "[LI]")
 #' names(patterns) <- c("arg", "val", "iso_leu")
-#' countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
+#' countPatterns(seq, patterns, trim=TRUE, label="cdr3")
 #'             
 #' @export
-countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="region") {
+countPatterns <- function(seq, patterns, nt=TRUE, trim=FALSE, label="region") {
     # Translate sequences if nucleotide
     region_aa <- if (nt) { translateDNA(seq, trim=trim) } else { seq }
     
@@ -474,13 +474,13 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="region") {
 #' # Subset example data
 #' db <- ExampleDb[c(1,10,100), c("sequence_id", "junction")]
 #' 
+#' # Calculate default amino acid properties from DNA sequences
+#' aminoAcidProperties(db, seq="junction")
+#
 #' # Calculate default amino acid properties from amino acid sequences
 #' # Use a custom output column prefix
 #' db$junction_aa <- translateDNA(db$junction)
-#' aminoAcidProperties(db, seq="junction_aa", label="junction")
-#
-#' # Calculate default amino acid properties from DNA sequences
-#' aminoAcidProperties(db, seq="junction", nt=TRUE)
+#' aminoAcidProperties(db, seq="junction_aa", label="junction", nt=FALSE)
 #' 
 #' # Use the Grantham, 1974 side chain volume scores from the seqinr package
 #' # Set pH=7.0 for the charge calculation
@@ -492,14 +492,14 @@ countPatterns <- function(seq, patterns, nt=FALSE, trim=FALSE, label="region") {
 #' # Rename the score vector to use single-letter codes
 #' names(x) <- translateStrings(names(x), ABBREV_AA)
 #' # Calculate properties
-#' aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", nt=TRUE, 
+#' aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", 
 #'                     trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 #'
 #' @export
 aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
                                                  "aliphatic","polarity","charge",
                                                  "basic","acidic", "aromatic"),
-                                seq="junction", nt=FALSE, trim=FALSE, label=NULL, ...) {
+                                seq="junction", nt=TRUE, trim=FALSE, label=NULL, ...) {
     # Check arguments
     property <- match.arg(property, several.ok=TRUE)
     
