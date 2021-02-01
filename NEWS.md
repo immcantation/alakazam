@@ -1,4 +1,4 @@
-Version 1.1.0: December 11, 2020
+Version 1.1.0: February 1, 2021
 -------------------------------------------------------------------------------
   
 General:
@@ -14,6 +14,11 @@ General:
 + Added the BioConductor dependencies Biostrings, GenomicAlignments, 
   and IRanges.
 
+Amino Acid Analysis:
+
++ Fixed a conflict in the default argument settings of `aminoAcidProperties`,
+  which will now default to `nt=TRUE`.
+
 Diversity:
 + Added a parameter to `countClones` (`remove_na`) that will remove all rows with NA 
   values in the clone column if `TRUE` (default) and issue a warning with how many were removed. 
@@ -25,9 +30,6 @@ Gene:
   segment call.
 + Added the function `getChain` to define the chain from the segment or 
   locus call.
-+ Added a parameter to `countGenes` (`remove_na`) that will remove all rows with NA 
-  values in the gene column if `TRUE` (default) and issue a warning with how many were removed. 
-  If `FALSE`, those rows will be kept instead.
 + Changed the check for empty columns in `countGenes` to give a warning instead of 
   an error so as not to disrupt running workflows.
 + Fixed a bug in `getSegment` where filtering of non-localized genes was not 
@@ -44,7 +46,10 @@ Lineage:
 + Added `branch_length` argument to `buildPhylipLineage`, and augmented 
   `graphToPhylo` and `phyloToGraph` to track intermediate sequence in nodes 
   for phylo object.
-
++ Added a parameter to `countGenes` (`remove_na`) that will remove all rows with NA 
+  values in the gene column if `TRUE` (default) and issue a warning with how many were removed. 
+  If `FALSE`, those rows will be kept instead.
+  
 Sequence:
 
 + In `padSeqEnds`, the argument `mod3=TRUE` has been added so that sequences are

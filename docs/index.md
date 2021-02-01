@@ -62,8 +62,8 @@ _Bioinformatics_, 1-3. doi: 10.1093/bioinformatics/btv359 (URL: https://doi.org/
 To cite the Ig-specific lineage reconstruction and diversity methods, please use:
 
 Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D, O'Connor K
-(2014). “B cells populating the multiple sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107. doi: 10.1126/scitranslmed.3008879
-(URL: https://doi.org/10.1126/scitranslmed.3008879).
+(2014). “B cells populating the multiple sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107. doi:
+10.1126/scitranslmed.3008879 (URL: https://doi.org/10.1126/scitranslmed.3008879).
 
 
 

@@ -75,7 +75,7 @@ Value
 A data.frame summarizing family, gene or allele counts and frequencies 
 with columns:
 
-+  `gene`:         name of the family, gene or allele
++  `gene`:         name of the family, gene or allele.
 +  `seq_count`:    total number of sequences for the gene.
 +  `seq_freq`:     frequency of the gene as a fraction of the total
 number of sequences within each grouping.
@@ -85,9 +85,11 @@ argument is specified.
 +  `copy_freq`:    frequency of the gene as a fraction of the total
 copy number within each group. Only present if 
 the `copy` argument is specified.
-+  `clone_count`:  total number of clones for the gene.
++  `clone_count`:  total number of clones for the gene. Only present if 
+the `clone` argument is specified.
 +  `clone_freq`:   frequency of the gene as a fraction of the total
-number of clones within each grouping.
+number of clones within each grouping. Only present if 
+the `clone` argument is specified.
 
 Additional columns defined by the `groups` argument will also be present.
 

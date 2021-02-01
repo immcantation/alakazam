@@ -13,6 +13,8 @@ ExampleDb <- ExampleDb[c("sequence_id",
                          "sequence_alignment",
                          "germline_alignment",
                          "germline_alignment_d_mask",
+                         "rev_comp",
+                         "productive",
                          "v_call",
                          "v_call_genotyped",
                          "d_call",
@@ -24,9 +26,7 @@ ExampleDb <- ExampleDb[c("sequence_id",
                          "np2_length",
                          "duplicate_count",
                          "clone_id",
-                         "sample_id",
-                         "productive",
-                         "rev_comp")]
+                         "sample_id")]
 c_trans <- c(IGHM="IgM", IGHD="IgD", IGHA="IgA", IGHG="IgG")
 ExampleDb <- ExampleDb %>%
     mutate(c_call=translateStrings(c_call, c_trans),

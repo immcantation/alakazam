@@ -58,7 +58,7 @@ calcCoverage(clones$seq_count[clones$sample_id == "+7d"])
 
 
 ```
-[1] 0.74106
+[1] 0.7418019
 
 ```
 

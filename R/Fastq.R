@@ -63,8 +63,8 @@
 #' @seealso \link{maskPositionsByQuality} and \link{getPositionQuality}
 #' 
 #' @examples
-#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+#' db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
 #'
 #' @export
@@ -415,8 +415,8 @@ sequenceAlignmentQuality <- function(data,
 #' @seealso \link{readFastqDb} and \link{getPositionQuality}
 #' 
 #' @examples
-#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+#' db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
 #' maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 #' 
@@ -474,8 +474,8 @@ maskPositionsByQuality <- function(data, min_quality=70,
 #' @seealso \link{readFastqDb} and \link{maskPositionsByQuality}
 #'           
 #' @examples
-#' db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-#' fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+#' db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+#' fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 #' db <- readFastqDb(db, fastq_file, quality_offset=-33)
 #' head(getPositionQuality(db))
 #

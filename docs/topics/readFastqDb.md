@@ -121,9 +121,9 @@ scores for `sequence_alignment`.
 1.  `quality_alignment_num`: A character vector, with comma separated 
 numerical quality values for each 
 position in `sequence_alignment`.
-1.  `quality_sequence`:      A character vector with ASCII Phred 
+1.  `quality`:      A character vector with ASCII Phred 
 scores for `sequence`.
-1.  `quality_sequence_num`:  A character vector, with comma separated 
+1.  `quality_num`:  A character vector, with comma separated 
 numerical quality values for each 
 position in `sequence`.
 
@@ -134,18 +134,17 @@ Examples
 -------------------
 
 ```R
-### Not run:
-db <- readChangeoDb("db.tsv")
-
-```
-
-**Error**: 'db.tsv' does not exist in current working directory ('/Users/vandej27/workspace/alakazam').
-```R
-# fastq_file <- "db.fastq"
-# db <- readFastqDb(db, fastq_file, quality_offset=-33)
+db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
+db <- readFastqDb(db, fastq_file, quality_offset=-33)
 ```
 
 
+
+See also
+-------------------
+
+[maskPositionsByQuality](maskPositionsByQuality.md) and [getPositionQuality](getPositionQuality.md)
 
 
 

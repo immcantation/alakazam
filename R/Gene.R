@@ -94,7 +94,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
         if (any(bool_na)) {
             if  (!all(bool_na)){
                 msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", gene, 
-                            " column and excluded from tabulation")
+                              " column and excluded from tabulation")
                 warning(msg)
             }
             data <- data[!bool_na, ]

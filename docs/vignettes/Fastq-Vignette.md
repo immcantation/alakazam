@@ -12,8 +12,8 @@ library(alakazam)
 library(dplyr)
 library(airr)
 
-db <- read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+db <- read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 ```
 
 ## Load quality scores
@@ -30,15 +30,15 @@ db[,new_cols] %>% head()
 
 ```
 ## # A tibble: 1 x 4
-##   quality_sequence_num                                 quality_sequence                                     quality_alignment_num                                quality_alignment                                   
-##   <chr>                                                <chr>                                                <chr>                                                <chr>                                               
-## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{… 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{…
+##   quality_num                                         quality                                        quality_alignment_num                                  quality_alignment                                     
+##   <chr>                                               <chr>                                          <chr>                                                  <chr>                                                 
+## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{… 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{…
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
 a path to the corresponding `.fastq` file (`fastq_file`). The sequencing quality scores will
-be merged into the `data.frame` by `sequence_id`. The newly added columns are :
-quality_sequence_num, quality_sequence, quality_alignment_num, quality_alignment. The other fields, contain the ASCII quality scores in the 
+be merged into the `data.frame` by `sequence_id`. The newly added columns are:
+quality_num, quality, quality_alignment_num, quality_alignment. The other fields, contain the ASCII quality scores in the 
 form of a vector, where values are comma separated, and `-` or `.` positions 
 have value `" "` (blank).
 

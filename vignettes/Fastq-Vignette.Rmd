@@ -42,8 +42,8 @@ library(alakazam)
 library(dplyr)
 library(airr)
 
-db <- read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+db <- read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 ```
 
 ## Load quality scores
