@@ -1,3 +1,5 @@
+[![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
+
 Alakazam
 -------------------------------------------------------------------------------
 
@@ -56,14 +58,22 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 To cite the alakazam package in publications, please use:
 
-Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G, Kleinstein S (2015). “Change-O: a toolkit for analyzing large-scale B cell immunoglobulin repertoire sequencing data.”
-_Bioinformatics_, 1-3. doi: 10.1093/bioinformatics/btv359 (URL: https://doi.org/10.1093/bioinformatics/btv359).
+Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G, Kleinstein
+S (2015). “Change-O: a toolkit for analyzing large-scale B cell
+immunoglobulin repertoire sequencing data.” _Bioinformatics_, 1-3. doi:
+10.1093/bioinformatics/btv359 (URL:
+https://doi.org/10.1093/bioinformatics/btv359).
 
-To cite the Ig-specific lineage reconstruction and diversity methods, please use:
+To cite the Ig-specific lineage reconstruction and diversity methods,
+please use:
 
-Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan S, Siddiqui B, Vigneault F, Kleinstein S, Hafler D, O'Connor K
-(2014). “B cells populating the multiple sclerosis brain mature in the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107. doi:
-10.1126/scitranslmed.3008879 (URL: https://doi.org/10.1126/scitranslmed.3008879).
+Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R,
+Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan S, Siddiqui B,
+Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells
+populating the multiple sclerosis brain mature in the draining cervical
+lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107.
+doi: 10.1126/scitranslmed.3008879 (URL:
+https://doi.org/10.1126/scitranslmed.3008879).
 
 
 

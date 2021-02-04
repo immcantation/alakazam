@@ -64,10 +64,14 @@ dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
 ```
-##   cdr3_aa_length cdr3_aa_gravy cdr3_aa_bulk cdr3_aa_aliphatic cdr3_aa_polarity cdr3_aa_charge cdr3_aa_basic cdr3_aa_acidic cdr3_aa_aromatic
-## 1             29     0.1724138     14.12345         0.8034483         8.168966     0.03902939     0.1034483     0.06896552       0.06896552
-## 2             29    -0.3482759     14.69034         0.6724138         8.255172     2.21407038     0.2068966     0.06896552       0.27586207
-## 3             26    -0.9884615     13.96154         0.5653846         8.873077     1.11045407     0.2307692     0.15384615       0.19230769
+##   cdr3_aa_length cdr3_aa_gravy cdr3_aa_bulk cdr3_aa_aliphatic cdr3_aa_polarity
+## 1             93     0.5634409     10.54172         0.1075269         7.812903
+## 2             93     0.6043011     10.71871         0.1827957         7.895699
+## 3             84     0.5571429      9.87631         0.2619048         8.132143
+##   cdr3_aa_charge cdr3_aa_basic cdr3_aa_acidic cdr3_aa_aromatic
+## 1     -1.9132765             0              0                0
+## 2     -1.6189262             0              0                0
+## 3     -0.9566382             0              0                0
 ```
 
 ```r
@@ -120,9 +124,9 @@ dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 
 ```
 ##   cdr3_aa_gravy cdr3_aa_charge
-## 1     0.1724138     0.03902939
-## 2    -0.3482759     2.21407038
-## 3    -0.9884615     1.11045407
+## 1     0.5634409     -1.9132765
+## 2     0.6043011     -1.6189262
+## 3     0.5571429     -0.9566382
 ```
 
 ### Using user defined scales
@@ -151,9 +155,9 @@ dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 
 ```
 ##   cdr3_aa_gravy cdr3_aa_charge
-## 1   -0.06551724     -0.0661116
-## 2    0.10482759      2.0664863
-## 3    0.13807692      1.0370349
+## 1    -0.1997849      -2.733567
+## 2    -0.1697849      -2.313019
+## 3    -0.1478571      -1.366784
 ```
 
 ### Getting vectors of individual properties

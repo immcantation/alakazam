@@ -53,21 +53,28 @@ Examples
 -------------------
 
 ```R
-db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
-fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
+db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
 maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 ```
 
 *Number of masked sequences: 1*
 ```
-# A tibble: 1 x 37
-  sequence_id sequence rev_comp productive v_call d_call j_call sequence_alignm… germline_alignm… junction junction_aa v_cigar d_cigar j_cigar stop_codon vj_in_frame locus junction_length np1_length np2_length
-  <chr>       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr>  <chr>            <chr>            <chr>    <chr>       <chr>   <chr>   <chr>   <lgl>      <lgl>       <chr>           <int>      <int>      <int>
-1 CGCTTTTCGG… GGCTTTC… FALSE    TRUE       IGHV4… IGHD3… IGHJ4… CAGCTGCACCTGCAG… CAGCTGCAGCTGCAG… TGTGCGA… CARGTDLVTG… 93S8=1… 403S9N… 425S4N… FALSE      TRUE        IGH                54         10          5
-# … with 17 more variables: v_sequence_start <int>, v_sequence_end <int>, v_germline_start <int>, v_germline_end <int>, d_sequence_start <int>, d_sequence_end <int>, d_germline_start <int>,
-#   d_germline_end <int>, j_sequence_start <int>, j_sequence_end <int>, j_germline_start <int>, j_germline_end <int>, consensus_count <int>, duplicate_count <int>, c_call <chr>, quality_alignment_num <chr>,
-#   sequence_alignment_masked <chr>
+[90m# A tibble: 1 x 37[39m
+  sequence_id sequence rev_comp productive v_call d_call j_call sequence_alignm…
+  [3m[90m<chr>[39m[23m       [3m[90m<chr>[39m[23m    [3m[90m<lgl>[39m[23m    [3m[90m<lgl>[39m[23m      [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m           
+[90m1[39m CGCTTTTCGG… GGCTTTC… FALSE    TRUE       IGHV4… IGHD3… IGHJ4… CAGCTGCACCTGCAG…
+[90m# … with 29 more variables: germline_alignment [3m[90m<chr>[90m[23m, junction [3m[90m<chr>[90m[23m,[39m
+[90m#   junction_aa [3m[90m<chr>[90m[23m, v_cigar [3m[90m<chr>[90m[23m, d_cigar [3m[90m<chr>[90m[23m, j_cigar [3m[90m<chr>[90m[23m,[39m
+[90m#   stop_codon [3m[90m<lgl>[90m[23m, vj_in_frame [3m[90m<lgl>[90m[23m, locus [3m[90m<chr>[90m[23m, junction_length [3m[90m<int>[90m[23m,[39m
+[90m#   np1_length [3m[90m<int>[90m[23m, np2_length [3m[90m<int>[90m[23m, v_sequence_start [3m[90m<int>[90m[23m,[39m
+[90m#   v_sequence_end [3m[90m<int>[90m[23m, v_germline_start [3m[90m<int>[90m[23m, v_germline_end [3m[90m<int>[90m[23m,[39m
+[90m#   d_sequence_start [3m[90m<int>[90m[23m, d_sequence_end [3m[90m<int>[90m[23m, d_germline_start [3m[90m<int>[90m[23m,[39m
+[90m#   d_germline_end [3m[90m<int>[90m[23m, j_sequence_start [3m[90m<int>[90m[23m, j_sequence_end [3m[90m<int>[90m[23m,[39m
+[90m#   j_germline_start [3m[90m<int>[90m[23m, j_germline_end [3m[90m<int>[90m[23m, consensus_count [3m[90m<int>[90m[23m,[39m
+[90m#   duplicate_count [3m[90m<int>[90m[23m, prcons [3m[90m<chr>[90m[23m, quality_alignment_num [3m[90m<chr>[90m[23m,[39m
+[90m#   sequence_alignment_masked [3m[90m<chr>[90m[23m[39m
 
 ```
 

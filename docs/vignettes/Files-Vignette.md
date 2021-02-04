@@ -29,7 +29,18 @@ airr_file <- system.file("extdata", "example_airr.tsv.gz", package="alakazam")
 
 # Read in the data
 db_changeo <- alakazam::readChangeoDb(changeo_file)
+```
+
+```
+## Error: '' does not exist in current working directory ('/home/susanna/Documents/Work/Yale/projects/software_projects/alakazam/vignettes').
+```
+
+```r
 db_airr <- airr::read_rearrangement(airr_file)
+```
+
+```
+## Error: '' does not exist in current working directory ('/home/susanna/Documents/Work/Yale/projects/software_projects/alakazam/vignettes').
 ```
 
 ## Writing data

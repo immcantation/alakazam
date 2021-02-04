@@ -16,7 +16,7 @@ data,
 property = c("length", "gravy", "bulk", "aliphatic", "polarity", "charge", "basic",
 "acidic", "aromatic"),
 seq = "junction",
-nt = TRUE,
+nt = FALSE,
 trim = FALSE,
 label = NULL,
 ...
@@ -136,17 +136,31 @@ Examples
 # Subset example data
 db <- ExampleDb[c(1,10,100), c("sequence_id", "junction")]
 
-# Calculate default amino acid properties from DNA sequences
-aminoAcidProperties(db, seq="junction")
+# Calculate default amino acid properties from amino acid sequences
+# Use a custom output column prefix
+db$junction_aa <- translateDNA(db$junction)
+aminoAcidProperties(db, seq="junction_aa", label="junction")
 
 ```
 
 
 ```
-     sequence_id                                                                                      junction junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG                 31        -1.2612903         14.72194             0.2838710             8.687097
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG                 27        -0.7037037         14.50222             0.2888889             7.874074
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG                 19        -0.3684211         13.18053             0.3105263             8.284211
+     sequence_id
+1 GN5SHBT02D2WUN
+2 GN5SHBT08JP7HP
+3 GN5SHBT05HH5SE
+                                                                                       junction
+1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
+2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
+3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
+                      junction_aa junction_aa_length junction_aa_gravy
+1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903
+2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037
+3             CASACSSGGCYEENWLDPW                 19        -0.3684211
+  junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
+1         14.72194             0.2838710             8.687097
+2         14.50222             0.2888889             7.874074
+3         13.18053             0.3105263             8.284211
   junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
 1           4.038916        0.25806452         0.09677419            0.2258065
 2          -1.233769        0.07407407         0.11111111            0.2962963
@@ -156,23 +170,33 @@ aminoAcidProperties(db, seq="junction")
 
 
 ```R
-# Calculate default amino acid properties from amino acid sequences
-# Use a custom output column prefix
-db$junction_aa <- translateDNA(db$junction)
-aminoAcidProperties(db, seq="junction_aa", label="junction", nt=FALSE)
+# Calculate default amino acid properties from DNA sequences
+aminoAcidProperties(db, seq="junction", nt=TRUE)
 
 ```
 
 
 ```
-     sequence_id                                                                                      junction                     junction_aa junction_aa_length junction_aa_gravy junction_aa_bulk
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903         14.72194
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037         14.50222
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG             CASACSSGGCYEENWLDPW                 19        -0.3684211         13.18053
-  junction_aa_aliphatic junction_aa_polarity junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1             0.2838710             8.687097           4.038916        0.25806452         0.09677419            0.2258065
-2             0.2888889             7.874074          -1.233769        0.07407407         0.11111111            0.2962963
-3             0.3105263             8.284211          -3.221436        0.00000000         0.15789474            0.1578947
+     sequence_id
+1 GN5SHBT02D2WUN
+2 GN5SHBT08JP7HP
+3 GN5SHBT05HH5SE
+                                                                                       junction
+1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
+2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
+3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
+                      junction_aa junction_aa_length junction_aa_gravy
+1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903
+2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037
+3             CASACSSGGCYEENWLDPW                 19        -0.3684211
+  junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
+1         14.72194             0.2838710             8.687097
+2         14.50222             0.2888889             7.874074
+3         13.18053             0.3105263             8.284211
+  junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
+1           4.038916        0.25806452         0.09677419            0.2258065
+2          -1.233769        0.07407407         0.11111111            0.2962963
+3          -3.221436        0.00000000         0.15789474            0.1578947
 
 ```
 
@@ -189,16 +213,24 @@ x <- aaindex[["GRAR740103"]]$I
 # Rename the score vector to use single-letter codes
 names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate properties
-aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", 
+aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", nt=TRUE, 
 trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 ```
 
 
 ```
-     sequence_id                                                                                      junction                     junction_aa cdr3_aa_bulk cdr3_aa_charge
-1 GN5SHBT02D2WUN TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG CARVKRRGWRRNSLWFGESTPSDAHRWFDPW     85.00000       4.242920
-2 GN5SHBT08JP7HP             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG     CARDRYYCGGDCYSPLPQYYYYGMDVW     79.76000      -1.064488
-3 GN5SHBT05HH5SE                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG             CASACSSGGCYEENWLDPW     58.79412      -3.058792
+     sequence_id
+1 GN5SHBT02D2WUN
+2 GN5SHBT08JP7HP
+3 GN5SHBT05HH5SE
+                                                                                       junction
+1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
+2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
+3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
+                      junction_aa cdr3_aa_bulk cdr3_aa_charge
+1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW     85.00000       4.242920
+2     CARDRYYCGGDCYSPLPQYYYYGMDVW     79.76000      -1.064488
+3             CASACSSGGCYEENWLDPW     58.79412      -3.058792
 
 ```
 
