@@ -156,6 +156,11 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     }
     names(tmp_df)[tmp_names == seq] <- "sequence"
     names(tmp_df)[tmp_names == id] <- "sequence_id"
+ 
+    if (length(unique(data[[junc_len]]))>1) {
+      message("Junctions of multiple lengths found. `ChangeoClone` will use the length of the first one in slot `junc_len`.")
+    }
+
     clone <- new("ChangeoClone", 
                  data=as.data.frame(tmp_df),
                  clone=as.character(data[[clone]][1]),
