@@ -2,7 +2,7 @@ ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
 
 #ExampleDb_airr <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
-#db_airr <- read_airr(ExampleDb_airr)
+#db_airr <- airr::read_rearrangement(ExampleDb_airr)
 
 # Load test database
 e1 <- new.env()
