@@ -223,9 +223,9 @@ runPhylip <- function(path, phylip_exec, verbose=FALSE, onetree=FALSE) {
     } 
     
     # Set dnapars or dnaml options
-    if ( grepl("dnaml$",phylip_exec) | grepl("dnaml\\.exe$",exec)){
+    if ( grepl("dnaml$",phylip_exec) | grepl("dnaml\\.exe$",phylip_exec)){
         phy_options <- c("I", "5")
-    }else if (grepl("dnapars$",phylip_exec) | grepl("dnapars\\.exe$",exec)) {
+    }else if (grepl("dnapars$",phylip_exec) | grepl("dnapars\\.exe$",phylip_exec)) {
         phy_options <- c("S", "Y", "I", "4", "5", ".")
     }else{
         stop("Executable not recognized! Must end with dnapars or dnaml")
