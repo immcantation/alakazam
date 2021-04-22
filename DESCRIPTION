@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 1.1.0.999
-Date: 2021-02-10
+Date: 2021-04-20
 Authors@R: c(person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -75,6 +75,7 @@ Suggests:
 RoxygenNote: 7.1.1
 Collate: 
     'Alakazam.R'
+    'Alignment.R'
     'AminoAcids.R'
     'Classes.R'
     'Core.R'
