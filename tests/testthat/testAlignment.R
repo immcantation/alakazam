@@ -189,7 +189,7 @@ test_that("calcJunctionAlignment: counts deleted and in cdr3 germline nucleotide
                           d_germline_start="D_GERM_START", d_germline_end="D_GERM_END",
                           j_germline_start="J_GERM_START", j_germline_end="J_GERM_END",
                           np1_length="NP1_LENGTH",np2_length="NP2_LENGTH",
-                          junction="JUNCTION")
+                          junction="JUNCTION", junction_length="JUNCTION_LENGTH")
     
     expect_equal(db_changeo[['v_germline_deleted_3']][2],3)
     expect_equal(db_changeo[['d_germline_deleted_5']][2],6)
