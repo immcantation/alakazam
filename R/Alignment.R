@@ -1,8 +1,8 @@
 # Alignment properties
 
-#' @param    db          Rearrangement database
+#' @param    data          Rearrangement database
 #' @param    germline_db Reference germline database, for the V,D and J alleles
-#'                       in \code{db}
+#'                       in \code{data}
 #' @param    v_call      Name of the column containing V-segment allele assignments.
 #' @param    d_call      Name of the column containing D-segment allele assignments.
 #' @param    j_call      Name of the column containing J-segment allele assignments.
@@ -17,7 +17,7 @@
 #'                      in \code{germline_db}.
 #' @param    junction  Name of the column containing the junction sequence.
 #' @param    sequence_alignment  Name of the column containing the aligned sequence.
-#' @return   Six new columns are added to \code{db}:
+#' @return   Six new columns are added to \code{data}:
 #' \enumerate{
 #'   \item v_germline_deleted_3 Number of 3' V germline nucleotides deleted
 #'   \item d_germline_deleted_5 Number of 5' D germline nucleotides deleted
@@ -27,7 +27,7 @@
 #'   \item j_cdr3_length Number of sequence_alignment J nucleotides in the CDR3
 #' }
 #' @export
-calcJunctionAlignment <- function(db, germline_db, 
+calcJunctionAlignment <- function(data, germline_db, 
                                   v_call="v_call",
                                   d_call="d_call",
                                   j_call="j_call",
@@ -43,7 +43,17 @@ calcJunctionAlignment <- function(db, germline_db,
                                   junction_length="junction_length",
                                   sequence_alignment="sequence_alignment") {
     
-    # db_row: one row from db
+    check <- checkColumns(data, 
+                          c(v_call, d_call, j_call, 
+                          v_germline_start, v_germline_end,
+                          d_germline_start, d_germline_end,
+                          j_germline_start, j_germline_end,
+                          np1_length, np2_length,
+                          junction, junction_length,
+                          sequence_alignment))
+    if (check != TRUE) { stop(check) }
+    
+    # db_row: one row from data
     # allele_call: one of v,d,j
     # germline_db: the reference germline database used to assign genes. 
     .countDeleted <- function(db_row, allele_call, germline_start,germline_end, 
@@ -114,17 +124,17 @@ calcJunctionAlignment <- function(db, germline_db,
         deleted
     }
     
-    for (i in 1:nrow(db))  {
-        v_dels <- .countDeleted(db[i,], v_call, v_germline_start, v_germline_end, germline_db, junction, junction_length, sequence_alignment, v_germline_start, v_germline_end)
-        d_dels <- .countDeleted(db[i,], d_call, d_germline_start, d_germline_end, germline_db, junction, junction_length, sequence_alignment, v_germline_start, v_germline_end)
-        j_dels <- .countDeleted(db[i,], j_call, j_germline_start, j_germline_end, germline_db, junction,  junction_length, sequence_alignment, v_germline_start, v_germline_end)
-        db[['v_germline_deleted_3']][i] <- v_dels[2]
-        db[['d_germline_deleted_5']][i] <- d_dels[1]
-        db[['d_germline_deleted_3']][i] <- d_dels[2]
-        db[['j_germline_deleted_5']][i] <- j_dels[1]
-        db[['v_cdr3_length']][i] <- v_dels[3]
-        db[['j_cdr3_length']][i] <- j_dels[3]
+    for (i in 1:nrow(data))  {
+        v_dels <- .countDeleted(data[i,], v_call, v_germline_start, v_germline_end, germline_db, junction, junction_length, sequence_alignment, v_germline_start, v_germline_end)
+        d_dels <- .countDeleted(data[i,], d_call, d_germline_start, d_germline_end, germline_db, junction, junction_length, sequence_alignment, v_germline_start, v_germline_end)
+        j_dels <- .countDeleted(data[i,], j_call, j_germline_start, j_germline_end, germline_db, junction,  junction_length, sequence_alignment, v_germline_start, v_germline_end)
+        data[['v_germline_deleted_3']][i] <- v_dels[2]
+        data[['d_germline_deleted_5']][i] <- d_dels[1]
+        data[['d_germline_deleted_3']][i] <- d_dels[2]
+        data[['j_germline_deleted_5']][i] <- j_dels[1]
+        data[['v_cdr3_length']][i] <- v_dels[3]
+        data[['j_cdr3_length']][i] <- j_dels[3]
         
     }
-    db
+    data
 }

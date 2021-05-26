@@ -180,7 +180,7 @@ test_that("calcJunctionAlignment: counts deleted and in cdr3 germline nucleotide
     expect_true(is.na(aln_db[['d_germline_deleted_3']][13]))
     expect_equal(aln_db[['j_germline_deleted_5']][13],0)
     expect_true(is.na(aln_db[['v_cdr3_length']][13]))
-    expect_true(is.na(aln_db[['j_cdr3_length']][13])) ## TODO: alignment looks off
+    expect_true(is.na(aln_db[['j_cdr3_length']][13])) ## NOTE: alignment is off, due to changeo issue 178
 
     db_changeo <- calcJunctionAlignment(db_changeo, 
                           germline_db,sequence_alignment="SEQUENCE_IMGT", 
