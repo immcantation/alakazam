@@ -62,14 +62,14 @@ tableEdges(graph, "c_call")
 
 
 ```
-[90m# A tibble: 4 x 3[39m
-[90m# Groups:   parent [3][39m
+[38;5;246m# A tibble: 4 x 3[39m
+[38;5;246m# Groups:   parent [3][39m
   parent    child     count
-  [3m[90m<chr>[39m[23m     [3m[90m<chr>[39m[23m     [3m[90m<int>[39m[23m
-[90m1[39m IGHA      IGHA,IGHG     1
-[90m2[39m IGHA,IGHG IGHA          1
-[90m3[39m IGHA,IGHG IGHG          3
-[90m4[39m [31mNA[39m        IGHA          1
+  [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m
+[38;5;250m1[39m IGHA      IGHA,IGHG     1
+[38;5;250m2[39m IGHA,IGHG IGHA          1
+[38;5;250m3[39m IGHA,IGHG IGHG          3
+[38;5;250m4[39m [31mNA[39m        IGHA          1
 
 ```
 
@@ -83,13 +83,13 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 
 ```
-[90m# A tibble: 3 x 3[39m
-[90m# Groups:   parent [2][39m
+[38;5;246m# A tibble: 3 x 3[39m
+[38;5;246m# Groups:   parent [2][39m
   parent    child     count
-  [3m[90m<chr>[39m[23m     [3m[90m<chr>[39m[23m     [3m[90m<int>[39m[23m
-[90m1[39m IGHA      IGHA,IGHG     1
-[90m2[39m IGHA,IGHG IGHA          1
-[90m3[39m IGHA,IGHG IGHG          3
+  [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m
+[38;5;250m1[39m IGHA      IGHA,IGHG     1
+[38;5;250m2[39m IGHA,IGHG IGHA          1
+[38;5;250m3[39m IGHA,IGHG IGHG          3
 
 ```
 
@@ -102,13 +102,13 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 
 
 ```
-[90m# A tibble: 3 x 3[39m
-[90m# Groups:   parent [2][39m
+[38;5;246m# A tibble: 3 x 3[39m
+[38;5;246m# Groups:   parent [2][39m
   parent    child     count
-  [3m[90m<chr>[39m[23m     [3m[90m<chr>[39m[23m     [3m[90m<int>[39m[23m
-[90m1[39m IGHA      IGHA,IGHG     1
-[90m2[39m IGHA,IGHG IGHA          1
-[90m3[39m IGHA,IGHG IGHG          3
+  [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m
+[38;5;250m1[39m IGHA      IGHA,IGHG     1
+[38;5;250m2[39m IGHA,IGHG IGHA          1
+[38;5;250m3[39m IGHA,IGHG IGHG          3
 
 ```
 

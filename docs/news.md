@@ -1,3 +1,12 @@
+Version 1.1.0.999: April 22, 2021
+-------------------------------------------------------------------------------
+
+General:
+
++ Added `calcJunctionAlignment`, which counts the number of nucleotides in the 
+  reference germline not present in the alignment, and the number of V and J 
+  nucleotides in the CDR3.
+
 Version 1.1.0: February 6, 2021
 -------------------------------------------------------------------------------
   

@@ -61,3 +61,7 @@ ExampleTrees <- airr_trees[order(match(airrClones,changeoClones))]
 
 # Save
 usethis::use_data(ExampleTrees, overwrite=TRUE)
+
+# Load one sequence db, with all airr fields
+oneseq_db <- read_rearrangement("data-raw/GN5SHBT02D2WUN_igblast_db-pass.tsv")
+usethis::use_data(oneseq_db, overwrite=TRUE)

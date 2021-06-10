@@ -26,6 +26,16 @@
 #'   \item v_cdr3_length Number of sequence_alignment V nucleotides in the CDR3
 #'   \item j_cdr3_length Number of sequence_alignment J nucleotides in the CDR3
 #' }
+#' 
+#' @examples
+#' data(oneseq_db)
+#' germline_db <- list(
+#' "IGHV3-11*05"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCTTGGTCAAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTC............AGTGACTACTACATGAGCTGGATCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATACATTAGTAGTAGT......AGTAGTTACACAAACTACGCAGACTCTGTGAAG...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCCGTGTATTACTGTGCGAGAGA",
+#' "IGHD3-10*01"="GTATTACTATGGTTCGGGGAGTTATTATAAC",
+#' "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
+#' )
+#' oneseq_db <- calcJunctionAlignment(oneseq_db, germline_db)
+#' oneseq_db %>% select(contains("deleted"))
 #' @export
 calcJunctionAlignment <- function(data, germline_db, 
                                   v_call="v_call",

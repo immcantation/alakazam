@@ -16,7 +16,7 @@ data,
 property = c("length", "gravy", "bulk", "aliphatic", "polarity", "charge", "basic",
 "acidic", "aromatic"),
 seq = "junction",
-nt = FALSE,
+nt = TRUE,
 trim = FALSE,
 label = NULL,
 ...
@@ -136,10 +136,8 @@ Examples
 # Subset example data
 db <- ExampleDb[c(1,10,100), c("sequence_id", "junction")]
 
-# Calculate default amino acid properties from amino acid sequences
-# Use a custom output column prefix
-db$junction_aa <- translateDNA(db$junction)
-aminoAcidProperties(db, seq="junction_aa", label="junction")
+# Calculate default amino acid properties from DNA sequences
+aminoAcidProperties(db, seq="junction")
 
 ```
 
@@ -153,25 +151,27 @@ aminoAcidProperties(db, seq="junction_aa", label="junction")
 1 TGTGCGAGAGTCAAGCGAAGAGGTTGGCGAAGGAACTCACTATGGTTCGGGGAGTCCACACCTAGCGATGCCCACCGATGGTTCGACCCCTGG
 2             TGTGCGAGAGATCGGTATTATTGTGGTGGTGACTGCTATTCCCCCCTACCCCAGTACTACTACTACGGTATGGACGTCTGG
 3                                     TGTGCGAGTGCCTGTAGCAGTGGTGGCTGCTACGAGGAGAACTGGCTCGACCCCTGG
-                      junction_aa junction_aa_length junction_aa_gravy
-1 CARVKRRGWRRNSLWFGESTPSDAHRWFDPW                 31        -1.2612903
-2     CARDRYYCGGDCYSPLPQYYYYGMDVW                 27        -0.7037037
-3             CASACSSGGCYEENWLDPW                 19        -0.3684211
-  junction_aa_bulk junction_aa_aliphatic junction_aa_polarity
-1         14.72194             0.2838710             8.687097
-2         14.50222             0.2888889             7.874074
-3         13.18053             0.3105263             8.284211
-  junction_aa_charge junction_aa_basic junction_aa_acidic junction_aa_aromatic
-1           4.038916        0.25806452         0.09677419            0.2258065
-2          -1.233769        0.07407407         0.11111111            0.2962963
-3          -3.221436        0.00000000         0.15789474            0.1578947
+  junction_aa_length junction_aa_gravy junction_aa_bulk junction_aa_aliphatic
+1                 31        -1.2612903         14.72194             0.2838710
+2                 27        -0.7037037         14.50222             0.2888889
+3                 19        -0.3684211         13.18053             0.3105263
+  junction_aa_polarity junction_aa_charge junction_aa_basic junction_aa_acidic
+1             8.687097           4.038916        0.25806452         0.09677419
+2             7.874074          -1.233769        0.07407407         0.11111111
+3             8.284211          -3.221436        0.00000000         0.15789474
+  junction_aa_aromatic
+1            0.2258065
+2            0.2962963
+3            0.1578947
 
 ```
 
 
 ```R
-# Calculate default amino acid properties from DNA sequences
-aminoAcidProperties(db, seq="junction", nt=TRUE)
+# Calculate default amino acid properties from amino acid sequences
+# Use a custom output column prefix
+db$junction_aa <- translateDNA(db$junction)
+aminoAcidProperties(db, seq="junction_aa", label="junction", nt=FALSE)
 
 ```
 
@@ -213,7 +213,7 @@ x <- aaindex[["GRAR740103"]]$I
 # Rename the score vector to use single-letter codes
 names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate properties
-aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", nt=TRUE, 
+aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", 
 trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 ```
 
