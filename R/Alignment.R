@@ -1,5 +1,8 @@
-# Alignment properties
-
+#' Alignment properties
+#'
+#' Report the number of deleted germline nucleotides in the alignment and the
+#' number of V gene and J gene nucleotides in the CDR3.
+#'
 #' @param    data          Rearrangement database
 #' @param    germline_db Reference germline database, for the V,D and J alleles
 #'                       in \code{data}
@@ -9,14 +12,28 @@
 #' @param    v_germline_start  Name of the column containing the number of the starting
 #'                      position of the alignment in the V reference germline 
 #'                      in \code{germline_db}.
+#' @param    v_germline_end  Name of the column containing the number of the ending
+#'                      position of the alignment in the V reference germline 
+#'                      in \code{germline_db}.
 #' @param    d_germline_start  Name of the column containing the number of the starting
 #'                      position of the alignment in the D reference germline 
 #'                      in \code{germline_db}.
-#' @param    d_germline_start  Name of the column containing the number of the starting
+#' @param    d_germline_end  Name of the column containing the number of the ending
+#'                      position of the alignment in the D reference germline 
+#'                      in \code{germline_db}.
+#' @param    j_germline_start  Name of the column containing the number of the starting
 #'                      position of the alignment in the J reference germline 
 #'                      in \code{germline_db}.
-#' @param    junction  Name of the column containing the junction sequence.
+#' @param    j_germline_end  Name of the column containing the number of the ending
+#'                      position of the alignment in the J reference germline 
+#'                      in \code{germline_db}.
+#' @param    np1_length Combined length of the N and P regions proximal to the V region.      
+#' @param    np2_length Combined length of the N and P regions proximal to the J region.             
+#' @param    junction   Name of the column containing the junction sequence.
+#' @param    junction_length Name of the column containing the length of the 
+#'                      junction region in nucleotides.
 #' @param    sequence_alignment  Name of the column containing the aligned sequence.
+#' 
 #' @return   Six new columns are added to \code{data}:
 #' \enumerate{
 #'   \item v_germline_deleted_3 Number of 3' V germline nucleotides deleted
@@ -30,12 +47,16 @@
 #' @examples
 #' data(oneseq_db)
 #' germline_db <- list(
-#' "IGHV3-11*05"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCTTGGTCAAGCCTGGAGGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTC............AGTGACTACTACATGAGCTGGATCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTTTCATACATTAGTAGTAGT......AGTAGTTACACAAACTACGCAGACTCTGTGAAG...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCCGTGTATTACTGTGCGAGAGA",
+#' "IGHV3-11*05"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCTTGGTCAAGCCTGGAGGGTCCCTGAGACT
+#' CTCCTGTGCAGCCTCTGGATTCACCTTC............AGTGACTACTACATGAGCTGGATCCGCCAGGCTCCAG
+#' GGAAGGGGCTGGAGTGGGTTTCATACATTAGTAGTAGT......AGTAGTTACACAAACTACGCAGACTCTGTGAAG
+#' ...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGA
+#' CACGGCCGTGTATTACTGTGCGAGAGA",
 #' "IGHD3-10*01"="GTATTACTATGGTTCGGGGAGTTATTATAAC",
 #' "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
 #' )
 #' oneseq_db <- calcJunctionAlignment(oneseq_db, germline_db)
-#' oneseq_db %>% select(contains("deleted"))
+#'
 #' @export
 calcJunctionAlignment <- function(data, germline_db, 
                                   v_call="v_call",
@@ -116,7 +137,7 @@ calcJunctionAlignment <- function(data, germline_db,
             if (grepl("[Vv]", allele)) {
                 last_cdr3_pre_np <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
                 first_cdr3_pre_np <- junction_start + 3   # without conserved 
-                len <- last_cdr3_pre_np - first_cdr3_pre_np + 1
+                # len <- last_cdr3_pre_np - first_cdr3_pre_np + 1
                 #germ_seq <- stringi::stri_sub(germline, db_row[[germline_end]]+1-len, db_row[[germline_end]] )
                 germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], first_cdr3_pre_np, last_cdr3_pre_np )
                 germ_cdr3_length <- nchar(gsub("[\\.-]","",germ_seq))
