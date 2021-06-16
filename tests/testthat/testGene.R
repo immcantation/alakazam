@@ -244,6 +244,15 @@ test_that("getSegment", {
     asis <- countGenes(data.frame("c_call"="IGHD", stringsAsFactors = F),gene="c_call", mode="asis")
     expect_equal(gene[['gene']], "IGHD")
     expect_equal(asis[['gene']], "IGHD")
+    
+    # Test for IMGT temporary designation nomenclature
+    tmp_call <- c("IGHV9S3*01", "IGKV10S12*01")
+    expect_equal(getAllele(tmp_call),
+                 c("IGHV9S3*01", "IGKV10S12*01"))
+    expect_equal(getGene(tmp_call),
+                 c("IGHV9S3", "IGKV10S12"))
+    expect_equal(getFamily(tmp_call),
+                 c("IGHV9", "IGKV10"))
 })
 
 ### sortGenes ####

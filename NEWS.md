@@ -1,4 +1,4 @@
-Version 1.1.0.999: April 22, 2021
+Version 1.1.0.999: June 16, 2021
 -------------------------------------------------------------------------------
 
 General:
@@ -6,6 +6,9 @@ General:
 + Added `calcJunctionAlignment`, which counts the number of nucleotides in the 
   reference germline not present in the alignment, and the number of V and J 
   nucleotides in the CDR3.
++ Fixed a bug in `getFamily` where temporary designation gene names were not
+  being correctly subset to the cluster (family) level.
+
 
 Version 1.1.0: February 6, 2021
 -------------------------------------------------------------------------------
