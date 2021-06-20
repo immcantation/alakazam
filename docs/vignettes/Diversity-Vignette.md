@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         140.       7.82   0   
-##  2 IGHA != IGHD 1         185.       7.99   0   
-##  3 IGHA != IGHD 2         191.      10.6    0   
-##  4 IGHA != IGHG 0           4.15     8.92   0.73
-##  5 IGHA != IGHG 1          24.7      6.77   0   
-##  6 IGHA != IGHG 2          27.2      4.86   0   
-##  7 IGHA != IGHM 0         159.       6.68   0   
-##  8 IGHA != IGHM 1         211.       5.68   0   
-##  9 IGHA != IGHM 2         229.       6.75   0   
-## 10 IGHD != IGHG 0         136.       7.60   0   
-## 11 IGHD != IGHG 1         160.       8.32   0   
-## 12 IGHD != IGHG 2         164.      11.5    0   
-## 13 IGHD != IGHM 0          18.9      5.88   0   
-## 14 IGHD != IGHM 1          26.5      8.43   0   
-## 15 IGHD != IGHM 2          37.8     13.0    0   
-## 16 IGHG != IGHM 0         155.       6.48   0   
-## 17 IGHG != IGHM 1         187.       6.65   0   
-## 18 IGHG != IGHM 2         202.       8.25   0
+##  1 IGHA != IGHD 0          139.      8.18   0   
+##  2 IGHA != IGHD 1          184.      8.24   0   
+##  3 IGHA != IGHD 2          190.     10.7    0   
+##  4 IGHA != IGHG 0            5.1     8.45   0.56
+##  5 IGHA != IGHG 1           24.9     6.51   0   
+##  6 IGHA != IGHG 2           27.2     4.60   0   
+##  7 IGHA != IGHM 0          158.      6.62   0   
+##  8 IGHA != IGHM 1          211.      5.89   0   
+##  9 IGHA != IGHM 2          228.      6.42   0   
+## 10 IGHD != IGHG 0          134.      7.53   0   
+## 11 IGHD != IGHG 1          159.      8.47   0   
+## 12 IGHD != IGHG 2          163.     11.3    0   
+## 13 IGHD != IGHM 0           19.0     5.34   0   
+## 14 IGHD != IGHM 1           26.7     7.56   0   
+## 15 IGHD != IGHM 2           38.1    11.7    0   
+## 16 IGHG != IGHM 0          153.      6.55   0   
+## 17 IGHG != IGHM 1          186.      6.25   0   
+## 18 IGHG != IGHM 2          201.      7.30   0
 ```
 
 ```r

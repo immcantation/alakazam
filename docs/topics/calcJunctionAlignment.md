@@ -1,10 +1,10 @@
-**calcJunctionAlignment** - *Alignment properties*
+**calcJunctionAlignment** - *Calculate junction region alignment properties*
 
 Description
 --------------------
 
-Report the number of deleted germline nucleotides in the alignment and the
-number of V gene and J gene nucleotides in the CDR3.
+`calcJunctionLength` determines the number of deleted germline nucleotides in the 
+junction region and the number of V gene and J gene nucleotides in the CDR3.
 
 
 Usage
@@ -34,66 +34,61 @@ Arguments
 -------------------
 
 data
-:   Rearrangement database
+:   `data.frame` containing sequence data.
 
 germline_db
-:   Reference germline database, for the V,D and J alleles
+:   reference germline database for the V, D and J genes.
 in `data`
 
 v_call
-:   Name of the column containing V-segment allele assignments.
+:   V gene assignment column.
 
 d_call
-:   Name of the column containing D-segment allele assignments.
+:   D gene assignment column.
 
 j_call
-:   Name of the column containing J-segment allele assignments.
+:   J gene assignment column.
 
 v_germline_start
-:   Name of the column containing the number of the starting
-position of the alignment in the V reference germline 
-in `germline_db`.
+:   column containing the start position of the alignment 
+in the V reference germline.
 
 v_germline_end
-:   Name of the column containing the number of the ending
-position of the alignment in the V reference germline 
-in `germline_db`.
+:   column containing the end position of the alignment in the 
+V reference germline.
 
 d_germline_start
-:   Name of the column containing the number of the starting
-position of the alignment in the D reference germline 
-in `germline_db`.
+:   column containing the start position of the alignment 
+in the D reference germline.
 
 d_germline_end
-:   Name of the column containing the number of the ending
-position of the alignment in the D reference germline 
-in `germline_db`.
+:   column containing the start position of the alignment 
+in the D reference germline.
 
 j_germline_start
-:   Name of the column containing the number of the starting
-position of the alignment in the J reference germline 
-in `germline_db`.
+:   column containing the start position of the alignment 
+in the J reference germline.
 
 j_germline_end
-:   Name of the column containing the number of the ending
-position of the alignment in the J reference germline 
-in `germline_db`.
+:   column containing the start position of the alignment 
+in the J reference germline.
 
 np1_length
-:   Combined length of the N and P regions proximal to the V region.
+:   combined length of the N and P regions between the 
+V and D regions (heavy chain) or V and J regions (light chain).
 
 np2_length
-:   Combined length of the N and P regions proximal to the J region.
+:   combined length of the N and P regions between the 
+D and J regions (heavy chain).
 
 junction
-:   Name of the column containing the junction sequence.
+:   column containing the junction sequence.
 
 junction_length
-:   Name of the column containing the length of the 
-junction region in nucleotides.
+:   column containing the length of the junction region in nucleotides.
 
 sequence_alignment
-:   Name of the column containing the aligned sequence.
+:   column containing the aligned sequence.
 
 
 
@@ -101,14 +96,15 @@ sequence_alignment
 Value
 -------------------
 
-Six new columns are added to `data`:
+A modified input `data.frame` with the following additional columns storing 
+junction alignment information:
 
-1.  v_germline_deleted_3 Number of 3' V germline nucleotides deleted
-1.  d_germline_deleted_5 Number of 5' D germline nucleotides deleted
-1.  d_germline_deleted_3 Number of 3' D germline nucleotides deleted
-1.  j_germline_deleted_5 Number of 5' J germline nucleotides deleted
-1.  v_cdr3_length Number of sequence_alignment V nucleotides in the CDR3
-1.  j_cdr3_length Number of sequence_alignment J nucleotides in the CDR3
+1. `v_germline_deleted_3`number of 3' V germline nucleotides deleted.
+1. `d_germline_deleted_5`number of 5' D germline nucleotides deleted.
+1. `d_germline_deleted_3`number of 3' D germline nucleotides deleted.
+1. `j_germline_deleted_5`number of 5' J germline nucleotides deleted.
+1. `v_cdr3_length`number of sequence_alignment V nucleotides in the CDR3.
+1. `j_cdr3_length`number of sequence_alignment J nucleotides in the CDR3.
 
 
 
@@ -117,7 +113,6 @@ Examples
 -------------------
 
 ```R
-data(oneseq_db)
 germline_db <- list(
 "IGHV3-11*05"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCTTGGTCAAGCCTGGAGGGTCCCTGAGACT
 CTCCTGTGCAGCCTCTGGATTCACCTTC............AGTGACTACTACATGAGCTGGATCCGCCAGGCTCCAG
@@ -127,7 +122,8 @@ CACGGCCGTGTATTACTGTGCGAGAGA",
 "IGHD3-10*01"="GTATTACTATGGTTCGGGGAGTTATTATAAC",
 "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
 )
-oneseq_db <- calcJunctionAlignment(oneseq_db, germline_db)
+
+db <- calcJunctionAlignment(SingleDb, germline_db)
 ```
 
 

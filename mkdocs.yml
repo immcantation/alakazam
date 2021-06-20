@@ -41,6 +41,7 @@ pages:
       - topics/isValidAASeq.md
       - topics/getPositionQuality.md
       - topics/maskPositionsByQuality.md
+      - topics/calcJunctionLength
     - 'Lineage Reconstruction':
       - topics/buildPhylipLineage.md
       - topics/graphToPhylo.md
