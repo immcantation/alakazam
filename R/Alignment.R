@@ -1,6 +1,6 @@
 #' Calculate junction region alignment properties
 #'
-#' \code{calcJunctionLength} determines the number of deleted germline nucleotides in the 
+#' \code{calcJunctionAlignment} determines the number of deleted germline nucleotides in the 
 #' junction region and the number of V gene and J gene nucleotides in the CDR3.
 #'
 #' @param   data                \code{data.frame} containing sequence data.
