@@ -94,7 +94,7 @@ Ig and TCR sequence annotation
 + [getAllele](getSegment.md):            Get V(D)J allele names.
 + [getGene](getSegment.md):              Get V(D)J gene names.
 + [getFamily](getSegment.md):            Get V(D)J family names.
-+ [calcJunctionAlignment](calcJunctionAlignment.md): Junction alignment properties 
++ [junctionAlignment](junctionAlignment.md): Junction alignment properties 
 
 
 

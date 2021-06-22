@@ -30,9 +30,9 @@ db[,new_cols] %>% head()
 
 ```
 ## # A tibble: 1 x 4
-##   quality_num                                                quality                                                 quality_alignment_num                                         quality_alignment                                            
-##   <chr>                                                      <chr>                                                   <chr>                                                         <chr>                                                        
-## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{… 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{{{{{{{{   {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{…
+##   quality_num        quality        quality_alignment_num  quality_alignment    
+##   <chr>              <chr>          <chr>                  <chr>                
+## 1 90,90,90,90,90,90… {{{{{{{{{{{{{… 90,90,90,90,90,90,90,… {{{{{{{{{{{{{{{{{{{{…
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 

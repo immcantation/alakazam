@@ -62,11 +62,19 @@ maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 *Number of masked sequences: 1*
 ```
 [38;5;246m# A tibble: 1 x 37[39m
-  sequence_id  sequence     rev_comp productive v_call  d_call  j_call sequence_alignment  germline_alignment  junction junction_aa v_cigar  d_cigar j_cigar stop_codon vj_in_frame locus junction_length np1_length np2_length v_sequence_start
-  [3m[38;5;246m<chr>[39m[23m        [3m[38;5;246m<chr>[39m[23m        [3m[38;5;246m<lgl>[39m[23m    [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m               [3m[38;5;246m<chr>[39m[23m               [3m[38;5;246m<chr>[39m[23m    [3m[38;5;246m<chr>[39m[23m       [3m[38;5;246m<chr>[39m[23m    [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<lgl>[39m[23m       [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<int>[39m[23m      [3m[38;5;246m<int>[39m[23m      [3m[38;5;246m<int>[39m[23m            [3m[38;5;246m<int>[39m[23m
-[38;5;250m1[39m CGCTTTTCGGA… GGCTTTCTGAG… FALSE    TRUE       IGHV4-… IGHD3-… IGHJ4… CAGCTGCACCTGCAGGAG… CAGCTGCAGCTGCAGGAG… TGTGCGA… CARGTDLVTG… 93S8=1X… 403S9N… 425S4N… FALSE      TRUE        IGH                54         10          5               94
-[38;5;246m# … with 16 more variables: v_sequence_end <int>, v_germline_start <int>, v_germline_end <int>, d_sequence_start <int>, d_sequence_end <int>, d_germline_start <int>, d_germline_end <int>, j_sequence_start <int>, j_sequence_end <int>,[39m
-[38;5;246m#   j_germline_start <int>, j_germline_end <int>, consensus_count <int>, duplicate_count <int>, c_call <chr>, quality_alignment_num <chr>, sequence_alignment_masked <chr>[39m
+  sequence_id sequence rev_comp productive v_call d_call j_call sequence_alignm…
+  [3m[38;5;246m<chr>[39m[23m       [3m[38;5;246m<chr>[39m[23m    [3m[38;5;246m<lgl>[39m[23m    [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m           
+[38;5;250m1[39m CGCTTTTCGG… GGCTTTC… FALSE    TRUE       IGHV4… IGHD3… IGHJ4… CAGCTGCACCTGCAG…
+[38;5;246m# … with 29 more variables: germline_alignment <chr>, junction <chr>,[39m
+[38;5;246m#   junction_aa <chr>, v_cigar <chr>, d_cigar <chr>, j_cigar <chr>,[39m
+[38;5;246m#   stop_codon <lgl>, vj_in_frame <lgl>, locus <chr>, junction_length <int>,[39m
+[38;5;246m#   np1_length <int>, np2_length <int>, v_sequence_start <int>,[39m
+[38;5;246m#   v_sequence_end <int>, v_germline_start <int>, v_germline_end <int>,[39m
+[38;5;246m#   d_sequence_start <int>, d_sequence_end <int>, d_germline_start <int>,[39m
+[38;5;246m#   d_germline_end <int>, j_sequence_start <int>, j_sequence_end <int>,[39m
+[38;5;246m#   j_germline_start <int>, j_germline_end <int>, consensus_count <int>,[39m
+[38;5;246m#   duplicate_count <int>, c_call <chr>, quality_alignment_num <chr>,[39m
+[38;5;246m#   sequence_alignment_masked <chr>[39m
 
 ```
 

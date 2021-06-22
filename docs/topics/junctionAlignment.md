@@ -1,16 +1,16 @@
-**calcJunctionAlignment** - *Calculate junction region alignment properties*
+**junctionAlignment** - *Calculate junction region alignment properties*
 
 Description
 --------------------
 
-`calcJunctionLength` determines the number of deleted germline nucleotides in the 
+`junctionAlignment` determines the number of deleted germline nucleotides in the 
 junction region and the number of V gene and J gene nucleotides in the CDR3.
 
 
 Usage
 --------------------
 ```
-calcJunctionAlignment(
+junctionAlignment(
 data,
 germline_db,
 v_call = "v_call",
@@ -99,12 +99,12 @@ Value
 A modified input `data.frame` with the following additional columns storing 
 junction alignment information:
 
-1. `v_germline_deleted_3`number of 3' V germline nucleotides deleted.
-1. `d_germline_deleted_5`number of 5' D germline nucleotides deleted.
-1. `d_germline_deleted_3`number of 3' D germline nucleotides deleted.
-1. `j_germline_deleted_5`number of 5' J germline nucleotides deleted.
-1. `v_cdr3_length`number of sequence_alignment V nucleotides in the CDR3.
-1. `j_cdr3_length`number of sequence_alignment J nucleotides in the CDR3.
+1. `v_germline_deleted_3`:  number of 3' V germline nucleotides deleted.
+1. `d_germline_deleted_5`:  number of 5' D germline nucleotides deleted.
+1. `d_germline_deleted_3`:  number of 3' D germline nucleotides deleted.
+1. `j_germline_deleted_5`:  number of 5' J germline nucleotides deleted.
+1. `v_cdr3_length`:         number of sequence_alignment V nucleotides in the CDR3.
+1. `j_cdr3_length`:         number of sequence_alignment J nucleotides in the CDR3.
 
 
 
@@ -123,7 +123,7 @@ CACGGCCGTGTATTACTGTGCGAGAGA",
 "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
 )
 
-db <- calcJunctionAlignment(SingleDb, germline_db)
+db <- junctionAlignment(SingleDb, germline_db)
 ```
 
 
