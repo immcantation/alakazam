@@ -1,6 +1,6 @@
 #' Calculate junction region alignment properties
 #'
-#' \code{calcJunctionAlignment} determines the number of deleted germline nucleotides in the 
+#' \code{junctionAlignment} determines the number of deleted germline nucleotides in the 
 #' junction region and the number of V gene and J gene nucleotides in the CDR3.
 #'
 #' @param   data                \code{data.frame} containing sequence data.
@@ -51,10 +51,10 @@
 #' "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
 #' )
 #' 
-#' db <- calcJunctionAlignment(SingleDb, germline_db)
+#' db <- junctionAlignment(SingleDb, germline_db)
 #'
 #' @export
-calcJunctionAlignment <- function(data, germline_db, 
+junctionAlignment <- function(data, germline_db, 
                                   v_call="v_call",
                                   d_call="d_call",
                                   j_call="j_call",

@@ -4,7 +4,7 @@ Version 1.1.0.999: June 20, 2021
 General:
 
 + Updated dependencies to ggplot2 >= 3.3.4.
-+ Added `calcJunctionAlignment`, which counts the number of nucleotides in the 
++ Added `junctionAlignment`, which counts the number of nucleotides in the 
   reference germline not present in the alignment, and the number of V and J 
   nucleotides in the CDR3.
   

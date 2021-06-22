@@ -1,6 +1,6 @@
-# load(file.path("tests", "data-tests", "calcJunctionAlignment.rda"))
-load(file.path("..", "data-tests", "calcJunctionAlignment.rda"))
-load(file.path("..", "data-tests", "calcJunctionAlignment_changeo.rda"))
+# load(file.path("tests", "data-tests", "junctionAlignment.rda"))
+load(file.path("..", "data-tests", "junctionAlignment.rda"))
+load(file.path("..", "data-tests", "junctionAlignment_changeo.rda"))
 
 germline_db <- c(
     "IGHV3-30*04"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCGTGGTCCAGCCTGGGAGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTC............AGTAGCTATGCTATGCACTGGGTCCGCCAGGCTCCAGGCAAGGGGCTGGAGTGGGTGGCAGTTATATCATATGAT......GGAAGTAATAAATACTACGCAGACTCCGTGAAG...GGCCGATTCACCATCTCCAGAGACAATTCCAAGAACACGCTGTATCTGCAAATGAACAGCCTGAGAGCTGAGGACACGGCTGTGTATTACTGTGCGAGAGA",
@@ -32,9 +32,9 @@ germline_db <- c(
     "IGKV2-30*01"="GATGTTGTGATGACTCAGTCTCCACTCTCCCTGCCCGTCACCCTTGGACAGCCGGCCTCCATCTCCTGCAGGTCTAGTCAAAGCCTCGTATACAGT...GATGGAAACACCTACTTGAATTGGTTTCAGCAGAGGCCAGGCCAATCTCCAAGGCGCCTAATTTATAAGGTT.....................TCTAACCGGGACTCTGGGGTCCCA...GACAGATTCAGCGGCAGTGGG......TCAGGCACTGATTTCACACTGAAAATCAGCAGGGTGGAGGCTGAGGATGTTGGGGTTTATTACTGCATGCAAGGTACACACTGGCCTCC"
 )
 
-test_that("calcJunctionAlignment: counts deleted and in cdr3 germline nucleotides", {
+test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", {
     
-    expect_warning(aln_db <- calcJunctionAlignment(db, germline_db ))
+    expect_warning(aln_db <- junctionAlignment(db, germline_db ))
     
     expect_equal(aln_db[['v_germline_deleted_3']][1],0)
     expect_equal(aln_db[['d_germline_deleted_5']][1],12)
@@ -182,7 +182,7 @@ test_that("calcJunctionAlignment: counts deleted and in cdr3 germline nucleotide
     expect_true(is.na(aln_db[['v_cdr3_length']][13]))
     expect_true(is.na(aln_db[['j_cdr3_length']][13])) ## NOTE: alignment is off, due to changeo issue 178
 
-    db_changeo <- calcJunctionAlignment(db_changeo, 
+    db_changeo <- junctionAlignment(db_changeo, 
                           germline_db,sequence_alignment="SEQUENCE_IMGT", 
                           v_call="V_CALL", d_call="D_CALL", j_call="J_CALL",
                           v_germline_start="V_GERM_START_IMGT", v_germline_end="V_GERM_END",

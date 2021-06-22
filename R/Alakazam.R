@@ -65,7 +65,7 @@
 #'   \item  \link{getAllele}:            Get V(D)J allele names.
 #'   \item  \link{getGene}:              Get V(D)J gene names.
 #'   \item  \link{getFamily}:            Get V(D)J family names.
-#'   \item  \link{calcJunctionAlignment}: Junction alignment properties 
+#'   \item  \link{junctionAlignment}: Junction alignment properties 
 #' }
 #' 
 #' @section  Sequence distance calculation:
