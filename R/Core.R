@@ -126,8 +126,6 @@ writeChangeoDb <- function(data, file) {
 makeTempDir <- function(prefix) {
     temp_path <- tempfile(paste0(prefix, "-temp-"))
 
-    # "/" works on Windows, and is what is appended by file.path
-    temp_path <- gsub("\\\\", "/", temp_path)
     dir.create(temp_path)
     
     return(temp_path)
