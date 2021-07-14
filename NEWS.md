@@ -1,4 +1,4 @@
-Version 1.1.0.999: June 20, 2021
+Version 1.1.0.999: July 13, 2021
 -------------------------------------------------------------------------------
 
 General:
@@ -12,6 +12,11 @@ Gene Usage:
 
 + Fixed a bug in `getFamily` where temporary designation gene names were not
   being correctly subset to the cluster (family) level.
+
+Lineage:
+
++ Fixed a bug in `runPhylip` which was causing `buildPhylipLineage` to fail 
+  when run on Windows.
 
 
 Version 1.1.0: February 6, 2021
