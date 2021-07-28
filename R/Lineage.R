@@ -231,7 +231,7 @@ runPhylip <- function(path, phylip_exec, verbose=FALSE, onetree=FALSE) {
     
     # Set platform specific options
     if (.Platform$OS.type == "windows") { 
-        quiet_params <- list(ignore.stdout=TRUE, ignore.stderr=TRUE)
+        quiet_params <- list(stdout=FALSE, stderr=FALSE)
         invoke <- system2
     } else { 
         quiet_params <- list(stdout=FALSE, stderr=FALSE)

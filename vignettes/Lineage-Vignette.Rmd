@@ -111,7 +111,7 @@ graph <- buildPhylipLineage(clone, phylip_exec, rm_temp=TRUE)
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-# Load data insted of running phylip
+# Load data instead of running phylip
 # Clone 3138 is at index 23
 graph <- ExampleTrees[[23]]
 ```
@@ -187,7 +187,7 @@ graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
 ```
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
-# Load data insted of running phylip
+# Load data instead of running phylip
 graphs <- ExampleTrees
 ```
 
