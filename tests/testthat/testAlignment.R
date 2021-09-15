@@ -36,10 +36,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     
     expect_warning(aln_db <- junctionAlignment(db, germline_db ))
     
-    expect_equal(aln_db[['v_germline_deleted_3']][1],0)
-    expect_equal(aln_db[['d_germline_deleted_5']][1],12)
-    expect_equal(aln_db[['d_germline_deleted_3']][1],1)
-    expect_equal(aln_db[['j_germline_deleted_5']][1],6)
+    expect_equal(aln_db[['e3v_length']][1],0)
+    expect_equal(aln_db[['e5d_length']][1],12)
+    expect_equal(aln_db[['e3d_length']][1],1)
+    expect_equal(aln_db[['e5j_length']][1],6)
     expect_equal(aln_db[['v_cdr3_length']][1],8)
     expect_equal(aln_db[['j_cdr3_length']][1],23)
     
@@ -56,10 +56,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     # from nt position in user submitted sequence: 181
     # nb of deleted nt	: 6
     # causing frameshift: no
-    expect_equal(aln_db[['v_germline_deleted_3']][2],2)
-    expect_equal(aln_db[['d_germline_deleted_5']][2],9)
-    expect_equal(aln_db[['d_germline_deleted_3']][2],5)
-    expect_equal(aln_db[['j_germline_deleted_5']][2],4)
+    expect_equal(aln_db[['e3v_length']][2],2)
+    expect_equal(aln_db[['e5d_length']][2],9)
+    expect_equal(aln_db[['e3d_length']][2],5)
+    expect_equal(aln_db[['e5j_length']][2],4)
     expect_equal(aln_db[['v_cdr3_length']][2],6)
     expect_equal(aln_db[['j_cdr3_length']][2],10)
     
@@ -67,10 +67,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     
     
     # Partial: NA junction
-    expect_equal(aln_db[['v_germline_deleted_3']][3],240)
-    expect_equal(aln_db[['d_germline_deleted_5']][3],13)
-    expect_equal(aln_db[['d_germline_deleted_3']][3],9)
-    expect_equal(aln_db[['j_germline_deleted_5']][3],19)
+    expect_equal(aln_db[['e3v_length']][3],240)
+    expect_equal(aln_db[['e5d_length']][3],13)
+    expect_equal(aln_db[['e3d_length']][3],9)
+    expect_equal(aln_db[['e5j_length']][3],19)
     expect_true(is.na(aln_db[['v_cdr3_length']][3]))
     expect_true(is.na(aln_db[['j_cdr3_length']][3]))
     
@@ -82,10 +82,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     # IMGT V-quest: no results
     # Should MakeDb.py --partial fail sequences like this?
     # Is v_germline_start correct?
-    expect_equal(aln_db[['v_germline_deleted_3']][4],128)
-    expect_equal(aln_db[['d_germline_deleted_5']][4],26)
-    expect_equal(aln_db[['d_germline_deleted_3']][4],0)
-    expect_equal(aln_db[['j_germline_deleted_5']][4],24)
+    expect_equal(aln_db[['e3v_length']][4],128)
+    expect_equal(aln_db[['e5d_length']][4],26)
+    expect_equal(aln_db[['e3d_length']][4],0)
+    expect_equal(aln_db[['e5j_length']][4],24)
     expect_true(is.na(aln_db[['v_cdr3_length']][4]))
     expect_true(is.na(aln_db[['j_cdr3_length']][4]))
     
@@ -95,10 +95,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     # Partial
     # Nucleotide deletions have been detected in the CDR3
     # Check makeRegionDefinition works with this sequence
-    expect_equal(aln_db[['v_germline_deleted_3']][5],3)
-    expect_true(is.na(aln_db[['d_germline_deleted_5']][5]))
-    expect_true(is.na(aln_db[['d_germline_deleted_3']][5]))
-    expect_equal(aln_db[['j_germline_deleted_5']][5],3)
+    expect_equal(aln_db[['e3v_length']][5],3)
+    expect_true(is.na(aln_db[['e5d_length']][5]))
+    expect_true(is.na(aln_db[['e3d_length']][5]))
+    expect_equal(aln_db[['e5j_length']][5],3)
     expect_equal(aln_db[['v_cdr3_length']][5],24)
     expect_equal(aln_db[['j_cdr3_length']][5],4)
     
@@ -112,27 +112,27 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     # plotJunctionAlignment(db[9,],germline_db)$plot #IMGT
     # Can't create germline for AGTCCTTAGCCAACAAT_imgt (9), CreateGermlines gives
     # error "Germline sequence differs in length from input sequence by 22 characters."
-    expect_equal(aln_db[['v_germline_deleted_3']][6],2)
-    expect_equal(aln_db[['d_germline_deleted_5']][6],6)
-    expect_equal(aln_db[['d_germline_deleted_3']][6],3)
-    expect_equal(aln_db[['j_germline_deleted_5']][6],12)
+    expect_equal(aln_db[['e3v_length']][6],2)
+    expect_equal(aln_db[['e5d_length']][6],6)
+    expect_equal(aln_db[['e3d_length']][6],3)
+    expect_equal(aln_db[['e5j_length']][6],12)
     expect_equal(aln_db[['v_cdr3_length']][6],6)
     expect_equal(aln_db[['j_cdr3_length']][6],18)
     
-    expect_equal(aln_db[['v_germline_deleted_3']][9],2)
-    expect_true(is.na(aln_db[['d_germline_deleted_5']][9]))
-    expect_true(is.na(aln_db[['d_germline_deleted_3']][9]))
-    expect_equal(aln_db[['j_germline_deleted_5']][9],0)
+    expect_equal(aln_db[['e3v_length']][9],2)
+    expect_true(is.na(aln_db[['e5d_length']][9]))
+    expect_true(is.na(aln_db[['e3d_length']][9]))
+    expect_equal(aln_db[['e5j_length']][9],0)
     expect_true(is.na(aln_db[['v_cdr3_length']][9]))
     expect_true(is.na(aln_db[['j_cdr3_length']][9]))
     
     # For this nonproductive seq, the junction is all np1 nucleotides (22nt)
     # plotJunctionAlignment(db[7,],germline_db)$plot #IgBLAST
     # plotJunctionAlignment(db[10,],germline_db)$plot #IMGT
-    expect_equal(aln_db[['v_germline_deleted_3']][7],32)
-    expect_true(is.na(aln_db[['d_germline_deleted_5']][7]))
-    expect_true(is.na(aln_db[['d_germline_deleted_3']][7]))
-    expect_equal(aln_db[['j_germline_deleted_5']][7],7)
+    expect_equal(aln_db[['e3v_length']][7],32)
+    expect_true(is.na(aln_db[['e5d_length']][7]))
+    expect_true(is.na(aln_db[['e3d_length']][7]))
+    expect_equal(aln_db[['e5j_length']][7],7)
     expect_equal(aln_db[['v_cdr3_length']][7],0)
     expect_equal(aln_db[['j_cdr3_length']][7],0)
     
@@ -166,19 +166,19 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
     # plotJunctionAlignment(db[12,],germline_db)$plot
     # plotJunctionAlignment(db[13,],germline_db)$plot
     
-    expect_equal(aln_db[['v_germline_deleted_3']][12],48)
-    expect_true(is.na(aln_db[['d_germline_deleted_5']][12]))
-    expect_true(is.na(aln_db[['d_germline_deleted_3']][12]))
-    expect_equal(aln_db[['j_germline_deleted_5']][12],3)
+    expect_equal(aln_db[['e3v_length']][12],48)
+    expect_true(is.na(aln_db[['e5d_length']][12]))
+    expect_true(is.na(aln_db[['e3d_length']][12]))
+    expect_equal(aln_db[['e5j_length']][12],3)
     # Junction is too short, no cdr3
     expect_true(is.na(aln_db[['v_cdr3_length']][12]))
     expect_true(is.na(aln_db[['j_cdr3_length']][12]))
     
     # No junction, expect all NA
-    expect_equal(aln_db[['v_germline_deleted_3']][13],0)
-    expect_true(is.na(aln_db[['d_germline_deleted_5']][13]))
-    expect_true(is.na(aln_db[['d_germline_deleted_3']][13]))
-    expect_equal(aln_db[['j_germline_deleted_5']][13],0)
+    expect_equal(aln_db[['e3v_length']][13],0)
+    expect_true(is.na(aln_db[['e5d_length']][13]))
+    expect_true(is.na(aln_db[['e3d_length']][13]))
+    expect_equal(aln_db[['e5j_length']][13],0)
     expect_true(is.na(aln_db[['v_cdr3_length']][13]))
     expect_true(is.na(aln_db[['j_cdr3_length']][13])) ## NOTE: alignment is off, due to changeo issue 178
 
@@ -191,10 +191,10 @@ test_that("junctionAlignment: counts deleted and in cdr3 germline nucleotides", 
                           np1_length="NP1_LENGTH",np2_length="NP2_LENGTH",
                           junction="JUNCTION", junction_length="JUNCTION_LENGTH")
     
-    expect_equal(db_changeo[['v_germline_deleted_3']][2],3)
-    expect_equal(db_changeo[['d_germline_deleted_5']][2],6)
-    expect_equal(db_changeo[['d_germline_deleted_3']][2],7)
-    expect_equal(db_changeo[['j_germline_deleted_5']][2],9)
+    expect_equal(db_changeo[['e3v_length']][2],3)
+    expect_equal(db_changeo[['e5d_length']][2],6)
+    expect_equal(db_changeo[['e3d_length']][2],7)
+    expect_equal(db_changeo[['e5j_length']][2],9)
     expect_equal(db_changeo[['v_cdr3_length']][2],5)
     expect_equal(db_changeo[['j_cdr3_length']][2],19)
     

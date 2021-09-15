@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 1.1.0.999
-Date: 2021-06-22
+Date: 2021-09-15
 Authors@R: c(person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -72,7 +72,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Collate: 
     'Alakazam.R'
     'Alignment.R'

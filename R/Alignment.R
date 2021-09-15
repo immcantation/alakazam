@@ -32,10 +32,10 @@
 #' @return  A modified input \code{data.frame} with the following additional columns storing 
 #'          junction alignment information:
 #'          \enumerate{
-#'              \item  \code{v_germline_deleted_3}:  number of 3' V germline nucleotides deleted.
-#'              \item  \code{d_germline_deleted_5}:  number of 5' D germline nucleotides deleted.
-#'              \item  \code{d_germline_deleted_3}:  number of 3' D germline nucleotides deleted.
-#'              \item  \code{j_germline_deleted_5}:  number of 5' J germline nucleotides deleted.
+#'              \item  \code{e3v_length}:  number of 3' V germline nucleotides deleted.
+#'              \item  \code{e5d_length}:  number of 5' D germline nucleotides deleted.
+#'              \item  \code{e3d_length}:  number of 3' D germline nucleotides deleted.
+#'              \item  \code{e5j_length}:  number of 5' J germline nucleotides deleted.
 #'              \item  \code{v_cdr3_length}:         number of sequence_alignment V nucleotides in the CDR3.
 #'              \item  \code{j_cdr3_length}:         number of sequence_alignment J nucleotides in the CDR3.
 #'          }
@@ -95,10 +95,10 @@ junctionAlignment <- function(data, germline_db,
                                allele_call=j_call, germline_start=j_germline_start, germline_end=j_germline_end, 
                                germline_db=germline_db, junction=junction, junction_length=junction_length, 
                                sequence_alignment=sequence_alignment)
-        data[['v_germline_deleted_3']][i] <- v_dels[2]
-        data[['d_germline_deleted_5']][i] <- d_dels[1]
-        data[['d_germline_deleted_3']][i] <- d_dels[2]
-        data[['j_germline_deleted_5']][i] <- j_dels[1]
+        data[['e3v_length']][i] <- v_dels[2]
+        data[['e5d_length']][i] <- d_dels[1]
+        data[['e3d_length']][i] <- d_dels[2]
+        data[['e5j_length']][i] <- j_dels[1]
         data[['v_cdr3_length']][i] <- v_dels[3]
         data[['j_cdr3_length']][i] <- j_dels[3]
     }
