@@ -39,7 +39,6 @@ BuildVignettes: true
 VignetteBuilder: knitr, rmarkdown
 Encoding: UTF-8
 SystemRequirements: C++11
-biocViews: DataRepresentation
 Depends:
     R (>= 3.5.0),
     ggplot2 (>= 3.3.4)
@@ -66,11 +65,12 @@ Imports:
     tibble,
     tidyr (>= 1.0.0),
     utils
-LinkingTo: Rcpp
 Suggests:
     knitr,
     rmarkdown,
     testthat
+biocViews: Software
+LinkingTo: Rcpp
 RoxygenNote: 7.1.2
 Collate: 
     'Alakazam.R'
