@@ -1,9 +1,9 @@
-Version 1.1.0.999: July 13, 2021
+Version 1.1.0.999: October 29, 2021
 -------------------------------------------------------------------------------
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.3.4.
++ Updated dependencies to R >= 4.0 and ggplot2 >= 3.3.4.
 + Removed lazyeval dependency.
 + Added `junctionAlignment`, which counts the number of nucleotides in the 
   reference germline not present in the alignment, and the number of V and J 

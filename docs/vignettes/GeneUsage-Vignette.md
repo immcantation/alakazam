@@ -46,7 +46,7 @@ head(gene, n=4)
 ```
 
 ```
-## # A tibble: 4 x 4
+## # A tibble: 4 × 4
 ## # Groups:   sample_id [2]
 ##   sample_id gene     seq_count seq_freq
 ##   <chr>     <chr>        <int>    <dbl>
@@ -133,7 +133,7 @@ head(family, n=4)
 ```
 
 ```
-## # A tibble: 4 x 5
+## # A tibble: 4 × 5
 ## # Groups:   sample_id, c_call [3]
 ##   sample_id c_call gene  clone_count clone_freq
 ##   <chr>     <chr>  <chr>       <int>      <dbl>
@@ -182,7 +182,7 @@ head(family, n=4)
 ```
 
 ```
-## # A tibble: 4 x 7
+## # A tibble: 4 × 7
 ## # Groups:   sample_id, c_call [3]
 ##   sample_id c_call gene  seq_count copy_count seq_freq copy_freq
 ##   <chr>     <chr>  <chr>     <int>      <dbl>    <dbl>     <dbl>

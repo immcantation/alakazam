@@ -135,6 +135,16 @@ Examples
 
 ```R
 db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+
+```
+
+
+```
+[1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m898.33TB/s[0m                                                                                                                                                                                                                                [1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m1.01PB/s[0m                                                                                                                                                                                                                                
+```
+
+
+```R
 fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
 ```

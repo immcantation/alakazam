@@ -298,7 +298,7 @@ tableEdges(graph, "c_call")
 ```
 
 ```
-## # A tibble: 5 x 3
+## # A tibble: 5 × 3
 ## # Groups:   parent [3]
 ##   parent child count
 ##   <chr>  <chr> <int>
@@ -320,7 +320,7 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 ```
 
 ```
-## # A tibble: 1 x 3
+## # A tibble: 1 × 3
 ## # Groups:   parent [1]
 ##   parent child count
 ##   <chr>  <chr> <int>
@@ -339,7 +339,7 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 ```
 
 ```
-## # A tibble: 2 x 3
+## # A tibble: 2 × 3
 ## # Groups:   parent [2]
 ##   parent child count
 ##   <chr>  <chr> <int>
@@ -369,10 +369,10 @@ print(edge_test)
 
 ```
 ##   parent child count  expected    pvalue
-## 1   IGHA  IGHA    36 34.850000 0.0000000
-## 2   IGHA  IGHG     2  2.687500 0.5000000
-## 3   IGHG  IGHA     1  2.473684 0.8421053
-## 4   IGHG  IGHG    99 98.650000 0.3500000
+## 1   IGHA  IGHA    36 34.800000 0.0500000
+## 2   IGHA  IGHG     2  2.545455 0.4545455
+## 3   IGHG  IGHA     1  2.882353 0.8823529
+## 4   IGHG  IGHG    99 99.350000 0.4500000
 ```
 
 ```r

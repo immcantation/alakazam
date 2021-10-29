@@ -62,7 +62,7 @@ tableEdges(graph, "c_call")
 
 
 ```
-[38;5;246m# A tibble: 4 x 3[39m
+[38;5;246m# A tibble: 4 × 3[39m
 [38;5;246m# Groups:   parent [3][39m
   parent    child     count
   [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m
@@ -83,7 +83,7 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 
 ```
-[38;5;246m# A tibble: 3 x 3[39m
+[38;5;246m# A tibble: 3 × 3[39m
 [38;5;246m# Groups:   parent [2][39m
   parent    child     count
   [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m
@@ -102,7 +102,7 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 
 
 ```
-[38;5;246m# A tibble: 3 x 3[39m
+[38;5;246m# A tibble: 3 × 3[39m
 [38;5;246m# Groups:   parent [2][39m
   parent    child     count
   [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<chr>[39m[23m     [3m[38;5;246m<int>[39m[23m

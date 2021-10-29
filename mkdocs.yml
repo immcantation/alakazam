@@ -1,5 +1,4 @@
 site_name: alakazam
-site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
 edit_uri: src/master/docs/
 theme: readthedocs
@@ -10,13 +9,13 @@ markdown_extensions:
   - toc:
       permalink: True
 docs_dir: 'docs'
-pages:
+nav:
+  - 'Immcantation Portal': 'https://immcantation.readthedocs.io'
   - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
     - 'Package Overview': topics/alakazam.md
     - 'Release Notes': news.md
-    - 'Related Projects': projects.md
   - 'Vignettes':
     - 'How to read and write files': vignettes/Files-Vignette.md
     - 'Basic gene usage analysis': vignettes/GeneUsage-Vignette.md
@@ -41,7 +40,7 @@ pages:
       - topics/isValidAASeq.md
       - topics/getPositionQuality.md
       - topics/maskPositionsByQuality.md
-      - topics/calcJunctionLength
+      - topics/junctionAlignment.md
     - 'Lineage Reconstruction':
       - topics/buildPhylipLineage.md
       - topics/graphToPhylo.md
@@ -108,6 +107,7 @@ pages:
       - topics/ExampleDbChangeo.md
       - topics/Example10x.md
       - topics/ExampleTrees.md
+      - topics/SingleDb.md
       - topics/ABBREV_AA.md
       - topics/IUPAC_CODES.md
       - topics/DEFAULT_COLORS.md

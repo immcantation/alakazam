@@ -1,9 +1,10 @@
-Version 1.1.0.999: June 20, 2021
+Version 1.1.0.999: October 29, 2021
 -------------------------------------------------------------------------------
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.3.4.
++ Updated dependencies to R >= 4.0 and ggplot2 >= 3.3.4.
++ Removed lazyeval dependency.
 + Added `junctionAlignment`, which counts the number of nucleotides in the 
   reference germline not present in the alignment, and the number of V and J 
   nucleotides in the CDR3.
@@ -12,6 +13,11 @@ Gene Usage:
 
 + Fixed a bug in `getFamily` where temporary designation gene names were not
   being correctly subset to the cluster (family) level.
+
+Lineage:
+
++ Fixed a bug in `runPhylip` which was causing `buildPhylipLineage` to fail 
+  when run on Windows.
 
 
 Version 1.1.0: February 6, 2021
