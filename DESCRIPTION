@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
 Version: 1.1.0.999
-Date: 2021-09-15
+Date: 2021-10-26
 Authors@R: c(person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -36,10 +36,10 @@ URL: https://alakazam.readthedocs.io/
 BugReports: https://bitbucket.org/kleinstein/alakazam/issues
 LazyData: true
 BuildVignettes: true
-VignetteBuilder: knitr
+VignetteBuilder: knitr, rmarkdown
 Encoding: UTF-8
 SystemRequirements: C++11
-biocViews:
+biocViews: DataRepresentation
 Depends:
     R (>= 3.5.0),
     ggplot2 (>= 3.3.4)
@@ -53,7 +53,6 @@ Imports:
     grid,
     igraph (>= 1.0.0),
     IRanges (>= 2.22.2),
-    lazyeval,
     Matrix,
     methods,
     progress,

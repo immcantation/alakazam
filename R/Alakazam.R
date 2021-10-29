@@ -128,7 +128,6 @@
 #'                          degree shortest_paths all_shortest_paths distances
 #'                          graph_from_adjacency_matrix components groups
 #' @importFrom  IRanges     IRanges
-#' @importFrom  lazyeval    interp
 #' @importFrom  Matrix      sparseMatrix rowSums
 #' @importFrom  progress    progress_bar
 #' @importFrom  readr       read_delim read_tsv write_delim write_tsv cols
