@@ -856,70 +856,70 @@ junctionAlignment <- function(data, germline_db,
 countDeleted <- function(db_row, allele_call, germline_start, germline_end, 
                          germline_db, junction, junction_length,
                          sequence_alignment) {
-  # db_row: one row from data
-  # allele_call: one of v,d,j
-  # germline_db: the reference germline database used to assign genes. 
-  allele <- getAllele(db_row[[allele_call]], first=T)
-  deleted <- c(NA, NA, NA)
-  
-  # Check for valid allele information
-  if (is.na(allele)) { 
-    return(deleted) 
-  }
-  # Check for allele in reference germlines
-  tryCatch(germline <- germline_db[[allele]],
-           error=function(e) { stop(allele, " not found in germline_db.") })
-  
-  allele_germline_start <- as.numeric(db_row[[germline_start]])
-  allele_germline_end <- as.numeric(db_row[[germline_end]])
-  
-  germline_head <- stringi::stri_sub(germline, 1, allele_germline_start - 1)
-  deleted_head <- nchar(gsub("\\.", "", germline_head))
-  
-  germline_tail <- stringi::stri_sub(germline, allele_germline_end+1, nchar(germline))
-  deleted_tail <- nchar(gsub("\\.", "", germline_tail))
-  
-  deleted[1] <- deleted_head
-  deleted[2] <- deleted_tail
-  
-  if (is.na(db_row[[junction]])) {
-    warning("NA junction found.")
-    return (deleted)
-  }
-  if (!db_row[[junction_length]]>6) {
-    message("Junction length <= 6.")
-    return (deleted)
-  }
-  
-  junction_len <- db_row[[junction_length]]
-  junction_start <- 310
-  # junction_end <- junction_start + junction_len - 1
-  
-  # get aligned junction end (counting gaps)
-  seq_aln <- s2c(db_row[[sequence_alignment]]) != "-"
-  seq_aln[1:junction_start-1] <- 0
-  junction_end <- which(cumsum(seq_aln[1:length(seq_aln)]) > junction_len)[1] - 1
-  
-  # For V and J alleles, calculate number of nt in the CDR3
-  germ_cdr3_length <- NA
-  if (grepl("[Vv]", allele)) {
-    last_cdr3_pre_np <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
-    first_cdr3_pre_np <- junction_start + 3   # without conserved 
-    # len <- last_cdr3_pre_np - first_cdr3_pre_np + 1
-    #germ_seq <- stringi::stri_sub(germline, db_row[[germline_end]]+1-len, db_row[[germline_end]] )
-    germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], first_cdr3_pre_np, last_cdr3_pre_np )
-    germ_cdr3_length <- nchar(gsub("[\\.-]", "", germ_seq))
-  } else if (grepl("[Jj]", allele))  {
-    j_aln_len <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
-    # germ_seq <- stringi::stri_sub(germline, db_row[[germline_start]], db_row[[germline_end]]-j_tail)
-    germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], 
-                                  nchar(db_row[[sequence_alignment]]) - j_aln_len + 1,
-                                  junction_end - 3)
-    germ_cdr3_length <- nchar(gsub("-", "", germ_seq))
-  } 
-  
-  deleted <- c(deleted_head, deleted_tail, germ_cdr3_length)
-  return(deleted)
+    # db_row: one row from data
+    # allele_call: one of v,d,j
+    # germline_db: the reference germline database used to assign genes. 
+    allele <- getAllele(db_row[[allele_call]], first=T)
+    deleted <- c(NA, NA, NA)
+    
+    # Check for valid allele information
+    if (is.na(allele)) { 
+        return(deleted) 
+    }
+    # Check for allele in reference germlines
+    tryCatch(germline <- germline_db[[allele]],
+             error=function(e) { stop(allele, " not found in germline_db.") })
+    
+    allele_germline_start <- as.numeric(db_row[[germline_start]])
+    allele_germline_end <- as.numeric(db_row[[germline_end]])
+    
+    germline_head <- stringi::stri_sub(germline, 1, allele_germline_start - 1)
+    deleted_head <- nchar(gsub("\\.", "", germline_head))
+    
+    germline_tail <- stringi::stri_sub(germline, allele_germline_end+1, nchar(germline))
+    deleted_tail <- nchar(gsub("\\.", "", germline_tail))
+    
+    deleted[1] <- deleted_head
+    deleted[2] <- deleted_tail
+    
+    if (is.na(db_row[[junction]])) {
+        warning("NA junction found.")
+        return (deleted)
+    }
+    if (!db_row[[junction_length]]>6) {
+        message("Junction length <= 6.")
+        return (deleted)
+    }
+    
+    junction_len <- db_row[[junction_length]]
+    junction_start <- 310
+    # junction_end <- junction_start + junction_len - 1
+    
+    # get aligned junction end (counting gaps)
+    seq_aln <- s2c(db_row[[sequence_alignment]]) != "-"
+    seq_aln[1:junction_start-1] <- 0
+    junction_end <- which(cumsum(seq_aln[1:length(seq_aln)]) > junction_len)[1] - 1
+    
+    # For V and J alleles, calculate number of nt in the CDR3
+    germ_cdr3_length <- NA
+    if (grepl("[Vv]", allele)) {
+        last_cdr3_pre_np <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
+        first_cdr3_pre_np <- junction_start + 3   # without conserved 
+        # len <- last_cdr3_pre_np - first_cdr3_pre_np + 1
+        #germ_seq <- stringi::stri_sub(germline, db_row[[germline_end]]+1-len, db_row[[germline_end]] )
+        germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], first_cdr3_pre_np, last_cdr3_pre_np )
+        germ_cdr3_length <- nchar(gsub("[\\.-]", "", germ_seq))
+    } else if (grepl("[Jj]", allele))  {
+        j_aln_len <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
+        # germ_seq <- stringi::stri_sub(germline, db_row[[germline_start]], db_row[[germline_end]]-j_tail)
+        germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], 
+                                      nchar(db_row[[sequence_alignment]]) - j_aln_len + 1,
+                                      junction_end - 3)
+        germ_cdr3_length <- nchar(gsub("-", "", germ_seq))
+    } 
+    
+    deleted <- c(deleted_head, deleted_tail, germ_cdr3_length)
+    return(deleted)
 }
 
 
