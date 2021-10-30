@@ -765,12 +765,12 @@ extractVRegion <- function(sequences, region=c("fwr1", "cdr1", "fwr2", "cdr2", "
 #' @return  A modified input \code{data.frame} with the following additional columns storing 
 #'          junction alignment information:
 #'          \enumerate{
-#'              \item  \code{e3v_length}:  number of 3' V germline nucleotides deleted.
-#'              \item  \code{e5d_length}:  number of 5' D germline nucleotides deleted.
-#'              \item  \code{e3d_length}:  number of 3' D germline nucleotides deleted.
-#'              \item  \code{e5j_length}:  number of 5' J germline nucleotides deleted.
-#'              \item  \code{v_cdr3_length}:         number of sequence_alignment V nucleotides in the CDR3.
-#'              \item  \code{j_cdr3_length}:         number of sequence_alignment J nucleotides in the CDR3.
+#'              \item  \code{e3v_length}:     number of 3' V germline nucleotides deleted.
+#'              \item  \code{e5d_length}:     number of 5' D germline nucleotides deleted.
+#'              \item  \code{e3d_length}:     number of 3' D germline nucleotides deleted.
+#'              \item  \code{e5j_length}:     number of 5' J germline nucleotides deleted.
+#'              \item  \code{v_cdr3_length}:  number of sequence_alignment V nucleotides in the CDR3.
+#'              \item  \code{j_cdr3_length}:  number of sequence_alignment J nucleotides in the CDR3.
 #'          }
 #' 
 #' @examples
