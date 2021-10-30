@@ -1,7 +1,6 @@
 # Common DNA, amino acid, and gene annotation operations for Alakazam
 
-
-#### Sequence distance functions ####
+#### Distance functions ####
 
 #' Build a DNA distance matrix
 #'
@@ -46,6 +45,7 @@ getDNAMatrix <- function(gap=-1) {
     return(1 - sub_mat)
 }
 
+
 #' Build an AA distance matrix
 #'
 #' \code{getAAMatrix} returns a Hamming distance matrix for IUPAC ambiguous
@@ -79,214 +79,6 @@ getAAMatrix <- function(gap=0) {
   sub_mat[c(1:27), c("-", ".")] <- 1 - gap
   
   return(1 - sub_mat)
-}
-
-
-#### Sequence manipulation functions ####
-
-#' Translate nucleotide sequences to amino acids
-#' 
-#' \code{translateDNA} translates nucleotide sequences to amino acid sequences.
-#' 
-#' @param   seq     vector of strings defining DNA sequence(s) to be converted to translated.
-#' @param   trim    boolean flag to remove 3 nts from both ends of seq
-#'          (converts IMGT junction to CDR3 region).
-#' 
-#' @return  A vector of translated sequence strings.
-#' 
-#' @seealso  \code{\link[seqinr]{translate}}.
-#' 
-#' @examples
-#' # Translate a single sequence
-#' translateDNA("ACTGACTCGA")
-#'
-#' # Translate a vector of sequences
-#' translateDNA(ExampleDb$junction[1:3])
-#' 
-#' # Remove the first and last codon from the translation
-#' translateDNA(ExampleDb$junction[1:3], trim=TRUE)
-#' 
-#' @export
-translateDNA <- function (seq, trim=FALSE) {
-    # Function to translate a single string
-    .translate <- function(x) {
-        if (stri_length(x) >= 3 & !is.na(x)) {
-            stri_join(seqinr::translate(unlist(strsplit(x, "")), ambiguous=TRUE), 
-                      collapse="")
-        } else {
-            NA
-        }
-    }
-    
-    # Remove 3 nucleotides from each end
-    # Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
-    if (trim) { seq <- substr(seq, 4, stri_length(seq) - 3) }
-    
-    # Replace gaps with N
-    seq <- gsub("[-.]", "N", seq)
-    
-    # Apply translation
-    aa <- sapply(seq, .translate, USE.NAMES=FALSE)
-    
-    return(aa)
-}
-
-
-#' Masks gap characters in DNA sequences
-#' 
-#' \code{maskSeqGaps} substitutes gap characters, \code{c("-", ".")}, with \code{"N"} 
-#' in a vector of DNA sequences.
-#'
-#' @param    seq         character vector of DNA sequence strings.
-#' @param    mask_char   character to use for masking.
-#' @param    outer_only  if \code{TRUE} replace only contiguous leading and trailing gaps;
-#'                       if \code{FALSE} replace all gap characters.
-#'                       
-#' @return   A modified \code{seq} vector with \code{"N"} in place of \code{c("-", ".")} 
-#'           characters.
-#' 
-#' @seealso  See \link{maskSeqEnds} for masking ragged edges.
-#'           
-#' @examples
-#' # Mask with Ns
-#' maskSeqGaps(c("ATG-C", "CC..C"))
-#' maskSeqGaps("--ATG-C-")
-#' maskSeqGaps("--ATG-C-", outer_only=TRUE)
-#' 
-#' # Mask with dashes
-#' maskSeqGaps(c("ATG-C", "CC..C"), mask_char="-")
-#' 
-#' @export
-maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
-    if (outer_only) {
-        for (i in 1:length(seq)) {
-            head_match <- attr(regexpr("^[-\\.]+", seq[i]), "match.length")
-            tail_match <- attr(regexpr("[-\\.]+$", seq[i]), "match.length")
-            if (head_match > 0) { 
-                seq[i] <- gsub("^[-\\.]+", 
-                               paste(rep(mask_char, head_match), collapse=""), 
-                               seq[i]) 
-            }
-            if (tail_match > 0) { 
-                seq[i] <- gsub("[-\\.]+$", 
-                               paste(rep(mask_char, tail_match), collapse=""), 
-                               seq[i]) 
-            }
-        }
-    } else {
-        seq <- gsub("[-\\.]", mask_char, seq)
-    }
-    
-    return(seq)
-}
-
-
-#' Masks ragged leading and trailing edges of aligned DNA sequences
-#' 
-#' \code{maskSeqEnds} takes a vector of DNA sequences, as character strings,
-#' and replaces the leading and trailing characters with \code{"N"} characters to create 
-#' a sequence vector with uniformly masked outer sequence segments.
-#' 
-#' @param    seq        character vector of DNA sequence strings.
-#' @param    mask_char  character to use for masking.
-#' @param    max_mask   the maximum number of characters to mask. If set to 0 then
-#'                      no masking will be performed. If set to \code{NULL} then the upper 
-#'                      masking bound will be automatically determined from the maximum 
-#'                      number of observed leading or trailing \code{"N"} characters amongst 
-#'                      all strings in \code{seq}. 
-#' @param    trim       if \code{TRUE} leading and trailing characters will be cut rather 
-#'                      than masked with \code{"N"} characters.
-#' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
-#' 
-#' @seealso  See \link{maskSeqGaps} for masking internal gaps.
-#'           See \link{padSeqEnds} for padding sequence of unequal length.
-#' 
-#' @examples
-#' # Default behavior uniformly masks ragged ends
-#' seq <- c("CCCCTGGG", "NAACTGGN", "NNNCTGNN")
-#' maskSeqEnds(seq)
-#'
-#' # Does nothing
-#' maskSeqEnds(seq, max_mask=0)
-#' 
-#' # Cut ragged sequence ends
-#' maskSeqEnds(seq, trim=TRUE)
-#'
-#' # Set max_mask to limit extent of masking and trimming
-#' maskSeqEnds(seq, max_mask=1)
-#' maskSeqEnds(seq, max_mask=1, trim=TRUE)
-#' 
-#' # Mask dashes instead of Ns
-#' seq <- c("CCCCTGGG", "-AACTGG-", "---CTG--")
-#' maskSeqEnds(seq, mask_char="-")
-#' 
-#' @export
-maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
-    # Find length of leading and trailing Ns
-    left_lengths <- attr(regexpr(paste0("(^", mask_char, "*)"), seq, perl=T), "capture.length")
-    right_lengths <- attr(regexpr(paste0("(", mask_char, "*$)"), seq, perl=T), "capture.length")
-    
-    # Mask to minimal inner sequence length
-    left_mask <- min(max(left_lengths[, 1]), max_mask)
-    right_mask <- min(max(right_lengths[, 1]), max_mask)
-    seq_lengths <- stri_length(seq)
-    if (trim) {
-        seq <- substr(seq, left_mask + 1, seq_lengths - right_mask)
-    } else {
-        substr(seq, 0, left_mask) <- paste(rep(mask_char, left_mask), collapse='')
-        substr(seq, seq_lengths - right_mask + 1, seq_lengths + 1) <- 
-            paste(rep(mask_char, right_mask), collapse='')
-    }
-    
-    return(seq)
-}
-
-
-#' Pads ragged ends of aligned DNA sequences
-#' 
-#' \code{padSeqEnds} takes a vector of DNA sequences, as character strings,
-#' and appends the ends of each sequence with an appropriate number of \code{"N"} 
-#' characters to create a sequence vector with uniform lengths.
-#' 
-#' @param    seq       character vector of DNA sequence strings.
-#' @param    len       length to pad to. Only applies if longer than the maximum length of
-#'                     the data in \code{seq}.
-#' @param    start     if \code{TRUE} pad the beginning of each sequence instead of the end. 
-#' @param    pad_char  character to use for padding.
-#' @param    mod3      if \code{TRUE} pad sequences to be of length multiple three.
-#' 
-#' @return   A modified \code{seq} vector with padded sequences.
-#' 
-#' @seealso  See \link{maskSeqEnds} for creating uniform masking from existing masking.
-#' 
-#' @examples
-#' # Default behavior uniformly pads ragged ends
-#' seq <- c("CCCCTGGG", "ACCCTG", "CCCC")
-#' padSeqEnds(seq)
-#'
-#' # Pad to fixed length
-#' padSeqEnds(seq, len=15)
-#'
-#' # Add padding to the beginning of the sequences instead of the ends
-#' padSeqEnds(seq, start=TRUE)
-#' padSeqEnds(seq, len=15, start=TRUE)
-#' 
-#' @export
-padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N", mod3=TRUE) {
-    # Set length to max input length
-    width <- max(stringi::stri_length(seq),len)
-    if (mod3 && width %% 3 != 0) {
-        width <- width + (3 - width %% 3)
-    }
-    
-    # Pad
-    if (!start) { 
-        seq <- stringi::stri_pad_right(seq, width=width, pad=pad_char)
-    } else {
-        seq <- stringi::stri_pad_left(seq, width=width, pad=pad_char)
-    }
-
-    return(seq)
 }
 
 
@@ -666,7 +458,216 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     return(unique_df)
 }
 
-#### Annotation functions ####
+
+#### Transformation functions ####
+
+#' Translate nucleotide sequences to amino acids
+#' 
+#' \code{translateDNA} translates nucleotide sequences to amino acid sequences.
+#' 
+#' @param   seq     vector of strings defining DNA sequence(s) to be converted to translated.
+#' @param   trim    boolean flag to remove 3 nts from both ends of seq
+#'          (converts IMGT junction to CDR3 region).
+#' 
+#' @return  A vector of translated sequence strings.
+#' 
+#' @seealso  \code{\link[seqinr]{translate}}.
+#' 
+#' @examples
+#' # Translate a single sequence
+#' translateDNA("ACTGACTCGA")
+#'
+#' # Translate a vector of sequences
+#' translateDNA(ExampleDb$junction[1:3])
+#' 
+#' # Remove the first and last codon from the translation
+#' translateDNA(ExampleDb$junction[1:3], trim=TRUE)
+#' 
+#' @export
+translateDNA <- function (seq, trim=FALSE) {
+  # Function to translate a single string
+  .translate <- function(x) {
+    if (stri_length(x) >= 3 & !is.na(x)) {
+      stri_join(seqinr::translate(unlist(strsplit(x, "")), ambiguous=TRUE), 
+                collapse="")
+    } else {
+      NA
+    }
+  }
+  
+  # Remove 3 nucleotides from each end
+  # Eg,  "ACTGACTCGA" -> "GACT" (with "ACT" and "CGA" removed)
+  if (trim) { seq <- substr(seq, 4, stri_length(seq) - 3) }
+  
+  # Replace gaps with N
+  seq <- gsub("[-.]", "N", seq)
+  
+  # Apply translation
+  aa <- sapply(seq, .translate, USE.NAMES=FALSE)
+  
+  return(aa)
+}
+
+
+#' Masks gap characters in DNA sequences
+#' 
+#' \code{maskSeqGaps} substitutes gap characters, \code{c("-", ".")}, with \code{"N"} 
+#' in a vector of DNA sequences.
+#'
+#' @param    seq         character vector of DNA sequence strings.
+#' @param    mask_char   character to use for masking.
+#' @param    outer_only  if \code{TRUE} replace only contiguous leading and trailing gaps;
+#'                       if \code{FALSE} replace all gap characters.
+#'                       
+#' @return   A modified \code{seq} vector with \code{"N"} in place of \code{c("-", ".")} 
+#'           characters.
+#' 
+#' @seealso  See \link{maskSeqEnds} for masking ragged edges.
+#'           
+#' @examples
+#' # Mask with Ns
+#' maskSeqGaps(c("ATG-C", "CC..C"))
+#' maskSeqGaps("--ATG-C-")
+#' maskSeqGaps("--ATG-C-", outer_only=TRUE)
+#' 
+#' # Mask with dashes
+#' maskSeqGaps(c("ATG-C", "CC..C"), mask_char="-")
+#' 
+#' @export
+maskSeqGaps <- function(seq, mask_char="N", outer_only=FALSE) {
+  if (outer_only) {
+    for (i in 1:length(seq)) {
+      head_match <- attr(regexpr("^[-\\.]+", seq[i]), "match.length")
+      tail_match <- attr(regexpr("[-\\.]+$", seq[i]), "match.length")
+      if (head_match > 0) { 
+        seq[i] <- gsub("^[-\\.]+", 
+                       paste(rep(mask_char, head_match), collapse=""), 
+                       seq[i]) 
+      }
+      if (tail_match > 0) { 
+        seq[i] <- gsub("[-\\.]+$", 
+                       paste(rep(mask_char, tail_match), collapse=""), 
+                       seq[i]) 
+      }
+    }
+  } else {
+    seq <- gsub("[-\\.]", mask_char, seq)
+  }
+  
+  return(seq)
+}
+
+
+#' Masks ragged leading and trailing edges of aligned DNA sequences
+#' 
+#' \code{maskSeqEnds} takes a vector of DNA sequences, as character strings,
+#' and replaces the leading and trailing characters with \code{"N"} characters to create 
+#' a sequence vector with uniformly masked outer sequence segments.
+#' 
+#' @param    seq        character vector of DNA sequence strings.
+#' @param    mask_char  character to use for masking.
+#' @param    max_mask   the maximum number of characters to mask. If set to 0 then
+#'                      no masking will be performed. If set to \code{NULL} then the upper 
+#'                      masking bound will be automatically determined from the maximum 
+#'                      number of observed leading or trailing \code{"N"} characters amongst 
+#'                      all strings in \code{seq}. 
+#' @param    trim       if \code{TRUE} leading and trailing characters will be cut rather 
+#'                      than masked with \code{"N"} characters.
+#' @return   A modified \code{seq} vector with masked (or optionally trimmed) sequences.
+#' 
+#' @seealso  See \link{maskSeqGaps} for masking internal gaps.
+#'           See \link{padSeqEnds} for padding sequence of unequal length.
+#' 
+#' @examples
+#' # Default behavior uniformly masks ragged ends
+#' seq <- c("CCCCTGGG", "NAACTGGN", "NNNCTGNN")
+#' maskSeqEnds(seq)
+#'
+#' # Does nothing
+#' maskSeqEnds(seq, max_mask=0)
+#' 
+#' # Cut ragged sequence ends
+#' maskSeqEnds(seq, trim=TRUE)
+#'
+#' # Set max_mask to limit extent of masking and trimming
+#' maskSeqEnds(seq, max_mask=1)
+#' maskSeqEnds(seq, max_mask=1, trim=TRUE)
+#' 
+#' # Mask dashes instead of Ns
+#' seq <- c("CCCCTGGG", "-AACTGG-", "---CTG--")
+#' maskSeqEnds(seq, mask_char="-")
+#' 
+#' @export
+maskSeqEnds <- function(seq, mask_char="N", max_mask=NULL, trim=FALSE) {
+  # Find length of leading and trailing Ns
+  left_lengths <- attr(regexpr(paste0("(^", mask_char, "*)"), seq, perl=T), "capture.length")
+  right_lengths <- attr(regexpr(paste0("(", mask_char, "*$)"), seq, perl=T), "capture.length")
+  
+  # Mask to minimal inner sequence length
+  left_mask <- min(max(left_lengths[, 1]), max_mask)
+  right_mask <- min(max(right_lengths[, 1]), max_mask)
+  seq_lengths <- stri_length(seq)
+  if (trim) {
+    seq <- substr(seq, left_mask + 1, seq_lengths - right_mask)
+  } else {
+    substr(seq, 0, left_mask) <- paste(rep(mask_char, left_mask), collapse='')
+    substr(seq, seq_lengths - right_mask + 1, seq_lengths + 1) <- 
+      paste(rep(mask_char, right_mask), collapse='')
+  }
+  
+  return(seq)
+}
+
+
+#' Pads ragged ends of aligned DNA sequences
+#' 
+#' \code{padSeqEnds} takes a vector of DNA sequences, as character strings,
+#' and appends the ends of each sequence with an appropriate number of \code{"N"} 
+#' characters to create a sequence vector with uniform lengths.
+#' 
+#' @param    seq       character vector of DNA sequence strings.
+#' @param    len       length to pad to. Only applies if longer than the maximum length of
+#'                     the data in \code{seq}.
+#' @param    start     if \code{TRUE} pad the beginning of each sequence instead of the end. 
+#' @param    pad_char  character to use for padding.
+#' @param    mod3      if \code{TRUE} pad sequences to be of length multiple three.
+#' 
+#' @return   A modified \code{seq} vector with padded sequences.
+#' 
+#' @seealso  See \link{maskSeqEnds} for creating uniform masking from existing masking.
+#' 
+#' @examples
+#' # Default behavior uniformly pads ragged ends
+#' seq <- c("CCCCTGGG", "ACCCTG", "CCCC")
+#' padSeqEnds(seq)
+#'
+#' # Pad to fixed length
+#' padSeqEnds(seq, len=15)
+#'
+#' # Add padding to the beginning of the sequences instead of the ends
+#' padSeqEnds(seq, start=TRUE)
+#' padSeqEnds(seq, len=15, start=TRUE)
+#' 
+#' @export
+padSeqEnds <- function(seq, len=NULL, start=FALSE, pad_char="N", mod3=TRUE) {
+  # Set length to max input length
+  width <- max(stringi::stri_length(seq),len)
+  if (mod3 && width %% 3 != 0) {
+    width <- width + (3 - width %% 3)
+  }
+  
+  # Pad
+  if (!start) { 
+    seq <- stringi::stri_pad_right(seq, width=width, pad=pad_char)
+  } else {
+    seq <- stringi::stri_pad_left(seq, width=width, pad=pad_char)
+  }
+  
+  return(seq)
+}
+
+
+#### Subregion functions ####
 
 #' Extracts FWRs and CDRs from IMGT-gapped sequences
 #' 
@@ -730,7 +731,199 @@ extractVRegion <- function(sequences, region=c("fwr1", "cdr1", "fwr2", "cdr2", "
 }
 
 
-#### Rcpp distance wrappers ####
+#' Calculate junction region alignment properties
+#'
+#' \code{junctionAlignment} determines the number of deleted germline nucleotides in the 
+#' junction region and the number of V gene and J gene nucleotides in the CDR3.
+#'
+#' @param   data                \code{data.frame} containing sequence data.
+#' @param   germline_db         reference germline database for the V, D and J genes.
+#'                              in \code{data}
+#' @param   v_call              V gene assignment column.
+#' @param   d_call              D gene assignment column.
+#' @param   j_call              J gene assignment column.
+#' @param   v_germline_start    column containing the start position of the alignment 
+#'                              in the V reference germline.
+#' @param   v_germline_end      column containing the end position of the alignment in the 
+#'                              V reference germline.
+#' @param   d_germline_start    column containing the start position of the alignment 
+#'                              in the D reference germline.
+#' @param   d_germline_end      column containing the start position of the alignment 
+#'                              in the D reference germline.
+#' @param   j_germline_start    column containing the start position of the alignment 
+#'                              in the J reference germline.
+#' @param   j_germline_end      column containing the start position of the alignment 
+#'                              in the J reference germline.
+#' @param   np1_length          combined length of the N and P regions between the 
+#'                              V and D regions (heavy chain) or V and J regions (light chain).      
+#' @param   np2_length          combined length of the N and P regions between the 
+#'                              D and J regions (heavy chain).            
+#' @param   junction            column containing the junction sequence.
+#' @param   junction_length     column containing the length of the junction region in nucleotides.
+#' @param   sequence_alignment  column containing the aligned sequence.
+#' 
+#' @return  A modified input \code{data.frame} with the following additional columns storing 
+#'          junction alignment information:
+#'          \enumerate{
+#'              \item  \code{e3v_length}:  number of 3' V germline nucleotides deleted.
+#'              \item  \code{e5d_length}:  number of 5' D germline nucleotides deleted.
+#'              \item  \code{e3d_length}:  number of 3' D germline nucleotides deleted.
+#'              \item  \code{e5j_length}:  number of 5' J germline nucleotides deleted.
+#'              \item  \code{v_cdr3_length}:         number of sequence_alignment V nucleotides in the CDR3.
+#'              \item  \code{j_cdr3_length}:         number of sequence_alignment J nucleotides in the CDR3.
+#'          }
+#' 
+#' @examples
+#' germline_db <- list(
+#' "IGHV3-11*05"="CAGGTGCAGCTGGTGGAGTCTGGGGGA...GGCTTGGTCAAGCCTGGAGGGTCCCTGAGACT
+#' CTCCTGTGCAGCCTCTGGATTCACCTTC............AGTGACTACTACATGAGCTGGATCCGCCAGGCTCCAG
+#' GGAAGGGGCTGGAGTGGGTTTCATACATTAGTAGTAGT......AGTAGTTACACAAACTACGCAGACTCTGTGAAG
+#' ...GGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGA
+#' CACGGCCGTGTATTACTGTGCGAGAGA",
+#' "IGHD3-10*01"="GTATTACTATGGTTCGGGGAGTTATTATAAC",
+#' "IGHJ5*02"="ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG"
+#' )
+#' 
+#' db <- junctionAlignment(SingleDb, germline_db)
+#'
+#' @export
+junctionAlignment <- function(data, germline_db, 
+                              v_call="v_call",
+                              d_call="d_call",
+                              j_call="j_call",
+                              v_germline_start="v_germline_start",
+                              v_germline_end="v_germline_end",
+                              d_germline_start="d_germline_start",
+                              d_germline_end="d_germline_end",
+                              j_germline_start="j_germline_start",
+                              j_germline_end="j_germline_end",
+                              np1_length="np1_length",
+                              np2_length="np2_length",
+                              junction="junction",
+                              junction_length="junction_length",
+                              sequence_alignment="sequence_alignment") {
+  
+  # Check input
+  check <- checkColumns(data, 
+                        c(v_call, d_call, j_call, 
+                          v_germline_start, v_germline_end,
+                          d_germline_start, d_germline_end,
+                          j_germline_start, j_germline_end,
+                          np1_length, np2_length,
+                          junction, junction_length,
+                          sequence_alignment))
+  if (check != TRUE) { stop(check) }
+  
+  # Get deletions
+  for (i in 1:nrow(data))  {
+    v_dels <- countDeleted(data[i,], 
+                           allele_call=v_call, germline_start=v_germline_start, germline_end=v_germline_end, 
+                           germline_db=germline_db, junction=junction, junction_length=junction_length, 
+                           sequence_alignment=sequence_alignment)
+    d_dels <- countDeleted(data[i,], 
+                           allele_call=d_call, germline_start=d_germline_start, germline_end=d_germline_end, 
+                           germline_db=germline_db, junction=junction, junction_length=junction_length, 
+                           sequence_alignment=sequence_alignment)
+    j_dels <- countDeleted(data[i,], 
+                           allele_call=j_call, germline_start=j_germline_start, germline_end=j_germline_end, 
+                           germline_db=germline_db, junction=junction, junction_length=junction_length, 
+                           sequence_alignment=sequence_alignment)
+    data[['e3v_length']][i] <- v_dels[2]
+    data[['e5d_length']][i] <- d_dels[1]
+    data[['e3d_length']][i] <- d_dels[2]
+    data[['e5j_length']][i] <- j_dels[1]
+    data[['v_cdr3_length']][i] <- v_dels[3]
+    data[['j_cdr3_length']][i] <- j_dels[3]
+  }
+  
+  return(data)
+}
+
+# Junction alignment helper
+#
+# Report the number of deleted germline nucleotides in the alignment
+#
+# @param    db_row               one row from a Rearrangement database.
+# @param    allele_call          column containing gene assignments.
+# @param    germline_start       column containing the start position of the alignment in the reference germline.
+# @param    germline_end         column containing the end position of the alignment in the reference germline.
+# @param    germline_db          reference germline database for the V, D and J genes.
+# @param    junction             column containing the junction sequence.
+# @param    junction_length      column containing the length of the  junction region in nucleotides.
+# @param    sequence_alignment   column containing the aligned sequence.
+# 
+# @return   Alignment deletions
+countDeleted <- function(db_row, allele_call, germline_start, germline_end, 
+                         germline_db, junction, junction_length,
+                         sequence_alignment) {
+  # db_row: one row from data
+  # allele_call: one of v,d,j
+  # germline_db: the reference germline database used to assign genes. 
+  allele <- getAllele(db_row[[allele_call]], first=T)
+  deleted <- c(NA, NA, NA)
+  
+  # Check for valid allele information
+  if (is.na(allele)) { 
+    return(deleted) 
+  }
+  # Check for allele in reference germlines
+  tryCatch(germline <- germline_db[[allele]],
+           error=function(e) { stop(allele, " not found in germline_db.") })
+  
+  allele_germline_start <- as.numeric(db_row[[germline_start]])
+  allele_germline_end <- as.numeric(db_row[[germline_end]])
+  
+  germline_head <- stringi::stri_sub(germline, 1, allele_germline_start - 1)
+  deleted_head <- nchar(gsub("\\.", "", germline_head))
+  
+  germline_tail <- stringi::stri_sub(germline, allele_germline_end+1, nchar(germline))
+  deleted_tail <- nchar(gsub("\\.", "", germline_tail))
+  
+  deleted[1] <- deleted_head
+  deleted[2] <- deleted_tail
+  
+  if (is.na(db_row[[junction]])) {
+    warning("NA junction found.")
+    return (deleted)
+  }
+  if (!db_row[[junction_length]]>6) {
+    message("Junction length <= 6.")
+    return (deleted)
+  }
+  
+  junction_len <- db_row[[junction_length]]
+  junction_start <- 310
+  # junction_end <- junction_start + junction_len - 1
+  
+  # get aligned junction end (counting gaps)
+  seq_aln <- s2c(db_row[[sequence_alignment]]) != "-"
+  seq_aln[1:junction_start-1] <- 0
+  junction_end <- which(cumsum(seq_aln[1:length(seq_aln)]) > junction_len)[1] - 1
+  
+  # For V and J alleles, calculate number of nt in the CDR3
+  germ_cdr3_length <- NA
+  if (grepl("[Vv]", allele)) {
+    last_cdr3_pre_np <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
+    first_cdr3_pre_np <- junction_start + 3   # without conserved 
+    # len <- last_cdr3_pre_np - first_cdr3_pre_np + 1
+    #germ_seq <- stringi::stri_sub(germline, db_row[[germline_end]]+1-len, db_row[[germline_end]] )
+    germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], first_cdr3_pre_np, last_cdr3_pre_np )
+    germ_cdr3_length <- nchar(gsub("[\\.-]", "", germ_seq))
+  } else if (grepl("[Jj]", allele))  {
+    j_aln_len <- db_row[[germline_end]] - db_row[[germline_start]] + 1 
+    # germ_seq <- stringi::stri_sub(germline, db_row[[germline_start]], db_row[[germline_end]]-j_tail)
+    germ_seq <- stringi::stri_sub(db_row[[sequence_alignment]], 
+                                  nchar(db_row[[sequence_alignment]]) - j_aln_len + 1,
+                                  junction_end - 3)
+    germ_cdr3_length <- nchar(gsub("-", "", germ_seq))
+  } 
+  
+  deleted <- c(deleted_head, deleted_tail, germ_cdr3_length)
+  return(deleted)
+}
+
+
+#### Rcpp wrappers ####
 
 #' Calculate distance between two sequences
 #' 

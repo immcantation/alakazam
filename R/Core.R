@@ -414,14 +414,22 @@ stoufferMeta <- function(p, w=NULL) {
     return(c(Z=Z, pvalue=pvalue))
 }
 
+
 # Stirling's approximation of the binomial coefficient
 # 
-# Calculates Stirling's approximation of the binomial coefficient for large numbers.
+# \code{lchooseStirling} calculates Stirling's approximation of the binomial coefficient 
+# for large numbers.
 #
-# @param    n  a vector of n.
-# @param    k  a vector of k.
-#
+# @param    n  vector of n.
+# @param    k  vector of k.
 # @return   The approximation of log(n choose k). For n < 100 \link{lchoose} is used.
+#
+# @seealso  \link{lchoose}.
+#
+# @examples
+# alakazam:::lchooseStirling(10e9, 10e4)
+#
+# @export
 lchooseStirling <- function(n, k) {
     if (any(n < k)) {
         stop("n must be >= k")
@@ -457,7 +465,6 @@ lchooseStirling <- function(n, k) {
     } else {
         stop("Inputs are wrong. n and k must have the same length or be length one.")
     } 
-    
     
     # Small n
     nCk[x] <-  lchoose(n[a], k[i])
