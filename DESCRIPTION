@@ -76,7 +76,6 @@ Suggests:
 RoxygenNote: 7.1.2
 Collate: 
     'Alakazam.R'
-    'Alignment.R'
     'AminoAcids.R'
     'Classes.R'
     'Core.R'
