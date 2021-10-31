@@ -17,7 +17,8 @@ markdown_extensions:
       toc_depth: 1-4
       permalink: True
 docs_dir: 'docs'
-pages:
+nav:
+  - 'Immcantation Portal': https://immcantation.readthedocs.io/
   - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
