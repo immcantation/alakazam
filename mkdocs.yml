@@ -17,13 +17,13 @@ markdown_extensions:
       toc_depth: 1-4
       permalink: True
 docs_dir: 'docs'
-nav:
-  - 'Immcantation Portal': 'https://immcantation.readthedocs.io'
+pages:
   - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
     - 'Package Overview': topics/alakazam.md
     - 'Release Notes': news.md
+    - 'Related Projects': projects.md
   - 'Vignettes':
     - 'How to read and write files': vignettes/Files-Vignette.md
     - 'Basic gene usage analysis': vignettes/GeneUsage-Vignette.md
