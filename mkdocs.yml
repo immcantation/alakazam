@@ -1,7 +1,8 @@
 site_name: alakazam
+site_url: https://alakazam.readthedocs.io
 repo_url: https://bitbucket.org/kleinstein/alakazam
 edit_uri: src/master/docs/
-theme: 
+theme:
   name: readthedocs
   navigation_depth: 2
   collapse_navigation: False
