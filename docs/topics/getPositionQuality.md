@@ -58,7 +58,7 @@ db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", pac
 
 
 ```
-[1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m999.12TB/s[0m                                                                                                                                                                                                                               [1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m1.03PB/s[0m                                                                                                                                                                                                                               
+[1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m1.00PB/s[0m                                                                                                                                                                                                                               [1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m739.08TB/s[0m                                                                                                                                                                                                                               
 ```
 
 
