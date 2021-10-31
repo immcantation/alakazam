@@ -12,6 +12,8 @@ markdown_extensions:
   - sane_lists
   - smarty
   - toc:
+      baselevel: 1
+      toc_depth: 1-4
       permalink: True
 docs_dir: 'docs'
 nav:
