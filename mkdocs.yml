@@ -1,7 +1,11 @@
 site_name: alakazam
 repo_url: https://bitbucket.org/kleinstein/alakazam
 edit_uri: src/master/docs/
-theme: readthedocs
+theme: 
+  name: readthedocs
+  navigation_depth: 2
+  collapse_navigation: False
+  titles_only: False
 markdown_extensions:
   - def_list
   - sane_lists
