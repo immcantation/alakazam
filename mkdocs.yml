@@ -9,7 +9,7 @@ markdown_extensions:
   - toc:
       permalink: True
 docs_dir: 'docs'
-nav:
+pages:
   - 'Immcantation Portal': 'https://immcantation.readthedocs.io'
   - 'About':
     - 'Introduction': index.md
