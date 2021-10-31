@@ -107,7 +107,7 @@ plotSubtrees(graphs, "sample_id", "out", style="v")
 
 ```
 
-*Warning*:Ignoring unknown parameters: fun.y*No summary function supplied, defaulting to `mean_se()`*![4](plotSubtrees-4.png)
+![2](plotSubtrees-2.png)
 
 ```R
 
@@ -116,7 +116,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 
 ```
 
-*Warning*:Ignoring unknown parameters: fun.y*No summary function supplied, defaulting to `mean_se()`*![8](plotSubtrees-8.png)
+![4](plotSubtrees-4.png)
 
 ```R
 
@@ -124,7 +124,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 plotSubtrees(graphs, "c_call", "depth", style="b")
 ```
 
-![10](plotSubtrees-10.png)
+![6](plotSubtrees-6.png)
 
 
 See also

@@ -257,7 +257,7 @@ annotation pair is observed more often than expected.
 
 ```{r, eval=TRUE}
 # Test isotype relationships
-edge_test <- testEdges(graph_list, "c_call", nperm=20)
+edge_test <- testEdges(graph_list, "c_call", nperm=10)
 
 # Print p-value table
 print(edge_test)
@@ -314,7 +314,7 @@ that the annotation is observed more often than expected in the MRCA position.
 
 ```{r, eval=TRUE}
 # Test isotype MRCA annotations
-mrca_test <- testMRCA(graph_list, "c_call", nperm=20)
+mrca_test <- testMRCA(graph_list, "c_call", nperm=10)
 
 # Print p-value table
 print(mrca_test)

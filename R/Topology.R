@@ -301,8 +301,7 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
         
         # Merge edge list into data.frame
         edge_df <- bind_rows(edge_list)        
-    }
-    else {
+    } else {
         # Get adjacency list
         edge_mat <- as_edgelist(graph, names=FALSE)
         edge_mat <- vertex_attr(graph, name=field, index=edge_mat)
@@ -884,7 +883,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
         p1 <- p1 + geom_violin(aes_string(fill=field), adjust=1.5, scale="width", trim=T, 
                                width=0.7, alpha=0.8) +
             geom_errorbarh(aes(xmin=..x.. - 0.4, xmax=..x.. + 0.4), color="black", 
-                           stat="summary", fun.y="mean", size=1.25, height=0, alpha=0.9)
+                           stat="summary", fun="mean", size=1.25, height=0, alpha=0.9)
     }
 
     # Set colors and legend

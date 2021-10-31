@@ -105,7 +105,7 @@ This output may be visualized using the `plotAbundanceCurve` function.
 ```r
 # Partitions the data on the sample column
 # Calculates a 95% confidence interval via 200 bootstrap realizations
-curve <- estimateAbundance(ExampleDb, group="sample_id", ci=0.95, nboot=200, clone="clone_id")
+curve <- estimateAbundance(ExampleDb, group="sample_id", ci=0.95, nboot=100, clone="clone_id")
 ```
 
 
@@ -132,14 +132,14 @@ orders (q) to generate a smooth curve.
 # 200 resampling realizations are performed (nboot=200)
 sample_curve <- alphaDiversity(ExampleDb, group="sample_id", clone="clone_id",
                                min_q=0, max_q=4, step_q=0.1,
-                               ci=0.95, nboot=200)
+                               ci=0.95, nboot=100)
 
 # Compare diversity curve across values in the c_call column
 # Analyse is restricted to c_call values with at least 30 sequences by min_n=30
 # Excluded groups are indicated by a warning message
 isotype_curve <- alphaDiversity(ExampleDb, group="c_call", clone="clone_id",
                                 min_q=0, max_q=4, step_q=0.1,
-                                ci=0.95, nboot=200)
+                                ci=0.95, nboot=100)
 ```
 
 
@@ -175,7 +175,7 @@ specified.
 # Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
 # Simpson's index) across values in the sample_id column
 # 200 bootstrap realizations are performed (nboot=200)
-isotype_test <- alphaDiversity(ExampleDb, group="c_call", min_q=0, max_q=2, step_q=1, nboot=200, clone="clone_id")
+isotype_test <- alphaDiversity(ExampleDb, group="c_call", min_q=0, max_q=2, step_q=1, nboot=100, clone="clone_id")
 
 # Print P-value table
 print(isotype_test@tests)
@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 × 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.47   0   
-##  2 IGHA != IGHD 1         183.       7.55   0   
-##  3 IGHA != IGHD 2         189.      10.3    0   
-##  4 IGHA != IGHG 0           4.70     7.94   0.64
-##  5 IGHA != IGHG 1          24.7      6.22   0   
-##  6 IGHA != IGHG 2          27.0      4.21   0   
-##  7 IGHA != IGHM 0         159.       6.84   0   
-##  8 IGHA != IGHM 1         211.       6.35   0   
-##  9 IGHA != IGHM 2         229.       7.02   0   
-## 10 IGHD != IGHG 0         134.       7.16   0   
-## 11 IGHD != IGHG 1         159.       7.68   0   
-## 12 IGHD != IGHG 2         162.      10.7    0   
-## 13 IGHD != IGHM 0          19.9      5.42   0   
-## 14 IGHD != IGHM 1          28.0      7.75   0   
-## 15 IGHD != IGHM 2          40.0     12.1    0   
-## 16 IGHG != IGHM 0         154.       6.75   0   
-## 17 IGHG != IGHM 1         187.       6.41   0   
-## 18 IGHG != IGHM 2         202.       7.71   0
+##  1 IGHA != IGHD 0         140.       8.83   0   
+##  2 IGHA != IGHD 1         183.       9.64   0   
+##  3 IGHA != IGHD 2         189.      12.6    0   
+##  4 IGHA != IGHG 0           3.54     8.53   0.78
+##  5 IGHA != IGHG 1          22.8      7.59   0.02
+##  6 IGHA != IGHG 2          25.3      5.16   0   
+##  7 IGHA != IGHM 0         160.       6.94   0   
+##  8 IGHA != IGHM 1         211.       6.41   0   
+##  9 IGHA != IGHM 2         229.       6.45   0   
+## 10 IGHD != IGHG 0         136.       7.44   0   
+## 11 IGHD != IGHG 1         160.       9.46   0   
+## 12 IGHD != IGHG 2         164.      13.3    0   
+## 13 IGHD != IGHM 0          20.0      6.52   0.02
+## 14 IGHD != IGHM 1          28.0      9.42   0.02
+## 15 IGHD != IGHM 2          39.8     14.4    0.02
+## 16 IGHG != IGHM 0         156.       6.37   0   
+## 17 IGHG != IGHM 1         188.       6.54   0   
+## 18 IGHG != IGHM 2         203.       7.50   0
 ```
 
 ```r

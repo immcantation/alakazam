@@ -249,31 +249,13 @@ p2 <- plotSubtrees(graph_list, "sample_id", "size", colors=sample_colors,
 p3 <- plotSubtrees(graph_list, "c_call", "pathlength", colors=IG_COLORS, 
                    main_title="Subtree path length", legend_title="Isotype", 
                    style="violin", silent=TRUE)
-```
-
-```
-## Warning: Ignoring unknown parameters: fun.y
-```
-
-```r
 # Violin plots of subtree depth by isotype
 p4 <- plotSubtrees(graph_list,  "c_call", "depth", colors=IG_COLORS, 
                    main_title="Subtree depth", legend_title="Isotype", 
                    style="violin", silent=TRUE)
-```
 
-```
-## Warning: Ignoring unknown parameters: fun.y
-```
-
-```r
 # Plot in a 2x2 grid
 gridPlot(p1, p2, p3, p4, ncol=2)
-```
-
-```
-## No summary function supplied, defaulting to `mean_se()`
-## No summary function supplied, defaulting to `mean_se()`
 ```
 
 ![plot of chunk Topology-Vignette-6](figure/Topology-Vignette-6-1.png)
@@ -361,7 +343,7 @@ annotation pair is observed more often than expected.
 
 ```r
 # Test isotype relationships
-edge_test <- testEdges(graph_list, "c_call", nperm=20)
+edge_test <- testEdges(graph_list, "c_call", nperm=10)
 
 # Print p-value table
 print(edge_test)
@@ -369,10 +351,10 @@ print(edge_test)
 
 ```
 ##   parent child count  expected    pvalue
-## 1   IGHA  IGHA    36 34.800000 0.0500000
-## 2   IGHA  IGHG     2  2.545455 0.4545455
-## 3   IGHG  IGHA     1  2.882353 0.8823529
-## 4   IGHG  IGHG    99 99.350000 0.4500000
+## 1   IGHA  IGHA    36 34.800000 0.0000000
+## 2   IGHA  IGHG     2  3.142857 0.7142857
+## 3   IGHG  IGHA     1  2.300000 0.8000000
+## 4   IGHG  IGHG    99 98.700000 0.4000000
 ```
 
 ```r
@@ -443,7 +425,7 @@ that the annotation is observed more often than expected in the MRCA position.
 
 ```r
 # Test isotype MRCA annotations
-mrca_test <- testMRCA(graph_list, "c_call", nperm=20)
+mrca_test <- testMRCA(graph_list, "c_call", nperm=10)
 ```
 
 ```r
@@ -453,8 +435,8 @@ print(mrca_test)
 
 ```
 ##   annotation count expected pvalue
-## 1       IGHA    12    11.25   0.00
-## 2       IGHG    31    31.75   0.75
+## 1       IGHA    12     11.5    0.0
+## 2       IGHG    31     31.5    0.5
 ```
 
 ```r

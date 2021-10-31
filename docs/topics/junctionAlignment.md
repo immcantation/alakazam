@@ -99,12 +99,12 @@ Value
 A modified input `data.frame` with the following additional columns storing 
 junction alignment information:
 
-1. `e3v_length`:  number of 3' V germline nucleotides deleted.
-1. `e5d_length`:  number of 5' D germline nucleotides deleted.
-1. `e3d_length`:  number of 3' D germline nucleotides deleted.
-1. `e5j_length`:  number of 5' J germline nucleotides deleted.
-1. `v_cdr3_length`:         number of sequence_alignment V nucleotides in the CDR3.
-1. `j_cdr3_length`:         number of sequence_alignment J nucleotides in the CDR3.
+1. `e3v_length`:     number of 3' V germline nucleotides deleted.
+1. `e5d_length`:     number of 5' D germline nucleotides deleted.
+1. `e3d_length`:     number of 3' D germline nucleotides deleted.
+1. `e5j_length`:     number of 5' J germline nucleotides deleted.
+1. `v_cdr3_length`:  number of sequence_alignment V nucleotides in the CDR3.
+1. `j_cdr3_length`:  number of sequence_alignment J nucleotides in the CDR3.
 
 
 
