@@ -110,7 +110,7 @@
 #' @import      methods
 #' @import      utils
 #' @importFrom  airr        read_rearrangement write_rearrangement
-#' @importFrom	ape 		read.tree di2multi reorder.phylo root ladderize
+#' @importFrom	ape 		read.fastq read.tree di2multi reorder.phylo root ladderize
 #' @importFrom  dplyr       do n desc %>%
 #'                          bind_cols bind_rows combine arrange left_join
 #'                          group_by ungroup
