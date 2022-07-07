@@ -52,35 +52,23 @@ Examples
 -------------------
 
 ```R
-db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
 
 ```
 
-
-```
-[1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m1.00PB/s[0m                                                                                                                                                                                                                               [1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m739.08TB/s[0m                                                                                                                                                                                                                               
-```
-
-
+**Error**: '' does not exist in current working directory ('/home/edelaron/git/Immcantation/alakazam').
 ```R
-fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
+fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
+
+```
+
+**Error in alakazam::checkColumns(data, check_cols)**: object 'db' not found
+```R
 head(getPositionQuality(db))
 ```
 
-*Warning*:NAs introduced by coercion
-```
-  position quality_alignment_num       sequence_id nt
-1        1                    90 CGCTTTTCGGATTGGAA  C
-2        2                    90 CGCTTTTCGGATTGGAA  A
-3        3                    90 CGCTTTTCGGATTGGAA  G
-4        4                    90 CGCTTTTCGGATTGGAA  C
-5        5                    90 CGCTTTTCGGATTGGAA  T
-6        6                    90 CGCTTTTCGGATTGGAA  G
-
-```
-
-
+**Error in checkColumns(data, c(sequence, quality_num))**: object 'db' not found
 
 See also
 -------------------

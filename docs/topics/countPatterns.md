@@ -57,7 +57,7 @@ seq <- c("TGTCAACAGGCTAACAGTTTCCGGACGTTC",
 "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
 patterns <- c("A", "V", "[LI]")
 names(patterns) <- c("arg", "val", "iso_leu")
-countPatterns(seq, patterns, trim=TRUE, label="cdr3")
+countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
 ```
 
 

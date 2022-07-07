@@ -31,5 +31,5 @@ Alakazam serves five main purposes:
 Contact
 -------------------------------------------------------------------------------
 
-For help and questions please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
+For help and questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
 or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).

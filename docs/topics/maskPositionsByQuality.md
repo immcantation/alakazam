@@ -53,34 +53,23 @@ Examples
 -------------------
 
 ```R
-db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
 
 ```
 
-
-```
-[1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m851.12TB/s[0m                                                                                                                                                                                                                               [1mindexed[0m [32m0B[0m in [36m 0s[0m, [32m0B/s[0m[1mindexed[0m [32m1.00TB[0m in [36m 0s[0m, [32m848.19TB/s[0m                                                                                                                                                                                                                               
-```
-
-
+**Error**: '' does not exist in current working directory ('/home/edelaron/git/Immcantation/alakazam').
 ```R
-fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
+fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
+
+```
+
+**Error in alakazam::checkColumns(data, check_cols)**: object 'db' not found
+```R
 maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 ```
 
-*Number of masked sequences: 1*
-```
-[38;5;246m# A tibble: 1 × 37[39m
-  sequence_id       sequence    rev_comp productive v_call  d_call  j_call sequence_alignment germline_alignment junction junction_aa v_cigar  d_cigar j_cigar stop_codon vj_in_frame locus junction_length np1_length np2_length
-  [3m[38;5;246m<chr>[39m[23m             [3m[38;5;246m<chr>[39m[23m       [3m[38;5;246m<lgl>[39m[23m    [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m              [3m[38;5;246m<chr>[39m[23m              [3m[38;5;246m<chr>[39m[23m    [3m[38;5;246m<chr>[39m[23m       [3m[38;5;246m<chr>[39m[23m    [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<chr>[39m[23m   [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<lgl>[39m[23m       [3m[38;5;246m<chr>[39m[23m           [3m[38;5;246m<int>[39m[23m      [3m[38;5;246m<int>[39m[23m      [3m[38;5;246m<int>[39m[23m
-[38;5;250m1[39m CGCTTTTCGGATTGGAA GGCTTTCTGA… FALSE    TRUE       IGHV4-… IGHD3-… IGHJ4… CAGCTGCACCTGCAGGA… CAGCTGCAGCTGCAGGA… TGTGCGA… CARGTDLVTG… 93S8=1X… 403S9N… 425S4N… FALSE      TRUE        IGH                54         10          5
-[38;5;246m# … with 17 more variables: v_sequence_start <int>, v_sequence_end <int>, v_germline_start <int>, v_germline_end <int>, d_sequence_start <int>, d_sequence_end <int>, d_germline_start <int>, d_germline_end <int>,[39m
-[38;5;246m#   j_sequence_start <int>, j_sequence_end <int>, j_germline_start <int>, j_germline_end <int>, consensus_count <int>, duplicate_count <int>, c_call <chr>, quality_alignment_num <chr>, sequence_alignment_masked <chr>[39m
-
-```
-
-
+**Error in checkColumns(data, required_cols)**: object 'db' not found
 
 See also
 -------------------

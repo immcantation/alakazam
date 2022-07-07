@@ -399,51 +399,11 @@ getGene(nl_call, first=FALSE, omit_nl=TRUE)
 
 ```R
 getFamily(nl_call, first=FALSE, omit_nl=TRUE)
-
 ```
 
 
 ```
 [1] "IGHV3" "IGHV3" ""     
-
-```
-
-
-```R
-
-# Temporary designation examples
-tmp_call <- c("IGHV9S3*01", "IGKV10S12*01")
-
-getAllele(tmp_call)
-
-```
-
-
-```
-[1] "IGHV9S3*01"   "IGKV10S12*01"
-
-```
-
-
-```R
-getGene(tmp_call)
-
-```
-
-
-```
-[1] "IGHV9S3"   "IGKV10S12"
-
-```
-
-
-```R
-getFamily(tmp_call)
-```
-
-
-```
-[1] "IGHV9"  "IGKV10"
 
 ```
 

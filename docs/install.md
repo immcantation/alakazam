@@ -1,14 +1,14 @@
 Download
 -------------------------------------------------------------------------------
 
-The latest stable release of Alakazam can be downloaded from 
+The latest stable release of `alakazam` can be downloaded from 
 <a href="http://cran.rstudio.com/web/packages/alakazam" target="_blank">CRAN</a>
 or <a href="https://bitbucket.org/kleinstein/alakazam/downloads" target="_blank">Bitbucket</a>.
 
 Installing Released Versions
 -------------------------------------------------------------------------------
 
-The simplest way to install Alakazam is via CRAN:
+The simplest way to install `alakazam` is via CRAN:
 
 ```R
 install.packages("alakazam")
@@ -17,7 +17,14 @@ install.packages("alakazam")
 Downloaded source builds from Bitbucket may be installed in the usual way:
 
 ```R
-install.packages("alakazam_x.y.z.tar.gz", repos=NULL, type="source")
+install.packages("alakazam_x.y.z.tar.gz", repos = NULL, type = "source")
+```
+
+If you have any trouble installing the package, it may be due to the Bioconductor 
+dependencies. You can run the following command to see what other packages may be needed:
+
+```R
+available.packages()["alakazam", "Imports"]
 ```
 
 Building Development Versions
@@ -38,8 +45,8 @@ install_bitbucket("kleinstein/alakazam@master")
 ```
 
 Note, using `install_bitbucket` will not build the documentation. To generate the 
-documentation, clone the repository and build as normal using devtools, 
-roxygen and knitr:
+documentation, clone the repository and build as normal using `devtools`, 
+`roxygen` and `knitr`:
 
 ```R
 library(devtools)
