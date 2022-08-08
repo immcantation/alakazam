@@ -253,6 +253,38 @@ test_that("getSegment", {
                  c("IGHV9S3", "IGKV10S12"))
     expect_equal(getFamily(tmp_call),
                  c("IGHV9", "IGKV10"))
+    
+    
+    # Test Mus musculus
+    # ADEGMC
+    mm_alleles <- c("IGHA*01", 
+                    "IGHD*01","IGHD5-1-1*01",
+                    "IGHE*01",
+                    "IGHG1*01","IGHG2A*01",
+                    "IGHM*01",
+                    "IGKC*01")
+    mm_genes <- c("IGHA",
+                  "IGHD","IGHD5-1-1",
+                  "IGHE",
+                  "IGHG1","IGHG2A",
+                  "IGHM",
+                  "IGKC")
+    mm_families <- c("IGHA",
+                  "IGHD","IGHD5",
+                  "IGHE",
+                  "IGHG1","IGHG2A",
+                  "IGHM",
+                  "IGKC")    
+    expect_equal(getGene(mm_alleles),mm_genes)
+    expect_equal(getFamily(mm_alleles),mm_families)
+    
+    
+    # Test for TCR
+    expect_equal(getGene(c("TRBV29-1*01","TRAV12-1*01")),
+                 c("TRBV29-1","TRAV12-1"))
+    expect_equal(getFamily(c("TRBV29-1*01","TRAV12-1*01")),
+                 c("TRBV29","TRAV12"))    
+                 
 })
 
 ### sortGenes ####
