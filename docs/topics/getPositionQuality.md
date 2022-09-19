@@ -52,23 +52,25 @@ Examples
 -------------------
 
 ```R
-db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-
-```
-
-**Error**: '' does not exist in current working directory ('/home/edelaron/git/Immcantation/alakazam').
-```R
-fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
-
-```
-
-**Error in alakazam::checkColumns(data, check_cols)**: object 'db' not found
-```R
 head(getPositionQuality(db))
 ```
 
-**Error in checkColumns(data, c(sequence, quality_num))**: object 'db' not found
+*Warning*:NAs introduced by coercion
+```
+  position quality_alignment_num       sequence_id nt
+1        1                    90 CGCTTTTCGGATTGGAA  C
+2        2                    90 CGCTTTTCGGATTGGAA  A
+3        3                    90 CGCTTTTCGGATTGGAA  G
+4        4                    90 CGCTTTTCGGATTGGAA  C
+5        5                    90 CGCTTTTCGGATTGGAA  T
+6        6                    90 CGCTTTTCGGATTGGAA  G
+
+```
+
+
 
 See also
 -------------------

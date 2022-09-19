@@ -53,23 +53,29 @@ Examples
 -------------------
 
 ```R
-db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="alakazam"))
-
-```
-
-**Error**: '' does not exist in current working directory ('/home/edelaron/git/Immcantation/alakazam').
-```R
-fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
+db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
+fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
-
-```
-
-**Error in alakazam::checkColumns(data, check_cols)**: object 'db' not found
-```R
 maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 ```
 
-**Error in checkColumns(data, required_cols)**: object 'db' not found
+*Number of masked sequences: 1*
+```
+# A tibble: 1 × 37
+  sequenc…¹ seque…² rev_c…³ produ…⁴ v_call d_call j_call seque…⁵ germl…⁶ junct…⁷
+  <chr>     <chr>   <lgl>   <lgl>   <chr>  <chr>  <chr>  <chr>   <chr>   <chr>  
+1 CGCTTTTC… GGCTTT… FALSE   TRUE    IGHV4… IGHD3… IGHJ4… CAGCTG… CAGCTG… TGTGCG…
+# … with 27 more variables: junction_aa <chr>, v_cigar <chr>, d_cigar <chr>,
+#   j_cigar <chr>, stop_codon <lgl>, vj_in_frame <lgl>, locus <chr>,
+#   junction_length <int>, np1_length <int>, np2_length <int>,
+#   v_sequence_start <int>, v_sequence_end <int>, v_germline_start <int>,
+#   v_germline_end <int>, d_sequence_start <int>, d_sequence_end <int>,
+#   d_germline_start <int>, d_germline_end <int>, j_sequence_start <int>,
+#   j_sequence_end <int>, j_germline_start <int>, j_germline_end <int>, …
+
+```
+
+
 
 See also
 -------------------

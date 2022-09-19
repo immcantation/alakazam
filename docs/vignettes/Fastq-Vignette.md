@@ -30,9 +30,10 @@ db[,new_cols] %>% head()
 
 ```
 ## # A tibble: 1 × 4
-##   quality_num                                                                                                                              quality quality_alignme… quality_alignme…
-##   <chr>                                                                                                                                    <chr>   <chr>            <chr>           
-## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,… {{{{{{… 90,90,90,90,90,… {{{{{{{{{{{{{{{…
+##   quality_num                                            quality quali…¹ quali…²
+##   <chr>                                                  <chr>   <chr>   <chr>  
+## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90… {{{{{{… 90,90,… {{{{{{…
+## # … with abbreviated variable names ¹​quality_alignment_num, ²​quality_alignment
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
@@ -116,4 +117,3 @@ db <- maskPositionsByQuality(db, min_quality=70,
 ```
 ## Number of masked sequences: 1
 ```
-
