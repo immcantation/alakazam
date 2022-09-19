@@ -1,3 +1,11 @@
+Version 1.2.1: September 19, 2022
+-------------------------------------------------------------------------------
+
+General:
+
++ Fixed bug in parsing of TCR gene names. 
++ Fixed missing import of `ape::read.fastq`. 
+
 Version 1.2.0: October 31, 2021
 -------------------------------------------------------------------------------
 
