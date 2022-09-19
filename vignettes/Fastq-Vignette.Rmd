@@ -108,4 +108,3 @@ db <- maskPositionsByQuality(db, min_quality=70,
                              sequence="sequence_alignment",
                              quality="quality_alignment_num")
 ```
-

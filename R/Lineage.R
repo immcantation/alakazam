@@ -618,8 +618,9 @@ phylipToGraph <- function(edges, clone) {
 #' @seealso  Takes as input a \link{ChangeoClone}. 
 #'           Temporary directories are created with \link{makeTempDir}.
 #'           Distance is calculated using \link{seqDist}. 
-#'           See the igraph \link[igraph]{graph} documentation for how to work 
-#'           with \code{graph} objects. 
+#'           See [igraph](http://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package) 
+#'           and [igraph.plotting](http://www.rdocumentation.org/packages/igraph/topics/plot.common) 
+#'           for working  with igraph \code{graph} objects.
 #'
 #' @examples
 #' \dontrun{
