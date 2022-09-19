@@ -354,7 +354,7 @@ countOccurrences <- function(x, pattern) {
 #'          "TGTCAAAAGTATAACAGTGCCCCCTGGACGTTC")
 #' patterns <- c("A", "V", "[LI]")
 #' names(patterns) <- c("arg", "val", "iso_leu")
-#' countPatterns(seq, patterns, trim=TRUE, label="cdr3")
+#' countPatterns(seq, patterns, nt=TRUE, trim=TRUE, label="cdr3")
 #'             
 #' @export
 countPatterns <- function(seq, patterns, nt=TRUE, trim=FALSE, label="region") {
