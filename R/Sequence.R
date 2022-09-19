@@ -258,9 +258,9 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     if (nseq <= 1) { 
         if (verbose) { .printVerbose(nseq, 1, 0) }
         if (dry) {
-            data$collapse_id <- 1
-            data$collapse_class <- "unique"
-            data$collapse_pass <- TRUE            
+            data[['collapse_id']] <- 1
+            data[['collapse_class']] <- "unique"
+            data[['collapse_pass']] <- TRUE            
         }
         return(data)
     }
@@ -273,9 +273,9 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     if (!any(d_mat[lower.tri(d_mat, diag=F)])) {
         if (verbose) { .printVerbose(nseq, nseq, 0) }
         if (dry) {
-            data$collapse_id <- 1:nrow(data)
-            data$collapse_class <- "unique"
-            data$collapse_pass <- TRUE            
+            data[['collapse_id']] <- 1:nrow(data)
+            data[['collapse_class']] <- "unique"
+            data[['collapse_pass']] <- TRUE            
         }
         return(data)
     }        
