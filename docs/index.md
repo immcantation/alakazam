@@ -44,8 +44,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 # Authors
 
-[Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
+[Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Nima Nouri](mailto:nima.nouri@yale.edu) (aut)  
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
 [Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (aut)  
