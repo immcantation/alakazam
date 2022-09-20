@@ -337,7 +337,7 @@ ABBREV_AA <- c("A"="Ala",
 #'          \code{c(start, end)} positions of the named region.
 #'          
 #' @references
-#'   \url{http://imgt.org}
+#'   \url{https://www.imgt.org/}
 #' 
 #' @export
 IMGT_REGIONS <- list("fwr1"=c(1, 78),

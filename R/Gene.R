@@ -189,7 +189,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
 #' @return    A character vector containing allele, gene or family names.
 #' 
 #' @references
-#'   \url{http://imgt.org}
+#'   \url{https://www.imgt.org/}
 #'
 #' @seealso  \link{countGenes}
 #'
