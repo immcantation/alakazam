@@ -1124,7 +1124,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     
     if (!all(is.na(group_labels))) {
         # Define grouped plot
-        p1 <- ggplot(data@abundance, aes_string(x="rank", y="p", group=data@group_by)) + 
+        p1 <- ggplot(data@abundance, aes(x=rank, y=p, group=!!rlang::sym(data@group_by))) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
@@ -1133,8 +1133,8 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes_string(ymin="lower", ymax="upper", fill=data@group_by), alpha=0.4) +
-            geom_line(aes_string(color=data@group_by))
+            geom_ribbon(aes(ymin=lower, ymax=upper, fill=!!rlang::sym(data@group_by)), alpha=0.4) +
+            geom_line(aes(color=!!rlang::sym(data@group_by)))
         
         # Set colors and legend
         if (!is.null(colors)) {
@@ -1152,7 +1152,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             line_color <- "black"
         }
         # Define plot
-        p1 <- ggplot(data@abundance, aes_string(x="rank", y="p")) + 
+        p1 <- ggplot(data@abundance, aes(x=rank, y=p)) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
@@ -1161,7 +1161,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes_string(ymin="lower", ymax="upper"), fill=line_color, alpha=0.4) +
+            geom_ribbon(aes(ymin=lower, ymax=upper), fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
     }
     
@@ -1257,13 +1257,15 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     if (!all(is.na(group_labels))) {
         # Define grouped plot
-        p1 <- ggplot(data@diversity, aes_string(x="q", y=y_value, group=data@group_by)) + 
+        p1 <- ggplot(data@diversity, aes(x=q, y=!!rlang::sym(y_value), 
+                                         group=!!rlang::sym(data@group_by))) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('q') +
             ylab(y_label) +
-            geom_ribbon(aes_string(ymin=y_min, ymax=y_max, fill=data@group_by), alpha=0.4) +
-            geom_line(aes_string(color=data@group_by))
+            geom_ribbon(aes(ymin=!!rlang::sym(y_min), ymax=!!rlang::sym(y_max), 
+                            fill=!!rlang::sym(data@group_by)), alpha=0.4) +
+            geom_line(aes(color=!!rlang::sym(data@group_by)))
     
         # Set colors and legend
         if (!is.null(colors)) {
@@ -1282,12 +1284,12 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
         }
       
         # Define ungrouped plot
-        p1 <- ggplot(data@diversity, aes_string(x="q", y=y_value)) + 
+        p1 <- ggplot(data@diversity, aes(x=q, y=!!rlang::sym(y_value))) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab('q') +
             ylab(y_label) +
-            geom_ribbon(aes_string(ymin=y_min, ymax=y_max), fill=line_color, alpha=0.4) +
+            geom_ribbon(aes(ymin=!!rlang::sym(y_min), ymax=!!rlang::sym(y_max)), fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
     }
     
@@ -1390,13 +1392,13 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
                       upper=!!rlang::sym("d") + !!rlang::sym("d_sd"))
     
     # Define base plot elements
-    p1 <- ggplot(df, aes_string(x=data@group_by)) + 
+    p1 <- ggplot(df, aes(x=!!rlang::sym(data@group_by))) + 
         ggtitle(main_title) + 
         baseTheme() + 
         xlab("") +
         ylab(bquote("Mean " ^ .(q) * D %+-% "SD")) +
-        geom_linerange(aes_string(ymin="lower", ymax="upper", color=data@group_by), alpha=0.8) +
-        geom_point(aes_string(y="d", color=data@group_by))
+        geom_linerange(aes(ymin=lower, ymax=upper, color=!!rlang::sym(data@group_by)), alpha=0.8) +
+        geom_point(aes(y=d, color=!!rlang::sym(data@group_by)))
     
     # Set colors and legend
     if (!is.null(colors)) {
