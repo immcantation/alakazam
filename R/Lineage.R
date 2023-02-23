@@ -28,6 +28,8 @@ NULL
 #' @param    junc_len     name of the column containing the length of the junction as a 
 #'                        numeric value. All entries in this column should be identical 
 #'                        for any given clone.
+#' @param    locusColumn  name of the column containing locus specification. Must be present
+#'                        and only contain the value "IGH", representing heavy chains.
 #' @param    clone        name of the column containing the identifier for the clone. All 
 #'                        entries in this column should be identical.
 #' @param    mask_char    character to use for masking and padding.
@@ -110,13 +112,21 @@ NULL
 makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
                              germ="germline_alignment", v_call="v_call", j_call="j_call",
                              junc_len="junction_length", clone="clone_id", mask_char="N",
-                             max_mask=0, pad_end=FALSE, text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                             add_count=TRUE, verbose=FALSE) {
+                             locusColumn="locus", max_mask=0, pad_end=FALSE, text_fields=NULL, 
+                             num_fields=NULL, seq_fields=NULL, add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
     check <- checkColumns(data, c(id, seq, germ, v_call, j_call, junc_len, clone, 
-                                  text_fields, num_fields, seq_fields))
+                                  text_fields, num_fields, seq_fields, locusColumn))
     if (check != TRUE) { stop(check) }
     
+    if(sum(is.na(data[[locusColumn]])) > 0){
+        stop(paste("Missing values found in",locusColumn,"column"))
+    }
+    if(sum(data[[locusColumn]] != "IGH") > 0){
+        stop(paste("Only heavy chain (IGH) allowed in",locusColumn,"column.",
+            "Heavy+light chain trees only supported in Dowser: https://dowser.readthedocs.io"))
+    }
+
     # Replace gaps with Ns and masked ragged ends
     tmp_df <- data[, c(id, seq, text_fields, num_fields, seq_fields)]
     tmp_df[[seq]] <- maskSeqGaps(tmp_df[[seq]], mask_char=mask_char, outer_only=FALSE)
@@ -132,13 +142,13 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
     seq_len <- stringi::stri_length(tmp_df[[seq]])
     if (any(seq_len != seq_len[1])) {
         len_message <- paste0("All sequences are not the same length for data with first ", 
-                              id, " = ", tmp_df[[id]][1], ".")
+                     id, " = ", tmp_df[[id]][1], ".")
         if (!pad_end) {
             len_message <- paste(len_message, 
-                                 "Consider specifying pad_end=TRUE and verify the multiple alignment.")
+                    "Consider specifying pad_end=TRUE and verify the multiple alignment.")
         } else {
             len_message <- paste(len_message,
-                                 "Verify that all sequences are properly multiple-aligned.")
+                    "Verify that all sequences are properly multiple-aligned.")
         }
         stop(len_message)
     }
