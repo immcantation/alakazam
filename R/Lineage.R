@@ -97,6 +97,7 @@ NULL
 #'                  j_call="Homsap IGKJ5*01 F",
 #'                  junction_length=2,
 #'                  clone_id=1,
+#'                  locus=rep("IGH", length=4),
 #'                  c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
 #'                  duplicate_count=1:4,
 #'                  stringsAsFactors=FALSE)
