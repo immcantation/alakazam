@@ -386,6 +386,16 @@ test_that("collapseDuplicates", {
     ) 
     expect_equal(obs, exp)
     
+    # Test dry
+    obs <- collapseDuplicates(db[-5,], text_fields=c("TYPE", "SAMPLE"), num_fields="COUNT", 
+                              add_count=TRUE, verbose=F, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                              dry=T)
+    exp <- obs
+    exp$collapse_class <- "duplicated"
+    exp$collapse_pass <- c(T,F,F,F)
+    expect_equal(obs, exp)
+    
+    
     
     ## All sequences are ambiguous,
     ## but belong to two independent ambiguous clusters
