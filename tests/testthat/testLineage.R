@@ -47,7 +47,7 @@ test_that("makeChangeoClone",{
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
     
     changeoclone <- makeChangeoClone(changeodb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
-           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", locusColumn="LOCUS",
+           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", locus="LOCUS",
            junc_len="JUNCTION_LENGTH", clone="CLONE", text_fields="TYPE", num_fields="COUNT")
 
     expect_true(inherits(clone, "ChangeoClone"))
@@ -67,7 +67,7 @@ test_that("makeChangeoClone",{
     db_trim <- changeodb
     db_trim$sequence_alignment <- c("CCCCTGGG", "CCCCTGG", "NAACTGG", "NNNCTG")
     changeoclone <- makeChangeoClone(db_trim, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", 
-           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", locusColumn="LOCUS",
+           germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", j_call="J_CALL", locus="LOCUS",
            junc_len="JUNCTION_LENGTH", clone="CLONE",text_fields="TYPE", 
            num_fields="COUNT", pad_end=TRUE)
 
@@ -84,7 +84,7 @@ test_that("makeChangeoClone",{
     clone <- makeChangeoClone(db, max_mask=3, text_fields="TYPE", num_fields="COUNT")
     changeoclone <- makeChangeoClone(changeodb, max_mask=3, id="SEQUENCE_ID",
             seq="SEQUENCE_IMGT", germ="GERMLINE_IMGT_D_MASK", v_call="V_CALL", 
-            j_call="J_CALL", locusColumn="LOCUS", junc_len="JUNCTION_LENGTH", clone="CLONE", 
+            j_call="J_CALL", locus="LOCUS", junc_len="JUNCTION_LENGTH", clone="CLONE", 
             text_fields="TYPE", num_fields="COUNT")
 
     exp <- data.frame("sequence_id"="A",

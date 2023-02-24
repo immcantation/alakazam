@@ -28,7 +28,7 @@ NULL
 #' @param    junc_len     name of the column containing the length of the junction as a 
 #'                        numeric value. All entries in this column should be identical 
 #'                        for any given clone.
-#' @param    locusColumn  name of the column containing locus specification. Must be present
+#' @param    locus  name of the column containing locus specification. Must be present
 #'                        and only contain the value "IGH", representing heavy chains.
 #' @param    clone        name of the column containing the identifier for the clone. All 
 #'                        entries in this column should be identical.
@@ -113,18 +113,18 @@ NULL
 makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment", 
                              germ="germline_alignment", v_call="v_call", j_call="j_call",
                              junc_len="junction_length", clone="clone_id", mask_char="N",
-                             locusColumn="locus", max_mask=0, pad_end=FALSE, text_fields=NULL, 
+                             locus="locus", max_mask=0, pad_end=FALSE, text_fields=NULL, 
                              num_fields=NULL, seq_fields=NULL, add_count=TRUE, verbose=FALSE) {
     # Check for valid fields
     check <- checkColumns(data, c(id, seq, germ, v_call, j_call, junc_len, clone, 
-                                  text_fields, num_fields, seq_fields, locusColumn))
+                                  text_fields, num_fields, seq_fields, locus))
     if (check != TRUE) { stop(check) }
     
-    if(sum(is.na(data[[locusColumn]])) > 0){
-        stop(paste("Missing values found in",locusColumn,"column"))
+    if(sum(is.na(data[[locus]])) > 0){
+        stop(paste("Missing values found in",locus,"column"))
     }
-    if(sum(data[[locusColumn]] != "IGH") > 0){
-        stop(paste("Only heavy chain (IGH) allowed in",locusColumn,"column.",
+    if(sum(data[[locus]] != "IGH") > 0){
+        stop(paste("Only heavy chain (IGH) allowed in",locus,"column.",
             "Heavy+light chain trees only supported in Dowser: https://dowser.readthedocs.io"))
     }
 
