@@ -424,7 +424,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         # Summarize MRCA counts
         mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
             select(!!!rlang::syms(c("GRAPH", field))) %>%
-            rename("annotation"=field) %>%
+            rename(all_of(c("annotation"=field))) %>%
             group_by(!!rlang::sym("annotation")) %>%
             dplyr::summarize(count=n())
         
