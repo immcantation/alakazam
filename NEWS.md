@@ -1,6 +1,10 @@
 Version 1.2.1.999: February 23, 2023
 -------------------------------------------------------------------------------
 
+Backwards Incompatible Changes:
+
++ Some functions now require the parameter `locus`: `makeChangeoClone` 
+
 General:
 
 + Updated dependencies to ggplot2 >= 3.4.0.
