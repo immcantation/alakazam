@@ -580,12 +580,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        first=FALSE) {
     # Check base input
     check <- checkColumns(data, c(v_call, j_call, junc_len))
-    if (check != TRUE) { stop(check) }
+    if (!check) { stop("A column or some combination of columns v_call, j_call, and junc_len were not found in the data") }
     
     # Check single-cell input
     if (!is.null(cell_id)) {
         check <- checkColumns(data, c(cell_id, locus))
-        if (check != TRUE) { stop(check) }
+        if (!check) { stop("Single cell data was indicated, but the cell_id and locus column were not found") }
     }
     
     # if necessary, cast select columns to character (factor not allowed later on)
@@ -638,14 +638,14 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         # make a copy
         data_orig <- data; rm(data)
         
-        if (only_heavy) {
+        if(only_heavy){
             
             # use heavy chains only
             
             # Straightforward subsetting like below won't work in cases 
             #     where multiple HCs are present for a cell 
             # subset to heavy only
-            # data <- data_orig[data_orig[[locus]]=="IGH", ]
+            data <- data_orig[data_orig[[locus]]=="IGH", ]
             
             # flatten data
             cols <- c(cell_id, v_call, j_call, junc_len)
