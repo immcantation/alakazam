@@ -32,6 +32,9 @@ ExampleDb <- ExampleDb %>%
     mutate(c_call=translateStrings(c_call, c_trans),
            germline_alignment=germline_alignment_d_mask)
 
+# we now require a locus column
+ExampleDb$locus <- "IGH"
+
 # Save
 usethis::use_data(ExampleDb, overwrite=TRUE)
 
@@ -41,10 +44,11 @@ usethis::use_data(ExampleDb, overwrite=TRUE)
 clones <- ExampleDb %>%
     group_by(clone_id) %>%
     do(CHANGEO=makeChangeoClone(., id="sequence_id", seq="sequence_alignment", 
-                                germ="germline_alignment", text_fields=c("sample_id", "c_call"),
-                                num_fields="duplicate_count", add_count=FALSE))
+                    germ="germline_alignment", text_fields=c("sample_id", "c_call"),
+                    num_fields="duplicate_count", add_count=FALSE))
 # Build lineages
-phylip_exec <- "~/local/apps/phylip-3.695/bin/dnapars"
+#phylip_exec <- "~/local/apps/phylip-3.695/bin/dnapars"
+phylip_exec <- "~/Programs/phylip-3.697/exe/dnapars"
 graphs <- lapply(clones$CHANGEO, buildPhylipLineage,
                  phylip_exec=phylip_exec, rm_temp=TRUE)
 
