@@ -645,7 +645,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             # Straightforward subsetting like below won't work in cases 
             #     where multiple HCs are present for a cell 
             # subset to heavy only
-            data <- data_orig[data_orig[[locus]]=="IGH", ]
+            data <- data_orig[data_orig[[locus]] %in% c("IGH","TRB","TRD"), ]
             
             # flatten data
             cols <- c(cell_id, v_call, j_call, junc_len)
