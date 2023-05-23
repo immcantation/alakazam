@@ -1126,7 +1126,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             # matrix
             # important to specify rowSums from Matrix package
             # base::rowSums will NOT work
-            cell_idx <- which(Matrix::rowSums(mtx_cell_VJL[, x])>0)
+            cell_idx <- which(Matrix::rowSums(mtx_cell_VJL[, x, drop=F ])>0)
         } else {
             # vector
             cell_idx <- which(mtx_cell_VJL[, x]>0)

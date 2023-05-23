@@ -331,6 +331,24 @@ test_that("groupGenes heavy only", {
 
 })
 
+
+test_that("groupGenes ", {
+    db <- structure(list(sample_id = "UW0343__S", sequence_id = "assemble12_0", 
+                   subject_id = "S1", v_call = "IGHV3-30*02,IGHV3-30-5*02", 
+                   j_call = "IGHJ6*03", junction = "TGTGCGAAAGTCCCCGTGGGGACTGCCTCTTACATGGACGCCTGG", 
+                   cell_id = NA_character_, single_cell = FALSE, locus = "IGH", 
+                   junction_length = 45L), row.names = c(NA, -1L
+                   ), class = c("tbl_df", "tbl", "data.frame"))
+    ft <- groupGenes(db, junc_len="junction_length",
+                  cell_id=NULL, locus="locus", only_heavy=T,
+                  first=TRUE)
+    ff <- groupGenes(db, junc_len="junction_length",
+                     cell_id=NULL, locus="locus", only_heavy=T,
+                     first=FALSE)
+    expect_equal(ft,ff)
+})
+
+
 test_that("groupGenes, single-cell mode, heavy and light", {
     
     # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
