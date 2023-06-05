@@ -474,7 +474,8 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         
         if (progress) { pb$tick() }
     }
-    id_col <- if_else(is.null(group), "group", group)
+    id_col <- "group"
+    if (!is.null(group)) { id_col <- group }
     abundance_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
     bootstrap_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
