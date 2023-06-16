@@ -644,8 +644,17 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             
             # Straightforward subsetting like below won't work in cases 
             #     where multiple HCs are present for a cell 
-            # subset to heavy only
-            data <- data_orig[data_orig[[locus]]=="IGH", ]
+            # CGJ 6/16/23
+            # subset to heavy only -- for both B and T cells
+            data <- data_orig[data_orig[[locus]] %in% c("IGH", "TRB", "TRD"),]
+            
+            # Check for cells with two heavy chains 
+            # CGJ 6/16/23 -- stop or warning or leave  be?
+            heavy_count <- table(data[[cell_id]])
+            multi_heavy_cells = names(heavy_count[heavy_count > 1])
+            if(length(multi_heavy_cells != 0)){
+              stop(paste("Only one heavy chain is allowed per cell. Filter out cells with multiple heavy chains or remove additional heavy chains.")
+            }
             
             # flatten data
             cols <- c(cell_id, v_call, j_call, junc_len)
