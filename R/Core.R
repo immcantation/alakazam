@@ -36,6 +36,8 @@
 #'                   
 #' @seealso  Wraps \link[readr]{read_delim}. 
 #'           See \link{writeChangeoDb} for writing to Change-O files.
+#'           See \link[airr]{read_rearrangement} and \link[airr]{write_rearrangement}
+#'           to read and write AIRR-C Standard formatted repertoires.
 #' 
 #' @examples
 #' \dontrun{
@@ -63,6 +65,19 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
     # Define types
     header <- names(suppressMessages(readr::read_tsv(file, n_max=1)))
     types <- do.call(readr::cols, CHANGEO[intersect(names(CHANGEO), header)])
+    
+    # Check if ChangeO format
+    if (length(types$cols)==0) {
+        airr_columns <- intersect(names(airr::RearrangementSchema), header)
+        if (length(airr_columns)>0) {
+            warning(paste0(
+            basename(file),
+            " is not in the Change-O format.\n",
+            "If you are trying to read an AIRR-C Standard formatted file,\n",
+            "use airr::read_rearrangement for correct type casting.
+            "))
+        }
+    }
     
     # Read file    
     db <- suppressMessages(readr::read_tsv(file, col_types=types, na=c("", "NA", "None")))
@@ -94,6 +109,8 @@ readChangeoDb <- function(file, select=NULL, drop=NULL, seq_upper=TRUE) {
 #' @return   NULL
 #' 
 #' @seealso  Wraps \link[readr]{write_delim}. See \link{readChangeoDb} for reading to Change-O files.
+#'           See \link[airr]{read_rearrangement} and \link[airr]{write_rearrangement}
+#'           to read and write AIRR-C Standard formatted repertoires.
 #' 
 #' @examples
 #' \dontrun{
