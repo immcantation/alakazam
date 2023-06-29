@@ -461,7 +461,7 @@ test_that("groupGenes, mixed bulk and single cell", {
         v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
         j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
         junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
-        locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGL"),
+        locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
         cell_id=c(1,2,3,NA,NA,1,NA),
         junction_length=12
     )
