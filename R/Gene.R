@@ -576,11 +576,22 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       cell_id=NULL, locus="locus", only_heavy=TRUE,
-                       first=FALSE) {
+                       sequence_alignment="sequence_alignment",cell_id=NULL, 
+                       locus="locus", only_heavy=TRUE, first=FALSE) {
+  
     # Check base input
-    check <- checkColumns(data, c(v_call, j_call, junc_len))
-    if (!check) { stop("A column or some combination of columns v_call, j_call, and junc_len were not found in the data") }
+    check <- checkColumns(data, c(v_call, j_call, junc_len, sequence_alignment))
+    if (!check) { stop("A column or some combination of columns v_call, j_call, junc_len, and sequence_alignment were not found in the data") }
+    
+    # check for ambiguous sequences that could cause clonal group clumping
+    # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
+    for(i in nrow(data)){
+      n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
+                              gregexpr("[ACTG]", data[[sequence_alignment]][i])))
+      if(n_informative < 250){
+        stop("Ambigous sequence alignments have been found. Please remove sequences with less than 250 informative sites")
+      }
+    }
     
     # Check single-cell input
     if (!is.null(cell_id)) {
@@ -653,7 +664,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             heavy_count <- table(data[[cell_id]])
             multi_heavy_cells = names(heavy_count[heavy_count > 1])
             if(length(multi_heavy_cells != 0)){
-              stop(paste("Only one heavy chain is allowed per cell. Filter out cells with multiple heavy chains or remove additional heavy chains.")
+              stop(paste("Only one heavy chain is allowed per cell. Filter out cells with multiple heavy chains or remove additional heavy chains."))
             }
             
             # flatten data
