@@ -86,7 +86,7 @@ head(clones, 5)
 You may also specify a column containing the abundance count of each sequence 
 (usually copy numbers), that will including weighting of each clone size by the 
 corresponding abundance count. Furthermore, multiple grouping columns may be
-specified such that `seq_freq` (unwieghted clone size as a fraction
+specified such that `seq_freq` (unweighted clone size as a fraction
 of total sequences in the group) and `copy_freq` (weighted faction) are 
 normalized to within multiple group data partitions.
 
