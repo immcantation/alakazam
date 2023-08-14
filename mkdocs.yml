@@ -6,7 +6,7 @@ edit_uri: src/master/docs/
 theme:
   name: readthedocs
   navigation_depth: 2
-  collapse_navigation: True
+  collapse_navigation: False
   titles_only: False
 markdown_extensions:
   - def_list
