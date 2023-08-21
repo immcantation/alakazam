@@ -318,10 +318,12 @@ test_that("groupGenes heavy only", {
                      V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"), 
                      J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"),
                      stringsAsFactors=F)
+    db$LOCUS <- getLocus(db$V_CALL)
     # group VJ genes
     db <- groupGenes(db,
                      v_call="V_CALL",
                      j_call="J_CALL",
+                     locus="LOCUS",
                      first=F)
     # test
     #expected <- c(2, 3, 2, 2, 2, 1, 2, 3)
@@ -552,7 +554,9 @@ test_that("groupGenes, AIRR-format migration", {
         regexp="airr::read_rearrangement"
     )
     
-    newDb_c <- groupGenes(db_c, v_call="V_CALL", j_call="J_CALL")
+    db_c$LOCUS <- getLocus(db$V_CALL)
+
+    newDb_c <- groupGenes(db_c, v_call="V_CALL", j_call="J_CALL", locus="LOCUS")
     newDb_a <- groupGenes(db_a, v_call="v_call", j_call="j_call")
     
     # newDb_c and newDb_a not directly comparable b/c diff ncol
