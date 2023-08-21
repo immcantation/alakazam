@@ -432,7 +432,9 @@ test_that("testDiversity reproduces v0.2.11 results", {
 
 # example_file <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
 example_file <- file.path("..", "data-tests", "ExampleDb_airr.gz")
-db <- readChangeoDb(example_file)
+expect_warning(
+    db <- readChangeoDb(example_file),
+regexp="airr::read_rearrangement")
 
 #### calcCoverage ####
 

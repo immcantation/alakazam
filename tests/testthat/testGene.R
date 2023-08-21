@@ -513,7 +513,11 @@ test_that("groupGenes, single-cell mode, heavy only", {
 test_that("countGenes, AIRR-format migration", {
     
     db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
-    db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz"))
+    expect_warning(
+        db_a <- readChangeoDb(
+            file.path("..", "data-tests", "ExampleDb_airr.gz")),
+        regexp = "airr::read_rearrangement"
+    )
     
     # 1
     genes_c <- countGenes(db_c, gene="V_CALL", groups="SAMPLE", mode="allele")
@@ -543,7 +547,10 @@ test_that("groupGenes, AIRR-format migration", {
 
     # 1 
     db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
-    db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz"))
+    expect_warning(
+        db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz")),
+        regexp="airr::read_rearrangement"
+    )
     
     newDb_c <- groupGenes(db_c, v_call="V_CALL", j_call="J_CALL")
     newDb_a <- groupGenes(db_a, v_call="v_call", j_call="j_call")

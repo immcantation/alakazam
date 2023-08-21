@@ -1,6 +1,9 @@
 # ExampleDb <- file.path("tests", "data-tests", "ExampleDb_airr.gz")
 ExampleDb <- file.path("..", "data-tests", "ExampleDb_airr.gz")
-db <- readChangeoDb(ExampleDb)
+expect_warning(
+    db <- readChangeoDb(ExampleDb),
+    regexp="airr::read_rearrangement"
+)
 
 test_that("makeChangeoClone",{
     # Example AIRR data.frame
