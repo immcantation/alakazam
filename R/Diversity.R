@@ -374,6 +374,17 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL, 
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
                               progress=FALSE) {
+    
+    # TODO:
+    # Add alakazam style cellIdColumn=NULL, locusColumn="locus", locusValues=c("IGH")
+    # similar to distToNearest
+    # filter based on locusValues
+    # if cellIdColumn
+    #    for rows that have unique cell_id, ok
+    #    if rows have cell_id not unique, count only once
+    # if not cellIdColumn, count heavy chains (locusValues will be IGH)
+    # If mixed bulk and sc do calculation but raise warning because different type of abundances
+    
     ## DEBUG
     # data=ExampleDb; group="sample_id"; clone="clone_id"; copy=NULL; min_n=1; max_n=NULL; ci=0.95; uniform=F; nboot=100
     # copy="duplicate_count"
