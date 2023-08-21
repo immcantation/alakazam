@@ -1,3 +1,6 @@
+#' @keywords internal
+"_PACKAGE"
+
 # Alakazam package documentation and import directives
 
 #' The alakazam package
