@@ -580,13 +580,19 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        first=FALSE) {
     # Check base input
     check <- checkColumns(data, c(v_call, j_call, junc_len))
-    if (!check) { stop("A column or some combination of columns v_call, j_call, and junc_len were not found in the data") }
+    if (check!=TRUE) { stop("A column or some combination of columns v_call, j_call, and junc_len were not found in the data") }
     
     # Check single-cell input
     if (!is.null(cell_id)) {
-        check <- checkColumns(data, c(cell_id, locus))
-        if (!check) { stop("Single cell data was indicated, but the cell_id and locus column were not found") }
+        check <- checkColumns(data, c(cell_id))
+        if (check != TRUE) { stop(check) }
     }
+    
+    # Check locus
+    # message locus is required
+    if (is.null(locus)) { stop("`locus`, is a required parameter.") }
+    check <- checkColumns(data, locus)
+    if (check != TRUE) { stop(check) }
     
     # if necessary, cast select columns to character (factor not allowed later on)
     if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
