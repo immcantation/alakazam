@@ -1086,9 +1086,12 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' @param    main_title    string specifying the plot title.
 #' @param    legend_title  string specifying the legend title.
 #' @param    xlim          numeric vector of two values specifying the 
-#'                         \code{c(lower, upper)} x-axis limits.
+#'                         \code{c(lower, upper)} x-axis limits. The lower x-axis 
+#'                         value must be >=1.
 #' @param    ylim          numeric vector of two values specifying the 
-#'                         \code{c(lower, upper)} y-axis limits.
+#'                         \code{c(lower, upper)} y-axis limits. The limits on the 
+#'                         abundance values are expressed as fractions of 1: use
+#'                         c(0,1) to set the lower and upper limits to 0% and 100%.
 #' @param    annotate      string defining whether to added values to the group labels 
 #'                         of the legend. When \code{"none"} (default) is specified no
 #'                         annotations are added. Specifying (\code{"depth"}) adds 
@@ -1118,6 +1121,17 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Check if abundance is in data
     if (is.null(data@abundance)) { stop("Missing abundance data.") }
     
+    # Validate abundance limits
+    if (!is.null(xlim)) {
+        if (xlim[1]<1) {
+            stop("The lower x-axis xlim value must be >=1.")
+        }
+        max_xlim <- max(data@abundance$rank, na.rm = T)
+        if (xlim[2]>max_xlim) {
+            message("The largest x-axis value is ",max_xlim,".")
+        }
+    }    
+
     # Check arguments
     annotate <- match.arg(annotate)
     
@@ -1141,7 +1155,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             baseTheme() + 
             xlab("Rank") +
             ylab("Abundance") +
-            scale_x_log10(limits=xlim,
+            scale_x_log10(
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
@@ -1169,16 +1183,17 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             baseTheme() + 
             xlab("Rank") +
             ylab("Abundance") +
-            scale_x_log10(limits=xlim,
+            scale_x_log10(
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
             geom_ribbon(aes(ymin=lower, ymax=upper), fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
     }
-    
     # Add additional theme elements
-    p1 <- p1 + do.call(theme, list(...))
+    p1 <- p1 + 
+        coord_cartesian(xlim=xlim,ylim=ylim) +
+        do.call(theme, list(...))
     
     # Plot
     if (!silent) { plot(p1) }
