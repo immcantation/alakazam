@@ -1322,24 +1322,26 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     # Set x-axis style
     if (log_x) {
-        p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(), limits=xlim,
+        p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(),
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
-        p1 <- p1 + scale_x_continuous(limits=xlim)
+        p1 <- p1 + scale_x_continuous()
     }
     
     # Set y-axis style
     if (log_y) {
-        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(), limits=ylim,
+        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(),
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
-        p1 <- p1 + scale_y_continuous(limits=ylim)
+        p1 <- p1 + scale_y_continuous()
     }
     
     # Add additional theme elements
-    p1 <- p1 + do.call(theme, list(...))
+    p1 <- p1 + 
+        coord_cartesian(xlim=xlim,ylim=ylim) +
+        do.call(theme, list(...))
 
     # Plot
     if (!silent) { plot(p1) }
