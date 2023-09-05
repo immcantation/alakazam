@@ -1,4 +1,4 @@
-**alakazam** - *The alakazam package*
+# The alakazam package
 
 Description
 --------------------
@@ -141,7 +141,6 @@ J Allergy Clin Immunol. 2014 134(3):604-12.
 1. Gupta NT, Vander Heiden JA, et al. Change-O: a toolkit for analyzing 
 large-scale B cell immunoglobulin repertoire sequencing data.
 Bioinformatics. 2015 Oct 15;31(20):3356-8.
-
 
 
 

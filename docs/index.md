@@ -1,6 +1,4 @@
-[![](http://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam)
-[![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam)
-[![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
+# [![](http://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam) [![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam) [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 
 
 Alakazam
@@ -35,14 +33,14 @@ For help and questions, please contact the [Immcantation Group](mailto:immcantat
 or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).
 
 
-# Dependencies
+## Dependencies
 
 **Depends:** ggplot2  
 **Imports:** airr, ape, dplyr, graphics, grid, igraph, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils, Biostrings, GenomicAlignments, IRanges  
 **Suggests:** knitr, rmarkdown, testthat
 
 
-# Authors
+## Authors
 
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
@@ -56,7 +54,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
-# Citing
+## Citing
 
 To cite the alakazam package in publications, please use:
 
@@ -79,6 +77,6 @@ please use:
 
 
 
-# License
+## License
 
 AGPL-3
