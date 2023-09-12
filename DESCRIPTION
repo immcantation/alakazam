@@ -1,8 +1,8 @@
 Package: alakazam
 Type: Package
 Version: 1.2.1.999
-Date: 2023-08-23
-Authors@R: c(person("Susanna", "Marquez", role=c("aut"), 
+Date: 2023-09-12
+Authors@R: c(person("Susanna", "Marquez", role=c("cre", "aut"), 
                     email="susanna.marquez@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
@@ -18,7 +18,9 @@ Authors@R: c(person("Susanna", "Marquez", role=c("aut"),
                     email="daniel.gadala-maria@yale.edu"),
              person("Edel", "Aron", role=c("ctb"), 
                     email="edel.aron@yale.edu"),
-             person("Jason", "Vander Heiden", role=c("cre", "aut"), 
+             person("Cole", "Jensen", role=c("ctb"),
+                    email="cole.jensen@yale.edu"),
+             person("Jason", "Vander Heiden", role=c("aut"), 
                     email="jason.vanderheiden@gmail.com"), 
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
