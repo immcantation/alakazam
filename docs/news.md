@@ -1,6 +1,6 @@
 # Release Notes
 
-Version 1.2.1.999: February 23, 2023
+Version 1.3.0: September 12, 2023
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -9,8 +9,18 @@ Backwards Incompatible Changes:
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.4.0.
++ Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1.
 + Performance improvements in `collapseDuplicates`.
+
+Diversity:
+
++ Fixed a bug in plotDiversityCurve and plotAbundanceCurve where limits were not 
+  being applied correctly to zoom in the plots.
+  
+Gene:
+
++ Fixed a bug in `groupGenes` where TCR chains where not being considered when
+  detecting heavy chain sequences prior to subsetting.
 
 Version 1.2.1: September 19, 2022
 -------------------------------------------------------------------------------

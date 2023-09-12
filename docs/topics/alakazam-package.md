@@ -29,16 +29,16 @@ Useful links:
 Author
 -------------------
 
-**Maintainer**: Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
+**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
 
 Authors:
 
-+  Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
 +  Namita Gupta [namita.gupta@yale.edu](namita.gupta@yale.edu)
 +  Nima Nouri [nima.nouri@yale.edu](nima.nouri@yale.edu)
 +  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
 +  Julian Zhou [julian.zhou@bulldogs.yale.edu](julian.zhou@bulldogs.yale.edu)
 +  Kenneth Hoehn [kenneth.hoehn@yale.edu](kenneth.hoehn@yale.edu)
++  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
 +  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
 
 
@@ -46,6 +46,7 @@ Other contributors:
 
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
 +  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
++  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu) [contributor]
 
 
 

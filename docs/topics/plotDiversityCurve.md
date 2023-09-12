@@ -102,7 +102,7 @@ plotDiversityCurve(div, legend_title="Sample")
 
 ```R
 
-#' # Plot diversity
+# Plot diversity
 plotDiversityCurve(div, legend_title="Sample", score="evenness")
 ```
 

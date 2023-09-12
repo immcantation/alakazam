@@ -42,7 +42,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 ## Authors
 
-[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (cre, aut)  
 [Namita Gupta](mailto:namita.gupta@yale.edu) (aut)  
 [Nima Nouri](mailto:nima.nouri@yale.edu) (aut)  
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
@@ -50,7 +50,8 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (aut)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
 [Edel Aron](mailto:edel.aron@yale.edu) (ctb)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (cre, aut)  
+[Cole Jensen](mailto:cole.jensen@yale.edu) (ctb)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
