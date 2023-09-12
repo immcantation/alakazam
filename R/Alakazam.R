@@ -121,7 +121,7 @@
 #'                          mutate mutate_at 
 #' 							one_of if_else
 #'							right_join rowwise
-#'                          summarize summarize_at
+#'                          summarize summarize_at all_of
 #'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
