@@ -71,9 +71,7 @@ getMRCA(graph, path="steps", root="Germline")
 
 ```
 
-*This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...*
+
 ```
                          name
 GN5SHBT06HH3QD GN5SHBT06HH3QD

@@ -208,12 +208,6 @@ graphs[sapply(graphs, is.null)] <- NULL
 graphs <- graphs[sapply(graphs, vcount) >= 5]
 ```
 
-```
-## This graph was created by an old(er) igraph version.
-##   Call upgrade_graph() on it to use with the current igraph version
-##   For now we convert it on the fly...
-```
-
 ## Converting between graph, phylo, and newick formats
 
 While much of analysis in `alakazam` focuses on using `igraph` `graph` objects,

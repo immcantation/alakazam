@@ -7,7 +7,7 @@ Backwards Incompatible Changes:
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1.
++ Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1, igraph >= 1.5.0.
 + Performance improvements in `collapseDuplicates`.
 
 Diversity:

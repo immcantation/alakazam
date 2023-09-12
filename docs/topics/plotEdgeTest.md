@@ -72,115 +72,18 @@ graphs <- ExampleTrees[1-10]
 # Perform edge test on isotypes
 x <- testEdges(graphs, "c_call", nperm=10)
 
-```
-
-*This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...**This graph was created by an old(er) igraph version.
-  Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...*
-```R
-
 # Plot
 plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-![49](plotEdgeTest-49.png)
+![2](plotEdgeTest-2.png)
 
 ```R
 plotEdgeTest(x, style="cdf")
 ```
 
-![51](plotEdgeTest-51.png)
+![4](plotEdgeTest-4.png)
 
 
 See also

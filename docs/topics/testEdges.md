@@ -71,16 +71,16 @@ print(x)
 
 ```
       parent     child count   expected pvalue
-1       IGHA      IGHA    39  60.300000    0.9
-2       IGHA IGHA,IGHG     3   3.100000    0.4
-3       IGHA      IGHG     2   4.800000    0.8
-4  IGHA,IGHG      IGHA    29   5.000000    0.0
-5  IGHA,IGHG IGHA,IGHG     1   2.000000    1.0
-6  IGHA,IGHG      IGHG    24   2.142857    0.0
-7  IGHD,IGHG      IGHG     8   2.333333    0.0
-8       IGHG      IGHA     1   6.500000    1.0
+1       IGHA      IGHA    39  63.100000    1.0
+2       IGHA IGHA,IGHG     3   3.300000    0.5
+3       IGHA      IGHG     2   4.300000    0.5
+4  IGHA,IGHG      IGHA    29   5.666667    0.0
+5  IGHA,IGHG IGHA,IGHG     1   1.000000    0.0
+6  IGHA,IGHG      IGHG    24   3.375000    0.0
+7  IGHD,IGHG      IGHG     8   3.800000    0.0
+8       IGHG      IGHA     1   4.500000    1.0
 9       IGHG IGHD,IGHG     1   1.000000    0.0
-10      IGHG      IGHG   112 134.600000    1.0
+10      IGHG      IGHG   112 134.200000    1.0
 
 ```
 
