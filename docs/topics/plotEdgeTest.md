@@ -166,7 +166,7 @@ x <- testEdges(graphs, "c_call", nperm=10)
   Call upgrade_graph() on it to use with the current igraph version
   For now we convert it on the fly...**This graph was created by an old(er) igraph version.
   Call upgrade_graph() on it to use with the current igraph version
-  For now we convert it on the fly...***Error in ecdf(d)**: 'x' must have 1 or more non-missing values
+  For now we convert it on the fly...*
 ```R
 
 # Plot
@@ -174,12 +174,14 @@ plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-**Error in eval(expr, envir, enclos)**: object 'x' not found
+![49](plotEdgeTest-49.png)
+
 ```R
 plotEdgeTest(x, style="cdf")
 ```
 
-**Error in eval(expr, envir, enclos)**: object 'x' not found
+![51](plotEdgeTest-51.png)
+
 
 See also
 -------------------

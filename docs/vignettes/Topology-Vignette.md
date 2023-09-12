@@ -350,11 +350,11 @@ print(edge_test)
 ```
 
 ```
-##   parent child count expected    pvalue
-## 1   IGHA  IGHA    36   35.300 0.1000000
-## 2   IGHA  IGHG     2    3.125 0.6250000
-## 3   IGHG  IGHA     1    2.000 0.5714286
-## 4   IGHG  IGHG    99   98.800 0.5000000
+##   parent child count  expected    pvalue
+## 1   IGHA  IGHA    36 34.900000 0.1000000
+## 2   IGHA  IGHG     2  2.625000 0.5000000
+## 3   IGHG  IGHA     1  2.666667 0.7777778
+## 4   IGHG  IGHG    99 98.600000 0.3000000
 ```
 
 ```r
