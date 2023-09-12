@@ -1073,7 +1073,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 
 #### Plotting functions ####
 
-#' Plots a clonal abundance distribution
+#' Plot a clonal abundance distribution
 #' 
 #' \code{plotAbundanceCurve} plots the results from estimating the complete clonal 
 #' relative abundance distribution. The distribution is plotted as a log rank abundance 
@@ -1091,7 +1091,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' @param    ylim          numeric vector of two values specifying the 
 #'                         \code{c(lower, upper)} y-axis limits. The limits on the 
 #'                         abundance values are expressed as fractions of 1: use
-#'                         c(0,1) to set the lower and upper limits to 0% and 100%.
+#'                         c(0,1) to set the lower and upper limits to 0\% and 100\%.
 #' @param    annotate      string defining whether to added values to the group labels 
 #'                         of the legend. When \code{"none"} (default) is specified no
 #'                         annotations are added. Specifying (\code{"depth"}) adds 
@@ -1099,13 +1099,12 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' @param    silent        if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                         object; if \code{FALSE} draw the plot.
 #' @param    ...           additional arguments to pass to ggplot2::theme.
-#'
+#' 
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  
-#' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for 
-#' generating the input abundance distribution.
-#' Plotting is performed with \link{ggplot}.
+#' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for
+#' generating the input abundance distribution. Plotting is performed with \link{ggplot}.
 #'           
 #' @examples
 #' # Estimate abundance by sample and plot
@@ -1243,7 +1242,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
 #' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample")
 #'
-#' #' # Plot diversity
+#' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample", score="evenness")
 #' 
 #' @export
