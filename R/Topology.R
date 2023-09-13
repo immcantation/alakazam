@@ -610,10 +610,10 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1:10]
+#' graphs <- ExampleTrees[6:10]
 #' 
 #' # Perform edge test on isotypes
-#' x <- testEdges(graphs, "c_call", nperm=10)
+#' x <- testEdges(graphs, "c_call", nperm=6)
 #' 
 #' # Plot
 #' plotEdgeTest(x, color="steelblue", style="hist")
