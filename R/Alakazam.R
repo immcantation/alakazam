@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @aliases dowser-package
 "_PACKAGE"
 
 # Alakazam package documentation and import directives
