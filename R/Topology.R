@@ -393,7 +393,7 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform MRCA test on isotypes
 #' x <- testMRCA(graphs, "c_call", nperm=10)
@@ -503,7 +503,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform edge test on isotypes
 #' x <- testEdges(graphs, "c_call", nperm=10)
@@ -610,7 +610,7 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform edge test on isotypes
 #' x <- testEdges(graphs, "c_call", nperm=10)
@@ -696,7 +696,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform MRCA test on isotypes
 #' x <- testMRCA(graphs, "c_call", nperm=10)
@@ -799,7 +799,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 #' 
 #' @examples
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Violin plots of node outdegree by sample
 #' plotSubtrees(graphs, "sample_id", "out", style="v")
