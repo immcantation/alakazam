@@ -12,8 +12,8 @@ General:
 
 Diversity:
 
-+ Fixed a bug in plotDiversityCurve and plotAbundanceCurve where limits were not 
-  being applied correctly to zoom in the plots.
++ Fixed a bug in `plotDiversityCurve` and `plotAbundanceCurve` where limits were 
+  not being applied correctly to zoom in the plots.
   
 Gene:
 
