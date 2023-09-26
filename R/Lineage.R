@@ -906,8 +906,8 @@ graphToPhylo <- function(graph) {
         ucanode <- paste0(germline,"_UCA")#max(as.numeric(nodes))+1
         nodes <- c(ucanode,nodes)
         df[df$from == germline,]$from <- ucanode
-        row <- c(ucanode,germline,0.0)
-        names(row) <- c("from","to","weight")
+        row <- c(ucanode,germline,0.0, 0.0)
+        names(row) <- c("from","to","weight", "label")
         df <- rbind(df, row)
         seqs <- c(seqs,seqs["Germline"])
         names(seqs)[length(seqs)] = paste0(germline,"_UCA")

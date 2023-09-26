@@ -4,7 +4,7 @@
 
 # Alakazam package documentation and import directives
 
-#' The alakazam package
+#' The Alakazam package
 #' 
 #' \code{alakazam} in a member of the Immcantation framework of tools and serves five main 
 #' purposes:
