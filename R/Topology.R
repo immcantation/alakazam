@@ -478,7 +478,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 }
 
 
-#' Tests for parent-child annotation enchrichment in lineage trees
+#' Tests for parent-child annotation enrichment in lineage trees
 #' 
 #' \code{testEdges} performs a permutation test on a set of lineage trees to determine
 #' the significance of an annotation's association with parent-child relationships.

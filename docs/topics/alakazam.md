@@ -1,4 +1,4 @@
-# The alakazam package
+# The Alakazam package
 
 Description
 --------------------
