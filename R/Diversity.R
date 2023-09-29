@@ -391,7 +391,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     # group=NULL
 
     # Hack for visibility of dplyr variables
-    . <- NULL
+    #. <- NULL
     
     # Check input
     if (!is.data.frame(data)) {
@@ -760,7 +760,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="clone_id", group="group") {
 # @return   data.frame containing test results for each value of q.
 helperTest <- function(div_df, q, group="group") {
     # Hack for visibility of dplyr variables
-    . <- NULL
+    #. <- NULL
     
     # Pairwise test
     group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
