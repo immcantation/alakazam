@@ -1,6 +1,6 @@
 # Release Notes
 
-Version 1.3.0: September 12, 2023
+Version 1.3.0: September 29, 2023
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -10,6 +10,8 @@ Backwards Incompatible Changes:
 General:
 
 + Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1, igraph >= 1.5.0.
++ Updated the example data `ExampleTrees` to use the igprah 1.5.0 format. See
+  https://r.igraph.org/news/index.html#igraph-150 for details.
 + Performance improvements in `collapseDuplicates`.
 
 Diversity:
