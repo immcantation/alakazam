@@ -3,7 +3,9 @@ Version 1.3.0: September 29, 2023
 
 Backwards Incompatible Changes:
 
-+ Some functions now require the parameter `locus`: `makeChangeoClone` 
++ Some functions now require the parameter `locus`: `makeChangeoClone`. In 
+  `groupGenes`, `locus` was previously required only for single cell data, now 
+  it is also required for bulk data.
 
 General:
 
