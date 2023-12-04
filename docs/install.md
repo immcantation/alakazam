@@ -29,6 +29,13 @@ dependencies. You can run the following command to see what other packages may b
 available.packages()["alakazam", "Imports"]
 ```
 
+Alternatively, you can use Bioconductor's `install` function:
+
+```R
+install.packages("BiocManager")
+BiocManager::install("alakazam")
+```
+
 Building Development Versions
 -------------------------------------------------------------------------------
 
