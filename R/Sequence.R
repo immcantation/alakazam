@@ -363,7 +363,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         }
         
         if (dry) {
-            idx_copy <- idx
+            #idx_copy <- idx
             data_idx_copy <- data_idx
             idx <- idx[idx %in% ambig_rows == FALSE]
             data_idx <- which(data[[seq]] %in% colnames(d_mat)[idx])

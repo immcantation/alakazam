@@ -137,10 +137,10 @@ head(family, n=4)
 ## # Groups:   sample_id, c_call [3]
 ##   sample_id c_call gene  clone_count clone_freq
 ##   <chr>     <chr>  <chr>       <int>      <dbl>
-## 1 -1h       IGHA   IGHV2           1     0.0149
-## 2 -1h       IGHG   IGHV6           1     0.0156
-## 3 +7d       IGHA   IGHV5           1     0.0172
-## 4 +7d       IGHA   IGHV6           1     0.0172
+## 1 +7d       IGHA   IGHV5           1    0.0172 
+## 2 +7d       IGHA   IGHV6           1    0.0172 
+## 3 +7d       IGHD   IGHV6           1    0.0213 
+## 4 +7d       IGHG   IGHV5           1    0.00971
 ```
 
 The output `data.frame` contains the additional grouping column (`c_call`) along with the 

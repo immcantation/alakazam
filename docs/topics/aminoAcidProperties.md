@@ -124,7 +124,7 @@ Blood 116, 1070-8 (2010).
 1. Wu YC, et al. The relationship between CD27 negative and positive B cell 
 populations in human peripheral blood. 
 Front Immunol 2, 1-12 (2011).
-1. [http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html](http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html)
+1. [https://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html](https://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html)
 
 
 

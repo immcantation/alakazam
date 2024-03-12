@@ -393,7 +393,7 @@ permuteLabels <- function(graph, field, exclude=c("Germline", NA)) {
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform MRCA test on isotypes
 #' x <- testMRCA(graphs, "c_call", nperm=10)
@@ -478,7 +478,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 }
 
 
-#' Tests for parent-child annotation enchrichment in lineage trees
+#' Tests for parent-child annotation enrichment in lineage trees
 #' 
 #' \code{testEdges} performs a permutation test on a set of lineage trees to determine
 #' the significance of an annotation's association with parent-child relationships.
@@ -503,7 +503,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform edge test on isotypes
 #' x <- testEdges(graphs, "c_call", nperm=10)
@@ -610,10 +610,10 @@ testEdges <- function(graphs, field, indirect=FALSE, exclude=c("Germline", NA), 
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[6:10]
 #' 
 #' # Perform edge test on isotypes
-#' x <- testEdges(graphs, "c_call", nperm=10)
+#' x <- testEdges(graphs, "c_call", nperm=6)
 #' 
 #' # Plot
 #' plotEdgeTest(x, color="steelblue", style="hist")
@@ -632,26 +632,26 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 
     if (style == "histogram") {
         # Plot edge null distribution
-        p1 <- ggplot(perm_sum, aes(x=count)) +
+        p1 <- ggplot(perm_sum, aes(x=!!rlang::sym("count"))) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("Number of realizations") + 
             geom_histogram(bins=50, fill=color, color=NA) +
-            geom_vline(data=obs_sum, aes(xintercept=count), 
+            geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
                        color="firebrick", linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
-        p1 <- ggplot(perm_sum, aes(x=count)) +
+        p1 <- ggplot(perm_sum, aes(x=!!rlang::sym("count"))) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
-            geom_vline(data=obs_sum, aes(xintercept=count), color="firebrick", 
+            geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), color="firebrick", 
                        linetype=3, size=0.75) + 
-            geom_hline(data=obs_sum, aes(yintercept=pvalue), color="steelblue", 
+            geom_hline(data=obs_sum, aes(yintercept=!!rlang::sym("pvalue")), color="steelblue", 
                        linetype=3, size=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     }
@@ -696,7 +696,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
 #' @examples
 #' \donttest{
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Perform MRCA test on isotypes
 #' x <- testMRCA(graphs, "c_call", nperm=10)
@@ -718,26 +718,26 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
     
     if (style == "histogram") {
         # Plot MRCA null distribution
-        p1 <- ggplot(perm_sum, aes(x=count)) +
+        p1 <- ggplot(perm_sum, aes(x=!!rlang::sym("count"))) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("Number of realizations") + 
             geom_histogram(fill=color, color=NA, bins=50) +
-            geom_vline(data=obs_sum, aes(xintercept=count), 
+            geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
                        color="firebrick", linetype=3, size=0.75) + 
             facet_wrap("Annotation", ncol=1, scales="free_y")
     } else if (style == "cdf") {
         # Plot ECDF of MRCA null distribution
-        p1 <- ggplot(perm_sum, aes(x=count)) +
+        p1 <- ggplot(perm_sum, aes(x=!!rlang::sym("count"))) +
             baseTheme() + 
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("P-value") +
             stat_ecdf(color=color, size=1) +
-            geom_vline(data=obs_sum, aes(xintercept=count), 
+            geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
                        color="firebrick", linetype=3, size=0.75) + 
-            geom_hline(data=obs_sum, aes(yintercept=pvalue), 
+            geom_hline(data=obs_sum, aes(yintercept=!!rlang::sym("pvalue")), 
                        color="steelblue", linetype=3, size=0.75) + 
             facet_wrap("Annotation", nrow=1, scales="free_y")
     }
@@ -799,7 +799,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
 #' 
 #' @examples
 #' # Define example tree set
-#' graphs <- ExampleTrees[1-10]
+#' graphs <- ExampleTrees[1:10]
 #' 
 #' # Violin plots of node outdegree by sample
 #' plotSubtrees(graphs, "sample_id", "out", style="v")

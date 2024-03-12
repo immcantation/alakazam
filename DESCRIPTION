@@ -1,8 +1,8 @@
 Package: alakazam
 Type: Package
-Version: 1.2.1.999
-Date: 2023-02-23
-Authors@R: c(person("Susanna", "Marquez", role=c("aut"), 
+Version: 1.3.0.999
+Date: 2024-01-17
+Authors@R: c(person("Susanna", "Marquez", role=c("cre", "aut"), 
                     email="susanna.marquez@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
                     email="namita.gupta@yale.edu"),
@@ -18,7 +18,9 @@ Authors@R: c(person("Susanna", "Marquez", role=c("aut"),
                     email="daniel.gadala-maria@yale.edu"),
              person("Edel", "Aron", role=c("ctb"), 
                     email="edel.aron@yale.edu"),
-             person("Jason", "Vander Heiden", role=c("cre", "aut"), 
+             person("Cole", "Jensen", role=c("ctb"),
+                    email="cole.jensen@yale.edu"),
+             person("Jason", "Vander Heiden", role=c("aut"), 
                     email="jason.vanderheiden@gmail.com"), 
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
@@ -38,7 +40,6 @@ LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr, rmarkdown
 Encoding: UTF-8
-SystemRequirements: C++11
 LinkingTo: Rcpp
 biocViews:
     Software,
@@ -47,12 +48,12 @@ Depends:
     R (>= 4.0),
     ggplot2 (>= 3.4.0)
 Imports:
-    airr (>= 1.3),
+    airr (>= 1.4.1),
     ape,
     dplyr (>= 1.0),
     graphics,
     grid,
-    igraph (>= 1.0),
+    igraph (>= 1.5.0),
     Matrix (>= 1.3-0),
     methods,
     progress,

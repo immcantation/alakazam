@@ -1,14 +1,28 @@
-Version 1.2.1.999: February 23, 2023
+Version 1.3.0: September 29, 2023
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
 
-+ Some functions now require the parameter `locus`: `makeChangeoClone` 
++ Some functions now require the parameter `locus`: `makeChangeoClone`. In 
+  `groupGenes`, `locus` was previously required only for single cell data, now 
+  it is also required for bulk data.
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.4.0.
++ Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1, igraph >= 1.5.0.
++ Updated the example data `ExampleTrees` to use the igprah 1.5.0 format. See
+  https://r.igraph.org/news/index.html#igraph-150 for details.
 + Performance improvements in `collapseDuplicates`.
+
+Diversity:
+
++ Fixed a bug in `plotDiversityCurve` and `plotAbundanceCurve` where limits were 
+  not being applied correctly to zoom in the plots.
+  
+Gene:
+
++ Fixed a bug in `groupGenes` where TCR chains where not being considered when
+  detecting heavy chain sequences prior to subsetting.
 
 Version 1.2.1: September 19, 2022
 -------------------------------------------------------------------------------

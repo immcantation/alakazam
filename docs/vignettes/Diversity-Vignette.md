@@ -72,7 +72,7 @@ head(clones, 5)
 You may also specify a column containing the abundance count of each sequence 
 (usually copy numbers), that will including weighting of each clone size by the 
 corresponding abundance count. Furthermore, multiple grouping columns may be
-specified such that `seq_freq` (unwieghted clone size as a fraction
+specified such that `seq_freq` (unweighted clone size as a fraction
 of total sequences in the group) and `copy_freq` (weighted faction) are 
 normalized to within multiple group data partitions.
 
@@ -185,24 +185,24 @@ print(isotype_test@tests)
 ## # A tibble: 18 × 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       8.30    0  
-##  2 IGHA != IGHD 1         184.       8.55    0  
-##  3 IGHA != IGHD 2         189.      12.6     0  
-##  4 IGHA != IGHG 0           4.54     7.47    0.7
-##  5 IGHA != IGHG 1          24.8      5.31    0  
-##  6 IGHA != IGHG 2          26.9      4.26    0  
-##  7 IGHA != IGHM 0         159.       7.31    0  
-##  8 IGHA != IGHM 1         211.       6.28    0  
-##  9 IGHA != IGHM 2         229.       6.71    0  
-## 10 IGHD != IGHG 0         135.       6.97    0  
-## 11 IGHD != IGHG 1         159.       8.92    0  
-## 12 IGHD != IGHG 2         162.      13.5     0  
-## 13 IGHD != IGHM 0          19.7      5.60    0  
-## 14 IGHD != IGHM 1          27.8      8.27    0  
-## 15 IGHD != IGHM 2          40.1     13.2     0  
-## 16 IGHG != IGHM 0         154.       6.26    0  
-## 17 IGHG != IGHM 1         187.       6.23    0  
-## 18 IGHG != IGHM 2         202.       7.68    0
+##  1 IGHA != IGHD 0         137.       7.88    0  
+##  2 IGHA != IGHD 1         182.       8.43    0  
+##  3 IGHA != IGHD 2         188.      10.8     0  
+##  4 IGHA != IGHG 0           3.25     8.37    0.7
+##  5 IGHA != IGHG 1          24.6      6.77    0  
+##  6 IGHA != IGHG 2          27.6      4.62    0  
+##  7 IGHA != IGHM 0         157.       6.61    0  
+##  8 IGHA != IGHM 1         210.       5.99    0  
+##  9 IGHA != IGHM 2         228.       6.92    0  
+## 10 IGHD != IGHG 0         134.       6.92    0  
+## 11 IGHD != IGHG 1         158.       7.56    0  
+## 12 IGHD != IGHG 2         161.      10.7     0  
+## 13 IGHD != IGHM 0          20.1      5.22    0  
+## 14 IGHD != IGHM 1          28.1      7.67    0  
+## 15 IGHD != IGHM 2          39.8     12.4     0  
+## 16 IGHG != IGHM 0         154.       6.58    0  
+## 17 IGHG != IGHM 1         186.       6.64    0  
+## 18 IGHG != IGHM 2         200.       7.94    0
 ```
 
 ```r

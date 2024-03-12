@@ -11,7 +11,9 @@ NULL
 #' \code{makeChangeoClone} takes a data.frame with AIRR or Change-O style columns as input and 
 #' masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
 #' annotations associated with duplicate sequences. It returns a \code{ChangeoClone} 
-#' object which serves as input for lineage reconstruction.
+#' object which serves as input for lineage reconstruction. \strong{Note}: To use the 
+#' most recent methods for building, visualizing and analyzing 
+#' trees, use the R package [Dowser](https://dowser.readthedocs.io).
 #' 
 #' @param    data         data.frame containing the AIRR or Change-O data for a clone. See Details
 #'                        for the list of required columns and their default values.
@@ -527,6 +529,8 @@ phylipToGraph <- function(edges, clone) {
 #' 
 #' \code{buildPhylipLineage} reconstructs an Ig lineage via maximum parsimony using the 
 #' dnapars application, or maximum liklihood using the dnaml application of the PHYLIP package.
+#' \strong{Note}: To use the most recent methods for building, visualizing and analyzing 
+#' trees, use the R package [Dowser](https://dowser.readthedocs.io).
 #' 
 #' @param    clone         \link{ChangeoClone} object containing clone data.
 #' @param    phylip_exec   absolute path to the PHYLIP dnapars executable.
@@ -906,8 +910,8 @@ graphToPhylo <- function(graph) {
         ucanode <- paste0(germline,"_UCA")#max(as.numeric(nodes))+1
         nodes <- c(ucanode,nodes)
         df[df$from == germline,]$from <- ucanode
-        row <- c(ucanode,germline,0.0)
-        names(row) <- c("from","to","weight")
+        row <- c(ucanode,germline,0.0, 0.0)
+        names(row) <- c("from","to","weight", "label")
         df <- rbind(df, row)
         seqs <- c(seqs,seqs["Germline"])
         names(seqs)[length(seqs)] = paste0(germline,"_UCA")
@@ -1055,7 +1059,6 @@ rerootGermline <- function(tree, germid, resolve=FALSE){
 #' }
 #' 
 #' @export
-
 readIgphyml <- function(file, id=NULL, format=c("graph", "phylo"), collapse=FALSE,
     branches=c("mutations","distance")) {
     # Check arguments

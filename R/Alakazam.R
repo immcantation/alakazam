@@ -1,6 +1,10 @@
+#' @keywords internal
+#' @aliases alakazam-package
+"_PACKAGE"
+
 # Alakazam package documentation and import directives
 
-#' The alakazam package
+#' The Alakazam package
 #' 
 #' \code{alakazam} in a member of the Immcantation framework of tools and serves five main 
 #' purposes:
@@ -116,9 +120,9 @@
 #'                          group_by ungroup
 #'                          filter slice select 
 #'                          mutate mutate_at 
-#' 							one_of if_else
+#' 							one_of
 #'							right_join rowwise
-#'                          summarize summarize_at
+#'                          summarize summarize_at all_of
 #'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
 #'                          make_graph make_directed_graph make_undirected_graph
@@ -154,10 +158,7 @@ NULL
 
 # Package loading actions
 .onAttach <- function(libname, pkgname) {
-    msg <- paste("As of v1.0.0 the AIRR Rearrangement schema is now the default file format.",
-                 "A description of the standard is available at https://docs.airr-community.org.",
-                 "The legacy Change-O format is supported through arguments to each function",
-                 "that allow the input column names to be explicitly defined.",
-                 sep="\n")
+    msg <- citation(pkgname)
+    msg <-paste(c(format(msg,"citation")),collapse="\n\n")
     packageStartupMessage(msg)
 }

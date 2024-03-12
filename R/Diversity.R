@@ -374,13 +374,24 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL, 
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
                               progress=FALSE) {
+    
+    # TODO:
+    # Add alakazam style cellIdColumn=NULL, locusColumn="locus", locusValues=c("IGH")
+    # similar to distToNearest
+    # filter based on locusValues
+    # if cellIdColumn
+    #    for rows that have unique cell_id, ok
+    #    if rows have cell_id not unique, count only once
+    # if not cellIdColumn, count heavy chains (locusValues will be IGH)
+    # If mixed bulk and sc do calculation but raise warning because different type of abundances
+    
     ## DEBUG
     # data=ExampleDb; group="sample_id"; clone="clone_id"; copy=NULL; min_n=1; max_n=NULL; ci=0.95; uniform=F; nboot=100
     # copy="duplicate_count"
     # group=NULL
 
     # Hack for visibility of dplyr variables
-    . <- NULL
+    #. <- NULL
     
     # Check input
     if (!is.data.frame(data)) {
@@ -474,7 +485,8 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         
         if (progress) { pb$tick() }
     }
-    id_col <- if_else(is.null(group), "group", group)
+    id_col <- "group"
+    if (!is.null(group)) { id_col <- group }
     abundance_df <- as.data.frame(bind_rows(abund_list, .id=id_col))
     bootstrap_df <- as.data.frame(bind_rows(boot_list, .id=id_col))
     
@@ -748,7 +760,7 @@ helperBeta <- function(boot_output, q, ci_x, clone="clone_id", group="group") {
 # @return   data.frame containing test results for each value of q.
 helperTest <- function(div_df, q, group="group") {
     # Hack for visibility of dplyr variables
-    . <- NULL
+    #. <- NULL
     
     # Pairwise test
     group_pairs <- combn(unique(div_df[[group]]), 2, simplify=F)
@@ -1061,7 +1073,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 
 #### Plotting functions ####
 
-#' Plots a clonal abundance distribution
+#' Plot a clonal abundance distribution
 #' 
 #' \code{plotAbundanceCurve} plots the results from estimating the complete clonal 
 #' relative abundance distribution. The distribution is plotted as a log rank abundance 
@@ -1074,9 +1086,12 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' @param    main_title    string specifying the plot title.
 #' @param    legend_title  string specifying the legend title.
 #' @param    xlim          numeric vector of two values specifying the 
-#'                         \code{c(lower, upper)} x-axis limits.
+#'                         \code{c(lower, upper)} x-axis limits. The lower x-axis 
+#'                         value must be >=1.
 #' @param    ylim          numeric vector of two values specifying the 
-#'                         \code{c(lower, upper)} y-axis limits.
+#'                         \code{c(lower, upper)} y-axis limits. The limits on the 
+#'                         abundance values are expressed as fractions of 1: use
+#'                         c(0,1) to set the lower and upper limits to 0\% and 100\%.
 #' @param    annotate      string defining whether to added values to the group labels 
 #'                         of the legend. When \code{"none"} (default) is specified no
 #'                         annotations are added. Specifying (\code{"depth"}) adds 
@@ -1084,13 +1099,12 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' @param    silent        if \code{TRUE} do not draw the plot and just return the ggplot2 
 #'                         object; if \code{FALSE} draw the plot.
 #' @param    ...           additional arguments to pass to ggplot2::theme.
-#'
+#' 
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  
-#' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for 
-#' generating the input abundance distribution.
-#' Plotting is performed with \link{ggplot}.
+#' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for
+#' generating the input abundance distribution. Plotting is performed with \link{ggplot}.
 #'           
 #' @examples
 #' # Estimate abundance by sample and plot
@@ -1106,6 +1120,17 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     # Check if abundance is in data
     if (is.null(data@abundance)) { stop("Missing abundance data.") }
     
+    # Validate abundance limits
+    if (!is.null(xlim)) {
+        if (xlim[1]<1) {
+            stop("The lower x-axis xlim value must be >=1.")
+        }
+        max_xlim <- max(data@abundance$rank, na.rm = T)
+        if (xlim[2]>max_xlim) {
+            message("The largest x-axis value is ",max_xlim,".")
+        }
+    }    
+
     # Check arguments
     annotate <- match.arg(annotate)
     
@@ -1124,16 +1149,20 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
     
     if (!all(is.na(group_labels))) {
         # Define grouped plot
-        p1 <- ggplot(data@abundance, aes(x=rank, y=p, group=!!rlang::sym(data@group_by))) + 
+        p1 <- ggplot(data@abundance, aes(x=!!rlang::sym("rank"), 
+                                         y=!!rlang::sym("p"), 
+                                         group=!!rlang::sym(data@group_by))) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
             ylab("Abundance") +
-            scale_x_log10(limits=xlim,
+            scale_x_log10(
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes(ymin=lower, ymax=upper, fill=!!rlang::sym(data@group_by)), alpha=0.4) +
+            geom_ribbon(aes(ymin=!!rlang::sym("lower"), 
+                            ymax=!!rlang::sym("upper"), 
+                            fill=!!rlang::sym(data@group_by)), alpha=0.4) +
             geom_line(aes(color=!!rlang::sym(data@group_by)))
         
         # Set colors and legend
@@ -1152,21 +1181,25 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
             line_color <- "black"
         }
         # Define plot
-        p1 <- ggplot(data@abundance, aes(x=rank, y=p)) + 
+        p1 <- ggplot(data@abundance, aes(x=!!rlang::sym("rank"), 
+                                         y=!!rlang::sym("p"))) + 
             ggtitle(main_title) + 
             baseTheme() + 
             xlab("Rank") +
             ylab("Abundance") +
-            scale_x_log10(limits=xlim,
+            scale_x_log10(
                           breaks=scales::trans_breaks("log10", function(x) 10^x),
                           labels=scales::trans_format("log10", scales::math_format(10^.x))) +
             scale_y_continuous(labels=scales::percent) +
-            geom_ribbon(aes(ymin=lower, ymax=upper), fill=line_color, alpha=0.4) +
+            geom_ribbon(aes(ymin=!!rlang::sym("lower"), 
+                            ymax=!!rlang::sym("upper")), 
+                        fill=line_color, alpha=0.4) +
             geom_line(color=line_color)
     }
-    
     # Add additional theme elements
-    p1 <- p1 + do.call(theme, list(...))
+    p1 <- p1 + 
+        coord_cartesian(xlim=xlim,ylim=ylim) +
+        do.call(theme, list(...))
     
     # Plot
     if (!silent) { plot(p1) }
@@ -1216,7 +1249,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
 #' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample")
 #'
-#' #' # Plot diversity
+#' # Plot diversity
 #' plotDiversityCurve(div, legend_title="Sample", score="evenness")
 #' 
 #' @export
@@ -1295,24 +1328,26 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
     
     # Set x-axis style
     if (log_x) {
-        p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(), limits=xlim,
+        p1 <- p1 + scale_x_continuous(trans=scales::log2_trans(),
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
-        p1 <- p1 + scale_x_continuous(limits=xlim)
+        p1 <- p1 + scale_x_continuous()
     }
     
     # Set y-axis style
     if (log_y) {
-        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(), limits=ylim,
+        p1 <- p1 + scale_y_continuous(trans=scales::log2_trans(),
                                       breaks=scales::trans_breaks('log2', function(x) 2^x),
                                       labels=scales::trans_format('log2', scales::math_format(2^.x)))
     } else {
-        p1 <- p1 + scale_y_continuous(limits=ylim)
+        p1 <- p1 + scale_y_continuous()
     }
     
     # Add additional theme elements
-    p1 <- p1 + do.call(theme, list(...))
+    p1 <- p1 + 
+        coord_cartesian(xlim=xlim,ylim=ylim) +
+        do.call(theme, list(...))
 
     # Plot
     if (!silent) { plot(p1) }
@@ -1397,8 +1432,10 @@ plotDiversityTest <- function(data, q, colors=NULL, main_title="Diversity", lege
         baseTheme() + 
         xlab("") +
         ylab(bquote("Mean " ^ .(q) * D %+-% "SD")) +
-        geom_linerange(aes(ymin=lower, ymax=upper, color=!!rlang::sym(data@group_by)), alpha=0.8) +
-        geom_point(aes(y=d, color=!!rlang::sym(data@group_by)))
+        geom_linerange(aes(ymin=!!rlang::sym("lower"), 
+                           ymax=!!rlang::sym("upper"), 
+                           color=!!rlang::sym(data@group_by)), alpha=0.8) +
+        geom_point(aes(y=!!rlang::sym("d"), color=!!rlang::sym(data@group_by)))
     
     # Set colors and legend
     if (!is.null(colors)) {
