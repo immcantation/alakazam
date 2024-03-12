@@ -577,7 +577,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       sequence_alignment="sequence_alignment",cell_id=NULL, 
+                       sequence_alignment=NULL,cell_id=NULL, 
                        locus="locus", only_heavy=TRUE, first=FALSE) {
   
     # Check base input
@@ -586,12 +586,14 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     
     # check for ambiguous sequences that could cause clonal group clumping
     # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
-    for(i in nrow(data)){
-      n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
-                              gregexpr("[ACTG]", data[[sequence_alignment]][i])))
-      if(n_informative < 250){
-        stop("Ambigous sequence alignments have been found. Please remove sequences with less than 250 informative sites")
-      }
+    if (!is.null(sequence_alignment)) {
+        for(i in nrow(data)){
+            n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
+                                                gregexpr("[ACTG]", data[[sequence_alignment]][i])))
+            if(n_informative < 250){
+                warning("Ambigous sequence alignments have been found. Please remove sequences with less than 250 informative sites")
+            }
+        }        
     }
         
     # Check locus
