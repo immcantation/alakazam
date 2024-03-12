@@ -440,13 +440,22 @@ test_that("groupGenes, single-cell mode, heavy only", {
     # 10 IGHV4-59 IGHJ1 84
     # 11 IGHV4-59 IGHJ1 84
     
-    # 1 by itself, 2 by itself, 3-5 together, 6-11 together
-    gg1_expect = c(rep("G2", 2), 
-                   rep("G1", 4), 
-                   rep("G3", 2+2+2), 
-                   rep("G4", 2+3+2+2+2+2)) 
+    # Cell with CELL_ID==B has 2 heavy and 2 light chains
+    # expect error
+    expect_error(
+        gg1 <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                     only_heavy=TRUE, first=FALSE),
+        regexp = "Only one heavy chain is allowed per cell"
+    )
     
-    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+    # 1 by itself, 2 by itself, 3-5 together, 6-11 together
+    gg1_expect = c(rep("G1", 2), 
+                   # rep("G1", 4), # Cell B removed
+                   rep("G2", 2+2+2), 
+                   rep("G3", 2+3+2+2+2+2)) 
+    
+    gg1 = groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                      only_heavy=TRUE, first=FALSE)
     
@@ -588,10 +597,13 @@ test_that("groupGenes, AIRR-format migration", {
     expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
     
     # 4
-    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+    # Cell with CELL_ID==B has 2 heavy and 2 light chains
+    newDb_c <- groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), 
+                          v_call="V_CALL", j_call="J_CALL", 
                           junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                           only_heavy=TRUE, first=FALSE)
-    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
+    newDb_a <- groupGenes(data_t1_airr %>% dplyr::filter(cell_id != "B"),
+                          v_call="v_call", j_call="j_call", 
                           junc_len="len", cell_id="cell_id", locus="locus", 
                           only_heavy=TRUE, first=FALSE)
     
