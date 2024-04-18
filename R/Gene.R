@@ -508,8 +508,8 @@ isLightChain <- function(data, locus="locus"){
 #
 # @return   A data.frame containing the AIRR or Change-O data.
 singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
-  heavy <- data[isHeavyChain(data),]
-  light <- data[isLightChain(data,),]
+  heavy <- data[isHeavyChain(data, locus = locus),]
+  light <- data[isLightChain(data, locus = locus),]
   
   # check for multiple heavy chains
   heavy_count <- table(heavy[[cell_id]])
