@@ -463,60 +463,68 @@ test_that("groupGenes, single-cell mode, heavy only", {
     
 })
 
-# Commented out because we are creating a new test
-# test_that("groupGenes, mixed bulk and single cell", {
-#     
-#     # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
-#     db <- data.frame(
-#         subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
-#         v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
-#         j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
-#         junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
-#         locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
-#         cell_id=c(1,2,3,NA,NA,1,NA),
-#         junction_length=12
-#     )
-#     
-#     # cell_id=NULL, only_heavy=T
-#     a <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#              cell_id=NULL, locus="locus", only_heavy=TRUE,
-#              first=FALSE)
-#     expect_equal(a[['vj_group']], c("G2","G1","G1","G1","G1","G3","G3"))
-#     
-#     # cell_id=NULL, only_heavy=F
-#     b <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id=NULL, locus="locus", only_heavy=FALSE,
-#                first=FALSE)
-#     
-#     # Should match a, becasue only_heavy only relevant for single cell
-#     expect_equal(a,b)
-#     
-#     # cell_id='cell_id', only_heavy=T
-#     c <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id="cell_id", locus="locus", only_heavy=TRUE,
-#                first=FALSE) 
-#     # Should match a, because mix bulk-sc -> bulk mode
-#     expect_equal(c,a)
-#     
-#     # subset to single-cell sequences
-#     d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-#                     cell_id="cell_id", locus="locus", only_heavy=TRUE,
-#                     first=FALSE)    
-#     expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
-#     
-#     # cell_id='cell_id', only_heavy=F
-#     e <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id="cell_id", locus="locus", only_heavy=FALSE,
-#                first=FALSE)  
-#     # Should match b, because mix bulk-sc -> bulk mode
-#     expect_equal(e,b)    
-#     
-#     # Suset to single-cell sequences
-#     f <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-#                     cell_id="cell_id", locus="locus", only_heavy=FALSE,
-#                     first=FALSE)
-# 
-# })
+test_that("groupGenes, mixed bulk and single cell", {
+
+    # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
+    db <- data.frame(
+        subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
+        v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
+        j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
+        junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
+        locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
+        cell_id=c(1,2,3,NA,NA,1,NA),
+        junction_length=12
+    )
+
+    # cell_id=NULL, only_heavy=T
+    a <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
+             cell_id=NULL, locus="locus", only_heavy=TRUE,
+             first=FALSE)
+    expect_equal(a[['vj_group']], c("G2","G1","G1","G1","G1","G3","G3"))
+
+    # cell_id=NULL, only_heavy=F
+    b <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
+               cell_id=NULL, locus="locus", only_heavy=FALSE,
+               first=FALSE)
+
+    # Should match a, becasue only_heavy only relevant for single cell
+    expect_equal(a,b)
+
+    # cell_id='cell_id', only_heavy=T
+    expect_warning(
+        c <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
+               cell_id="cell_id", locus="locus", only_heavy=TRUE,
+               first=FALSE),
+        "Mixed single cell and bulk data was indicated"
+    )
+    
+    # TODO
+    # Should match a, because mix bulk-sc -> bulk mode
+    # expect_equal(c,a)
+
+    # subset to single-cell sequences
+    d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                    cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                    first=FALSE)
+    expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
+
+    # cell_id='cell_id', only_heavy=F
+    expect_warning(
+        e <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
+               cell_id="cell_id", locus="locus", only_heavy=FALSE,
+               first=FALSE),
+        "Mixed single cell and bulk data was indicated"
+    )
+    # TODO
+    # Should match b, because mix bulk-sc -> bulk mode
+    # expect_equal(e,b)
+
+    # Subset to single-cell sequences
+    # f <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+    #                 cell_id="cell_id", locus="locus", only_heavy=FALSE,
+    #                 first=FALSE)
+
+})
 
 
 #### AIRR-format migration tests ####
