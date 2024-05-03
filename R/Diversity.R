@@ -245,16 +245,24 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_n
         warning(check) # instead of throwing an error and potentially disrupting a workflow
     }
 
-    # Handle NAs
-    if (remove_na) {
-        bool_na <- is.na(data[, clone])
-        if (any(bool_na)) {
-            if  (!all(bool_na)){
+    # Checking for NAs
+    bool_na <- is.na(data[, clone])
+    if (any(bool_na)) {
+        if  (!all(bool_na)){
+            # Handle NAs
+            if (remove_na) {
                 msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", clone, 
                             " column and excluded from tabulation")
                 warning(msg)
+                data <- data[!bool_na, ]
+            } else  {
+                msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", clone, 
+                            " column. Consider excluding them from the clonal tabulation by setting remove_na=TRUE")
+                warning(msg)
             }
-            data <- data[!bool_na, ]
+        } else {
+            msg <- paste0("All values in the ", clone, " column are NA. Consider re-running the clonal analysis.")
+            warning(msg)
         }
     }
     
