@@ -1,5 +1,6 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
+db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv"))
 
 ### countGenes ####
 
@@ -515,7 +516,7 @@ test_that("groupGenes, mixed bulk and single cell", {
                first=FALSE),
         "Mixed single cell and bulk data was indicated"
     )
-    # TODO
+    # TODO - Tests with the same data used in scoper
     # Should match b, because mix bulk-sc -> bulk mode
     # expect_equal(e,b)
 
@@ -523,7 +524,20 @@ test_that("groupGenes, mixed bulk and single cell", {
     # f <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
     #                 cell_id="cell_id", locus="locus", only_heavy=FALSE,
     #                 first=FALSE)
-
+    
+    gg <- groupGenes(db_gg, cell_id=NULL, first=T)
+    expect_equal(gg[["vj_group"]], 
+                 gg[["expected_group_cell_id-null_first-T"]])
+    
+    gg <- groupGenes(db_gg, cell_id=NULL, first=F)
+    expect_equal(gg[["vj_group"]], 
+                 gg[["expected_group_cell_id-null_first-F"]])
+    
+    # TODO fix this test
+    # groupdGenes now removes bulk sequences
+    # gg <- groupGenes(db_gg, cell_id="cell_id", locus="locus", 
+    #                  only_heavy=TRUE, first=TRUE)
+    # gg[["vj_group"]]
 })
 
 
