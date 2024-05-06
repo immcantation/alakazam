@@ -28,8 +28,8 @@
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
 #' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
-#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted)
-#' @param    remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
+#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted).
+#' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
 #' 
@@ -75,6 +75,9 @@
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
                        mode=c("gene", "allele", "family", "asis"), remove_na=TRUE) {
+    #TODO: locusValues is not needed for countGenes
+    #TODO: split db between bulk and single-cell, then for single-cell collapse by cell_id
+
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)

@@ -6,7 +6,7 @@ db <- readChangeoDb(example_file)
 
 test_that("calcCoverage", {
     # Calculate clone sizes
-    clones <- countClones(db, groups="SAMPLE", clone="CLONE", locusColumn="LOCUS")
+    clones <- countClones(db, groups="SAMPLE", clone="CLONE")
     # Calculate 1st order coverage for a single sample
     obs <- calcCoverage(clones$seq_count[clones$SAMPLE == "RL01"])
     expect_equal(obs, 0.1608073, tolerance=0.001)
@@ -17,14 +17,14 @@ test_that("calcCoverage", {
 
 test_that("countClones", {
 	# Calculate clone sizes
-	clones <- countClones(db, groups="SAMPLE", clone="CLONE", locusColumn="LOCUS")
+	clones <- countClones(db, groups="SAMPLE", clone="CLONE")
 	expect_equal(clones$seq_count[1:6], c(31, 15, 5, 4, 4, 4))
 	expect_equal(clones$seq_freq[1:6], 
 	             c(0.15, 0.07, 0.02, 0.04, 0.04, 0.02), 
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
-    clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE", locusColumn="LOCUS")
+    clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
 
 	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
 	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
@@ -51,12 +51,12 @@ test_that("countClones", {
 	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
-	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY", locusColumn="LOCUS"), 
+	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
 	             ungrouped_toy, 
 	             tolerance=0.01)
 
 	# Check toy grouped
-	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY", locusColumn="LOCUS") %>% ungroup(), 
+	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
 	
@@ -137,7 +137,7 @@ test_that("calcDiversity", {
 
 test_that("estimateAbundance-current", {
 	set.seed(90)
-	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE", locusColumn="LOCUS")
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	expect_equal(abund@abundance$p[1:5], 
 	             c(0.0372, 0.0370, 0.0139, 0.0133, 0.0126),
 	             tolerance=0.001, check.attributes = FALSE)
@@ -151,7 +151,7 @@ test_that("estimateAbundance-current", {
 	
 	# Grouping by isotype rather than sample identifier should raise warning
 	set.seed(90)
-	expect_warning(abund <- estimateAbundance(db, group="ISOTYPE", nboot=100, clone="CLONE", locusColumn="LOCUS"),
+	expect_warning(abund <- estimateAbundance(db, group="ISOTYPE", nboot=100, clone="CLONE"),
 	               "Not all groups passed threshold")
 })
 
@@ -161,7 +161,7 @@ test_that("estimateAbundance-current", {
 test_that("alphaDiversity", {
     # Test diversity
     set.seed(5)
-	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE", locusColumn="LOCUS")
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9,20), ])
 	exp <- data.frame("SAMPLE" = c("RL01", "RL01", "RL01", "RL02"),
@@ -180,7 +180,7 @@ test_that("alphaDiversity", {
 
 	# Test diversity p-values
 	set.seed(3)
-	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE", locusColumn="LOCUS")
+	abund <- estimateAbundance(db, group="SAMPLE", nboot=100, clone="CLONE")
 	div <- alphaDiversity(abund, step_q=1, max_q=4)
 	expect_equal(div@tests$pvalue[1:5], 
 	             c(0, 0, 0, 0, 0), tolerance=0.001)
@@ -189,7 +189,7 @@ test_that("alphaDiversity", {
 	
 	# Verify two-steps == one-step
 	set.seed(3)
-	div_single <- alphaDiversity(db, step_q=1, max_q=4, group="SAMPLE", nboot=100, clone="CLONE", locusColumn="LOCUS")
+	div_single <- alphaDiversity(db, step_q=1, max_q=4, group="SAMPLE", nboot=100, clone="CLONE")
 	expect_equal(div, div_single)
 })
 
@@ -261,7 +261,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
                                     step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
-                                    ci=0.95, nboot=100, locusColumn="LOCUS")
+                                    ci=0.95, nboot=100)
     obs <- diversity_obj@diversity[c(1, 3, 9, 20), ]
     
     # test the deprecated function
@@ -269,7 +269,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     expect_warning(rarefy_obj <- rarefyDiversity(as.data.frame(db), 
                                                  group="SAMPLE", clone="CLONE", copy=NULL, 
                                                  step_q=1, min_q=0, max_q=10, min_n=30, max_n=NULL,
-                                                 ci=0.95, nboot=100, locusColumn="LOCUS"),
+                                                 ci=0.95, nboot=100),
                   "is deprecated")
     # should match same code run outside the function
     expect_equal(diversity_obj, rarefy_obj)
@@ -289,14 +289,14 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
     diversity_obj <- alphaDiversity(as.data.frame(db), 
                                     group="SAMPLE", clone="CLONE", copy=NULL, 
                                     step_q=1, min_q=0, max_q=0, min_n=30, max_n=NULL,
-                                    ci=0.95, nboot=100, locusColumn = "LOCUS")
+                                    ci=0.95, nboot=100)
     
     # test the deprecated function
     set.seed(3)
     expect_warning(testdiv_obj <- testDiversity(as.data.frame(db), 
                                      group="SAMPLE", clone="CLONE", copy=NULL, 
                                      q=0, min_n=30, max_n=NULL,
-                                     ci=0.95, nboot=100, locusColumn="LOCUS"),
+                                     ci=0.95, nboot=100),
         "is deprecated")
     
     # should be the same as the code run outside the function
@@ -305,7 +305,7 @@ test_that("alphaDiversity reproduces rarefyDiversity and testDiversity", {
 
 test_that("estimateAbundance reproduces v0.2.11 results", {
     set.seed(90)
-    abund <- estimateAbundance(db, group="SAMPLE", min_n=1, uniform=FALSE, nboot=1000, clone="CLONE", locusColumn="LOCUS")
+    abund <- estimateAbundance(db, group="SAMPLE", min_n=1, uniform=FALSE, nboot=1000, clone="CLONE")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(abund@abundance$P[1:6], 
     #              c(0.038086, 0.038086, 0.012930, 0.012930, 0.012930, 0.012930),
@@ -329,7 +329,7 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
     expect_equal(abund@abundance$rank[1000:1005], c(36, 37, 38, 39, 40, 41))
     
     set.seed(90)
-    abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100, clone="CLONE", locusColumn="LOCUS")
+    abund <- estimateAbundance(db[c(1, 289), ], group="SAMPLE", min_n=1, uniform=FALSE, nboot=100, clone="CLONE")
     expect_equal(abund@abundance$lower, c(1, 1), check.attributes = FALSE)
     expect_equal(abund@abundance$upper, c(1, 1), check.attributes = FALSE)
     expect_equal(abund@abundance$rank, c(1, 1), check.attributes = FALSE)
@@ -338,7 +338,7 @@ test_that("estimateAbundance reproduces v0.2.11 results", {
 test_that("rarefyDiversity reproduces v0.2.11 results", {
     set.seed(5)
     # Group by sample identifier
-    expect_warning(div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=1000, locusColumn="LOCUS"),
+    expect_warning(div <- rarefyDiversity(db, "SAMPLE", step_q=1, max_q=10, nboot=1000),
                    "is deprecated")
     obs <- data.frame(div@diversity[c(1, 3, 9, 20), ])
     # Exact v0.2.11 test results with nboot=100
@@ -369,7 +369,7 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
     
     # Grouping by isotype rather than sample identifier
     set.seed(25)
-    expect_warning(div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=1000, locusColumn = "LOCUS"),
+    expect_warning(div <- rarefyDiversity(db, "ISOTYPE", min_n=40, step_q=1, max_q=10, nboot=1000),
                    "Not all groups passed threshold")
     obs <- data.frame(div@diversity[c(5, 13, 19, 30), ])
     # Exact v0.2.11 test results with nboot=100
@@ -401,7 +401,7 @@ test_that("rarefyDiversity reproduces v0.2.11 results", {
 test_that("testDiversity reproduces v0.2.11 results", {
     set.seed(3)
     # Groups under the size threshold are excluded and a warning message is issued.
-    expect_warning(div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=1000, locusColumn="LOCUS"),
+    expect_warning(div <- testDiversity(db, "SAMPLE", q=0, min_n=30, nboot=1000),
                    "is deprecated")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(div@tests$PVALUE, 0)
@@ -411,7 +411,7 @@ test_that("testDiversity reproduces v0.2.11 results", {
     expect_equal(div@diversity$d, c(88.13, 63.57), tolerance=0.05)
     
     set.seed(3)
-    expect_warning(div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000, locusColumn="LOCUS"),
+    expect_warning(div <- testDiversity(rbind(db, db), "SAMPLE", q=0, min_n=30, nboot=1000),
                    "is deprecated")
     # Exact v0.2.11 test results with nboot=100
     # expect_equal(div@tests$PVALUE, 0.88)
@@ -438,7 +438,7 @@ expect_warning(
 regexp="airr::read_rearrangement")
 
 expect_warning(db_mixed_cloned <- airr::read_rearrangement(file.path("..", "data-tests", "db_test_cloned.tsv")))
-db_sc_cloned <- db_mixed_cloned %>% dplyr::filter(!is.na(cell_id))
+db_sc_cloned <- db_mixed_cloned %>% dplyr::filter(!is.na(cell_id)) %>% dplyr::mutate("umi_count" = 2)
 db_bulk_cloned <- db_mixed_cloned %>% dplyr::select(-cell_id)
 
 #### calcCoverage ####
@@ -490,12 +490,12 @@ test_that("countClones", {
 	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
-	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY", locusColumn = "LOCUS"), 
+	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
 	             ungrouped_toy,
 	             tolerance=0.01)
 
 	# Check toy grouped
-	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY", locusColumn="LOCUS") %>% ungroup(), 
+	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
 })
@@ -531,15 +531,9 @@ test_that("countClones with bulk data", {
 
 })
 
-test_that("countClones with bulk data light chains", {
-    expect_warning(clones <- countClones(db_bulk_cloned, locusValues = "light"))
-    clones_expect <- tibble::tibble(
-        clone_id = c("1","4","2","3"),
-        seq_count = c(8,2,1,1),
-        seq_freq = c(8/12,2/12,1/12,1/12)
-    )
+test_that("countClones with sc data and specified copy fails", {
+    expect_error(clones <- countClones(db_sc_cloned, copy="umi_count"))
 })
-
 
 #### calcInferredDiversity ####
 
