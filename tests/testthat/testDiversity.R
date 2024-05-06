@@ -116,7 +116,6 @@ test_that("countClones", {
 	             tolerance=0.001)
 })
 
-
 #### calcInferredDiversity ####
 
 test_that("calcDiversity", {
@@ -438,6 +437,10 @@ expect_warning(
     db <- readChangeoDb(example_file),
 regexp="airr::read_rearrangement")
 
+expect_warning(db_mixed_cloned <- airr::read_rearrangement(file.path("..", "data-tests", "db_test_cloned.tsv")))
+db_sc_cloned <- db_mixed_cloned %>% dplyr::filter(!is.na(cell_id))
+db_bulk_cloned <- db_mixed_cloned %>% dplyr::select(-cell_id)
+
 #### calcCoverage ####
 
 test_that("calcCoverage", {
@@ -495,6 +498,46 @@ test_that("countClones", {
 	expect_equal(countClones(db_toy, groups="GROUP", clone="CLONE", copy="COPY", locusColumn="LOCUS") %>% ungroup(), 
 	             grouped_toy, 
 	             tolerance=0.01)
+})
+
+test_that("countClones with mixed data", {
+    expect_warning(clones <- countClones(db_mixed_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(11,2,2,1),
+        seq_freq = c(11/16,2/16,2/16,1/16)
+    )
+    expect_equal(clones,
+                    clones_expect,
+                    tolerance=0.01)
+})
+
+test_that("countClones with sc data", {
+    expect_warning(clones <- countClones(db_sc_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(10,2,2,1),
+        seq_freq = c(10/15,2/15,2/15,1/15)
+    )
+})
+
+test_that("countClones with bulk data", {
+    expect_warning(clones <- countClones(db_bulk_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(11,2,2,1),
+        seq_freq = c(11/16,2/16,2/16,1/16)
+    )
+
+})
+
+test_that("countClones with bulk data light chains", {
+    expect_warning(clones <- countClones(db_bulk_cloned, locusValues = "light"))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","4","2","3"),
+        seq_count = c(8,2,1,1),
+        seq_freq = c(8/12,2/12,1/12,1/12)
+    )
 })
 
 
