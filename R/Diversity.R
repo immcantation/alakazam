@@ -207,6 +207,13 @@ inferCompleteAbundance <- function(x) {
 #'                   sequence. If this value is specified, then total copy abundance
 #'                   is determined by the sum of copy numbers within each clonal group.
 #' @param    clone   name of the \code{data} column containing clone identifiers.
+#' @param    cellIdColumn name of the \code{data} column containing cell identifiers. If
+#'                   \code{cell_id=NULL} then the function will assume bulk data and
+#'                   only count clones according to the specified chains.
+#' @param    locusColumn   name of the \code{data} column containing locus information.
+#' @param    locusValues  name of the locus to count clones for bulk data. If \code{locusValues="heavy"}
+#'                       (the default), then only heavy chain sequences (IGH, TRB or TRD) are counted. If \code{locusValues="light"},
+#'                        then only light chain sequences (IGL, IGK, TRA or TRG) are counted.
 #' @param    remove_na    removes rows with \code{NA} values in the clone column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a clone in the final counts 
 #'                        and relative abundances.
@@ -238,34 +245,50 @@ inferCompleteAbundance <- function(x) {
 #' clones <- countClones(ExampleDb, groups=c("sample_id", "c_call"), copy="duplicate_count")
 #' 
 #' @export
-countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_na=TRUE) {
+countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", cellIdColumn="cell_id", 
+                        locusColumn="locus", locusValues = "heavy", remove_na=TRUE) {
     # Check input
-    check <- checkColumns(data, c(clone, copy, groups))
+    check <- checkColumns(data, c(clone, copy, groups, locusColumn))
     if (check != TRUE) { 
         warning(check) # instead of throwing an error and potentially disrupting a workflow
     }
 
-    # Checking for NAs
-    bool_na <- is.na(data[, clone])
-    if (any(bool_na)) {
-        if  (!all(bool_na)){
-            # Handle NAs
-            if (remove_na) {
+    if (!locusValues %in% c("heavy", "light")) {
+        stop("Count_locus must be either 'heavy' or 'light'.")
+    }
+
+    # Handle NAs
+    if (remove_na) {
+        bool_na <- is.na(data[, clone])
+        if (any(bool_na)) {
+            if  (!all(bool_na)){
                 msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", clone, 
                             " column and excluded from tabulation")
                 warning(msg)
-                data <- data[!bool_na, ]
-            } else  {
-                msg <- paste0("NA(s) found in ", sum(bool_na), " row(s) of the ", clone, 
-                            " column. Consider excluding them from the clonal tabulation by setting remove_na=TRUE")
-                warning(msg)
             }
-        } else {
-            msg <- paste0("All values in the ", clone, " column are NA. Consider re-running the clonal analysis.")
-            warning(msg)
+            data <- data[!bool_na, ]
         }
     }
-    
+
+    # Validating single-cell data if cellIdColumn is present
+    check_cellid <- checkColumns(data, cellIdColumn)
+    if (check_cellid==TRUE) {
+        data <- singleCellValidation(data, locusColumn, cellIdColumn)
+        if (any(is.na(data[, cellIdColumn]))) {
+            msg <- paste("NA(s) found in ", sum(is.na(data[, cellIdColumn])), " row(s) of the ", cellIdColumn, 
+                            " column. Mixed bulk and single-cell data is assumed and we will count clones only according to heavy chains.")
+            warning(msg)
+        }
+        data <- data[isHeavyChain(data, locusColumn),]
+    } else {
+        # Subsetting to specified locus for counting clones
+        if (locusValues == "heavy"){
+            data <- data[isHeavyChain(data, locusColumn),]
+        } else if (locusValues == "light"){
+            data <- data[isLightChain(data, locusColumn),]
+        }
+    }
+
     # Tabulate clonal abundance
     if (is.null(copy)) {
         clone_tab <- data %>% 
@@ -299,7 +322,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_n
 bootstrapAbundance <- function(x, n, nboot=200, method="before") {
     ## DEBUG
     # x=abund_obs; method="before"
-    # Check argumets
+    # Check arguments
     method <- match.arg(method)
   
     if (method == "before") {
@@ -355,6 +378,13 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #'                     be resampled to its original size or, if specified, \code{max_size}.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
+#' @param    cellIdColumn name of the \code{data} column containing cell identifiers. If
+#'                     \code{cell_id=NULL} then the function will assume bulk data and 
+#'                    only count clones according to the specified chains.
+#' @param    locusColumn name of the \code{data} column containing locus information.
+#' @param    locusValues name of the locus to count clones for bulk data. If \code{locusValues="heavy"}
+#'                    (the default), then only heavy chain sequences (IGH, TRB or TRD) are counted. If \code{locusValues="light"},
+#'                   then only light chain sequences (IGL, IGK, TRA or TRG) are counted.
 #' @param    progress  if \code{TRUE} show a progress bar. 
 #' 
 #' @return   A \link{AbundanceCurve} object summarizing the abundances.
@@ -381,6 +411,7 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #' @export
 estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL, 
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
+                              cellIdColumn="cell_id", locusColumn="locus", locusValues="heavy", 
                               progress=FALSE) {
     
     # TODO:
@@ -416,7 +447,9 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     
     # Tabulate clonal abundance
     count_col <- if (!is.null(copy)) { "copy_count" } else { "seq_count" }
-    clone_tab <- countClones(data, copy=copy, clone=clone, groups=group) %>%
+    clone_tab <- countClones(data, copy=copy, clone=clone, groups=group, 
+                                cellIdColumn=cellIdColumn, locusColumn=locusColumn,
+                                locusValues=locusValues) %>%
         dplyr::mutate(clone_count=!!rlang::sym(count_col))
 
     # Tabulate group sizes
