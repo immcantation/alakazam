@@ -122,6 +122,11 @@ makeChangeoClone <- function(data, id="sequence_id", seq="sequence_alignment",
                                   text_fields, num_fields, seq_fields, locus))
     if (check != TRUE) { stop(check) }
     
+    num_clones <- length(unique(data[[clone]]))
+    if (num_clones > 1) {
+        stop(paste0("`data` contains ",num_clones, " clone identifiers in the `",clone,"` field. Expecting one."))
+    }
+    
     if(sum(is.na(data[[locus]])) > 0){
         stop(paste("Missing values found in",locus,"column"))
     }
