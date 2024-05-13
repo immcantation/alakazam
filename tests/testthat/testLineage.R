@@ -46,6 +46,13 @@ test_that("makeChangeoClone",{
                       "collapse_count"=c(1, 2),
                       stringsAsFactors=FALSE)
     
+    # Bad data
+    # Stop if data contains multiple clone identifiers
+    bad_db <- db
+    bad_db$clone_id <- 1:nrow(bad_db)
+    expect_error(makeChangeoClone(bad_db, locus="locus"),
+                 "`data` contains 4 clone identifiers in the `clone_id` field. Expecting one.")
+    
     # Without end masking
     clone <- makeChangeoClone(db, text_fields="TYPE", num_fields="COUNT")
     
@@ -147,7 +154,7 @@ test_that("buildPhylipLineage", {
         expect_true(inherits(graph, "igraph"))
         expect_equal(igraph::vcount(graph), 5)
         expect_equal(igraph::ecount(graph), 4)
-        expect_true(igraph::is.directed(graph))
+        expect_true(igraph::is_directed(graph))
         
         expect_equal(igraph::graph_attr_names(graph),
                      c("clone", "v_gene", "j_gene", "junc_len"))
