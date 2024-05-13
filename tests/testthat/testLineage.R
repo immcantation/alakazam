@@ -154,7 +154,7 @@ test_that("buildPhylipLineage", {
         expect_true(inherits(graph, "igraph"))
         expect_equal(igraph::vcount(graph), 5)
         expect_equal(igraph::ecount(graph), 4)
-        expect_true(igraph::is.directed(graph))
+        expect_true(igraph::is_directed(graph))
         
         expect_equal(igraph::graph_attr_names(graph),
                      c("clone", "v_gene", "j_gene", "junc_len"))
