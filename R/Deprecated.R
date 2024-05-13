@@ -86,10 +86,10 @@ NULL
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL,
                             ci=0.95, nboot=2000, uniform=TRUE, 
-                            locusColumn="locus", locusValues="heavy", cellIdColumn="cell_id",
+                            cell_id="cell_id",
                             progress=FALSE) {
     .Deprecated("alphaDiversity")
-    bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci, cellIdColumn=cellIdColumn, locusColumn=locusColumn, locusValues=locusValues)
+    bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci, cell_id=cell_id)
     diversity_obj <- alphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
 
     return(diversity_obj)
@@ -179,10 +179,10 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
                           min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95,
-                          locusColumn="locus", locusValues="heavy", cellIdColumn="cell_id") {
+                          cell_id="cell_id") {
     .Deprecated("alphaDiversity")
 
-    abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci, locusColumn=locusColumn, locusValues=locusValues, cellIdColumn=cellIdColumn)
+    abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci, cell_id=cell_id)
     diversity_obj <- alphaDiversity(abundance_obj, min_q=q, max_q=q, step_q=1, ci=ci)
 
     return(diversity_obj)
