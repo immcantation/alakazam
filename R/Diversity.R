@@ -271,6 +271,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", cell_id=
     if (cell_id %in% names(data)) {
         # Handle single-cell and mixed bulk and single-cell case
         data_sc <- data %>% dplyr::filter(!is.na(!!rlang::sym(cell_id)))
+        data_sc[[cell_id]] <- as.character(data_sc[[cell_id]])
         data_blk <- data %>% dplyr::filter(is.na(!!rlang::sym(cell_id)))
         if (nrow(data_blk > 0)){
             data_blk[[cell_id]] <- paste0("bulk", 1:nrow(data_blk)) #dummy cell_id for bulk data

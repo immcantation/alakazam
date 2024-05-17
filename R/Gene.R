@@ -74,10 +74,7 @@
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
-                       mode=c("gene", "allele", "family", "asis"), remove_na=TRUE) {
-    #TODO: locusValues is not needed for countGenes
-    #TODO: split db between bulk and single-cell, then for single-cell collapse by cell_id
-
+                       mode=c("gene", "allele", "family", "asis"), cell_id="cell_id", remove_na=TRUE) {
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)
@@ -89,6 +86,12 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     check <- checkColumns(data, c(gene, groups, copy))
     if (check != TRUE) { 
         warning(check) # instead of throwing an error and potentially disrupting a workflow
+    }
+
+    # Don't allow a copy column for single-cell data as it doesn't make sense to count copies
+    if (cell_id %in% names(data) & !is.null(copy)) {
+        stop("Copy column specification not allowed for single-cell or mixed bulk and single-cell data. 
+        A cell_id column is present in the dataframe single-cell or mixed bulk and single-cell data is assumed.")
     }
 
     # Handle NAs
@@ -114,39 +117,98 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     }
     
     # Tabulate abundance
-    if (is.null(copy) & is.null(clone)) {
-        # Tabulate sequence abundance
-        gene_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(seq_count=n()) %>%
-            mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("seq_count")))
-    } else if (!is.null(clone) & is.null(copy)) {
-        # Find count of genes within each clone and keep first with maximum count
-        gene_tab <- data %>%
-            group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
-            dplyr::mutate(clone_gene_count=n()) %>%
-            ungroup() %>%
-            group_by(!!!rlang::syms(c(groups, clone))) %>%
-            slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
-            ungroup() %>%
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(clone_count=n()) %>%
-            mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
-            arrange(!!rlang::sym("clone_count"))
-    } else {
-        if (!is.null(clone) & !is.null(copy)) {
-            warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
-                    "The 'clone' argument will be ignored.")
+    if (cell_id %in% names(data)) {
+        # Handle single-cell and mixed bulk and single-cell data
+        data_sc <- data %>% dplyr::filter(!is.na(!!rlang::sym(cell_id)))
+        data_sc[[cell_id]] <- as.character(data_sc[[cell_id]])
+        data_blk <- data %>% dplyr::filter(is.na(!!rlang::sym(cell_id)))
+        if (nrow(data_blk > 0)){
+            warning(paste0("Mixed bulk and single-cell data detected.\n",
+                    "Sequences with '",cell_id,"' NA will be counted individually towards the total number of sequences.\n",
+                    "Consider filtering these sequences first for heavy or light chains. \n"))
+            data_blk[[cell_id]] <- paste0("bulk_", 1:nrow(data_blk)) # dummy cell_id for bulk data
         }
-        # Tabulate copy abundance
-        gene_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            summarize(seq_count=length(!!rlang::sym(gene)),
-                       copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
-            mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
-                   copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("copy_count")))
+        data <- bind_rows(data_sc, data_blk)
+
+        if (is.null(clone)) {
+            # Tabulate sequence abundance
+            cell_num <- data %>%
+                dplyr::select(!!!rlang::syms(c(groups, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups))) %>%
+                dplyr::summarize(cell_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::select(!!!rlang::syms(c(groups)), cell_count)
+            gene_tab_count <- data %>% 
+                dplyr::select(!!!rlang::syms(c(groups, gene, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=n()) 
+            if (nrow(cell_num) > 1){
+                gene_tab <- gene_tab_count %>%
+                    dplyr::left_join(cell_num, by=groups) %>%
+                    dplyr::mutate(seq_freq=seq_count/cell_count) %>%
+                    dplyr::arrange(desc(seq_count))
+            } else {
+                gene_tab <- gene_tab_count %>%
+                    dplyr::mutate(seq_freq=seq_count/cell_num$cell_count) %>%
+                    dplyr::arrange(desc(seq_count))
+            }
+
+        } else {
+            # Get unique count per cell and
+            # Find count of genes within each clone and keep first with maximum count
+            gene_tab <- data %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
+                dplyr::mutate(clone_gene_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(clone_count=n()) %>%
+                dplyr::mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(!!rlang::sym("clone_count"))
+        }
+
+    } else {
+
+        if (is.null(copy) & is.null(clone)) {
+            # Tabulate sequence abundance
+            gene_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=n()) %>%
+                dplyr::mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("seq_count")))
+        } else if (!is.null(clone) & is.null(copy)) {
+            # Find count of genes within each clone and keep first with maximum count
+            gene_tab <- data %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
+                dplyr::mutate(clone_gene_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(clone_count=n()) %>%
+                dplyr::mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(!!rlang::sym("clone_count"))
+        } else {
+            if (!is.null(clone) & !is.null(copy)) {
+                warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
+                        "The 'clone' argument will be ignored.")
+            }
+            # Tabulate copy abundance
+            gene_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=length(!!rlang::sym(gene)),
+                        copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
+                dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                    copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("copy_count")))
+        }
     }
 
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
