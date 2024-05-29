@@ -543,7 +543,14 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     
     # Get sequence vector and translate if required
     region <- as.character(data[[seq]])
-    region_aa <- if (nt) { translateDNA(region, trim=trim) } else { region }
+    region_aa <- if (nt) { 
+        translateDNA(region, trim=trim) 
+    } else {
+        if (trim) {
+            region <- substr(region, 2, stri_length(region) - 1)
+        }
+        region
+    }
     
     ## Will retrieve properties for valid sequences only
     ## keep index to fill results data.frame
@@ -611,3 +618,4 @@ aminoAcidProperties <- function(data, property=c("length", "gravy", "bulk",
     data_cols <- colnames(data) %in% colnames(out_df) == FALSE
     return(cbind(data[, data_cols], out_df))
 }
+
