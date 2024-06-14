@@ -525,19 +525,39 @@ test_that("groupGenes, mixed bulk and single cell", {
     #                 cell_id="cell_id", locus="locus", only_heavy=FALSE,
     #                 first=FALSE)
     
+    # Bulk mode cell_id=NULL
+    ## first=T
     gg <- groupGenes(db_gg, cell_id=NULL, first=T)
     expect_equal(gg[["vj_group"]], 
                  gg[["expected_group_cell_id-null_first-T"]])
-    
+    ## first=F
     gg <- groupGenes(db_gg, cell_id=NULL, first=F)
     expect_equal(gg[["vj_group"]], 
                  gg[["expected_group_cell_id-null_first-F"]])
     
-    # TODO fix this test
-    # groupdGenes now removes bulk sequences
-    # gg <- groupGenes(db_gg, cell_id="cell_id", locus="locus", 
-    #                  only_heavy=TRUE, first=TRUE)
-    # gg[["vj_group"]]
+    # Single cell mode cell_id="cell_id" with mixed bulk and single cell data
+    ## first=TRUE
+    
+    ### only_heavy=TRUE
+    # TODO fix this. groupdGenes now removes bulk sequences
+    expect_warning(
+        gg <- groupGenes(db_gg, cell_id="cell_id", only_heavy=TRUE, first=TRUE),
+        "Mixed single cell and bulk data was indicated"
+    )
+    gg[["expected_group_cell_id_first-T_only_heavy-T"]]
+    
+    ### only_heavy=TRUE
+    #TODO
+    
+    ## first=FALSE
+    #TODO
+    
+    ### only_heavy=TRUE
+    #TODO
+    
+    ### only_heavy=TRUE
+    #TODO
+
 })
 
 
