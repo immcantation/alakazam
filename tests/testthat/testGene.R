@@ -1,6 +1,7 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
-db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv"))
+expect_warning(db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv")),
+               "db_test.tsv is not in the Change-O format")
 
 ### countGenes ####
 
@@ -564,7 +565,7 @@ test_that("groupGenes, mixed bulk and single cell", {
     expect_equal(gg[["vj_group"]], 
                  gg[["expected_group_cell_id-null_first-F"]])
     
-    # Single cell mode cell_id="cell_id" with mixed bulk and single cell data
+    # Single cell mode cell_id="cell_id" mixed with bulk
     ## first=TRUE
     
     ### only_heavy=TRUE
