@@ -137,6 +137,35 @@ test_that("countGenes", {
     
 })
 
+test_that("countGenes works for single-cell", {
+    # Without copy numbers
+    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="family"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq,2), 
+                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+                 tolerance=0.001)
+    
+    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq,2), 
+                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+                 tolerance=0.001)
+    
+    added_cell <- data.frame(
+        subject_id = c("S2","S2","S2"),
+        v_call = c("IGHV1-1","IGKV1-1","IGKV1-1"),
+        j_call = c("IGHJ1-1","IGKJ1-1","IGKJ1-1"),
+        cell_id = c(30,30,30)
+    )
+
+    # Specific use case for identical light V gene within 1 cell that should be counted only once
+    db_gg_multilight <- db_gg %>%
+                        dplyr::select(c("subject_id","v_call","j_call","cell_id")) %>%
+                        dplyr::bind_rows(db_gg, added_cell)
+    expect_warning(genes <- countGenes(db_gg_multilight, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
+    expect_equal(genes$seq_freq, 
+                 c(0.8, 0.5, 0.1, 0.1, 0.05, 0.05, 1,1),
+                 tolerance=0.001)
+})
+
 ### getSegment ####
 
 test_that("getSegment", {
