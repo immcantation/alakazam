@@ -9,7 +9,7 @@ seq07	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	4	12	G1	G1	G1	G1		1	1	1
 seq08	S1	IGKV1-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	4	12	G3	G3	G1 (sc, same group as heavy)	G1 (sc, same group as heavy)		1	1	1	
 seq09	S1	IGKV2-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	4	12	G4	G3	G1 (sc, same group as heavy)	G1 (sc, same group as heavy)		1	1	NA	removed by dowser::resolveLightChains
 seq10	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	6	12	G1	G1	G1	G1		1	1	1	
-seq11	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	NA_17	12	G1	G1	G1 (heavy bulk)	G1 (heavy bulk)		1	1	1	
+seq11	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	NA	12	G1	G1	G1 (heavy bulk)	G1 (heavy bulk)		1	1	1	
 seq12	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	8	12	G1	G1	G1	G1		1	1	1	
 seq13	S1	IGKV1-1*01,IGKV2-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	8	12	G3	G3	G1 (sc, same group as heavy)	G1 (sc, same group as heavy)		1	1	1	
 seq14	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATCG	IGH	5	12	G1	G1	G1	G1		1	2	1	
@@ -17,7 +17,7 @@ seq15	S1	IGKV3-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	5	12	G5	G4	G1 (sc, same group as h
 seq16	S1	IGHV2-1*01	IGHJ1*01	TGTAAAACCTGG	IGH	7	12	G2	G2	G2	G2		2	3	1	
 seq17	S1	IGKV1-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	7	12	G3	G3	G2 (sc, same group as heavy)	G2 (sc, same group as heavy)		2	3	1	
 seq18	S1	IGKV1-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	9	12	G3	G3	G3 (light sc, no heavy, own group)	G3 (light sc, no heavy, own group)		NA	NA	NA	removed by dowser::resolveLightChains
-seq19	S1	IGKV1-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	NA_18	12	G3	G3	G4 (light bulk, own group)	G4 (light bulk, own group)		NA	NA	NA	removed by dowser::resolveLightChains
+seq19	S1	IGKV1-1*01	IGKJ1*01	TGTCCCCCCTGG	IGK	NA	12	G3	G3	G4 (light bulk, own group)	G4 (light bulk, own group)		NA	NA	NA	removed by dowser::resolveLightChains
 seq20	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGT	IGH	10	12	G1	G1	G1	G1		1	1	2	matches based on seq similarity to seq 5
 seq21	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATCG	IGH	11	12	G1	G1	G1	G1		1	2	1	matches based on seq similarity to seq15
 seq22	S1	IGHV1-1*01	IGHJ2*01	TGTAAAAAATGG	IGH	12	12	G1	G1	G1	G1		1	4	1	
