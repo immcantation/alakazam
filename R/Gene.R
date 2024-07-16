@@ -743,14 +743,20 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     
     # check for ambiguous sequences that could cause clonal group clumping
     # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
+    # TODO  SSNN 7/16/24: 
+    # - update docs and release notes
     if (!is.null(sequence_alignment)) {
-        for(i in nrow(data)){
-            n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
+        ambiguous_count <- 0
+        for (i in nrow(data)) {
+            n_informative <- lengths(regmatches(data[[sequence_alignment]][i],
                                                 gregexpr("[ACTG]", data[[sequence_alignment]][i])))
-            if(n_informative < 250){
-                warning("Ambigous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
+            if (n_informative < 250) {
+                ambiguous_count <- ambiguous_count + 1
             }
-        }        
+        }
+        if (ambiguous_count > 0 ) {
+            warning(ambiguous_count, " ambiguous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
+        }
     }
     
     # CGJ 4/12/24
