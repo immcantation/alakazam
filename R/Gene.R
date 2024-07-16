@@ -780,7 +780,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     separator_between_seq <- ";"
     
     # single-cell mode? CGJ 6/24/24 -- SC mode is not needed?
-    if (!is.null(cell_id) & !is.null(locus)){
+    # initialize FALSE, needed for bulk data
+    mixed <- FALSE
+    single_cell <- FALSE
         if(sum(is.na(data[[cell_id]])) == 0) {
             single_cell <- TRUE
             
