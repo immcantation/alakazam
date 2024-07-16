@@ -716,7 +716,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # but they didn't set up the function to run groupGenes in single cell mode.
     # TODO  SSNN 7/16/24: 
     # - update docs and release notes
-    if(is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)){
+    if (is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)) {
         nmissing <- sum(is.na(data$cell_id))
         if(nmissing > 0){
             # If cell_id is not all NA ask to specify cell_id
