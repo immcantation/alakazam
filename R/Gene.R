@@ -709,17 +709,29 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         stop("only_heavy = FALSE is not longer supported. Use only_heavy = TRUE.")
     }
     
-    # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go 
+    # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go
     # through the SC pathway
+    # Let the user know that `data` seems to contain single cell sequences 
+    # (because `locus` and "cell_id" present),
+    # but they didn't set up the function to run groupGenes in single cell mode.
+    # TODO  SSNN 7/16/24: 
+    # - update docs and release notes
     if(is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)){
         nmissing <- sum(is.na(data$cell_id))
         if(nmissing > 0){
-            stop(paste("A cell_id column was found in the data, but was not specified.",
+            # If cell_id is not all NA ask to specify cell_id
+            if (nmissing < nrow(data)) {
+                msg <- paste(
+                       "A cell_id column was found in the data, but was not specified.",
                        "Additionally, the data appears to have paired and unpaired cell data.",
-                       "This data type requires the single cell workflow, please specify the cell_id and rerun."))
+                       "This data type requires the single cell workflow, please specify the cell_id and rerun."        
+                )
+                stop(msg)
+            }
         } else{
+            # cell_id with data found. Ask to specify cell_id
             stop(paste("A cell_id column was found in the data, but was not specified.",
-                       "Please specify the cell_id column and rerun."))
+                       "Please specify the cell_id column to use the single cell workflow and rerun."))
         }
     }
     
