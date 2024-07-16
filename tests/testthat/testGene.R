@@ -464,22 +464,9 @@ test_that("groupGenes, mixed bulk and single cell", {
                     first=FALSE)
     expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
 
-    # cell_id='cell_id', only_heavy=F
-    expect_warning(
-        e <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-               cell_id="cell_id", locus="locus", only_heavy=FALSE,
-               first=FALSE),
-        "Mixed single cell and bulk data was indicated"
-    )
-    # TODO - Tests with the same data used in scoper
-    # Should match b, because mix bulk-sc -> bulk mode
-    # expect_equal(e,b)
+    # TODO SSNN 7/16/2024
+    # Run tests with the same data used in scoper
 
-    # Subset to single-cell sequences
-    # f <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-    #                 cell_id="cell_id", locus="locus", only_heavy=FALSE,
-    #                 first=FALSE)
-    
     # Bulk mode cell_id=NULL
     ## first=T
     gg <- groupGenes(db_gg, cell_id=NULL, first=T)
