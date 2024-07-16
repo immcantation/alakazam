@@ -737,9 +737,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     
     # Check base input
     # CGJ 4/12/24 added locus to this check to not repeat later
-    check <- checkColumns(data, c(v_call, j_call, sequence_alignment, locus))
+    check <- checkColumns(data, c(v_call, j_call, junc_len, sequence_alignment, locus, cell_id))
     if (check!=TRUE) { stop(paste("A column or some combination of columns v_call, j_call,",
-                                  "sequence_alignment, and locus were not found in the data")) }
+                                  "junc_len, sequence_alignment, locus, and cell_id were not found in the data")) }
     
     # check for ambiguous sequences that could cause clonal group clumping
     # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
