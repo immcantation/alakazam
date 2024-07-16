@@ -702,9 +702,11 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        locus="locus", only_heavy=TRUE, first=FALSE) {
     
     # CGJ 6/24/24 -- onlyHeavy warning
-    if(!only_heavy){
-        warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported."))
-        only_heavy <- FALSE
+    # Support for only_heavy = FALSE removed. Stop if requested.
+    # TODO  SSNN 7/16/24:
+    # - update docs, comments in code, and release notes
+    if (!only_heavy) {
+        stop("only_heavy = FALSE is not longer supported. Use only_heavy = TRUE.")
     }
     
     # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go 
