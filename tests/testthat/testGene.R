@@ -469,11 +469,11 @@ test_that("groupGenes, mixed bulk and single cell", {
 
     # Bulk mode cell_id=NULL
     ## first=T
-    gg <- groupGenes(db_gg, cell_id=NULL, first=T)
-    expect_equal(gg[["vj_group"]], 
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=T)
+    expect_equal(gg[["vj_group"]],
                  gg[["expected_group_cell_id-null_first-T"]])
     ## first=F
-    gg <- groupGenes(db_gg, cell_id=NULL, first=F)
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=F)
     expect_equal(gg[["vj_group"]], 
                  gg[["expected_group_cell_id-null_first-F"]])
     
