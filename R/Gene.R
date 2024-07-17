@@ -785,7 +785,10 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # initialize FALSE, needed for bulk data
     mixed <- FALSE
     single_cell <- FALSE
-        if(sum(is.na(data[[cell_id]])) == 0) {
+    if (!is.null(cell_id) & !is.null(locus)) {
+        # single cell fields exist
+        if (sum(is.na(data[[cell_id]])) == 0) {
+            # all rows have cell_id data
             single_cell <- TRUE
             
             if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
@@ -797,7 +800,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
             }
-        } else if(sum(is.na(data[[cell_id]])) != 0){
+        } else if (any(!is.na(data[[cell_id]]))) {
+            # some rows have cell_id data, and some NA
             single_cell <- TRUE
             mixed <- TRUE
             
@@ -811,14 +815,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 stop("The locus column contains invalid loci annotations.")
             }
         }
-    } else{
-        single_cell <- FALSE
     }
-    
-    # only set if `single_cell` & `only_heavy`
-    v_call_light <- NULL
-    j_call_light <- NULL
-    junc_len_light <- NULL
     
     # single-cell mode
     if (single_cell) {
