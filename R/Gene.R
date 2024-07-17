@@ -904,9 +904,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         } 
     } 
     
-    # TODO: remove this?
     if(mixed){
-        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains
+        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
         #indx <- which(data[[v_call]] == "")
         #data <- data[-indx,]
         #cell_seq_idx <- cell_seq_idx[-indx]
@@ -926,23 +925,19 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # NULL will disappear when doing c()
     # c(NULL,NULL) gives NULL still
     cols_for_grouping_heavy <- c(v_call, j_call, junc_len)
-    cols_for_grouping_light <- c(v_call_light, j_call_light, junc_len_light)
-    
+
     # Check NA(s) in columns
-    bool_na <- rowSums( is.na( data[, c(cols_for_grouping_heavy, cols_for_grouping_light)] ) ) >0
+    bool_na <- rowSums( is.na( data[, c(cols_for_grouping_heavy)] ) ) >0
     if (any(bool_na)) {
         entityName <- ifelse(single_cell, " cell(s)", " sequence(s)")
-        msg <- paste0("NA(s) found in one or more of { ", 
-                      v_call, ", ", j_call, 
+        msg <- paste0("NA(s) found in one or more of { ",
+                      v_call, ", ", j_call,
                       ifelse(is.null(junc_len), "", ", "), junc_len,
-                      ifelse(is.null(v_call_light), "", ", "), v_call_light,
-                      ifelse(is.null(j_call_light), "", ", "), j_call_light,
-                      ifelse(is.null(junc_len_light), "", ", "), junc_len_light,
                       " } columns. ", sum(bool_na), entityName, " removed.\n")
         warning(msg)
         data <- data[!bool_na, ]
         if (single_cell) {
-            # maintain one-to-one relationship between 
+            # maintain one-to-one relationship between
             # rows of data, cell_id_uniq, and cell_seq_idx
             cell_id_uniq <- cell_id_uniq[!bool_na]
             cell_seq_idx <- cell_seq_idx[!bool_na]
