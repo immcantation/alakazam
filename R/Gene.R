@@ -1174,19 +1174,19 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 i_orig_l <- cell_seq_idx[[i_cell]][["light"]]
                 
                 # if it's just the light chain give in an NA and skip
-                if(length(i_orig_h) == 0 & length(i_orig_l) == 1){
+                if (length(i_orig_h) == 0 & length(i_orig_l) == 1) {
                     data_orig$vj_group[i_orig_l] <- NA
                     next
                 }
                 
-                # sanity check 
-                # both chains are present in the cell 
-                if(!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0){
+                # sanity check
+                # both chains are present in the cell
+                if (!all(is.na(data_orig[[cell_id]][i_orig_h])) & length(i_orig_l) != 0 ) {
                     # sanity check
                     stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
                 } else{
                     # just the heavy chain
-                    if(is.na(data_orig[[cell_id]][i_orig_h])){
+                    if (all(is.na(data_orig[[cell_id]][i_orig_h]))) {
                         stopifnot(is.na(cell_id_uniq[i_cell]))
                     }else{
                         stopifnot(data_orig[[cell_id]][i_orig_h] == cell_id_uniq[i_cell])
