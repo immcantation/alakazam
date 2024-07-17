@@ -705,6 +705,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # Support for only_heavy = FALSE removed. Stop if requested.
     # TODO  SSNN 7/16/24:
     # - update docs, comments in code, and release notes
+    # - maybe update the message and say that the parameter will be removed in a the next release? It
+    #   doesn't make sense to keep it if it can not be adjusted.
     if (!only_heavy) {
         stop("only_heavy = FALSE is not longer supported. Use only_heavy = TRUE.")
     }
