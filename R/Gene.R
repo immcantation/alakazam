@@ -904,8 +904,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         } 
     } 
     
+    # TODO: remove this?
     if(mixed){
-        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
+        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains
         #indx <- which(data[[v_call]] == "")
         #data <- data[-indx,]
         #cell_seq_idx <- cell_seq_idx[-indx]
