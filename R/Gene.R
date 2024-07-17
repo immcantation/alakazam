@@ -1158,7 +1158,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         data_orig$vj_group <- NA
         
         # map back to data_orig
-        if(!mixed){
+        if (!mixed) {
             for (i_cell in 1:nrow(data)) {
                 # wrt data_orig
                 i_orig_h <- cell_seq_idx[[i_cell]][["heavy"]]
