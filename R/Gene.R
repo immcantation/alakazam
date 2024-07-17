@@ -817,10 +817,10 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         }
     }
     
-    # single-cell mode
+    # single-cell mode (incl. mixed)
     if (single_cell) {
         # make a copy
-        data_orig <- data; 
+        data_orig <- data
         # regardless of using heavy only, or using both heavy and light
         # for each cell
         # - index wrt data of heavy chain
