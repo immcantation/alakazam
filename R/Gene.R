@@ -869,17 +869,18 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         
         
         # use heavy chains only
-        # Straightforward subsetting like below won't work in cases 
-        #     where multiple HCs are present for a cell 
+        # Straightforward subsetting like below won't work in cases
+        #     where multiple HCs are present for a cell
         # CGJ 6/16/23
         # subset to heavy only -- for both B and T cells
-        data <- data_orig[isHeavyChain(data_orig, locus = locus),]
+        # data <- data_orig[isHeavyChain(data_orig, locus = locus),]
         
-        # Check for cells with two heavy chains 
+        # Check for cells with two heavy chains
         # singleCellValdiation 4/12/24
-        if(!mixed){
-            data <- singleCellValidation(data, locus = locus, cell_id = cell_id)
-        }
+        # TODO: are we doing the single cell validation anywhere?
+        # if(!mixed){
+        #     data <- singleCellValidation(data, locus = locus, cell_id = cell_id)
+        # }
         
         # flatten data
         cols <- c(cell_id, v_call, j_call, junc_len)
