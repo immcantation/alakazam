@@ -826,29 +826,46 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         # - index wrt data of heavy chain
         # - index wrt data of light chain(s)
         cell_id_uniq <- unique(data[[cell_id]])
-        if(mixed){
-            cell_seq_idx <- sapply(cell_id_uniq, function(x){
-                if(is.na(x)){
-                    # heavy chain
-                    idx_h <- which( is.na(data[[cell_id]]) & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
-                } else{
-                    # heavy chain
-                    idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
-                }
-                # light chain
-                idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
-                return(list(heavy=idx_h, light=idx_l))
-            }, USE.NAMES=FALSE, simplify=FALSE)
-        } else{
-            cell_seq_idx <- sapply(cell_id_uniq, function(x){
-                # heavy chain
-                idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
-                # light chain
-                idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
-                
-                return(list(heavy=idx_h, light=idx_l))
-            }, USE.NAMES=FALSE, simplify=FALSE)
-        }
+        # if(mixed){
+        #     cell_seq_idx <- sapply(cell_id_uniq, function(x){
+        #         if(is.na(x)){
+        #             # heavy chains without cell_id
+        #             idx_h <- which( is.na(data[[cell_id]]) & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+        #         } else{
+        #             # single cell heavy chain
+        #             idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+        #         }
+        #         # light chain
+        #         idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
+        #         return(list(heavy=idx_h, light=idx_l))
+        #     }, USE.NAMES=FALSE, simplify=FALSE)
+        # } else {
+        #     cell_seq_idx <- sapply(cell_id_uniq, function(x){
+        #         # heavy chain
+        #         idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+        #         # light chain
+        #         idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
+        #
+        #         return(list(heavy=idx_h, light=idx_l))
+        #     }, USE.NAMES=FALSE, simplify=FALSE)
+        # }
+        
+        # TODO: Can we simplify the code above to this? Is this slower?
+        # Heavy bulk sequences will go together, sc sequences will go by cell_id.
+        # Light bulk sequences will be ignored (idx_l always empty for bulk light chains) and light sc will go by cell_id
+        cell_seq_idx <- sapply(cell_id_uniq, function(x){
+            if (is.na(x)) {
+                # heavy chains without cell_id
+                idx_h <- which( is.na(data[[cell_id]]) & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+            } else{
+                # single cell heavy chain
+                idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+            }
+            # light chain
+            # idx_l will be empty if the cell_id (x) is NA
+            idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
+            return(list(heavy=idx_h, light=idx_l))
+        }, USE.NAMES=FALSE, simplify=FALSE)
         
         
         # use heavy chains only
