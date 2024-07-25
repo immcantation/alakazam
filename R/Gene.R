@@ -887,6 +887,14 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         data <- data.frame(matrix(NA, nrow=length(cell_seq_idx), ncol=length(cols)))
         colnames(data) <- cols
         
+        # Next for loop will create something like this,
+        # with all bulk sequence data concatenated.
+        #
+        # cell_id                v_call                                 j_call                     junction_length
+        # 1                      Homsap IGHV3-11*05 F                   Homsap IGHJ4*03 F              93
+        # 2                      Homsap IGHV3-48*03 F                   Homsap IGHJ1*01 F              84
+        # 3                      Homsap IGHV3-20*01 F                   Homsap IGHJ3*01 F              78
+        # NA Homsap IGHV3-20*01 F;Homsap IGHV4-34*01 F Homsap IGHJ3*01 F;Homsap IGHJ4*02 F          78;111
         for (i_cell in 1:length(cell_seq_idx)) {
             i_cell_h <- cell_seq_idx[[i_cell]][["heavy"]]
             
@@ -904,8 +912,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         }
     }
     
+    # TODO: remove this?
     if(mixed){
-        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
+        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains
         #indx <- which(data[[v_call]] == "")
         #data <- data[-indx,]
         #cell_seq_idx <- cell_seq_idx[-indx]
