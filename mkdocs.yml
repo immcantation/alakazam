@@ -7,7 +7,11 @@ theme:
   name: readthedocs
   navigation_depth: 2
   collapse_navigation: False
+  sticky_navigation: False
+  locale: en
   titles_only: False
+  analytics:
+    gtag: G-BDGVJ44VYF
 markdown_extensions:
   - def_list
   - sane_lists
