@@ -51,6 +51,7 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
 [Edel Aron](mailto:edel.aron@yale.edu) (ctb)  
 [Cole Jensen](mailto:cole.jensen@yale.edu) (ctb)  
+[Gisela Gabernet](mailto:gisela.gabernet@yale.edu) (ctb)  
 [Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 

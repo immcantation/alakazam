@@ -47,6 +47,7 @@ Other contributors:
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
 +  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
 +  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu) [contributor]
++  Gisela Gabernet [gisela.gabernet@yale.edu](gisela.gabernet@yale.edu) [contributor]
 
 
 
