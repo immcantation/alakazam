@@ -3,6 +3,7 @@ site_url: https://alakazam.readthedocs.io
 site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/alakazam
 edit_uri: src/master/docs/
+google_analytics: ['G-BDGVJ44VYF', 'https://alakazam.readthedocs.io']
 theme:
   name: readthedocs
   navigation_depth: 2
