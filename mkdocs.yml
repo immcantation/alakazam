@@ -20,7 +20,7 @@ markdown_extensions:
       baselevel: 1
       toc_depth: 1-4
       permalink: True
-docs_dir: 'docs'
+docs_dir: docs
 nav:
   - 'Immcantation Portal': https://immcantation.readthedocs.io/
   - 'About':
