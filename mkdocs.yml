@@ -7,7 +7,11 @@ theme:
   name: readthedocs
   navigation_depth: 2
   collapse_navigation: False
+  sticky_navigation: False
+  locale: en
   titles_only: False
+  analytics:
+    gtag: G-BDGVJ44VYF
 markdown_extensions:
   - def_list
   - sane_lists
@@ -16,7 +20,7 @@ markdown_extensions:
       baselevel: 1
       toc_depth: 1-4
       permalink: True
-docs_dir: 'docs'
+docs_dir: docs
 nav:
   - 'Immcantation Portal': https://immcantation.readthedocs.io/
   - 'About':
@@ -24,7 +28,7 @@ nav:
     - 'Download & Installation': install.md
     - 'Package Overview': topics/alakazam.md
     - 'Release Notes': news.md
-    - 'Related Projects': projects.md    
+    - 'Related Projects': projects.md
   - 'Vignettes':
     - 'How to read and write files': vignettes/Files-Vignette.md
     - 'Basic gene usage analysis': vignettes/GeneUsage-Vignette.md
