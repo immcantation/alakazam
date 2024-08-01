@@ -1,3 +1,11 @@
+Version 1.3.1: August 1, 2024
+-------------------------------------------------------------------------------
+
+Documentation:
+
++ This is a documentation-only update to address changes in Read the Docs.
+
+
 Version 1.3.0: September 29, 2023
 -------------------------------------------------------------------------------
 
