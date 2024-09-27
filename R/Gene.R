@@ -629,6 +629,8 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #'                         is used. if \code{FALSE} the union of ambiguous gene 
 #'                         assignments is used to group all sequences with any 
 #'                         overlapping gene calls.
+#' @param   ninformative   The number of informative sites in a given alignment 
+#'                         required proper grouping.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{vj_group} column. 
@@ -699,7 +701,7 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        sequence_alignment=NULL,cell_id=NULL,
-                       locus="locus", only_heavy=TRUE, first=FALSE) {
+                       locus="locus", only_heavy=TRUE, first=FALSE, ninformative = 250) {
   
   # CGJ 6/24/24 -- onlyHeavy warning
   # Deprecation/Removal of only_heavy = FALSE
@@ -738,7 +740,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     for(i in nrow(data)){
       n_informative <- lengths(regmatches(data[[sequence_alignment]][i],
                                           gregexpr("[ACTG]", data[[sequence_alignment]][i])))
-      if(n_informative < 250){
+      
+      if(n_informative < ninformative){
         ambiguous_count <- ambiguous_count + 1
       }
     }
