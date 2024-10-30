@@ -30,9 +30,9 @@ db[,new_cols] %>% head()
 
 ```
 ## # A tibble: 1 × 4
-##   quality_num                    quality quality_alignment_num quality_alignment
-##   <chr>                          <chr>   <chr>                 <chr>            
-## 1 90,90,90,90,90,90,90,90,90,90… {{{{{{… 90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{…
+##   quality_num                                                                                     quality quality_alignment_num quality_alignment
+##   <chr>                                                                                           <chr>   <chr>                 <chr>            
+## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,9… {{{{{{… 90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{…
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
@@ -89,7 +89,7 @@ ggplot(quality, aes(x=position,
 ```
 
 ```
-## Warning: Removed 27 rows containing missing values (`geom_point()`).
+## Warning: Removed 27 rows containing missing values or values outside the scale range (`geom_point()`).
 ```
 
 ![Sequence quality per IMGT position for one sequence.](figure/Fastq-Vignette-4-1.png)

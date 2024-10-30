@@ -1,4 +1,4 @@
-# The Alakazam package
+# The alakazam package
 
 Description
 --------------------
@@ -94,7 +94,6 @@ Ig and TCR sequence annotation
 + [getAllele](getSegment.md):            Get V(D)J allele names.
 + [getGene](getSegment.md):              Get V(D)J gene names.
 + [getFamily](getSegment.md):            Get V(D)J family names.
-+ [junctionAlignment](junctionAlignment.md): Junction alignment properties 
 
 
 

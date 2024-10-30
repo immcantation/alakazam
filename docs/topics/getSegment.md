@@ -117,7 +117,7 @@ A character vector containing allele, gene or family names.
 References
 -------------------
 
-[https://www.imgt.org/](https://www.imgt.org/)
+[http://imgt.org](http://imgt.org)
 
 
 
@@ -159,8 +159,7 @@ getAllele(kappa_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01"
-[2] "IGKJ5*01"                            
+[1] "IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01" "IGKJ5*01"                            
 
 ```
 
@@ -301,8 +300,7 @@ getAllele(heavy_call, first=FALSE, strip_d=FALSE)
 
 
 ```
-[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"              
-[3] "IGHJ1*01"                
+[1] "IGHV1-69*01,IGHV1-69D*01" "IGHD1-1*01"               "IGHJ1*01"                
 
 ```
 
@@ -382,8 +380,7 @@ getAllele(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```
-[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"              
-[3] ""                         
+[1] "IGHV3-30-3*01,IGHV3-30*01" "IGHV3-30*01"               ""                         
 
 ```
 
@@ -402,51 +399,11 @@ getGene(nl_call, first=FALSE, omit_nl=TRUE)
 
 ```R
 getFamily(nl_call, first=FALSE, omit_nl=TRUE)
-
 ```
 
 
 ```
 [1] "IGHV3" "IGHV3" ""     
-
-```
-
-
-```R
-
-# Temporary designation examples
-tmp_call <- c("IGHV9S3*01", "IGKV10S12*01")
-
-getAllele(tmp_call)
-
-```
-
-
-```
-[1] "IGHV9S3*01"   "IGKV10S12*01"
-
-```
-
-
-```R
-getGene(tmp_call)
-
-```
-
-
-```
-[1] "IGHV9S3"   "IGKV10S12"
-
-```
-
-
-```R
-getFamily(tmp_call)
-```
-
-
-```
-[1] "IGHV9"  "IGKV10"
 
 ```
 

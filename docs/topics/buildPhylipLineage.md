@@ -5,8 +5,6 @@ Description
 
 `buildPhylipLineage` reconstructs an Ig lineage via maximum parsimony using the 
 dnapars application, or maximum liklihood using the dnaml application of the PHYLIP package.
-**Note**: To use the most recent methods for building, visualizing and analyzing 
-trees, use the R package [Dowser](https://dowser.readthedocs.io).
 
 
 Usage
@@ -189,9 +187,8 @@ See also
 Takes as input a [ChangeoClone](ChangeoClone-class.md). 
 Temporary directories are created with [makeTempDir](makeTempDir.md).
 Distance is calculated using [seqDist](seqDist.md). 
-See [igraph](http://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package) 
-and [igraph.plotting](http://www.rdocumentation.org/packages/igraph/topics/plot.common) 
-for working  with igraph `graph` objects.
+See [igraph](http://www.rdocumentation.org/packages/igraph/topics/aaa-igraph-package) and [igraph.plotting](http://www.rdocumentation.org/packages/igraph/topics/plot.common) for working 
+with igraph `graph` objects.
 
 
 

@@ -50,7 +50,7 @@ References
 
 1. Moore DS. Amino acid and peptide net charges: A simple calculational procedure. 
 Biochem Educ. 13, 10-11 (1985).
-1. [https://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html](https://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html)
+1. [http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html](http://emboss.sourceforge.net/apps/cvs/emboss/apps/iep.html)
 
 
 

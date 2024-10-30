@@ -41,8 +41,6 @@ See also
 -------------------
 
 Wraps [write_delim](http://www.rdocumentation.org/packages/readr/topics/write_delim). See [readChangeoDb](readChangeoDb.md) for reading to Change-O files.
-See [read_rearrangement](http://www.rdocumentation.org/packages/airr/topics/read_tabular) and [write_rearrangement](http://www.rdocumentation.org/packages/airr/topics/write_tabular)
-to read and write AIRR-C Standard formatted repertoires.
 
 
 

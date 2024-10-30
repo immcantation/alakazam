@@ -1,4 +1,4 @@
-**plotAbundanceCurve** - *Plot a clonal abundance distribution*
+**plotAbundanceCurve** - *Plots a clonal abundance distribution*
 
 Description
 --------------------
@@ -43,14 +43,11 @@ legend_title
 
 xlim
 :   numeric vector of two values specifying the 
-`c(lower, upper)` x-axis limits. The lower x-axis 
-value must be >=1.
+`c(lower, upper)` x-axis limits.
 
 ylim
 :   numeric vector of two values specifying the 
-`c(lower, upper)` y-axis limits. The limits on the 
-abundance values are expressed as fractions of 1: use
-c(0,1) to set the lower and upper limits to 0% and 100%.
+`c(lower, upper)` y-axis limits.
 
 annotate
 :   string defining whether to added values to the group labels 
@@ -90,8 +87,9 @@ plotAbundanceCurve(abund, legend_title="Sample")
 See also
 -------------------
 
-See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for
-generating the input abundance distribution. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for 
+generating the input abundance distribution.
+Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

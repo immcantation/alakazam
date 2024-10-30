@@ -29,24 +29,24 @@ Useful links:
 Author
 -------------------
 
-**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
+**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](mailto:susanna.marquez@yale.edu)
 
 Authors:
 
-+  Namita Gupta [namita.gupta@yale.edu](namita.gupta@yale.edu)
-+  Nima Nouri [nima.nouri@yale.edu](nima.nouri@yale.edu)
-+  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
-+  Julian Zhou [julian.zhou@bulldogs.yale.edu](julian.zhou@bulldogs.yale.edu)
-+  Kenneth Hoehn [kenneth.hoehn@yale.edu](kenneth.hoehn@yale.edu)
-+  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
-+  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
++  Namita Gupta [namita.gupta@yale.edu](mailto:namita.gupta@yale.edu)
++  Nima Nouri [nima.nouri@yale.edu](mailto:nima.nouri@yale.edu)
++  Ruoyi Jiang [ruoyi.jiang@yale.edu](mailto:ruoyi.jiang@yale.edu)
++  Julian Zhou [julian.zhou@bulldogs.yale.edu](mailto:julian.zhou@bulldogs.yale.edu)
++  Kenneth Hoehn [kenneth.hoehn@yale.edu](mailto:kenneth.hoehn@yale.edu)
++  Jason Vander Heiden [jason.vanderheiden@gmail.com](mailto:jason.vanderheiden@gmail.com)
++  Steven Kleinstein [steven.kleinstein@yale.edu](mailto:steven.kleinstein@yale.edu) [copyright holder]
 
 
 Other contributors:
 
-+  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
-+  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
-+  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu) [contributor]
++  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](mailto:daniel.gadala-maria@yale.edu) [contributor]
++  Edel Aron [edel.aron@yale.edu](mailto:edel.aron@yale.edu) [contributor]
++  Cole Jensen [cole.jensen@yale.edu](mailto:cole.jensen@yale.edu) [contributor]
 
 
 

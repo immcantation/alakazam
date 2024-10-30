@@ -28,7 +28,7 @@ with values containing a numeric vector of length two defining the
 References
 -------------------
 
-[https://www.imgt.org/](https://www.imgt.org/)
+[http://imgt.org](http://imgt.org)
 
 
 

@@ -1,4 +1,4 @@
-**testEdges** - *Tests for parent-child annotation enrichment in lineage trees*
+**testEdges** - *Tests for parent-child annotation enchrichment in lineage trees*
 
 Description
 --------------------
@@ -61,7 +61,7 @@ Examples
 
 ```R
 # Define example tree set
-graphs <- ExampleTrees[1:10]
+graphs <- ExampleTrees[1-10]
 
 # Perform edge test on isotypes
 x <- testEdges(graphs, "c_call", nperm=10)
@@ -70,9 +70,17 @@ print(x)
 
 
 ```
-  parent child count expected pvalue
-1   IGHA  IGHA     6        6      0
-2   IGHG  IGHG     6        6      0
+      parent     child count   expected pvalue
+1       IGHA      IGHA    39  60.600000    1.0
+2       IGHA IGHA,IGHG     3   3.200000    0.5
+3       IGHA      IGHG     2   4.300000    0.8
+4  IGHA,IGHG      IGHA    29   8.857143    0.0
+5  IGHA,IGHG IGHA,IGHG     1   2.000000    1.0
+6  IGHA,IGHG      IGHG    24   2.833333    0.0
+7  IGHD,IGHG      IGHG     8   2.500000    0.0
+8       IGHG      IGHA     1   4.400000    0.9
+9       IGHG IGHD,IGHG     1   1.000000    0.0
+10      IGHG      IGHG   112 135.000000    1.0
 
 ```
 
