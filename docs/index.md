@@ -8,7 +8,7 @@
     It will be held virtually on **January 30th, 2025**, from 10 to 1:30pm (ET).
     All talks will be from user-submitted abstracts (due on **November 1st, 2024**).
 
-    Full information here: https://immcantation.github.io/users-meeting/
+    Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
 Alakazam
 -------------------------------------------------------------------------------
