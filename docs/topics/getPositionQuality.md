@@ -63,24 +63,12 @@ db <- readFastqDb(db, fastq_file, quality_offset=-33)
 
 ```
 
-*Warning*:failed to read sequences, returns NULL**Error in attr(DNA, "QUAL") <- QUAL**: attempt to set an attribute on NULL
+**Error in eval(expr, envir, enclos)**: object 'db' not found
 ```R
 head(getPositionQuality(db))
 ```
 
-*Warning*:NAs introduced by coercion
-```
-  position quality_alignment_num       sequence_id nt
-1        1                    90 CGCTTTTCGGATTGGAA  C
-2        2                    90 CGCTTTTCGGATTGGAA  A
-3        3                    90 CGCTTTTCGGATTGGAA  G
-4        4                    90 CGCTTTTCGGATTGGAA  C
-5        5                    90 CGCTTTTCGGATTGGAA  T
-6        6                    90 CGCTTTTCGGATTGGAA  G
-
-```
-
-
+**Error in eval(expr, envir, enclos)**: object 'db' not found
 
 See also
 -------------------

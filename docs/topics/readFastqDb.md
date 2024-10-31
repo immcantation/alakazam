@@ -144,7 +144,7 @@ fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
 ```
 
-*Warning*:failed to read sequences, returns NULL**Error in attr(DNA, "QUAL") <- QUAL**: attempt to set an attribute on NULL
+**Error in eval(expr, envir, enclos)**: object 'db' not found
 
 See also
 -------------------

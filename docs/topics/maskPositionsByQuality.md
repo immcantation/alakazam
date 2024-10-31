@@ -64,26 +64,12 @@ db <- readFastqDb(db, fastq_file, quality_offset=-33)
 
 ```
 
-*Warning*:failed to read sequences, returns NULL**Error in attr(DNA, "QUAL") <- QUAL**: attempt to set an attribute on NULL
+**Error in eval(expr, envir, enclos)**: object 'db' not found
 ```R
 maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 ```
 
-*Number of masked sequences: 1*
-```
-# A tibble: 1 × 40
-  sequence_id       sequence  rev_comp productive v_call d_call j_call sequence_alignment germline_alignment junction junction_aa v_cigar d_cigar
-  <chr>             <chr>     <lgl>    <lgl>      <chr>  <chr>  <chr>  <chr>              <chr>              <chr>    <chr>       <chr>   <chr>  
-1 CGCTTTTCGGATTGGAA GGCTTTCT… FALSE    TRUE       IGHV4… IGHD3… IGHJ4… CAGCTGCACCTGCAGGA… CAGCTGCAGCTGCAGGA… TGTGCGA… CARGTDLVTG… 93S8=1… 403S9N…
-# ℹ 27 more variables: j_cigar <chr>, stop_codon <lgl>, vj_in_frame <lgl>, locus <chr>, junction_length <int>, np1_length <int>,
-#   np2_length <int>, v_sequence_start <int>, v_sequence_end <int>, v_germline_start <int>, v_germline_end <int>, d_sequence_start <int>,
-#   d_sequence_end <int>, d_germline_start <int>, d_germline_end <int>, j_sequence_start <int>, j_sequence_end <int>, j_germline_start <int>,
-#   j_germline_end <int>, consensus_count <int>, duplicate_count <int>, c_call <chr>, quality_num <chr>, quality <chr>,
-#   quality_alignment_num <chr>, quality_alignment <chr>, sequence_alignment_masked <chr>
-
-```
-
-
+**Error in eval(expr, envir, enclos)**: object 'db' not found
 
 See also
 -------------------
