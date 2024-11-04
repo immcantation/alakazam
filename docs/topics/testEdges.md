@@ -66,21 +66,22 @@ graphs <- ExampleTrees[1-10]
 # Perform edge test on isotypes
 x <- testEdges(graphs, "c_call", nperm=10)
 print(x)
+
 ```
 
 
 ```
       parent     child count   expected    pvalue
-1       IGHA      IGHA    39  52.300000 0.9000000
-2       IGHA IGHA,IGHG     3   3.000000 0.5000000
-3       IGHA      IGHG     2   4.777778 0.7777778
-4  IGHA,IGHG      IGHA    29  17.000000 0.0000000
-5  IGHA,IGHG IGHA,IGHG     1   2.000000 1.0000000
-6  IGHA,IGHG      IGHG    24   1.857143 0.0000000
-7  IGHD,IGHG      IGHG     8   1.000000 0.0000000
+1       IGHA      IGHA    39  60.400000 0.9000000
+2       IGHA IGHA,IGHG     3   3.200000 0.5000000
+3       IGHA      IGHG     2   4.400000 0.9000000
+4  IGHA,IGHG      IGHA    29  10.166667 0.0000000
+5  IGHA,IGHG IGHA,IGHG     1   1.333333 0.3333333
+6  IGHA,IGHG      IGHG    24   4.600000 0.0000000
+7  IGHD,IGHG      IGHG     8   1.125000 0.0000000
 8       IGHG      IGHA     1   4.200000 1.0000000
 9       IGHG IGHD,IGHG     1   1.000000 0.0000000
-10      IGHG      IGHG   112 137.000000 1.0000000
+10      IGHG      IGHG   112 135.700000 1.0000000
 
 ```
 

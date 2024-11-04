@@ -105,6 +105,7 @@ seqEqual("ATGGC", "ATGGN", ignore="N")
 
 ```R
 seqEqual("AT--T", "ATGGC", ignore="N")
+
 ```
 
 

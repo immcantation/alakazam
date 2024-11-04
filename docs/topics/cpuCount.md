@@ -27,6 +27,7 @@ Examples
 
 ```R
 cpuCount()
+
 ```
 
 

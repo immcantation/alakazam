@@ -466,7 +466,7 @@ countPatterns <- function(seq, patterns, nt=TRUE, trim=FALSE, label="region") {
 #' }
 #' 
 #' @seealso 
-#' See \link{countPatterns} for counting the occurance of specific amino acid subsequences.
+#' See \link{countPatterns} for counting the occurrence of specific amino acid subsequences.
 #' See \link{gravy}, \link{bulk}, \link{aliphatic}, \link{polar} and \link{charge} for functions 
 #' that calculate the included properties individually.
 #' 

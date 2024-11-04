@@ -172,6 +172,7 @@ stringsAsFactors=FALSE)
 
  # With end masking
  makeChangeoClone(db, max_mask=3, text_fields="c_call", num_fields="duplicate_count")
+
 ```
 
 **Error in makeChangeoClone(db, max_mask = 3, text_fields = "c_call", num_fields = "duplicate_count")**: The column locus was not found

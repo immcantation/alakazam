@@ -177,6 +177,7 @@ Examples
 # num_fields="duplicate_count", mask_char="-")
 # graph <- buildPhylipLineage(clone, phylip_exec, dist_mat=getDNAMatrix(gap=-1), 
 # rm_temp=TRUE)
+
 ```
 
 

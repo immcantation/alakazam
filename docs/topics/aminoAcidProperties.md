@@ -199,6 +199,7 @@ names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate properties
 aminoAcidProperties(db, property=c("bulk", "charge"), seq="junction", 
 trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
+
 ```
 
 

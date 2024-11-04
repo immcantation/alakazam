@@ -89,7 +89,7 @@ getAAMatrix <- function(gap=0) {
 #'
 #' @param    data         data.frame containing Change-O columns. The data.frame 
 #'                        must contain, at a minimum, a unique identifier column 
-#'                        and a column containg a character vector of DNA sequences.
+#'                        and a column containing a character vector of DNA sequences.
 #' @param    id           name of the column containing sequence identifiers.
 #' @param    seq          name of the column containing DNA sequences.
 #' @param    text_fields  character vector of textual columns to collapse. The textual 
@@ -98,8 +98,8 @@ getAAMatrix <- function(gap=0) {
 #'                        \code{sep}.
 #' @param    num_fields   vector of numeric columns to collapse. The numeric annotations
 #'                        of duplicate sequences will be summed. 
-#' @param    seq_fields   vector of nucletoide sequence columns to collapse. The sequence 
-#'                        with the fewest numer of non-informative characters will be 
+#' @param    seq_fields   vector of nucleotide sequence columns to collapse. The sequence 
+#'                        with the fewest number of non-informative characters will be 
 #'                        retained. Where a non-informative character is one of 
 #'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
@@ -118,7 +118,7 @@ getAAMatrix <- function(gap=0) {
 #' @return   A modified \code{data} data.frame with duplicate sequences removed and 
 #'           annotation fields collapsed if \code{dry=FALSE}. If \code{dry=TRUE}, 
 #'           sequences will be labeled with the collapse action, but the input will be
-#'           otherwise unmodifed (see Details).
+#'           otherwise unmodified (see Details).
 #'           
 #' @details
 #' \code{collapseDuplicates} identifies duplicate sequences in the \code{seq} column by
@@ -149,7 +149,7 @@ getAAMatrix <- function(gap=0) {
 #' \code{dry=FALSE} case.
 #' 
 #' \itemize{
-#'   \item  \code{collapse_id}:     an identifer for the group of identical sequences.
+#'   \item  \code{collapse_id}:     an identifier for the group of identical sequences.
 #'   \item  \code{collapse_class}:  string defining how the sequence matches to the other in the set.
 #'                                  one of \code{"duplicated"} (has duplicates),
 #'                                  \code{"unique"} (no duplicates), \code{"ambiguous_duplicate"} 
@@ -1037,7 +1037,7 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #'
 #' @param    seq       character vector containing a DNA sequences. The sequence vector needs to
 #'                     be named.
-#' @param    indx      numeric vector contating the indices (a subset of indices of \code{seq}).
+#' @param    indx      numeric vector containing the indices (a subset of indices of \code{seq}).
 #' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 
 #'                     matrix returned by \link{getDNAMatrix}. If gap 
 #'                     characters, \code{c("-", ".")}, are assigned a value of -1 
@@ -1051,7 +1051,7 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #'           sequences specified by \code{indx} indices. 
 #'           
 #'           Note that the input subsampled indices will be ordered ascendingly. Therefore, 
-#'           it is necassary to assign unique names to the input sequences, \code{seq}, 
+#'           it is necessary to assign unique names to the input sequences, \code{seq}, 
 #'           to recover the input order later. Row and columns names will be added accordingly.
 #' 
 #'           Amino acid distance matrix may be built with \link{getAAMatrix}. 

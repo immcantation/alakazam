@@ -120,6 +120,7 @@ maskSeqEnds(seq, max_mask=1, trim=TRUE)
 # Mask dashes instead of Ns
 seq <- c("CCCCTGGG", "-AACTGG-", "---CTG--")
 maskSeqEnds(seq, mask_char="-")
+
 ```
 
 

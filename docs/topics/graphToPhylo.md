@@ -63,19 +63,6 @@ Examples
 ```R
 ### Not run:
 library(igraph)
-
-```
-
-*
-Attaching package: ‘igraph’
-**The following objects are masked from ‘package:stats’:
-
-    decompose, spectrum
-**The following object is masked from ‘package:base’:
-
-    union
-*
-```R
 # library(ape)
 # 
 # #convert to phylo
@@ -95,6 +82,7 @@ Attaching package: ‘igraph’
 # 
 # #plot graph - same as before, possibly rotated
 # plot(graph_r,layout=layout_as_tree)
+
 ```
 
 

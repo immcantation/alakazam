@@ -122,6 +122,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 
 # Boxplot of node depth by isotype
 plotSubtrees(graphs, "c_call", "depth", style="b")
+
 ```
 
 ![6](plotSubtrees-6.png)

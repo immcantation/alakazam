@@ -23,7 +23,7 @@ setClassUnion("CharNULL", members=c("character", "NULL"))
 #'                     \item  \code{group}:  group identifier.
 #'                     \item  \code{clone_id} or \code{CLONE}:  clone identifier. 
 #'                     \item  \code{p}:      relative abundance of the clone.
-#'                     \item  \code{lower}:  lower confidence inverval bound.
+#'                     \item  \code{lower}:  lower confidence interval bound.
 #'                     \item  \code{upper}:  upper confidence interval bound.
 #'                     \item  \code{rank}:   the rank of the clone abundance.
 #'                   }
@@ -63,12 +63,12 @@ setClass("AbundanceCurve",
 #'                                             realizations.
 #'                     \item  \code{d_sd}:     standard deviation of the diversity index 
 #'                                             over all bootstrap realizations.
-#'                     \item  \code{d_lower}:  diversity lower confidence inverval bound.
+#'                     \item  \code{d_lower}:  diversity lower confidence interval bound.
 #'                     \item  \code{d_upper}:  diversity upper confidence interval bound.
 #'                     \item  \code{e}:        evenness index calculated as \code{D} 
 #'                                             divided by \code{D} at \code{Q=0}.
-#'                     \item  \code{e_lower}:  evenness lower confidence inverval bound.
-#'                     \item  \code{e_upper}:  eveness upper confidence interval bound.
+#'                     \item  \code{e_lower}:  evenness lower confidence interval bound.
+#'                     \item  \code{e_upper}:  evenness upper confidence interval bound.
 #'                   }
 #' @slot  tests    data.frame describing the significance test results with columns:
 #'                 \itemize{
@@ -145,7 +145,7 @@ setMethod("plot", c(x="DiversityCurve", y="numeric"),
 
 #' S4 class defining a clone
 #' 
-#' \code{ChangeoClone} defines a common data structure for perform lineage recontruction
+#' \code{ChangeoClone} defines a common data structure for perform lineage reconstruction
 #' from Change-O data.
 #' 
 #' @slot     data      data.frame containing sequences and annotations. Contains the
@@ -184,7 +184,7 @@ setClass("ChangeoClone",
 #'                        \item  \code{annotation}:  annotation value.
 #'                        \item  \code{count}:       observed count of MRCA positions 
 #'                                                   with the given annotation.
-#'                        \item  \code{expected}:    expected mean count of MRCA occurance
+#'                        \item  \code{expected}:    expected mean count of MRCA occurrence
 #'                                                   for the annotation.
 #'                        \item  \code{pvalue}:      one-sided p-value for the hypothesis that 
 #'                                                   the observed annotation abundance is greater 

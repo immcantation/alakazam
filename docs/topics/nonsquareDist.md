@@ -77,6 +77,7 @@ D 0 1 1 0
 
 nonsquareDist(seq, indx=c(1,3), 
 dist_mat=getDNAMatrix(gap=0))
+
 ```
 
 

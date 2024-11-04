@@ -265,6 +265,7 @@ DISCARDED> 1
 db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
 collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 add_count=TRUE, verbose=TRUE)
+
 ```
 
 

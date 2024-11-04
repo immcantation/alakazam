@@ -72,22 +72,20 @@ graphs <- ExampleTrees[1-10]
 # Perform edge test on isotypes
 x <- testEdges(graphs, "c_call", nperm=10)
 
-```
-
-**Error in ecdf(d)**: 'x' must have 1 or more non-missing values
-```R
-
 # Plot
 plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-**Error in eval(expr, envir, enclos)**: object 'x' not found
+![2](plotEdgeTest-2.png)
+
 ```R
 plotEdgeTest(x, style="cdf")
+
 ```
 
-**Error in eval(expr, envir, enclos)**: object 'x' not found
+![4](plotEdgeTest-4.png)
+
 
 See also
 -------------------

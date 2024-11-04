@@ -97,7 +97,7 @@ nav:
       - topics/pairwiseDist.md
       - topics/pairwiseEqual.md
       - topics/nonsquareDist.md
-    - 'Amino Acid Propertes':
+    - 'Amino Acid Properties':
       - topics/aminoAcidProperties.md
       - topics/countPatterns.md
       - topics/aliphatic.md

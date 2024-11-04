@@ -66,6 +66,7 @@ translateDNA(ExampleDb$junction[1:3])
 
 # Remove the first and last codon from the translation
 translateDNA(ExampleDb$junction[1:3], trim=TRUE)
+
 ```
 
 

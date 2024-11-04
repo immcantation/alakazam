@@ -202,6 +202,7 @@ extractVRegion(clone$sequence_alignment, c("cdr1", "cdr2"))
 
 # Get all FWRs
 extractVRegion(clone$sequence_alignment, c("fwr1", "fwr2", "fwr3"))
+
 ```
 
 

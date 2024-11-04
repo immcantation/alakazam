@@ -62,6 +62,7 @@ Examples
 # Summarize a tree
 graph <- ExampleTrees[[23]]
 summarizeSubtrees(graph, fields="c_call", root="Germline")
+
 ```
 
 

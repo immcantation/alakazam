@@ -75,14 +75,15 @@ x <- testMRCA(graphs, "c_call", nperm=10)
 
 ```R
 print(x)
+
 ```
 
 
 ```
   annotation count expected pvalue
-1       IGHA    16     13.3      0
-2  IGHA,IGHG     1      1.0      0
-3       IGHG    31     34.0      1
+1       IGHA    16    13.40   0.00
+2  IGHA,IGHG     1     1.75   0.75
+3       IGHG    31    33.90   1.00
 
 ```
 

@@ -90,6 +90,7 @@ padSeqEnds(seq, start=TRUE)
 
 ```R
 padSeqEnds(seq, len=15, start=TRUE)
+
 ```
 
 

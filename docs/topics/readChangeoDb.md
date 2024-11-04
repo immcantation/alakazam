@@ -71,6 +71,7 @@ Examples
 # # Drop columns and do not alter sequence field case
 # db <- readChangeoDb("changeo.tsv", drop=c("D_CALL", "DUPCOUNT"), 
 # seq_upper=FALSE)
+
 ```
 
 

@@ -17,7 +17,7 @@ Backwards Incompatible Changes:
 General:
 
 + Updated dependencies to ggplot2 >= 3.4.0, airr >= 1.4.1, igraph >= 1.5.0.
-+ Updated the example data `ExampleTrees` to use the igprah 1.5.0 format. See
++ Updated the example data `ExampleTrees` to use the igraph 1.5.0 format. See
   https://r.igraph.org/news/index.html#igraph-150 for details.
 + Performance improvements in `collapseDuplicates`.
 
@@ -216,7 +216,7 @@ Diversity:
 + Moved the rarefaction calculation for the diversity functions into 
   `estimateAbundance`. `alphaDiversity` will call `estimateAbundance` for 
   bootstrapping if not provided an existing `AbundanceCurve` object.
-+ Restructured the `DiversityCurve` and `AbundanceCurve` objects to accomodate
++ Restructured the `DiversityCurve` and `AbundanceCurve` objects to accommodate
   the new diversity methods.
 
 Gene Usage:
@@ -248,7 +248,7 @@ Gene Usage:
   to the `group` pairs that do not exist in the data.
 + Added new function `groupGenes` to group sequences sharing same V and J gene.
   
-Toplogy Analysis:
+Topology Analysis:
 
 + Fixed a bug in tableEdges causing it to fail when no parent/child 
   relationships exist when specifying `indirect=TRUE`.

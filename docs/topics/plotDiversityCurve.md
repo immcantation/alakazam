@@ -104,6 +104,7 @@ plotDiversityCurve(div, legend_title="Sample")
 
 #' # Plot diversity
 plotDiversityCurve(div, legend_title="Sample", score="evenness")
+
 ```
 
 ![4](plotDiversityCurve-4.png)

@@ -66,6 +66,7 @@ sortGenes(genes)
 
 # Sort genes by position in the locus
 sortGenes(genes, method="pos")
+
 ```
 
 

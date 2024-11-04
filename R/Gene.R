@@ -1182,7 +1182,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
 #' \code{sortGenes} sorts a vector of V(D)J gene names by either lexicographic ordering 
 #' or locus position. 
 #' 
-#' @param    genes    vector of strings respresenting V(D)J gene names.
+#' @param    genes    vector of strings representing V(D)J gene names.
 #' @param    method   string defining the method to use for sorting genes. One of:
 #'                    \itemize{
 #'                      \item \code{"name"}:      sort in lexicographic order. Order is by 

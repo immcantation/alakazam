@@ -89,6 +89,7 @@ plotDiversityTest(div, 0, legend_title="Sample")
 
 # Plot results at q=2 (equivalent to Simpson's index)
 plotDiversityTest(div, q=2, legend_title="Sample")
+
 ```
 
 ![4](plotDiversityTest-4.png)

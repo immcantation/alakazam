@@ -79,6 +79,7 @@ Examples
 # Estimate abundance by sample and plot
 abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 plotAbundanceCurve(abund, legend_title="Sample")
+
 ```
 
 ![2](plotAbundanceCurve-2.png)

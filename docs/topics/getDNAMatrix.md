@@ -72,6 +72,7 @@ N  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0 -1 -1 1
 # Set gap characters to 0 distance
 # Makes gap characters equivalent to Ns
 getDNAMatrix(gap=0)
+
 ```
 
 

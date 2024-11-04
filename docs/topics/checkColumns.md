@@ -101,6 +101,7 @@ checkColumns(df, c("A", "D"), logic="all")
 
 ```R
 checkColumns(df, c("A", "D"), logic="any")
+
 ```
 
 

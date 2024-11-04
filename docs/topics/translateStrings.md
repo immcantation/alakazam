@@ -67,6 +67,7 @@ translateStrings(strings, translation)
 strings <- LETTERS[1:5]
 translation <- list("1-3"=c("A","B","C"), "4-5"=c("D","E"))
 translateStrings(strings, translation)
+
 ```
 
 

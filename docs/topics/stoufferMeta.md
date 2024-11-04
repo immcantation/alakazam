@@ -58,6 +58,7 @@ stoufferMeta(p)
 
 # Weighted
 stoufferMeta(p, w)
+
 ```
 
 

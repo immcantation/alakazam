@@ -72,6 +72,7 @@ Examples
 # s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
 # s2 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="s2")
 # combineIgphyml(list(s1, s2))
+
 ```
 
 

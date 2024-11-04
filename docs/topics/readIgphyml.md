@@ -121,6 +121,7 @@ Examples
 # s1 <- readIgphyml("IB+7d_lineages_gy.tsv_igphyml_stats_hlp.tab", id="+7d")
 # print(s1$param$OMEGA_CDR_MLE[1])
 # plot(s1$trees[[1]], layout=layout_as_tree, edge.label=E(s1$trees[[1]])$weight)
+
 ```
 
 

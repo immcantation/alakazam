@@ -140,6 +140,7 @@ Examples
 # div <- rarefyDiversity(ExampleDb, "c_call", min_n=40, step_q=1, max_q=10, 
 # nboot=100)
 # plotDiversityCurve(div, legend_title="Isotype")
+
 ```
 
 

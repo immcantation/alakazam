@@ -399,6 +399,7 @@ getGene(nl_call, first=FALSE, omit_nl=TRUE)
 
 ```R
 getFamily(nl_call, first=FALSE, omit_nl=TRUE)
+
 ```
 
 

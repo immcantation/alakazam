@@ -142,9 +142,10 @@ db <- airr::read_rearrangement(system.file("extdata", "test_seq.tsv", package="a
 ```R
 fastq_file <- system.file("extdata", "test_seq.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
+
 ```
 
-**Error in eval(expr, envir, enclos)**: object 'db' not found
+*Warning*:failed to read sequences, returns NULL**Error in attr(DNA, "QUAL") <- QUAL**: attempt to set an attribute on NULL
 
 See also
 -------------------
