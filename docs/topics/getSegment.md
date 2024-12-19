@@ -117,7 +117,7 @@ A character vector containing allele, gene or family names.
 References
 -------------------
 
-[http://imgt.org](http://imgt.org)
+[https://www.imgt.org/](https://www.imgt.org/)
 
 
 

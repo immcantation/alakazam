@@ -43,11 +43,14 @@ legend_title
 
 xlim
 :   numeric vector of two values specifying the 
-`c(lower, upper)` x-axis limits.
+`c(lower, upper)` x-axis limits. The lower x-axis 
+value must be >=1.
 
 ylim
 :   numeric vector of two values specifying the 
-`c(lower, upper)` y-axis limits.
+`c(lower, upper)` y-axis limits. The limits on the 
+abundance values are expressed as fractions of 1: use
+c(0,1) to set the lower and upper limits to 0% and 100%.
 
 annotate
 :   string defining whether to added values to the group labels 

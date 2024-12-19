@@ -6,7 +6,9 @@ Description
 `makeChangeoClone` takes a data.frame with AIRR or Change-O style columns as input and 
 masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
 annotations associated with duplicate sequences. It returns a `ChangeoClone` 
-object which serves as input for lineage reconstruction.
+object which serves as input for lineage reconstruction. **Note**: To use the 
+most recent methods for building, visualizing and analyzing 
+trees, use the R package [Dowser](https://dowser.readthedocs.io).
 
 
 Usage
@@ -22,6 +24,7 @@ j_call = "j_call",
 junc_len = "junction_length",
 clone = "clone_id",
 mask_char = "N",
+locus = "locus",
 max_mask = 0,
 pad_end = FALSE,
 text_fields = NULL,
@@ -70,6 +73,10 @@ entries in this column should be identical.
 
 mask_char
 :   character to use for masking and padding.
+
+locus
+:   name of the column containing locus specification. Must be present
+and only contain the value "IGH", representing heavy chains.
 
 max_mask
 :   maximum number of characters to mask at the leading and trailing
@@ -157,6 +164,7 @@ v_call="Homsap IGKV1-39*01 F",
 j_call="Homsap IGKJ5*01 F",
 junction_length=2,
 clone_id=1,
+locus=rep("IGH", length=4),
 c_call=c("IGHM", "IGHG", "IGHG", "IGHA"),
 duplicate_count=1:4,
 stringsAsFactors=FALSE)
@@ -167,7 +175,33 @@ stringsAsFactors=FALSE)
 
 ```
 
-**Error in makeChangeoClone(db, text_fields = "c_call", num_fields = "duplicate_count")**: The column locus was not found
+
+```
+An object of class "ChangeoClone"
+Slot "data":
+  sequence_id sequence    c_call duplicate_count collapse_count
+1           C NAACTGGN      IGHG               3              1
+2           A CCCCTGGG IGHG,IGHM               3              2
+
+Slot "clone":
+[1] "1"
+
+Slot "germline":
+[1] "CCCCAGGG"
+
+Slot "v_gene":
+[1] "IGKV1-39"
+
+Slot "j_gene":
+[1] "IGKJ5"
+
+Slot "junc_len":
+[1] 2
+
+
+```
+
+
 ```R
 
  # With end masking
@@ -175,7 +209,32 @@ stringsAsFactors=FALSE)
 
 ```
 
-**Error in makeChangeoClone(db, max_mask = 3, text_fields = "c_call", num_fields = "duplicate_count")**: The column locus was not found
+
+```
+An object of class "ChangeoClone"
+Slot "data":
+  sequence_id sequence         c_call duplicate_count collapse_count
+1           A NNNCTGNN IGHA,IGHG,IGHM              10              4
+
+Slot "clone":
+[1] "1"
+
+Slot "germline":
+[1] "CCCCAGGG"
+
+Slot "v_gene":
+[1] "IGKV1-39"
+
+Slot "j_gene":
+[1] "IGKJ5"
+
+Slot "junc_len":
+[1] 2
+
+
+```
+
+
 
 See also
 -------------------
