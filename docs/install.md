@@ -5,7 +5,7 @@ Download
 
 The latest stable release of `alakazam` can be downloaded from 
 <a href="http://cran.rstudio.com/web/packages/alakazam" target="_blank">CRAN</a>
-or <a href="https://bitbucket.org/kleinstein/alakazam/downloads" target="_blank">Bitbucket</a>.
+or <a href="https://github.com/immcantation/alakazam/tags" target="_blank">GitHub</a>.
 
 Installing Released Versions
 -------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ The simplest way to install `alakazam` is via CRAN:
 install.packages("alakazam")
 ```
 
-Downloaded source builds from Bitbucket may be installed in the usual way:
+Downloaded source builds from GitHub may be installed in the usual way:
 
 ```R
 install.packages("alakazam_x.y.z.tar.gz", repos = NULL, type = "source")
@@ -39,7 +39,7 @@ BiocManager::install("alakazam")
 Building Development Versions
 -------------------------------------------------------------------------------
 
-To build from the [source code](http://bitbucket.org/kleinstein/alakazam),
+To build from the [source code](http://github.com/immcantation/alakazam),
 first install the build dependencies:
 
 ```R
@@ -50,10 +50,10 @@ To install the latest development code via devtools:
 
 ```R
 library(devtools)
-install_bitbucket("kleinstein/alakazam@master")
+install_github("immcantation/alakazam@master")
 ```
 
-Note, using `install_bitbucket` will not build the documentation. To generate the 
+Note, using `install_github` will not build the documentation. To generate the 
 documentation, clone the repository and build as normal using `devtools`, 
 `roxygen` and `knitr`:
 

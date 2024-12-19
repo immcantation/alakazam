@@ -20,7 +20,7 @@ See also
 Useful links:
 
 +  [https://alakazam.readthedocs.io/](https://alakazam.readthedocs.io/)
-+  Report bugs at [https://bitbucket.org/kleinstein/alakazam/issues](https://bitbucket.org/kleinstein/alakazam/issues)
++  Report bugs at [https://github.com/immcantation/alakazam/issues](https://github.com/immcantation/alakazam/issues)
 
 
 

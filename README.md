@@ -11,6 +11,17 @@
 
     Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
+**IMPORTANT!** 
+Alakazam has moved to https://github.com/immcantation/alakazam
+
+To update Git configuration settings use:
+
+```
+   git config user.email "your-gh-user@email.com"
+   git config user.name "your-gh-user-name"
+   git remote set-url origin git@github.com:immcantation/alakazam.git
+```
+
 Alakazam
 -------------------------------------------------------------------------------
 
@@ -40,4 +51,4 @@ Contact
 -------------------------------------------------------------------------------
 
 For help and questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
-or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).
+or use the [issue tracker](https://github.com/immcantation/alakazam/issues).
