@@ -706,6 +706,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # CGJ 6/24/24 -- onlyHeavy warning
     # Deprecation/Removal of only_heavy = FALSE
     # TODO update docs and release notes
+    # TODO consider using stop
     if(!only_heavy){
         warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported."),
                 immediate.=TRUE)
