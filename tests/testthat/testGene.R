@@ -413,9 +413,13 @@ test_that("groupGenes, single-cell mode, heavy only", {
     # Cell with CELL_ID==B has 2 heavy and 2 light chains
     # expect error
     expect_error(
+        singleCellValidation(data_t1, cell_id="CELL_ID",locus="LOCUS"),
+        regexp = "Only one heavy chain is allowed per cell"
+    )
+    expect_error(
         gg1 <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_heavy=TRUE, first=FALSE),
+                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                          only_heavy=TRUE, first=FALSE),
         regexp = "Only one heavy chain is allowed per cell"
     )
     
