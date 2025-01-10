@@ -93,6 +93,7 @@ data(pK)
 x <- setNames(pK[["Murray"]], rownames(pK))
 # Calculate charge
 charge(seq, pK=x)
+
 ```
 
 

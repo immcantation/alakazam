@@ -89,6 +89,7 @@ D 2 3 3 0
 # Gaps of any length will be treated as single mismatches with a gap=-1 distance matrix
 pairwiseDist(c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C"), 
 dist_mat=getDNAMatrix(gap=-1))
+
 ```
 
 

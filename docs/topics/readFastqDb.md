@@ -137,6 +137,7 @@ Examples
 db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", package="alakazam"))
 fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
+
 ```
 
 

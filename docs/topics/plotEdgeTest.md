@@ -81,6 +81,7 @@ plotEdgeTest(x, color="steelblue", style="hist")
 
 ```R
 plotEdgeTest(x, style="cdf")
+
 ```
 
 ![4](plotEdgeTest-4.png)

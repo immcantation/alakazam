@@ -115,6 +115,7 @@ clone="clone_id", mode="family")
 # Count absent genes 
 genes <- countGenes(ExampleDb, gene="v_call", groups="sample_id", 
 mode="allele", fill=TRUE)
+
 ```
 
 

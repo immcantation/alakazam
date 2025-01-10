@@ -73,6 +73,7 @@ x <- aaindex[["KIDA850101"]]$I
 names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate hydrophobicity
 gravy(seq, hydropathy=x)
+
 ```
 
 

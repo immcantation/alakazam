@@ -65,6 +65,7 @@ plot(g1)
 seq <- c("A", "T", "T", "C")
 colors <- translateStrings(seq, setNames(names(DNA_COLORS), DNA_COLORS))
 plot(1:4, 1:4, col=colors, pch=16, cex=6)
+
 ```
 
 ![4](DEFAULT_COLORS-4.png)

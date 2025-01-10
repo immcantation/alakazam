@@ -79,6 +79,7 @@ library(igraph)
 # 
 # #plot graph - same as before, possibly rotated
 # plot(graph_r,layout=layout_as_tree)
+
 ```
 
 

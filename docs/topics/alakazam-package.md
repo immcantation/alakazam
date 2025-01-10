@@ -20,7 +20,7 @@ See also
 Useful links:
 
 +  [https://alakazam.readthedocs.io/](https://alakazam.readthedocs.io/)
-+  Report bugs at [https://bitbucket.org/kleinstein/alakazam/issues](https://bitbucket.org/kleinstein/alakazam/issues)
++  Report bugs at [https://github.com/immcantation/alakazam/issues](https://github.com/immcantation/alakazam/issues)
 
 
 
@@ -29,17 +29,17 @@ Useful links:
 Author
 -------------------
 
-**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
+**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](mailto:susanna.marquez@yale.edu)
 
 Authors:
 
-+  Namita Gupta [namita.gupta@yale.edu](namita.gupta@yale.edu)
-+  Nima Nouri [nima.nouri@yale.edu](nima.nouri@yale.edu)
-+  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
-+  Julian Zhou [julian.zhou@bulldogs.yale.edu](julian.zhou@bulldogs.yale.edu)
-+  Kenneth Hoehn [kenneth.hoehn@yale.edu](kenneth.hoehn@yale.edu)
-+  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
-+  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
++  Namita Gupta [namita.gupta@yale.edu](mailto:namita.gupta@yale.edu)
++  Nima Nouri [nima.nouri@yale.edu](mailto:nima.nouri@yale.edu)
++  Ruoyi Jiang [ruoyi.jiang@yale.edu](mailto:ruoyi.jiang@yale.edu)
++  Julian Zhou [julian.zhou@bulldogs.yale.edu](mailto:julian.zhou@bulldogs.yale.edu)
++  Kenneth Hoehn [kenneth.hoehn@yale.edu](mailto:kenneth.hoehn@yale.edu)
++  Jason Vander Heiden [jason.vanderheiden@gmail.com](mailto:jason.vanderheiden@gmail.com)
++  Steven Kleinstein [steven.kleinstein@yale.edu](mailto:steven.kleinstein@yale.edu) [copyright holder]
 
 
 Other contributors:

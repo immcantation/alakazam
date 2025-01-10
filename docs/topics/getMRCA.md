@@ -87,6 +87,7 @@ GN5SHBT06HH3QD       +7d   IGHA              10 GN5SHBT06HH3QD     1       20
 
 # Exclude nodes without an isotype annotation and use weighted path length
 getMRCA(graph, path="distance", root="Germline", field="c_call", exclude=NA)
+
 ```
 
 

@@ -34,11 +34,12 @@ Examples
 
 ```R
 makeTempDir("Clone50")
+
 ```
 
 
 ```
-[1] "/tmp/RtmpfnBULh/Clone50-temp-150765ca358e0"
+[1] "/tmp/RtmpqvQnWr/Clone50-temp-24ce1f193fcd"
 
 ```
 

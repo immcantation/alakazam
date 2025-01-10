@@ -7,7 +7,7 @@ The `alakazam` package includes a set of functions to inspect the sequencing qua
 Load example data:
 
 
-```r
+``` r
 library(alakazam)
 library(dplyr)
 library(airr)
@@ -21,7 +21,7 @@ fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam"
 This method allows to add the quality scores to the repertoire `data.frame` as strings.
 
 
-```r
+``` r
 original_cols <- colnames(db)
 db <- readFastqDb(db, fastq_file, style="both", quality_sequence=TRUE)
 new_cols <- setdiff(colnames(db), original_cols)
@@ -30,9 +30,9 @@ db[,new_cols] %>% head()
 
 ```
 ## # A tibble: 1 × 4
-##   quality_num                    quality quality_alignment_num quality_alignment
-##   <chr>                          <chr>   <chr>                 <chr>            
-## 1 90,90,90,90,90,90,90,90,90,90… {{{{{{… 90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{…
+##   quality_num                                                                                     quality quality_alignment_num quality_alignment
+##   <chr>                                                                                           <chr>   <chr>                 <chr>            
+## 1 90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,9… {{{{{{… 90,90,90,90,90,90,90… {{{{{{{{{{{{{{{{…
 ```
 
 The function `readFastq` takes as main inputs a repertoire `data.frame` (`db`) and 
@@ -47,7 +47,7 @@ can be used to generate a `data.frame` of sequencing quality values
 per position.
 
 
-```r
+``` r
 quality <- getPositionQuality(db, sequence_id="sequence_id", 
                               sequence="sequence_alignment",
                               quality_num="quality_alignment_num")
@@ -57,7 +57,7 @@ quality <- getPositionQuality(db, sequence_id="sequence_id",
 ## Warning in FUN(X[[i]], ...): NAs introduced by coercion
 ```
 
-```r
+``` r
 head(quality)
 ```
 
@@ -72,7 +72,7 @@ head(quality)
 ```
 
 
-```r
+``` r
 min_pos <- min(quality$position)
 max_pos <- max(quality$position)
 
@@ -89,7 +89,7 @@ ggplot(quality, aes(x=position,
 ```
 
 ```
-## Warning: Removed 27 rows containing missing values (`geom_point()`).
+## Warning: Removed 27 rows containing missing values or values outside the scale range (`geom_point()`).
 ```
 
 ![Sequence quality per IMGT position for one sequence.](figure/Fastq-Vignette-4-1.png)
@@ -107,7 +107,7 @@ will show the number of sequences in `db` that had at least one position
 masked.
 
 
-```r
+``` r
 db <- maskPositionsByQuality(db, min_quality=70,
                              sequence="sequence_alignment",
                              quality="quality_alignment_num")

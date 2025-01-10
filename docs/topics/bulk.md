@@ -72,6 +72,7 @@ x <- aaindex[["GRAR740103"]]$I
 names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate average volume
 bulk(seq, bulkiness=x)
+
 ```
 
 

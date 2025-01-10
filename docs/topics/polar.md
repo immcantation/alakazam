@@ -72,6 +72,7 @@ x <- aaindex[["ZIMJ680103"]]$I
 names(x) <- translateStrings(names(x), ABBREV_AA)
 # Calculate polarity
 polar(seq, polarity=x)
+
 ```
 
 

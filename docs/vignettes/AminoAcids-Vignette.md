@@ -18,7 +18,7 @@ can be applied to other regions simply by altering the sequence data column used
 A small example AIRR database, `ExampleDb`, is included in the `alakazam` package.
 
 
-```r
+``` r
 # Load required packages
 library(alakazam)
 library(dplyr)
@@ -55,7 +55,7 @@ codon (the conserved residues) prior to analysis. The prefix `cdr3` is added
 to the output column names using the `label="cdr3"` argument.
 
 
-```r
+``` r
 db_props <- aminoAcidProperties(db, seq="junction", trim=TRUE, 
                                 label="cdr3")
 
@@ -64,17 +64,13 @@ dplyr::select(db_props[1:3, ], starts_with("cdr3"))
 ```
 
 ```
-##   cdr3_aa_length cdr3_aa_gravy cdr3_aa_bulk cdr3_aa_aliphatic cdr3_aa_polarity
-## 1             29     0.1724138     14.12345         0.8034483         8.168966
-## 2             29    -0.3482759     14.69034         0.6724138         8.255172
-## 3             26    -0.9884615     13.96154         0.5653846         8.873077
-##   cdr3_aa_charge cdr3_aa_basic cdr3_aa_acidic cdr3_aa_aromatic
-## 1     0.03902939     0.1034483     0.06896552       0.06896552
-## 2     2.21407038     0.2068966     0.06896552       0.27586207
-## 3     1.11045407     0.2307692     0.15384615       0.19230769
+##   cdr3_aa_length cdr3_aa_gravy cdr3_aa_bulk cdr3_aa_aliphatic cdr3_aa_polarity cdr3_aa_charge cdr3_aa_basic cdr3_aa_acidic cdr3_aa_aromatic
+## 1             29     0.1724138     14.12345         0.8034483         8.168966     0.03902939     0.1034483     0.06896552       0.06896552
+## 2             29    -0.3482759     14.69034         0.6724138         8.255172     2.21407038     0.2068966     0.06896552       0.27586207
+## 3             26    -0.9884615     13.96154         0.5653846         8.873077     1.11045407     0.2307692     0.15384615       0.19230769
 ```
 
-```r
+``` r
 # Define a ggplot theme for all plots
 tmp_theme <- theme_bw() + theme(legend.position="bottom")
 
@@ -116,7 +112,7 @@ grand average of hydrophobicity (`gravy`) index and normalized net charge
 (`charge`) by specifying `property=c("gravy", "charge")`. 
 
 
-```r
+``` r
 db_props <- aminoAcidProperties(db, seq="junction", property=c("gravy", "charge"),
                                 trim=TRUE, label="cdr3")
 dplyr::select(db_props[1:3, ], starts_with("cdr3"))
@@ -138,7 +134,7 @@ the `seqinr` package instead of the defaults for calculating the GRAVY index and
 net charge.
 
 
-```r
+``` r
 # Load the relevant data objects from the seqinr package
 library(seqinr)
 data(aaindex)
@@ -176,7 +172,7 @@ required this may be accomplished using one of the worker functions:
 The input to each function must be a vector of amino acid sequences.
 
 
-```r
+``` r
 # Translate junction DNA sequences to amino acids and trim first and last codons
 cdr3 <- translateDNA(db$junction[1:3], trim=TRUE)
 
@@ -188,7 +184,7 @@ gravy(cdr3)
 ## [1]  0.1724138 -0.3482759 -0.9884615
 ```
 
-```r
+``` r
 # Average bulkiness
 bulk(cdr3)
 ```
@@ -197,7 +193,7 @@ bulk(cdr3)
 ## [1] 14.12345 14.69034 13.96154
 ```
 
-```r
+``` r
 # Average polarity
 polar(cdr3)
 ```
@@ -206,7 +202,7 @@ polar(cdr3)
 ## [1] 8.168966 8.255172 8.873077
 ```
 
-```r
+``` r
 # Normalized aliphatic index
 aliphatic(cdr3)
 ```
@@ -215,7 +211,7 @@ aliphatic(cdr3)
 ## [1] 0.8034483 0.6724138 0.5653846
 ```
 
-```r
+``` r
 # Unnormalized aliphatic index
 aliphatic(cdr3, normalize=FALSE)
 ```
@@ -224,7 +220,7 @@ aliphatic(cdr3, normalize=FALSE)
 ## [1] 23.3 19.5 14.7
 ```
 
-```r
+``` r
 # Normalized net charge
 charge(cdr3)
 ```
@@ -233,7 +229,7 @@ charge(cdr3)
 ## [1] 0.03902939 2.21407038 1.11045407
 ```
 
-```r
+``` r
 # Unnormalized net charge
 charge(cdr3, normalize=FALSE)
 ```
@@ -242,7 +238,7 @@ charge(cdr3, normalize=FALSE)
 ## [1] 0.03902939 2.21407038 1.11045407
 ```
 
-```r
+``` r
 # Count of acidic amino acids
 # Takes a named list of regular expressions
 countPatterns(cdr3, nt=FALSE, c(ACIDIC="[DE]"), label="cdr3")

@@ -92,6 +92,7 @@ plotMRCATest(x, color="steelblue", style="hist")
 
 ```R
 plotMRCATest(x, style="cdf")
+
 ```
 
 ![6](plotMRCATest-6.png)

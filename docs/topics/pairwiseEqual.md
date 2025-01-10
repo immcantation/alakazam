@@ -40,6 +40,7 @@ seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
 d <- pairwiseEqual(seq)
 rownames(d) <- colnames(d) <- seq
 d
+
 ```
 
 

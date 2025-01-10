@@ -1,4 +1,4 @@
-**plotAbundanceCurve** - *Plot a clonal abundance distribution*
+**plotAbundanceCurve** - *Plots a clonal abundance distribution*
 
 Description
 --------------------
@@ -82,6 +82,7 @@ Examples
 # Estimate abundance by sample and plot
 abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 plotAbundanceCurve(abund, legend_title="Sample")
+
 ```
 
 ![2](plotAbundanceCurve-2.png)
@@ -90,8 +91,9 @@ plotAbundanceCurve(abund, legend_title="Sample")
 See also
 -------------------
 
-See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for
-generating the input abundance distribution. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for 
+generating the input abundance distribution.
+Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

@@ -81,6 +81,7 @@ calcDiversity(p, q)
 # Or proportional abundance
 p <- c(1/15, 1/15, 1/5, 2/3)
 calcDiversity(p, q)
+
 ```
 
 

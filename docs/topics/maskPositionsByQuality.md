@@ -57,6 +57,7 @@ db <- airr::read_rearrangement(system.file("extdata", "example_quality.tsv", pac
 fastq_file <- system.file("extdata", "example_quality.fastq", package="alakazam")
 db <- readFastqDb(db, fastq_file, quality_offset=-33)
 maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
+
 ```
 
 *Number of masked sequences: 1*

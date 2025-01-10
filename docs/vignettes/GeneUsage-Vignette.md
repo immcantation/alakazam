@@ -20,7 +20,7 @@ However, the optional clonal clustering (`clone_id`) and duplicate count (`dupli
 columns may be used to quantify usage by different abundance criteria.
 
 
-```r
+``` r
 # Load required packages
 library(alakazam)
 library(dplyr)
@@ -39,7 +39,7 @@ different samples we will set `gene="v_call"` (the column containing gene data) 
 the gene level we set `mode="gene"`:
 
 
-```r
+``` r
 # Quantify usage at the gene level
 gene <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="gene")
 head(gene, n=4)
@@ -67,7 +67,7 @@ containing IGHV1 family genes. We extract the family portion of the gene name us
 ordered the genes by genomic position by passing `method="position"` to `sortGenes`.
 
 
-```r
+``` r
 # Assign sorted levels and subset to IGHV1
 ighv1 <- gene %>%
     mutate(gene=factor(gene, levels=sortGenes(unique(gene), method="name"))) %>%
@@ -92,7 +92,7 @@ Alternatively, usage can be quantified at the allele (`mode="allele"`) or
 family level (`mode="family"`):
 
 
-```r
+``` r
 # Quantify V family usage by sample
 family <- countGenes(ExampleDb, gene="v_call", groups="sample_id", mode="family")
 
@@ -125,7 +125,7 @@ Clonal criteria are added by passing a value to the `clone` argument of `countGe
 be considered for counting.
 
 
-```r
+``` r
 # Quantify V family clonal usage by sample and isotype
 family <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
                      clone="clone_id", mode="family")
@@ -148,7 +148,7 @@ The output `data.frame` contains the additional grouping column (`c_call`) along
 and the frequencies within the given `sample_id` and `c_call` pair, respectively.
 
 
-```r
+``` r
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family clonal usage by sample and isotype
@@ -174,7 +174,7 @@ a copy number column to the `copy` argument (`copy="duplicate_count"`). Specifyi
 being ignored.
 
 
-```r
+``` r
 # Calculate V family copy numbers by sample and isotype
 family <- countGenes(ExampleDb, gene="v_call", groups=c("sample_id", "c_call"), 
                      mode="family", copy="duplicate_count")
@@ -197,7 +197,7 @@ as well as the additional copy number columns `copy_count` and `copy_freq` refle
 copy number (`duplicate_count`) for each sequence within the given `gene`, `sample_id` and `c_call`.
 
 
-```r
+``` r
 # Subset to IGHM and IGHG for plotting
 family <- filter(family, c_call %in% c("IGHM", "IGHG"))
 # Plot V family copy abundance by sample and isotype

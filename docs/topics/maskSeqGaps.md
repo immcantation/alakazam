@@ -81,6 +81,7 @@ maskSeqGaps("--ATG-C-", outer_only=TRUE)
 
 # Mask with dashes
 maskSeqGaps(c("ATG-C", "CC..C"), mask_char="-")
+
 ```
 
 

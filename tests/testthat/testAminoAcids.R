@@ -123,6 +123,15 @@ test_that("aminoAcidProperties", {
     expect_warning(aminoAcidProperties(db[1:4, ], seq="JUNCTION", nt=FALSE,
                                        trim=FALSE, label="junction", property="length"),
                    "2 sequences")
+    
+    db <- data.frame(
+        "junction"="ACTGACTCGA",
+        "junction_aa"="TDS"
+    )
+    aa_prop_trim_F <- aminoAcidProperties(db, seq="junction_aa", nt=F, trim=F)
+    expect_equal(aa_prop_trim_F$junction_aa_aa_length, 3)
+    aa_prop_trim_T <- aminoAcidProperties(db, seq="junction_aa", nt=F, trim=T)
+    expect_equal(aa_prop_trim_T$junction_aa_aa_length, 1)
 })
 
 test_that("validate amino acid sequences" ,{

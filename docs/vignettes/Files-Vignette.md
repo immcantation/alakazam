@@ -21,7 +21,7 @@ are included in the `alakazam` package. For specific details about the latter, v
 [AIRR Community documentation site](https://docs.airr-community.org/en/stable/datarep/rearrangements.html).
 
 
-```r
+``` r
 # Set the file paths from inside the package directory
 # These files are smaller versions of the example databases previously mentioned
 changeo_file <- system.file("extdata", "example_changeo.tab.gz", package="alakazam")
@@ -35,7 +35,7 @@ db_airr <- airr::read_rearrangement(airr_file)
 ## Writing data
 
 
-```r
+``` r
 # Write the data to a tab-delimited file
 alakazam::writeChangeoDb(db_changeo, "changeo.tsv")
 airr::write_rearrangement(db_airr, "airr.tsv")

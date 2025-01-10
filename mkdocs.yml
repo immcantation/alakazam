@@ -1,15 +1,20 @@
 site_name: alakazam
 site_url: https://alakazam.readthedocs.io
 site_favicon: img/favicon.ico
-repo_url: https://bitbucket.org/kleinstein/alakazam
+repo_url: https://github.com/immcantation/alakazam
 edit_uri: src/master/docs/
 google_analytics: ['G-BDGVJ44VYF', 'https://alakazam.readthedocs.io']
 theme:
   name: readthedocs
   navigation_depth: 2
   collapse_navigation: False
+  sticky_navigation: False
+  locale: en
   titles_only: False
+  analytics:
+    gtag: G-BDGVJ44VYF
 markdown_extensions:
+  - admonition
   - def_list
   - sane_lists
   - smarty
@@ -17,7 +22,7 @@ markdown_extensions:
       baselevel: 1
       toc_depth: 1-4
       permalink: True
-docs_dir: 'docs'
+docs_dir: docs
 nav:
   - 'Immcantation Portal': https://immcantation.readthedocs.io/
   - 'About':
@@ -93,7 +98,7 @@ nav:
       - topics/pairwiseDist.md
       - topics/pairwiseEqual.md
       - topics/nonsquareDist.md
-    - 'Amino Acid Propertes':
+    - 'Amino Acid Properties':
       - topics/aminoAcidProperties.md
       - topics/countPatterns.md
       - topics/aliphatic.md

@@ -34,7 +34,7 @@ AIRR file, as well as an additional grouping column. In this example we
 will use the grouping columns `sample_id` and `c_call`.
 
 
-```r
+``` r
 # Load required packages
 library(alakazam)
 
@@ -51,7 +51,7 @@ generated using the `countClones` function either with or without copy numbers, 
 the size of each clone is determined by the number of sequence members:
 
 
-```r
+``` r
 # Partitions the data based on the sample column
 clones <- countClones(ExampleDb, group="sample_id")
 head(clones, 5)
@@ -70,14 +70,14 @@ head(clones, 5)
 ```
 
 You may also specify a column containing the abundance count of each sequence 
-(usually copy numbers), that will including weighting of each clone size by the 
+(usually copy numbers), that will include weighting of each clone size by the 
 corresponding abundance count. Furthermore, multiple grouping columns may be
 specified such that `seq_freq` (unweighted clone size as a fraction
-of total sequences in the group) and `copy_freq` (weighted faction) are 
+of total sequences in the group) and `copy_freq` (weighted fraction) are 
 normalized to within multiple group data partitions.
 
 
-```r
+``` r
 # Partitions the data based on both the sample_id and c_call columns
 # Weights the clone sizes by the duplicate_count column
 clones <- countClones(ExampleDb, group=c("sample_id", "c_call"), copy="duplicate_count", clone="clone_id")
@@ -102,14 +102,14 @@ intervals. A complete clonal abundance distribution may be inferred using the
 This output may be visualized using the `plotAbundanceCurve` function.
 
 
-```r
+``` r
 # Partitions the data on the sample column
-# Calculates a 95% confidence interval via 200 bootstrap realizations
+# Calculates a 95% confidence interval via 100 bootstrap realizations
 curve <- estimateAbundance(ExampleDb, group="sample_id", ci=0.95, nboot=100, clone="clone_id")
 ```
 
 
-```r
+``` r
 # Plots a rank abundance curve of the relative clonal abundances
 sample_colors <- c("-1h"="seagreen", "+7d"="steelblue")
 plot(curve, colors = sample_colors, legend_title="Sample")
@@ -125,11 +125,11 @@ resampling realization. Diversity (D) is calculated over a range of diversity
 orders (q) to generate a smooth curve.
 
 
-```r
+``` r
 # Compare diversity curve across values in the "sample" column
 # q ranges from 0 (min_q=0) to 4 (max_q=4) in 0.05 increments (step_q=0.05)
 # A 95% confidence interval will be calculated (ci=0.95)
-# 200 resampling realizations are performed (nboot=200)
+# 100 resampling realizations are performed (nboot=100)
 sample_curve <- alphaDiversity(ExampleDb, group="sample_id", clone="clone_id",
                                min_q=0, max_q=4, step_q=0.1,
                                ci=0.95, nboot=100)
@@ -143,7 +143,7 @@ isotype_curve <- alphaDiversity(ExampleDb, group="c_call", clone="clone_id",
 ```
 
 
-```r
+``` r
 # Plot a log-log (log_q=TRUE, log_d=TRUE) plot of sample diversity
 # Indicate number of sequences resampled from each group in the title
 sample_main <- paste0("Sample diversity")
@@ -154,7 +154,7 @@ plot(sample_curve, colors=sample_colors, main_title=sample_main,
 
 ![plot of chunk Diversity-Vignette-7](figure/Diversity-Vignette-7-1.png)
 
-```r
+``` r
 # Plot isotype diversity using default set of Ig isotype colors
 isotype_main <- paste0("Isotype diversity")
 plot(isotype_curve, colors=IG_COLORS, main_title=isotype_main, 
@@ -171,10 +171,10 @@ distributions between groups when running `alphaDiversity` for all values of `q`
 specified.
 
 
-```r
+``` r
 # Test diversity at q=0, q=1 and q=2 (equivalent to species richness, Shannon entropy, 
 # Simpson's index) across values in the sample_id column
-# 200 bootstrap realizations are performed (nboot=200)
+# 100 bootstrap realizations are performed (nboot=100)
 isotype_test <- alphaDiversity(ExampleDb, group="c_call", min_q=0, max_q=2, step_q=1, nboot=100, clone="clone_id")
 
 # Print P-value table
@@ -185,27 +185,27 @@ print(isotype_test@tests)
 ## # A tibble: 18 × 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         137.       7.88    0  
-##  2 IGHA != IGHD 1         182.       8.43    0  
-##  3 IGHA != IGHD 2         188.      10.8     0  
-##  4 IGHA != IGHG 0           3.25     8.37    0.7
-##  5 IGHA != IGHG 1          24.6      6.77    0  
-##  6 IGHA != IGHG 2          27.6      4.62    0  
-##  7 IGHA != IGHM 0         157.       6.61    0  
-##  8 IGHA != IGHM 1         210.       5.99    0  
-##  9 IGHA != IGHM 2         228.       6.92    0  
-## 10 IGHD != IGHG 0         134.       6.92    0  
-## 11 IGHD != IGHG 1         158.       7.56    0  
-## 12 IGHD != IGHG 2         161.      10.7     0  
-## 13 IGHD != IGHM 0          20.1      5.22    0  
-## 14 IGHD != IGHM 1          28.1      7.67    0  
-## 15 IGHD != IGHM 2          39.8     12.4     0  
-## 16 IGHG != IGHM 0         154.       6.58    0  
-## 17 IGHG != IGHM 1         186.       6.64    0  
-## 18 IGHG != IGHM 2         200.       7.94    0
+##  1 IGHA != IGHD 0         139.       6.84   0   
+##  2 IGHA != IGHD 1         183.       8.01   0   
+##  3 IGHA != IGHD 2         191.      11.3    0   
+##  4 IGHA != IGHG 0           2.67     7.32   0.74
+##  5 IGHA != IGHG 1          23.0      5.69   0   
+##  6 IGHA != IGHG 2          26.0      3.96   0   
+##  7 IGHA != IGHM 0         158.       6.25   0   
+##  8 IGHA != IGHM 1         210.       6.40   0   
+##  9 IGHA != IGHM 2         229.       7.33   0   
+## 10 IGHD != IGHG 0         136.       6.90   0   
+## 11 IGHD != IGHG 1         160.       8.19   0   
+## 12 IGHD != IGHG 2         164.      11.6    0   
+## 13 IGHD != IGHM 0          19.4      6.14   0   
+## 14 IGHD != IGHM 1          27.0      8.71   0   
+## 15 IGHD != IGHM 2          38.2     13.1    0   
+## 16 IGHG != IGHM 0         155.       6.10   0   
+## 17 IGHG != IGHM 1         187.       6.22   0   
+## 18 IGHG != IGHM 2         203.       7.97   0
 ```
 
-```r
+``` r
 # Plot results at q=0 and q=2
 # Plot the mean and standard deviations at q=0 and q=2
 plot(isotype_test, 0, colors=IG_COLORS, main_title=isotype_main, 
@@ -214,7 +214,7 @@ plot(isotype_test, 0, colors=IG_COLORS, main_title=isotype_main,
 
 ![plot of chunk Diversity-Vignette-8](figure/Diversity-Vignette-8-1.png)
 
-```r
+``` r
 plot(isotype_test, 2, colors=IG_COLORS, main_title=isotype_main, 
      legend_title="Isotype")
 ```

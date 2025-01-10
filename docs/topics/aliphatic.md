@@ -52,6 +52,7 @@ Examples
 ```R
 seq <- c("CARDRSTPWRRGIASTTVRTSW", NA, "XXTQMYVRT")
 aliphatic(seq)
+
 ```
 
 

@@ -29,6 +29,7 @@ Examples
 ```R
 aa <- c("Ala", "Ile", "Trp")
 translateStrings(aa, ABBREV_AA)
+
 ```
 
 

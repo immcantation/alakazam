@@ -98,6 +98,7 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 # Count indirect edges walking through germline and inferred nodes
 tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
+
 ```
 
 

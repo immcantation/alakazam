@@ -38,6 +38,7 @@ Examples
 ```R
 seq <- c("CARDRSTPWRRGIASTTVRTSW", "XXTQMYVR--XX", "CARJ", "10") 
 isValidAASeq(seq)
+
 ```
 
 

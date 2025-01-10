@@ -59,7 +59,7 @@
 #'   \item  \link{alphaDiversity}:  	 Generate clonal alpha diversity curves.
 #'   \item  \link{plotAbundanceCurve}:   Plot clone size distribution as a rank-abundance 
 #'   \item  \link{plotDiversityCurve}:   Plot clonal diversity curves.
-#'   \item  \link{plotDiversityTest}:    Plot testing at given diversity hill indicex. 
+#'   \item  \link{plotDiversityTest}:    Plot testing at given diversity hill indices. 
 #' }
 #' 
 #' @section  Ig and TCR sequence annotation:
@@ -82,7 +82,7 @@
 #'                                 set of sequences.
 #' }
 #' 
-#' @section  Amino acid propertes:
+#' @section  Amino acid properties:
 #' \itemize{
 #'   \item  \link{translateDNA}:         Translate DNA sequences to amino acid sequences.
 #'   \item  \link{aminoAcidProperties}:  Calculate various physicochemical properties of amino acid 

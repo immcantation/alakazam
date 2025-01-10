@@ -153,6 +153,7 @@ Examples
 # Group by genes
 db <- groupGenes(ExampleDb)
 head(db$vj_group)
+
 ```
 
 

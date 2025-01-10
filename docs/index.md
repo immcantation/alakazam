@@ -1,5 +1,13 @@
 # [![](http://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam) [![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam) [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 
+!!! important "2025 Immcantation Users Group Meeting"
+    *Are you an Immcantation user and/or interested in adaptive immune receptor repertoire analysis?*
+    
+    Register now for the upcoming Immcantation Users Group Meeting!
+    It will be held virtually on **January 30th, 2025, from 10 to 1:30pm (ET)**.
+    All talks will be from user-submitted abstracts.
+
+    Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
 Alakazam
 -------------------------------------------------------------------------------
@@ -30,7 +38,7 @@ Contact
 -------------------------------------------------------------------------------
 
 For help and questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
-or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?status=new&status=open).
+or use the [issue tracker](https://github.com/immcantation/alakazam/issues).
 
 
 ## Dependencies
@@ -60,21 +68,15 @@ or use the [issue tracker](https://bitbucket.org/kleinstein/alakazam/issues?stat
 
 To cite the alakazam package in publications, please use:
 
-  Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G,
-  Kleinstein S (2015). “Change-O: a toolkit for analyzing large-scale B
-  cell immunoglobulin repertoire sequencing data.” _Bioinformatics_,
-  1-3. doi:10.1093/bioinformatics/btv359
+  Gupta N, Vander Heiden J, Uduman M, Gadala-Maria D, Yaari G, Kleinstein S (2015). “Change-O: a toolkit for analyzing
+  large-scale B cell immunoglobulin repertoire sequencing data.” _Bioinformatics_, 1-3. doi:10.1093/bioinformatics/btv359
   <https://doi.org/10.1093/bioinformatics/btv359>.
 
-To cite the Ig-specific lineage reconstruction and diversity methods,
-please use:
+To cite the Ig-specific lineage reconstruction and diversity methods, please use:
 
-  Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R,
-  Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan S, Siddiqui
-  B, Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells
-  populating the multiple sclerosis brain mature in the draining
-  cervical lymph nodes.” _Science Translational Medicine_, *6*(248),
-  248ra107. doi:10.1126/scitranslmed.3008879
+  Stern J, Yaari G, Vander Heiden J, Church G, Donahue W, Hintzen R, Huttner A, Laman J, Nagra R, Nylander A, Pitt D, Ramanan S,
+  Siddiqui B, Vigneault F, Kleinstein S, Hafler D, O'Connor K (2014). “B cells populating the multiple sclerosis brain mature in
+  the draining cervical lymph nodes.” _Science Translational Medicine_, *6*(248), 248ra107. doi:10.1126/scitranslmed.3008879
   <https://doi.org/10.1126/scitranslmed.3008879>.
 
 

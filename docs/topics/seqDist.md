@@ -167,6 +167,7 @@ seqDist("AT--C", "AT--C", dist_mat=getDNAMatrix(gap=-1))
 
 # Discontiguous runs of gap characters each count as separate gaps
 seqDist("-TGGC", "AT--C", dist_mat=getDNAMatrix(gap=-1))
+
 ```
 
 

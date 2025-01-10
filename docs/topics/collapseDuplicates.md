@@ -252,12 +252,9 @@ DISCARDED> 1
 
 
 ```
-  sequence_id sequence_alignment    c_call sample_id duplicate_count
-1           C           NAACTGGN      IGHG        S2               3
-2           A           CCCCTGGG IGHG,IGHM        S1               3
-  collapse_count
-1              1
-2              2
+  sequence_id sequence_alignment    c_call sample_id duplicate_count collapse_count
+1           C           NAACTGGN      IGHG        S2               3              1
+2           A           CCCCTGGG IGHG,IGHM        S1               3              2
 
 ```
 
@@ -268,6 +265,7 @@ DISCARDED> 1
 db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
 collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
 add_count=TRUE, verbose=TRUE)
+
 ```
 
 
@@ -284,10 +282,8 @@ DISCARDED> 0
 
 
 ```
-  sequence_id sequence_alignment         c_call sample_id duplicate_count
-1           A           NNNCTGNN IGHA,IGHG,IGHM     S1,S2              10
-  collapse_count
-1              4
+  sequence_id sequence_alignment         c_call sample_id duplicate_count collapse_count
+1           A           NNNCTGNN IGHA,IGHG,IGHM     S1,S2              10              4
 
 ```
 
