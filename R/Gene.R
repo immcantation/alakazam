@@ -708,7 +708,8 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # TODO update docs and release notes
     # TODO consider using stop
     if(!only_heavy){
-        warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported."),
+        warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported.",
+                      "Running as if only_heavy = TRUE"),
                 immediate.=TRUE)
         only_heavy <- FALSE
     }
@@ -1107,7 +1108,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                                     symmetric=F, triangular=F, index1=T, 
                                     dimnames=list(exp_uniq, exp_uniq))
     
-    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v, exp_lst)
+    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v)
     
     ### identify connected components based on adjcencey matrix
     # this is the grouping
