@@ -19,12 +19,16 @@ jobs:
         run: |
           devtools::document()
         shell: Rscript {0}
+      - name: Update buildignore
+        run: |
+            sed -i '/test/ d' .Rbuildignore
+        shell: bash
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
           options(crayon.enabled=TRUE)
-          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran", "--run-donttest"), error_on="error", check_dir="check")
+          rcmdcheck::rcmdcheck(args = c("--as-cran", "--run-donttest", "--timings"), error_on="warning", check_dir="check")
         shell: Rscript {0}
       - name: Show testthat output
         if: always()
