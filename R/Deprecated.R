@@ -32,6 +32,7 @@ NULL
 #' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
 #'                     number of observations. If \code{FALSE} then allow each group to
 #'                     be resampled to its original size or, if specified, \code{max_size}.
+#' @param    cell_id   name of the \code{data} column containing cell identifiers. 
 #' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
