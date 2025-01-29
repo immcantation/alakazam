@@ -32,6 +32,7 @@
 #' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
+#' @param   cell_id  name of hte \code{data} column containing the cell identifiers for each sequence.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -539,39 +540,45 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 
 # Check if the input data has heavy chains
 # 
-# \code{isHeavyChain} Filler
-# @param    data     data.frame containing the AIRR or Change-O data for a clone. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A logical vector indicating if the row entry is a heavy chain or not.
+# Output:
+# A logical vector indicating if the row entry is a heavy chain or not.
 isHeavyChain <- function(data, locus="locus"){
-    check <- data[[locus]] %in% c("IGH", "TRB", "TRD") 
+    check <- data[[locus]] %in% c("IGH", "TRB", "TRD")
     return(check)
 }
 
 # Check if the input data has light chains
 # 
-# \code{isLightChain} Filler
-# @param    data     data.frame containing the AIRR or Change-O data. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A logical vector indicating if the row entry is a light chain or not.
+# Output:
+# A logical vector indicating if the row entry is a light chain or not.
 isLightChain <- function(data, locus="locus"){
     check <- data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG")
     return(check)
 }
 
-# Check for common single cell problems 
+# Check for common single cell problems
 # 
-# \code{singleCellValidation} Filler
-# @param    data     data.frame containing the AIRR or Change-O data. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
-# @param    cell_id  The column specifying the sequence cell id. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A data.frame containing the AIRR or Change-O data.
+# cell_id: The column specifying the sequence cell id. 
+# Output:
+# A data.frame containing the AIRR or Change-O data.
 singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
     heavy <- data[isHeavyChain(data, locus = locus),]
     light <- data[isLightChain(data, locus = locus),]
@@ -625,6 +632,8 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 #'                         for grouping. Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
+#' @param    split_light   A deprecated parameter. This would split clones by the light chain.
+#'                         For similar function use dowser::resolveLightChains
 #' @param    first         if \code{TRUE} only the first call of the gene assignments 
 #'                         is used. if \code{FALSE} the union of ambiguous gene 
 #'                         assignments is used to group all sequences with any 

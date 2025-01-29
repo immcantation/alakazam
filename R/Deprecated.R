@@ -118,6 +118,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @param    nboot     number of bootstrap realizations to perform.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    progress  if \code{TRUE} show a progress bar.
+#' @param    cell_id   the name of the \code{data} column containing cell identifiers.
 #' 
 #' @return   A \link{DiversityCurve} object containing slot test with p-values and summary 
 #'             statistics.
