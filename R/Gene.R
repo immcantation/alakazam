@@ -700,7 +700,7 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       sequence_alignment=NULL,cell_id=NULL,
+                       sequence_alignment=NULL,cell_id=NULL, split_light = FALSE,
                        locus="locus", only_heavy=TRUE, first=FALSE, ninformative = 250) {
     
     # CGJ 6/24/24 -- onlyHeavy warning
@@ -708,10 +708,13 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # TODO update docs and release notes
     # TODO consider using stop
     if(!only_heavy){
-        warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported.",
-                      "Running as if only_heavy = TRUE"),
-                immediate.=TRUE)
-        only_heavy <- FALSE
+      warning('only_heavy = FALSE is deprecated. Running as if only_heavy = TRUE')
+      only_heavy <- TRUE
+    }
+    if(split_light){
+      warning(paste('split_light = TRUE is deprecated. Please use split_light = FALSE.',
+                    'After clonal identification, light chain groups can be found with dowser::resolveLightChains'))
+      split_light <- FALSE
     }
     
     # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go
@@ -898,12 +901,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         } 
     } 
     
-    if(mixed){
+   # if(mixed){
         # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
         #indx <- which(data[[v_call]] == "")
         #data <- data[-indx,]
         #cell_seq_idx <- cell_seq_idx[-indx]
-    }
+    # }
     
     # one-to-one annotation-to-chain correspondence for both V and J (heavy)
     # for each cell/row, number of between_seq separators in heavy V annotation and in heavy J annotation must match
@@ -1009,8 +1012,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         unlist(combo_unique_full_idx[idx_lst], use.names=FALSE)
     }, simplify=FALSE, USE.NAMES=FALSE)
     
-    stopifnot( length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data) )
-    
+    stopifnot(length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data))
     # tip: unlist with use.names=F makes it much faster (>100x)
     # https://www.r-bloggers.com/speed-trick-unlist-use-namesfalse-is-heaps-faster/
     exp_uniq <- sort(unique(unlist(exp_lst_uniq, use.names=FALSE)))
