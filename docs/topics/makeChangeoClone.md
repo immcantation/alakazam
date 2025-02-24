@@ -4,7 +4,7 @@ Description
 --------------------
 
 `makeChangeoClone` takes a data.frame with AIRR or Change-O style columns as input and 
-masks gap positions, masks ragged ends, removes duplicates sequences, and merges 
+masks gap positions, masks ragged ends, removes duplicate sequences, and merges 
 annotations associated with duplicate sequences. It returns a `ChangeoClone` 
 object which serves as input for lineage reconstruction. **Note**: To use the 
 most recent methods for building, visualizing and analyzing 
