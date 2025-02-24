@@ -86,11 +86,11 @@ Details
 -------------------
 
 `readIgphyml` reads output from the IgPhyML repertoire phylogenetics inference package. 
-The resulting object is divded between parameter estimates (usually under the HLP19 model),
+The resulting object is divided between parameter estimates (usually under the HLP19 model),
 which provide information about mutation and selection pressure operating on the sequences.
 
 Trees returned from this function are either igraph objects or phylo objects, and each may be 
-visualized accordingly. Futher, branch lengths in tree may represent either the expected number of
+visualized accordingly. Further, branch lengths in tree may represent either the expected number of
 substitutions per site (codon, if estimated under HLP or GY94 models), or the total number of 
 expected substitutions per site. If the latter, internal nodes - but not tips - separated by branch
 lengths less than 0.1 are collapsed to simplify viewing.

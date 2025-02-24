@@ -4,7 +4,7 @@ Description
 --------------------
 
 `buildPhylipLineage` reconstructs an Ig lineage via maximum parsimony using the 
-dnapars application, or maximum liklihood using the dnaml application of the PHYLIP package.
+dnapars application, or maximum likelihood using the dnaml application of the PHYLIP package.
 **Note**: To use the most recent methods for building, visualizing and analyzing 
 trees, use the R package [Dowser](https://dowser.readthedocs.io).
 

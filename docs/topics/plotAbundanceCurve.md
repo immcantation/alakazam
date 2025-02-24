@@ -1,4 +1,4 @@
-**plotAbundanceCurve** - *Plots a clonal abundance distribution*
+**plotAbundanceCurve** - *Plot a clonal abundance distribution*
 
 Description
 --------------------

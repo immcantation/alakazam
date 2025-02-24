@@ -94,7 +94,7 @@ Significance of the difference in diversity index (<code class = 'eq'>D</code>) 
 constructing a bootstrap delta distribution for each pair of unique values in the 
 `group` column. The bootstrap delta distribution is built by subtracting the diversity 
 index <code class = 'eq'>Da</code> in <code class = 'eq'>group-a</code> from the corresponding value <code class = 'eq'>Db</code> in <code class = 'eq'>group-b</code>, 
-for all bootstrap realizations, yeilding a distribution of `nboot` total deltas; where 
+for all bootstrap realizations, yielding a distribution of `nboot` total deltas; where 
 <code class = 'eq'>group-a</code> is the group with the greater mean <code class = 'eq'>D</code>. The p-value for hypothesis 
 <code class = 'eq'>Da  !=  Db</code> is the value of <code class = 'eq'>P(0)</code> from the empirical cumulative distribution 
 function of the bootstrap delta distribution, multiplied by 2 for the two-tailed correction.

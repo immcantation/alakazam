@@ -3,7 +3,7 @@
 Description
 --------------------
 
-`ChangeoClone` defines a common data structure for perform lineage recontruction
+`ChangeoClone` defines a common data structure for perform lineage reconstruction
 from Change-O data.
 
 

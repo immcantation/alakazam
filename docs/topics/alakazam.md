@@ -1,4 +1,4 @@
-# The alakazam package
+# The Alakazam package
 
 Description
 --------------------
@@ -80,7 +80,7 @@ Diversity analysis
 + [alphaDiversity](alphaDiversity.md):  	 Generate clonal alpha diversity curves.
 + [plotAbundanceCurve](plotAbundanceCurve.md):   Plot clone size distribution as a rank-abundance 
 + [plotDiversityCurve](plotDiversityCurve.md):   Plot clonal diversity curves.
-+ [plotDiversityTest](plotDiversityTest.md):    Plot testing at given diversity hill indicex. 
++ [plotDiversityTest](plotDiversityTest.md):    Plot testing at given diversity hill indices. 
 
 
 
@@ -111,7 +111,7 @@ set of sequences.
 
 
 
-Amino acid propertes
+Amino acid properties
 -------------------
 
 

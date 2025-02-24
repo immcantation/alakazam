@@ -48,12 +48,12 @@ Slots
 realizations.
 + `d_sd`:     standard deviation of the diversity index 
 over all bootstrap realizations.
-+ `d_lower`:  diversity lower confidence inverval bound.
++ `d_lower`:  diversity lower confidence interval bound.
 + `d_upper`:  diversity upper confidence interval bound.
 + `e`:        evenness index calculated as `D` 
 divided by `D` at `Q=0`.
-+ `e_lower`:  evenness lower confidence inverval bound.
-+ `e_upper`:  eveness upper confidence interval bound.
++ `e_lower`:  evenness lower confidence interval bound.
++ `e_upper`:  evenness upper confidence interval bound.
 
 
 `tests`

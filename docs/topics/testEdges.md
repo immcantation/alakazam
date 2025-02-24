@@ -1,4 +1,4 @@
-**testEdges** - *Tests for parent-child annotation enchrichment in lineage trees*
+**testEdges** - *Tests for parent-child annotation enrichment in lineage trees*
 
 Description
 --------------------

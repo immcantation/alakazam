@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 genes
-:   vector of strings respresenting V(D)J gene names.
+:   vector of strings representing V(D)J gene names.
 
 method
 :   string defining the method to use for sorting genes. One of:

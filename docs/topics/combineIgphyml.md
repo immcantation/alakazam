@@ -24,7 +24,7 @@ which can be added automatically using the `id` option of
 format
 :   string specifying whether each column of the resulting data.frame
 should represent a parameter (`wide`) or if 
-there should only be three columns; i.e. id, varable, and value
+there should only be three columns; i.e. id, variable, and value
 (`long`).
 
 

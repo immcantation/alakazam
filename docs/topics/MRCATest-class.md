@@ -42,7 +42,7 @@ Slots
 + `annotation`:  annotation value.
 + `count`:       observed count of MRCA positions 
 with the given annotation.
-+ `expected`:    expected mean count of MRCA occurance
++ `expected`:    expected mean count of MRCA occurrence
 for the annotation.
 + `pvalue`:      one-sided p-value for the hypothesis that 
 the observed annotation abundance is greater 

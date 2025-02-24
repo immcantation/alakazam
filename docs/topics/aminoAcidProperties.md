@@ -220,7 +220,7 @@ trim=TRUE, label="cdr3", bulkiness=x, pH=7.0)
 See also
 -------------------
 
-See [countPatterns](countPatterns.md) for counting the occurance of specific amino acid subsequences.
+See [countPatterns](countPatterns.md) for counting the occurrence of specific amino acid subsequences.
 See [gravy](gravy.md), [bulk](bulk.md), [aliphatic](aliphatic.md), [polar](polar.md) and [charge](charge.md) for functions 
 that calculate the included properties individually.
 

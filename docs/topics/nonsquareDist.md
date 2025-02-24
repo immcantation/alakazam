@@ -20,7 +20,7 @@ seq
 be named.
 
 indx
-:   numeric vector contating the indices (a subset of indices of `seq`).
+:   numeric vector containing the indices (a subset of indices of `seq`).
 
 dist_mat
 :   Character distance matrix. Defaults to a Hamming distance 
@@ -42,7 +42,7 @@ A matrix of numerical distance between each entry in `seq` and
 sequences specified by `indx` indices. 
 
 Note that the input subsampled indices will be ordered ascendingly. Therefore, 
-it is necassary to assign unique names to the input sequences, `seq`, 
+it is necessary to assign unique names to the input sequences, `seq`, 
 to recover the input order later. Row and columns names will be added accordingly.
 
 Amino acid distance matrix may be built with [getAAMatrix](getAAMatrix.md). 

@@ -31,7 +31,7 @@ Arguments
 data
 :   data.frame containing Change-O columns. The data.frame 
 must contain, at a minimum, a unique identifier column 
-and a column containg a character vector of DNA sequences.
+and a column containing a character vector of DNA sequences.
 
 id
 :   name of the column containing sequence identifiers.
@@ -50,8 +50,8 @@ num_fields
 of duplicate sequences will be summed.
 
 seq_fields
-:   vector of nucletoide sequence columns to collapse. The sequence 
-with the fewest numer of non-informative characters will be 
+:   vector of nucleotide sequence columns to collapse. The sequence 
+with the fewest number of non-informative characters will be 
 retained. Where a non-informative character is one of 
 `c("N", "-", ".", "?")`. Note, this is distinct from the 
 `seq` parameter which is used to determine duplicates.
@@ -86,7 +86,7 @@ Value
 A modified `data` data.frame with duplicate sequences removed and 
 annotation fields collapsed if `dry=FALSE`. If `dry=TRUE`, 
 sequences will be labeled with the collapse action, but the input will be
-otherwise unmodifed (see Details).
+otherwise unmodified (see Details).
 
 
 Details
@@ -120,7 +120,7 @@ will be appended to the input defining the collapse action that would have been 
 `dry=FALSE` case.
 
 
-+ `collapse_id`:     an identifer for the group of identical sequences.
++ `collapse_id`:     an identifier for the group of identical sequences.
 + `collapse_class`:  string defining how the sequence matches to the other in the set.
 one of `"duplicated"` (has duplicates),
 `"unique"` (no duplicates), `"ambiguous_duplicate"` 
