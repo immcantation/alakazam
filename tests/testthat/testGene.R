@@ -450,15 +450,6 @@ test_that("groupGenes, mixed bulk and single cell", {
         junction_length=12
     )
 
-
-    # cell_id='cell_id', only_heavy=T
-    expect_warning(
-        c <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-               cell_id="cell_id", locus="locus", only_heavy=TRUE,
-               first=FALSE),
-        "Mixed single cell and bulk data was indicated"
-    )
-    
     # TODO
     # Should match a, because mix bulk-sc -> bulk mode
     # expect_equal(c,a)
@@ -468,6 +459,15 @@ test_that("groupGenes, mixed bulk and single cell", {
                     cell_id="cell_id", locus="locus", only_heavy=TRUE,
                     first=FALSE)
     expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
+    
+    expect_warning(d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                    cell_id="cell_id", locus="locus", only_heavy=FALSE,
+                    first=FALSE))
+    
+    expect_warning(d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                                      cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                                      first=FALSE, split_light=TRUE))
+    expect_equal(d[['vj_group']], d_oh[['vj_group']], d_sl[['vj_group']])
 
     # TODO SSNN 7/16/2024
     # Run tests with the same data used in scoper
@@ -481,27 +481,6 @@ test_that("groupGenes, mixed bulk and single cell", {
     gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=F)
     expect_equal(gg[["vj_group"]], 
                  gg[["expected_group_cell_id-null_first-F"]])
-    
-    # Single cell mode cell_id="cell_id" mixed with bulk
-    ## first=TRUE
-    
-    ### only_heavy=TRUE
-    # TODO fix this. groupGenes now removes bulk sequences
-    expect_warning(
-        gg <- groupGenes(db_gg, cell_id="cell_id", only_heavy=TRUE, first=TRUE),
-        "Mixed single cell and bulk data was indicated"
-    )
-    # gg[["vj_group"]]
-    # gg[["expected_group_cell_id_first-T_only_heavy-T"]]
-    
-       
-    ## first=FALSE
-    #TODO
-    
-    ### only_heavy=TRUE
-    #TODO
-    
-
 })
 
 

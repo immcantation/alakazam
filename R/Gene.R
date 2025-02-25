@@ -32,6 +32,7 @@
 #' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
+#' @param   cell_id  name of hte \code{data} column containing the cell identifiers for each sequence.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -539,39 +540,45 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 
 # Check if the input data has heavy chains
 # 
-# \code{isHeavyChain} Filler
-# @param    data     data.frame containing the AIRR or Change-O data for a clone. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A logical vector indicating if the row entry is a heavy chain or not.
+# Output:
+# A logical vector indicating if the row entry is a heavy chain or not.
 isHeavyChain <- function(data, locus="locus"){
-    check <- data[[locus]] %in% c("IGH", "TRB", "TRD") 
+    check <- data[[locus]] %in% c("IGH", "TRB", "TRD")
     return(check)
 }
 
 # Check if the input data has light chains
 # 
-# \code{isLightChain} Filler
-# @param    data     data.frame containing the AIRR or Change-O data. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A logical vector indicating if the row entry is a light chain or not.
+# Output:
+# A logical vector indicating if the row entry is a light chain or not.
 isLightChain <- function(data, locus="locus"){
     check <- data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG")
     return(check)
 }
 
-# Check for common single cell problems 
+# Check for common single cell problems
 # 
-# \code{singleCellValidation} Filler
-# @param    data     data.frame containing the AIRR or Change-O data. See Details
-#'                        for the list of required columns and their default values.
-# @param    locus    The column specifying the sequence locus. 
-# @param    cell_id  The column specifying the sequence cell id. 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
 #
-# @return   A data.frame containing the AIRR or Change-O data.
+# cell_id: The column specifying the sequence cell id. 
+# Output:
+# A data.frame containing the AIRR or Change-O data.
 singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
     heavy <- data[isHeavyChain(data, locus = locus),]
     light <- data[isLightChain(data, locus = locus),]
@@ -625,6 +632,8 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 #'                         for grouping. Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
+#' @param    split_light   A deprecated parameter. This would split clones by the light chain.
+#'                         For similar function use dowser::resolveLightChains
 #' @param    first         if \code{TRUE} only the first call of the gene assignments 
 #'                         is used. if \code{FALSE} the union of ambiguous gene 
 #'                         assignments is used to group all sequences with any 
@@ -700,7 +709,7 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       sequence_alignment=NULL,cell_id=NULL,
+                       sequence_alignment=NULL,cell_id=NULL, split_light = FALSE,
                        locus="locus", only_heavy=TRUE, first=FALSE, ninformative = 250) {
     
     # CGJ 6/24/24 -- onlyHeavy warning
@@ -708,9 +717,13 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # TODO update docs and release notes
     # TODO consider using stop
     if(!only_heavy){
-        warning(paste("only_heavy = TRUE is required and only_heavy = FALSE is not longer supported."),
-                immediate.=TRUE)
-        only_heavy <- FALSE
+      warning('only_heavy = FALSE is deprecated. Running as if only_heavy = TRUE')
+      only_heavy <- TRUE
+    }
+    if(split_light){
+      warning(paste('split_light = TRUE is deprecated. Please use split_light = FALSE.',
+                    'After clonal identification, light chain groups can be found with dowser::resolveLightChains'))
+      split_light <- FALSE
     }
     
     # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go
@@ -897,12 +910,12 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         } 
     } 
     
-    if(mixed){
+   # if(mixed){
         # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
         #indx <- which(data[[v_call]] == "")
         #data <- data[-indx,]
         #cell_seq_idx <- cell_seq_idx[-indx]
-    }
+    # }
     
     # one-to-one annotation-to-chain correspondence for both V and J (heavy)
     # for each cell/row, number of between_seq separators in heavy V annotation and in heavy J annotation must match
@@ -1008,8 +1021,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         unlist(combo_unique_full_idx[idx_lst], use.names=FALSE)
     }, simplify=FALSE, USE.NAMES=FALSE)
     
-    stopifnot( length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data) )
-    
+    stopifnot(length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data))
     # tip: unlist with use.names=F makes it much faster (>100x)
     # https://www.r-bloggers.com/speed-trick-unlist-use-namesfalse-is-heaps-faster/
     exp_uniq <- sort(unique(unlist(exp_lst_uniq, use.names=FALSE)))
@@ -1107,7 +1119,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                                     symmetric=F, triangular=F, index1=T, 
                                     dimnames=list(exp_uniq, exp_uniq))
     
-    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v, exp_lst)
+    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v)
     
     ### identify connected components based on adjcencey matrix
     # this is the grouping
