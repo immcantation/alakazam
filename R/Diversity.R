@@ -207,6 +207,8 @@ inferCompleteAbundance <- function(x) {
 #'                   sequence. If this value is specified, then total copy abundance
 #'                   is determined by the sum of copy numbers within each clonal group.
 #' @param    clone   name of the \code{data} column containing clone identifiers.
+#' @param    cell_id name of the \code{data} column containing cell identifiers. If
+#'                   \code{cell_id} column is not present the function will assume bulk data.
 #' @param    remove_na    removes rows with \code{NA} values in the clone column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a clone in the final counts 
 #'                        and relative abundances.
@@ -238,11 +240,18 @@ inferCompleteAbundance <- function(x) {
 #' clones <- countClones(ExampleDb, groups=c("sample_id", "c_call"), copy="duplicate_count")
 #' 
 #' @export
-countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_na=TRUE) {
+countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", cell_id="cell_id", 
+                        remove_na=TRUE) {
     # Check input
     check <- checkColumns(data, c(clone, copy, groups))
     if (check != TRUE) { 
         warning(check) # instead of throwing an error and potentially disrupting a workflow
+    }
+
+    # Don't allow a copy column for single-cell data as it doesn't make sense to count copies
+    if (cell_id %in% names(data) & !is.null(copy)) {
+        stop("Copy column specification not allowed for single-cell or mixed bulk and single-cell data. 
+        A cell_id column is present in the dataframe single-cell or mixed bulk and single-cell data is assumed.")
     }
 
     # Handle NAs
@@ -257,23 +266,44 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_n
             data <- data[!bool_na, ]
         }
     }
-    
+
     # Tabulate clonal abundance
-    if (is.null(copy)) {
+    if (cell_id %in% names(data)) {
+        # Handle single-cell and mixed bulk and single-cell case
+        data_sc <- data %>% dplyr::filter(!is.na(!!rlang::sym(cell_id)))
+        data_sc[[cell_id]] <- as.character(data_sc[[cell_id]])
+        data_blk <- data %>% dplyr::filter(is.na(!!rlang::sym(cell_id)))
+        if (nrow(data_blk > 0)){
+            data_blk[[cell_id]] <- paste0("bulk", 1:nrow(data_blk)) #dummy cell_id for bulk data
+        }
+        data <- bind_rows(data_sc, data_blk)
+
         clone_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, clone))) %>%
+            dplyr::select(!!!rlang::syms(c(groups, clone, cell_id))) %>%
+            dplyr::distinct() %>%
+            dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
             dplyr::summarize(seq_count=n()) %>%
             dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
             dplyr::arrange(desc(!!rlang::sym("seq_count")))
     } else {
-        clone_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, clone))) %>%
-            dplyr::summarize(seq_count=length(.data[[clone]]),
-                              copy_count=sum(.data[[copy]], na.rm=TRUE)) %>%
-            dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
-                          copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
-            dplyr::arrange(desc(!!rlang::sym("copy_count"))) 
+        if (is.null(copy)) {
+            clone_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::summarize(seq_count=n()) %>%
+                dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("seq_count")))
+
+        } else {
+            clone_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::summarize(seq_count=length(.data[[clone]]),
+                                copy_count=sum(.data[[copy]], na.rm=TRUE)) %>%
+                dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                            copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("copy_count"))) 
+        }
     }
+
     return(clone_tab)
 }
 
@@ -291,7 +321,7 @@ countClones <- function(data, groups=NULL, copy=NULL, clone="clone_id", remove_n
 bootstrapAbundance <- function(x, n, nboot=200, method="before") {
     ## DEBUG
     # x=abund_obs; method="before"
-    # Check argumets
+    # Check arguments
     method <- match.arg(method)
   
     if (method == "before") {
@@ -347,6 +377,8 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #'                     be resampled to its original size or, if specified, \code{max_size}.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    nboot     number of bootstrap realizations to generate.
+#' @param    cell_id name of the \code{data} column containing cell identifiers. If
+#'                     \code{cell_id=NULL} then the function will assume bulk data.
 #' @param    progress  if \code{TRUE} show a progress bar. 
 #' 
 #' @return   A \link{AbundanceCurve} object summarizing the abundances.
@@ -373,16 +405,16 @@ bootstrapAbundance <- function(x, n, nboot=200, method="before") {
 #' @export
 estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL, 
                               min_n=30, max_n=NULL, uniform=TRUE, ci=0.95, nboot=200,
-                              progress=FALSE) {
+                              cell_id="cell_id", progress=FALSE) {
     
     # TODO:
-    # Add alakazam style cellIdColumn=NULL, locusColumn="locus", locusValues=c("IGH")
+    # Add alakazam style cell_id=NULL,
     # similar to distToNearest
     # filter based on locusValues
-    # if cellIdColumn
+    # if cell_id
     #    for rows that have unique cell_id, ok
     #    if rows have cell_id not unique, count only once
-    # if not cellIdColumn, count heavy chains (locusValues will be IGH)
+    # if not cell_id, count heavy chains (locusValues will be IGH)
     # If mixed bulk and sc do calculation but raise warning because different type of abundances
     
     ## DEBUG
@@ -408,7 +440,8 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
     
     # Tabulate clonal abundance
     count_col <- if (!is.null(copy)) { "copy_count" } else { "seq_count" }
-    clone_tab <- countClones(data, copy=copy, clone=clone, groups=group) %>%
+    clone_tab <- countClones(data, copy=copy, clone=clone, groups=group, 
+                                cell_id=cell_id) %>%
         dplyr::mutate(clone_count=!!rlang::sym(count_col))
 
     # Tabulate group sizes

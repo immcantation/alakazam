@@ -28,10 +28,11 @@
 #'                   \code{getAllele}) or using the value as it is in the column
 #'                   \code{gene}, without any processing.
 #' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
-#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted)
-#' @param    remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
+#'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted).
+#' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
+#' @param   cell_id  name of hte \code{data} column containing the cell identifiers for each sequence.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:
@@ -74,7 +75,7 @@
 #'
 #'@export
 countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
-                       mode=c("gene", "allele", "family", "asis"), remove_na=TRUE) {
+                       mode=c("gene", "allele", "family", "asis"), cell_id="cell_id", remove_na=TRUE) {
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)
@@ -87,7 +88,13 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     if (check != TRUE) { 
         warning(check) # instead of throwing an error and potentially disrupting a workflow
     }
-
+    
+    # Don't allow a copy column for single-cell data as it doesn't make sense to count copies
+    if (cell_id %in% names(data) & !is.null(copy)) {
+        stop("Copy column specification not allowed for single-cell or mixed bulk and single-cell data. 
+        A cell_id column is present in the dataframe single-cell or mixed bulk and single-cell data is assumed.")
+    }
+    
     # Handle NAs
     if (remove_na) {
         bool_na <- is.na(data[, gene])
@@ -100,7 +107,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             data <- data[!bool_na, ]
         }
     }
-
+    
     # Extract gene, allele or family assignments
     if (mode != "asis") {
         gene_func <- switch(mode,
@@ -111,41 +118,100 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
     }
     
     # Tabulate abundance
-    if (is.null(copy) & is.null(clone)) {
-        # Tabulate sequence abundance
-        gene_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(seq_count=n()) %>%
-            mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("seq_count")))
-    } else if (!is.null(clone) & is.null(copy)) {
-        # Find count of genes within each clone and keep first with maximum count
-        gene_tab <- data %>%
-            group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
-            dplyr::mutate(clone_gene_count=n()) %>%
-            ungroup() %>%
-            group_by(!!!rlang::syms(c(groups, clone))) %>%
-            slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
-            ungroup() %>%
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            dplyr::summarize(clone_count=n()) %>%
-            mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
-            arrange(!!rlang::sym("clone_count"))
-    } else {
-        if (!is.null(clone) & !is.null(copy)) {
-            warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
-                    "The 'clone' argument will be ignored.")
+    if (cell_id %in% names(data)) {
+        # Handle single-cell and mixed bulk and single-cell data
+        data_sc <- data %>% dplyr::filter(!is.na(!!rlang::sym(cell_id)))
+        data_sc[[cell_id]] <- as.character(data_sc[[cell_id]])
+        data_blk <- data %>% dplyr::filter(is.na(!!rlang::sym(cell_id)))
+        if (nrow(data_blk > 0)){
+            warning(paste0("Mixed bulk and single-cell data detected.\n",
+                           "Sequences with '",cell_id,"' NA will be counted individually towards the total number of sequences.\n",
+                           "Consider filtering these sequences first for heavy or light chains. \n"))
+            data_blk[[cell_id]] <- paste0("bulk_", 1:nrow(data_blk)) # dummy cell_id for bulk data
         }
-        # Tabulate copy abundance
-        gene_tab <- data %>% 
-            group_by(!!!rlang::syms(c(groups, gene))) %>%
-            summarize(seq_count=length(!!rlang::sym(gene)),
-                       copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
-            mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
-                   copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
-            arrange(desc(!!rlang::sym("copy_count")))
+        data <- bind_rows(data_sc, data_blk)
+        
+        if (is.null(clone)) {
+            # Tabulate sequence abundance
+            cell_num <- data %>%
+                dplyr::select(!!!rlang::syms(c(groups, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups))) %>%
+                dplyr::summarize(cell_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::select(!!!rlang::syms(c(groups)), cell_count)
+            gene_tab_count <- data %>% 
+                dplyr::select(!!!rlang::syms(c(groups, gene, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=n()) 
+            if (nrow(cell_num) > 1){
+                gene_tab <- gene_tab_count %>%
+                    dplyr::left_join(cell_num, by=groups) %>%
+                    dplyr::mutate(seq_freq=seq_count/cell_count) %>%
+                    dplyr::arrange(desc(seq_count))
+            } else {
+                gene_tab <- gene_tab_count %>%
+                    dplyr::mutate(seq_freq=seq_count/cell_num$cell_count) %>%
+                    dplyr::arrange(desc(seq_count))
+            }
+            
+        } else {
+            # Get unique count per cell and
+            # Find count of genes within each clone and keep first with maximum count
+            gene_tab <- data %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene, cell_id))) %>%
+                dplyr::distinct() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
+                dplyr::mutate(clone_gene_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(clone_count=n()) %>%
+                dplyr::mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(!!rlang::sym("clone_count"))
+        }
+        
+    } else {
+        
+        if (is.null(copy) & is.null(clone)) {
+            # Tabulate sequence abundance
+            gene_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=n()) %>%
+                dplyr::mutate(., seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("seq_count")))
+        } else if (!is.null(clone) & is.null(copy)) {
+            # Find count of genes within each clone and keep first with maximum count
+            gene_tab <- data %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone, gene))) %>%
+                dplyr::mutate(clone_gene_count=n()) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, clone))) %>%
+                dplyr::slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
+                dplyr::ungroup() %>%
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(clone_count=n()) %>%
+                dplyr::mutate(clone_freq=!!rlang::sym("clone_count")/sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(!!rlang::sym("clone_count"))
+        } else {
+            if (!is.null(clone) & !is.null(copy)) {
+                warning("Specifying both 'copy' and 'clone' columns is not meaningful. ",
+                        "The 'clone' argument will be ignored.")
+            }
+            # Tabulate copy abundance
+            gene_tab <- data %>% 
+                dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
+                dplyr::summarize(seq_count=length(!!rlang::sym(gene)),
+                                 copy_count=sum(!!rlang::sym(copy), na.rm=TRUE)) %>%
+                dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/sum(!!rlang::sym("seq_count"), na.rm=TRUE),
+                              copy_freq=!!rlang::sym("copy_count")/sum(!!rlang::sym("copy_count"), na.rm=TRUE)) %>%
+                dplyr::arrange(desc(!!rlang::sym("copy_count")))
+        }
     }
-
+    
     # If a gene is present in one GROUP but not another, will fill the COUNT and FREQ with 0s
     if (fill) {
         gene_tab <- gene_tab %>%
@@ -153,9 +219,9 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             tidyr::complete(!!!rlang::syms(as.list(c(groups, gene))),
                             fill = list(seq_count = 0, seq_freq = 0, copy_count = 0, copy_freq = 0, clone_count = 0, clone_freq = 0))
     }
-
+    
     # Rename gene column
-    gene_tab <- gene_tab %>% rename(all_of(c("gene"=gene)))
+    gene_tab <- gene_tab %>% rename(dplyr::all_of(c("gene"=gene)))
     
     return(gene_tab)
 }
@@ -256,14 +322,14 @@ getSegment <- function(segment_call, segment_regex, first=TRUE, collapse=TRUE,
         # Clean segment_call to keep only the name (remove species)
         allele_regex <- '((IG[HKL]|TR[ABDG])[VDJADEGMC][A-R0-9\\(\\)]*[-/\\w]*[-\\*]*[\\.\\w]+)'
         segment_call <- gsub(paste0(edge_regex, "(", allele_regex, ")", edge_regex), "\\1", 
-                  segment_call, perl=T)
+                             segment_call, perl=T)
         # non-localized regex
         nl_regex <- paste0('(IG[HKL]|TR[ABDG])[VDJADEGMC][0-9]+-NL[0-9]([-/\\w]*[-\\*][\\.\\w]+)*(',
                            sep, "|$)")
         # delete non-localized calls
         segment_call <- gsub(nl_regex, "", segment_call, perl=TRUE)
     }
-
+    
     # Extract calls
     r <- gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), "\\1", 
               segment_call, perl=T)
@@ -324,7 +390,7 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE,
 #' @rdname getSegment
 #' @export
 getLocus <- function(segment_call, first=TRUE, collapse=TRUE, 
-                      strip_d=TRUE, omit_nl=FALSE, sep=",") {
+                     strip_d=TRUE, omit_nl=FALSE, sep=",") {
     locus_regex <- '((IG[HLK]|TR[ABDG]))'
     r <- getSegment(segment_call, locus_regex, first=first, collapse=collapse, 
                     strip_d=strip_d, omit_nl=omit_nl, sep=sep)
@@ -338,7 +404,7 @@ getLocus <- function(segment_call, first=TRUE, collapse=TRUE,
 getChain <- function(segment_call, first=TRUE, collapse=TRUE, 
                      strip_d=TRUE, omit_nl=FALSE, sep=",") {
     r <- getLocus(segment_call, first=first, collapse=collapse, 
-                    strip_d=strip_d, omit_nl=omit_nl, sep=sep)
+                  strip_d=strip_d, omit_nl=omit_nl, sep=sep)
     r <- gsub("(IGH)|(TR[BD])", "VH", r)
     r <- gsub("(IG[KL])|(TR[AG])", "VL", r)
     
@@ -472,6 +538,68 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
     return(exp)
 }
 
+# Check if the input data has heavy chains
+# 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
+#
+# Output:
+# A logical vector indicating if the row entry is a heavy chain or not.
+isHeavyChain <- function(data, locus="locus"){
+    check <- data[[locus]] %in% c("IGH", "TRB", "TRD")
+    return(check)
+}
+
+# Check if the input data has light chains
+# 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
+#
+# Output:
+# A logical vector indicating if the row entry is a light chain or not.
+isLightChain <- function(data, locus="locus"){
+    check <- data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG")
+    return(check)
+}
+
+# Check for common single cell problems
+# 
+# Input: 
+# a data.frame containing the AIRR or Change-O data for a clone. See Details
+# for the list of required columns and their default values.
+# 
+# locus: The column specifying the sequence locus. 
+#
+# cell_id: The column specifying the sequence cell id. 
+# Output:
+# A data.frame containing the AIRR or Change-O data.
+singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
+    heavy <- data[isHeavyChain(data, locus = locus),]
+    light <- data[isLightChain(data, locus = locus),]
+    
+    # check for multiple heavy chains
+    heavy_count <- table(heavy[[cell_id]])
+    multi_heavy_cells <- names(heavy_count[heavy_count > 1])
+    if(length(multi_heavy_cells != 0)){
+        stop(paste("Only one heavy chain is allowed per cell. Remove cells with",
+                   "multiple heavy chains.")) }
+    heavy <- heavy[!heavy[[cell_id]] %in% multi_heavy_cells,]
+    
+    # check for unpaired light chains 
+    pairedIndx <- light[[cell_id]] %in% heavy[[cell_id]]
+    if(FALSE %in% pairedIndx){
+        stop("Unpaired light chains were found in the data. Please remove them.")
+        light <- light[pairedIndx,]
+    }
+    data <- rbind(heavy,light)
+    return(data)
+}
 
 #' Group sequences by gene assignment
 #'
@@ -492,6 +620,7 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'                         If \code{NULL} then 1-stage partitioning is perform
 #'                         considering only the V and J genes is performed. 
 #'                         See Details for further clarification.
+#' @param    sequence_alignment name of the column containing the sequence alignment. 
 #' @param    cell_id       name of the column containing cell identifiers or barcodes. 
 #'                         If specified, grouping will be performed in single-cell mode
 #'                         with the behavior governed by the \code{locus} and 
@@ -503,10 +632,14 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 #'                         for grouping. Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
+#' @param    split_light   A deprecated parameter. This would split clones by the light chain.
+#'                         For similar function use dowser::resolveLightChains
 #' @param    first         if \code{TRUE} only the first call of the gene assignments 
 #'                         is used. if \code{FALSE} the union of ambiguous gene 
 #'                         assignments is used to group all sequences with any 
 #'                         overlapping gene calls.
+#' @param   ninformative   The number of informative sites in a given alignment 
+#'                         required proper grouping.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{vj_group} column. 
@@ -576,23 +709,86 @@ getAllVJL <- function(v, j, l, sep_chain, sep_anno, first) {
 #'  
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
-                       cell_id=NULL, locus="locus", only_heavy=TRUE,
-                       first=FALSE) {
-    # Check base input
-    check <- checkColumns(data, c(v_call, j_call, junc_len))
-    if (check!=TRUE) { stop("A column or some combination of columns v_call, j_call, and junc_len were not found in the data") }
+                       sequence_alignment=NULL,cell_id=NULL, split_light = FALSE,
+                       locus="locus", only_heavy=TRUE, first=FALSE, ninformative = 250) {
     
-    # Check single-cell input
-    if (!is.null(cell_id)) {
-        check <- checkColumns(data, c(cell_id))
-        if (check != TRUE) { stop(check) }
+    # CGJ 6/24/24 -- onlyHeavy warning
+    # Deprecation/Removal of only_heavy = FALSE
+    # TODO update docs and release notes
+    # TODO consider using stop
+    if(!only_heavy){
+      warning('only_heavy = FALSE is deprecated. Running as if only_heavy = TRUE')
+      only_heavy <- TRUE
+    }
+    if(split_light){
+      warning(paste('split_light = TRUE is deprecated. Please use split_light = FALSE.',
+                    'After clonal identification, light chain groups can be found with dowser::resolveLightChains'))
+      split_light <- FALSE
     }
     
-    # Check locus
-    # message locus is required
-    if (is.null(locus)) { stop("`locus`, is a required parameter.") }
-    check <- checkColumns(data, locus)
-    if (check != TRUE) { stop(check) }
+    # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go
+    # through the SC pathway
+    # Let the user know that data seems to have single cell sequences, but they didn't set up
+    # the function to run in single cell mode
+    # TODO update docs and release notes
+    if(is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)){
+        nmissing <- sum(is.na(data$cell_id))
+        if(nmissing > 0){
+            stop(paste("A cell_id column was found in the data, but was not specified.",
+                       "Additionally, the data appears to have paired and unpaired cell data.",
+                       "This data type requires the single cell workflow, please specify the cell_id and rerun."))
+        } else{
+            stop(paste("A cell_id column was found in the data, but was not specified.",
+                       "Please specify the cell_id column and rerun."))
+        }
+    }
+    
+    # Check base input
+    # CGJ 4/12/24 added locus to this check to not repeat later
+    check <- checkColumns(data, c(v_call, j_call, junc_len, sequence_alignment, locus))
+    if (check!=TRUE) { stop(paste("A column or some combination of columns v_call, j_call,",
+                                  "junc_len, sequence_alignment, and locus were not found in the data")) }
+    
+    # check for ambiguous sequences that could cause clonal group clumping
+    # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
+    if (!is.null(sequence_alignment)) {
+        ambiguous_count <- 0
+        for(i in nrow(data)){
+            n_informative <- lengths(regmatches(data[[sequence_alignment]][i],
+                                                gregexpr("[ACTG]", data[[sequence_alignment]][i])))
+            
+            if(n_informative < ninformative){
+                ambiguous_count <- ambiguous_count + 1
+            }
+        }
+        if(ambiguous_count > 0){
+            warning(ambiguous_count, " ambiguous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
+        }
+    }
+    
+    # check for ambiguous sequences that could cause clonal group clumping
+    # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
+    if (!is.null(sequence_alignment)) {
+        for(i in nrow(data)){
+            n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
+                                                gregexpr("[ACTG]", data[[sequence_alignment]][i])))
+            if(n_informative < 250){
+                warning("Ambigous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
+            }
+        }        
+    }
+    
+    # CGJ 4/12/24
+    # check for factors here rather than after the indexing/one-to-one annotation check
+    # NULL will disappear when doing c()
+    # c(NULL,NULL) gives NULL still
+    cols_for_grouping <- c(v_call, j_call, junc_len)
+    # cols cannot be factor
+    if (any( sapply(cols_for_grouping, function(x){class(data[[x]]) == "factor"}) )) {
+        stop("one or more of { ", v_call, ", ", j_call,
+             ifelse(is.null(junc_len), " ", ", "), junc_len,
+             "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
+    }
     
     # if necessary, cast select columns to character (factor not allowed later on)
     if (!is(data[[v_call]], "character")) { data[[v_call]] <- as.character(data[[v_call]]) }
@@ -602,20 +798,41 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     separator_within_seq <- ","
     separator_between_seq <- ";"
     
-    # single-cell mode?
-    if (!is.null(cell_id) & !is.null(locus)) {
-        single_cell <- TRUE
-        
-        if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
-        if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
-        
-        # check locus column
-        valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
-        check <- !all(unique(data[[locus]]) %in% valid_loci)
-        if (check) {
-            stop("The locus column contains invalid loci annotations.")
+    # single-cell mode? CGJ 6/24/24 -- SC mode is not needed?
+    # Initialize mixed
+    mixed <- FALSE
+    single_cell <- FALSE
+    if (!is.null(cell_id) & !is.null(locus)){
+        # single cell fields exist
+        if(sum(is.na(data[[cell_id]])) == 0) {
+            # all rows have cell_id data
+            single_cell <- TRUE
+            
+            if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
+            if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
+            
+            # check locus column
+            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            check <- !all(unique(data[[locus]]) %in% valid_loci)
+            if (check) {
+                stop("The locus column contains invalid loci annotations.")
+            }
+        } else if(any(!is.na(data[[cell_id]]))){
+            # some rows have cell_id data, and some NA
+            single_cell <- TRUE
+            mixed <- TRUE
+            
+            if (!is(data[[cell_id]], "character")) { data[[cell_id]] <- as.character(data[[cell_id]]) }
+            if (!is(data[[locus]], "character")) { data[[locus]] <- as.character(data[[locus]]) }
+            
+            # check locus column
+            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            check <- !all(unique(data[[locus]]) %in% valid_loci)
+            if (check) {
+                stop("The locus column contains invalid loci annotations.")
+            }
         }
-    } else {
+    } else{
         single_cell <- FALSE
     }
     
@@ -626,120 +843,82 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     
     # single-cell mode
     if (single_cell) {
-        
+        # make a copy
+        data_orig <- data
         # regardless of using heavy only, or using both heavy and light
         # for each cell
         # - index wrt data of heavy chain
         # - index wrt data of light chain(s)
         cell_id_uniq <- unique(data[[cell_id]])
-        cell_seq_idx <- sapply(cell_id_uniq, function(x){
-            # heavy chain
-            idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
-            # light chain
-            idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
-            
-            return(list(heavy=idx_h, light=idx_l))
-        }, USE.NAMES=FALSE, simplify=FALSE)
-        
-        # make a copy
-        data_orig <- data; rm(data)
-        
-        if(only_heavy){
-            
-            # use heavy chains only
-            
-            # Straightforward subsetting like below won't work in cases 
-            #     where multiple HCs are present for a cell 
-            # subset to heavy only
-            data <- data_orig[data_orig[[locus]] %in% c("IGH","TRB","TRD"), ]
-            
-            # flatten data
-            cols <- c(cell_id, v_call, j_call, junc_len)
-            data <- data.frame(matrix(NA, nrow=length(cell_seq_idx), ncol=length(cols)))
-            colnames(data) <- cols
-            
-            for (i_cell in 1:length(cell_seq_idx)) {
-                i_cell_h <- cell_seq_idx[[i_cell]][["heavy"]]
-                
-                data[[cell_id]][i_cell] <- cell_id_uniq[i_cell]
-                
-                # heavy chain V, J, junc_len
-                data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
-                                               collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
-                                               collapse=separator_between_seq)
-                if (!is.null(junc_len)) {
-                    data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
-                                                     collapse=separator_between_seq)
+        if(mixed){
+            cell_seq_idx <- sapply(cell_id_uniq, function(x){
+                if(is.na(x)){
+                    # heavy chain
+                    idx_h <- which( is.na(data[[cell_id]]) & data[[locus]] %in% c("IGH", "TRB", "TRD"))
+                } else{
+                    # heavy chain
+                    idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD"))
                 }
-            }
-            
-            
-        } else {
-            
-            # use heavy AND light chains for grouping
-            v_call_light <- "v_call_light"
-            j_call_light <- "j_call_light"
-            # ifelse won't return NULL
-            if (is.null(junc_len)) {
-                junc_len_light <- NULL
-            } else {
-                junc_len_light <- "len_light"
-            }
-            
-            # flatten data
-            cols <- c(cell_id, v_call, j_call, junc_len, v_call_light, j_call_light, junc_len_light)
-            data <- data.frame(matrix(NA, nrow=length(cell_seq_idx), ncol=length(cols)))
-            colnames(data) <- cols
-            
-            for (i_cell in 1:length(cell_seq_idx)) {
-                i_cell_h <- cell_seq_idx[[i_cell]][["heavy"]]
-                i_cell_l <- cell_seq_idx[[i_cell]][["light"]]
+                # light chain
+                idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
+                return(list(heavy=idx_h, light=idx_l))
+            }, USE.NAMES=FALSE, simplify=FALSE)
+        } else{
+            cell_seq_idx <- sapply(cell_id_uniq, function(x){
+                # heavy chain
+                idx_h <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGH", "TRB", "TRD")) 
+                # light chain
+                idx_l <- which( data[[cell_id]]==x & data[[locus]] %in% c("IGK", "IGL", "TRA", "TRG") )
                 
-                data[[cell_id]][i_cell] <- cell_id_uniq[i_cell]
-                
-                # heavy chain V, J, junc_len
-                data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
-                                               collapse=separator_between_seq)
-                data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
-                                               collapse=separator_between_seq)
-                if (!is.null(junc_len)) {
-                    data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
-                                                     collapse=separator_between_seq)
-                }
-                
-                # light chain V, J, junc_len
-                data[[v_call_light]][i_cell] <- paste0(data_orig[[v_call]][i_cell_l], 
-                                                     collapse=separator_between_seq)
-                data[[j_call_light]][i_cell] <- paste0(data_orig[[j_call]][i_cell_l], 
-                                                     collapse=separator_between_seq)
-                if (!is.null(junc_len_light)) {
-                    data[[junc_len_light]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_l], 
-                                                           collapse=separator_between_seq)
-                }
-                
-            }
-            
-            # It cannot be the case that there are 2 V annotations but only 1 J annotation for 
-            # the two light chains. Both J annotations must be spelled out for each light chain,
-            # separated by \code{separator_between_seq}, even if the annotated alleles are the same.
-            # 
-            # This one-to-one annotation-to-chain correspondence for both V and J is explicitly
-            # checked and an error raised if the requirement is not met. 
-            
-            # one-to-one annotation-to-chain correspondence for both V and J (light)
-            # for each cell/row, number of bewteen_seq separators in light V annotation and in light J annotation must match
-            n_separator_btw_seq_v_light <- stringi::stri_count_fixed(str=data[[v_call_light]], pattern=separator_between_seq)
-            n_separator_btw_seq_j_light <- stringi::stri_count_fixed(str=data[[j_call_light]], pattern=separator_between_seq)
-            if (any( n_separator_btw_seq_v_light != n_separator_btw_seq_j_light )) {
-                stop("Requirement not met: one-to-one annotation-to-chain correspondence for both V and J (light)")
-            }
-            
+                return(list(heavy=idx_h, light=idx_l))
+            }, USE.NAMES=FALSE, simplify=FALSE)
         }
+        
+        
+        # use heavy chains only
+        # Straightforward subsetting like below won't work in cases 
+        #     where multiple HCs are present for a cell 
+        # CGJ 6/16/23
+        # subset to heavy only -- for both B and T cells
+        data <- data_orig[isHeavyChain(data_orig, locus = locus),]
+        
+        # Check for cells with two heavy chains 
+        # singleCellValdiation 4/12/24
+        if(!mixed){
+            data <- singleCellValidation(data, locus = locus, cell_id = cell_id)
+        }
+        
+        # flatten data
+        cols <- c(cell_id, v_call, j_call, junc_len)
+        data <- data.frame(matrix(NA, nrow=length(cell_seq_idx), ncol=length(cols)))
+        colnames(data) <- cols
+        
+        for (i_cell in 1:length(cell_seq_idx)) {
+            i_cell_h <- cell_seq_idx[[i_cell]][["heavy"]]
+            
+            data[[cell_id]][i_cell] <- cell_id_uniq[i_cell]
+            
+            # heavy chain V, J, junc_len
+            data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h], 
+                                             collapse=separator_between_seq)
+            data[[j_call]][i_cell] <- paste0(data_orig[[j_call]][i_cell_h], 
+                                             collapse=separator_between_seq)
+            if (!is.null(junc_len)) {
+                data[[junc_len]][i_cell] <- paste0(data_orig[[junc_len]][i_cell_h], 
+                                                   collapse=separator_between_seq)
+            }
+        } 
     } 
     
+   # if(mixed){
+        # remove the entry(s) from data and cell_seq_idx that are cells with only light chains 
+        #indx <- which(data[[v_call]] == "")
+        #data <- data[-indx,]
+        #cell_seq_idx <- cell_seq_idx[-indx]
+    # }
+    
     # one-to-one annotation-to-chain correspondence for both V and J (heavy)
-    # for each cell/row, number of bewteen_seq separators in heavy V annotation and in heavy J annotation must match
+    # for each cell/row, number of between_seq separators in heavy V annotation and in heavy J annotation must match
     # (in theory, there should be 1 heavy chain per cell; but 10x can return cell with >1 heavy chains and 
     #  you never know if the user will supply this cell as input)
     n_separator_btw_seq_v_heavy <- stringi::stri_count_fixed(str=data[[v_call]], pattern=separator_between_seq)
@@ -753,20 +932,6 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # c(NULL,NULL) gives NULL still
     cols_for_grouping_heavy <- c(v_call, j_call, junc_len)
     cols_for_grouping_light <- c(v_call_light, j_call_light, junc_len_light)
-    
-    # cols cannot be factor
-    if (any( sapply(cols_for_grouping_heavy, function(x){class(data[[x]]) == "factor"}) )) {
-        stop("one or more of { ", v_call, ", ", j_call,  
-             ifelse(is.null(junc_len), " ", ", "), junc_len, 
-             "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
-    }
-    if (single_cell & !only_heavy) {
-        if (any( sapply(cols_for_grouping_light, function(x) {class(data[[x]]) == "factor"}) )) {
-            stop("one or more of { ", v_call_light, ", ", j_call_light,  
-                 ifelse(is.null(junc_len_light), " ", ", "), junc_len_light, 
-                 "} is factor. Must be character.\nIf using read.table(), make sure to set stringsAsFactors=FALSE.\n")
-        }  
-    }
     
     # Check NA(s) in columns
     bool_na <- rowSums( is.na( data[, c(cols_for_grouping_heavy, cols_for_grouping_light)] ) ) >0
@@ -808,13 +973,19 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         m_v <- match(data[[v_call]], v_unique)
         m_j <- match(data[[j_call]], j_unique)
         
+        # CGJ 4/15/24 put together instead of back to back steps for same condition
         if (is.null(junc_len)) {
             combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i) {
                 idx_v <- which (v_unique == combo_unique[[v_call]][i])
                 idx_j <- which (j_unique == combo_unique[[j_call]][i])
                 idx <- which(m_v==idx_v & m_j==idx_j)
                 return(idx)
-            }, simplify=FALSE, USE.NAMES=FALSE) 
+            }, simplify=FALSE, USE.NAMES=FALSE)
+            exp_lst <- sapply(1:nrow(combo_unique), function(i){
+                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
+                          l=NULL, first=first,
+                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
+            }, simplify=F, USE.NAMES=FALSE)
         } else {
             l_unique <- unique(combo_unique[[junc_len]])
             m_l <- match(data[[junc_len]], l_unique)
@@ -825,173 +996,13 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 idx <- which(m_v==idx_v & m_j==idx_j & m_l==idx_l)
                 return(idx)
             }, simplify=FALSE, USE.NAMES=FALSE)
-        }
-        
-        # expand combo_unique
-        if (is.null(junc_len)) {
-            exp_lst <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
-                          l=NULL, first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=F, USE.NAMES=FALSE)
-        } else {
             exp_lst <- sapply(1:nrow(combo_unique), function(i){
                 getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
                           l=combo_unique[[junc_len]][i], first=first,
                           sep_anno=separator_within_seq, sep_chain=separator_between_seq)
             }, simplify=F, USE.NAMES=FALSE)
         }
-        
-    } else {
-        # single_cell & !only_heavy
-        
-        # important: do not do this separately for heavy and light
-        # must keep the pairing structure
-        combo_unique <- unique(data[, c(cols_for_grouping_heavy, cols_for_grouping_light)])
-        
-        # unique components
-        v_unique_h <- unique(combo_unique[[v_call]])
-        j_unique_h <- unique(combo_unique[[j_call]])
-        v_unique_l <- unique(combo_unique[[v_call_light]])
-        j_unique_l <- unique(combo_unique[[j_call_light]])
-        
-        # map each row in full data to unique combo
-        m_v_h <- match(data[[v_call]], v_unique_h)
-        m_j_h <- match(data[[j_call]], j_unique_h)
-        m_v_l <- match(data[[v_call_light]], v_unique_l)
-        m_j_l <- match(data[[j_call_light]], j_unique_l)
-        
-        if (!is.null(junc_len)) {
-            l_unique_h <- unique(combo_unique[[junc_len]])
-            m_l_h <- match(data[[junc_len]], l_unique_h)
-        }
-        if (!is.null(junc_len_light)) {
-            l_unique_l <- unique(combo_unique[[junc_len_light]])
-            m_l_l <- match(data[[junc_len_light]], l_unique_l)
-        }
-        
-        # expand combo_unique
-        if (is.null(junc_len) & is.null(junc_len_light)) {
-            
-            # map
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v_h <- which( v_unique_h == combo_unique[[v_call]][i] )
-                idx_j_h <- which( j_unique_h == combo_unique[[j_call]][i] )
-                idx_v_l <- which( v_unique_l == combo_unique[[v_call_light]][i] )
-                idx_j_l <- which( j_unique_l == combo_unique[[j_call_light]][i] )
-                idx <- which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_v_l==idx_v_l & m_j_l==idx_j_l)
-                return(idx)
-            }, simplify=FALSE, USE.NAMES=FALSE) 
-            
-            # heavy
-            exp_h <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
-                          l=NULL, first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            # light
-            exp_l <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
-                          l=NULL, first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            
-            
-        } else if (!is.null(junc_len) & !is.null(junc_len_light)) {
-            
-            # map
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v_h <- which( v_unique_h == combo_unique[[v_call]][i] )
-                idx_j_h <- which( j_unique_h == combo_unique[[j_call]][i] )
-                idx_l_h <- which( l_unique_h == combo_unique[[junc_len]][i] )
-                idx_v_l <- which( v_unique_l == combo_unique[[v_call_light]][i] )
-                idx_j_l <- which( j_unique_l == combo_unique[[j_call_light]][i] )
-                idx_l_l <- which( l_unique_l == combo_unique[[junc_len_light]][i] )
-                idx <- which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
-                                m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
-                return(idx)
-            }, simplify=FALSE, USE.NAMES=FALSE) 
-            
-            # heavy
-            exp_h <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
-                          l=combo_unique[[junc_len]][i], first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            # light
-            exp_l <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
-                          l=combo_unique[[junc_len_light]][i], first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            
-        } else if (is.null(junc_len) & !is.null(junc_len_light)) {
-            
-            # map
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v_h <- which( v_unique_h == combo_unique[[v_call]][i] )
-                idx_j_h <- which( j_unique_h == combo_unique[[j_call]][i] )
-                idx_v_l <- which( v_unique_l == combo_unique[[v_call_light]][i] )
-                idx_j_l <- which( j_unique_l == combo_unique[[j_call_light]][i] )
-                idx_l_l <- which( l_unique_l == combo_unique[[junc_len_light]][i] )
-                idx <- which(m_v_h==idx_v_h & m_j_h==idx_j_h & 
-                                m_v_l==idx_v_l & m_j_l==idx_j_l & m_l_l==idx_l_l)
-                return(idx)
-            }, simplify=FALSE, USE.NAMES=FALSE) 
-            
-            # heavy
-            exp_h <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
-                          l=NULL, first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            # light
-            exp_l <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
-                          l=combo_unique[[junc_len_light]][i], first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            
-        } else if (!is.null(junc_len) & is.null(junc_len_light)) {
-            
-            # map
-            combo_unique_full_idx <- sapply(1:nrow(combo_unique), function(i){
-                idx_v_h <- which( v_unique_h == combo_unique[[v_call]][i] )
-                idx_j_h <- which( j_unique_h == combo_unique[[j_call]][i] )
-                idx_l_h <- which( l_unique_h == combo_unique[[junc_len]][i] )
-                idx_v_l <- which( v_unique_l == combo_unique[[v_call_light]][i] )
-                idx_j_l <- which( j_unique_l == combo_unique[[j_call_light]][i] )
-                idx <- which(m_v_h==idx_v_h & m_j_h==idx_j_h & m_l_h==idx_l_h & 
-                                m_v_l==idx_v_l & m_j_l==idx_j_l)
-                return(idx)
-            }, simplify=FALSE, USE.NAMES=FALSE) 
-            
-            # heavy
-            exp_h <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call]][i], j=combo_unique[[j_call]][i], 
-                          l=combo_unique[[junc_len]][i], first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            # light
-            exp_l <- sapply(1:nrow(combo_unique), function(i){
-                getAllVJL(v=combo_unique[[v_call_light]][i], j=combo_unique[[j_call_light]][i], 
-                          l=NULL, first=first,
-                          sep_anno=separator_within_seq, sep_chain=separator_between_seq)
-            }, simplify=FALSE, USE.NAMES=FALSE)
-            
-        }
-        
-        # pair heavy & light
-        stopifnot( length(exp_h) == length(exp_l) )
-        exp_lst <- sapply(1:length(exp_h), function(i){
-            n_h <- length(exp_h[[i]])
-            n_l <- length(exp_l[[i]])
-            stringi::stri_paste(rep.int(exp_h[[i]], times=n_l),
-                                rep(exp_l[[i]], each=n_h),
-                                sep="@")
-        }, simplify=FALSE, USE.NAMES=FALSE)
-        
-    }
+    } 
     
     # one-to-one correspondence btw exp_lst and combo_unique_full_idx
     # exp_lst: VJL combinations
@@ -1010,8 +1021,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         unlist(combo_unique_full_idx[idx_lst], use.names=FALSE)
     }, simplify=FALSE, USE.NAMES=FALSE)
     
-    stopifnot( length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data) )
-    
+    stopifnot(length(unique(unlist(exp_lst_uniq_full_idx, use.names=FALSE))) == nrow(data))
     # tip: unlist with use.names=F makes it much faster (>100x)
     # https://www.r-bloggers.com/speed-trick-unlist-use-namesfalse-is-heaps-faster/
     exp_uniq <- sort(unique(unlist(exp_lst_uniq, use.names=FALSE)))
@@ -1109,7 +1119,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                                     symmetric=F, triangular=F, index1=T, 
                                     dimnames=list(exp_uniq, exp_uniq))
     
-    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v, exp_lst)
+    rm(m1_i, m1_j, m2_i, m2_j, m1_i_v, m1_j_v, m2_i_v, m2_j_v)
     
     ### identify connected components based on adjcencey matrix
     # this is the grouping
@@ -1157,25 +1167,49 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         data_orig$vj_group <- NA
         
         # map back to data_orig
-        for (i_cell in 1:nrow(data)) {
-            # wrt data_orig
-            i_orig_h <- cell_seq_idx[[i_cell]][["heavy"]]
-            i_orig_l <- cell_seq_idx[[i_cell]][["light"]]
-            # sanity check
-            stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
-            # grouping
-            data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
+        if(!mixed){
+            for (i_cell in 1:nrow(data)) {
+                # wrt data_orig
+                i_orig_h <- cell_seq_idx[[i_cell]][["heavy"]]
+                i_orig_l <- cell_seq_idx[[i_cell]][["light"]]
+                # sanity check
+                stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
+                # grouping
+                data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
+            }
+        } else{
+            for (i_cell in 1:nrow(data)) {
+                i_orig_h <- cell_seq_idx[[i_cell]][["heavy"]]
+                i_orig_l <- cell_seq_idx[[i_cell]][["light"]]
+                
+                # if it's just the light chain give in an NA and skip
+                if(length(i_orig_h) == 0 & length(i_orig_l) == 1){
+                    data_orig$vj_group[i_orig_l] <- NA
+                    next
+                }
+                
+                # sanity check 
+                # both chains are present in the cell 
+                if(!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0){
+                    # sanity check
+                    stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
+                } else{
+                    # just the heavy chain
+                    if(is.na(data_orig[[cell_id]][i_orig_h])){
+                        stopifnot(is.na(cell_id_uniq[i_cell]))
+                    }else{
+                        stopifnot(data_orig[[cell_id]][i_orig_h] == cell_id_uniq[i_cell])
+                    }
+                }
+                # grouping
+                data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
+            }
         }
-        
-        # remove rows with $vj_group values of NA
-        # these had already been removed by the NA check for `data`
-        data_orig <- data_orig[!is.na(data_orig$vj_group), ]
         
         return(data_orig)
     }
     
 }
-
 
 #' Sort V(D)J genes
 #'
@@ -1217,7 +1251,7 @@ sortGenes <- function(genes, method=c("name", "position")) {
     
     # Check arguments
     method <- match.arg(method)
-
+    
     # Build sorting table
     sort_tab <- tibble(CALL=sort(getAllele(genes, first=FALSE, strip_d=FALSE))) %>%
         # Determine the gene and family
@@ -1231,7 +1265,7 @@ sortGenes <- function(genes, method=c("name", "position")) {
                G2=as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("G2"))),
                A1=as.numeric(sub("[^\\*]+\\*|[^\\*]+$", "", !!rlang::sym("ALLELE")))
         )
-
+    
     # Convert missing values to 0
     sort_tab[is.na(sort_tab)] <- 0
     

@@ -1,5 +1,7 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
+expect_warning(db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv")),
+               "db_test.tsv is not in the Change-O format")
 
 ### countGenes ####
 
@@ -134,6 +136,35 @@ test_that("countGenes", {
                  c(1, 2),
                  tolerance=0.001)
     
+})
+
+test_that("countGenes works for single-cell", {
+    # Without copy numbers
+    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="family"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq,2), 
+                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+                 tolerance=0.001)
+    
+    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq,2), 
+                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+                 tolerance=0.001)
+    
+    added_cell <- data.frame(
+        subject_id = c("S2","S2","S2"),
+        v_call = c("IGHV1-1","IGKV1-1","IGKV1-1"),
+        j_call = c("IGHJ1-1","IGKJ1-1","IGKJ1-1"),
+        cell_id = c(30,30,30)
+    )
+
+    # Specific use case for identical light V gene within 1 cell that should be counted only once
+    db_gg_multilight <- db_gg %>%
+                        dplyr::select(c("subject_id","v_call","j_call","cell_id")) %>%
+                        dplyr::bind_rows(db_gg, added_cell)
+    expect_warning(genes <- countGenes(db_gg_multilight, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
+    expect_equal(genes$seq_freq, 
+                 c(0.8, 0.5, 0.1, 0.1, 0.05, 0.05, 1,1),
+                 tolerance=0.001)
 })
 
 ### getSegment ####
@@ -334,7 +365,8 @@ test_that("groupGenes heavy only", {
 })
 
 
-test_that("groupGenes ", {
+test_that("groupGenes, when 1 row ", {
+    # Tests fix for rowSums when 1 row
     db <- structure(list(sample_id = "UW0343__S", sequence_id = "assemble12_0", 
                    subject_id = "S1", v_call = "IGHV3-30*02,IGHV3-30-5*02", 
                    j_call = "IGHJ6*03", junction = "TGTGCGAAAGTCCCCGTGGGGACTGCCTCTTACATGGACGCCTGG", 
@@ -342,77 +374,15 @@ test_that("groupGenes ", {
                    junction_length = 45L), row.names = c(NA, -1L
                    ), class = c("tbl_df", "tbl", "data.frame"))
     ft <- groupGenes(db, junc_len="junction_length",
-                  cell_id=NULL, locus="locus", only_heavy=T,
+                  cell_id="cell_id", locus="locus", only_heavy=T,
                   first=TRUE)
     ff <- groupGenes(db, junc_len="junction_length",
-                     cell_id=NULL, locus="locus", only_heavy=T,
+                     cell_id="cell_id", locus="locus", only_heavy=T,
                      first=FALSE)
     expect_equal(ft,ff)
 })
 
 
-test_that("groupGenes, single-cell mode, heavy and light", {
-    
-    # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
-    load(file.path("..", "data-tests", "db_sc.rda")) # data_t1
-    
-    # View(data_t1[, c("V_CALL", "J_CALL", "LEN")])
-    
-    # manual deduction
-    # 1 
-    # IGHV3-11 IGHJ4 93 IGKV1-39 IGLJ6 30
-    # 2 
-    # IGHV3-7 IGHJ1 24 IGLV2-11 IGLJ6 33
-    # IGHV3-6 IGHJ1 24 IGLV2-11 IGLJ6 33 (first=F)
-    # IGHV1-4 IGHJ3 27 IGLV2-11 IGLJ6 33
-    # IGHV1-4 IGHJ4 27 IGLV2-11 IGLJ6 33 (first=F)
-    # IGHV3-7 IGHJ1 24 IGKV2-13 IGLJ3 57
-    # IGHV3-6 IGHJ1 24 IGKV2-13 IGLJ3 57 (first=F)
-    # IGHV1-4 IGHJ3 27 IGKV2-13 IGLJ3 57
-    # IGHV1-4 IGHJ4 27 IGKV2-13 IGLJ3 57 (first=F)
-    # 
-    # 3 IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36
-    # 4 IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36
-    # 5 IGHV3-7 IGHJ5 90 IGLV2-20 IGLJ3 36
-    #   IGHV3-7 IGHJ5 90 IGLV3-30 IGLJ3 36 (first=F)
-    # 
-    # 6 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
-    #   IGHV4-59 IGHJ1 84 IGKV1-25 IGKJ3 60
-    # 7 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
-    # 8 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
-    # 9 IGHV4-59 IGHJ1 84 IGKV1-27 IGKJ5 39
-    # 
-    # 10 IGHV4-59 IGHJ1 84 IGKV1-6 IGKJ4 42
-    # 11 IGHV4-59 IGHJ1 84 IGKV1-6 IGKJ4 42
-    
-    # gg1 first=F
-    # 1 by itself; 2 by itself; 3-5 together; 6-9 together; 10-11 together
-    gg1_expect = c(rep("G2", 2), 
-                   rep("G1", 4), 
-                   rep("G3", 2+2+2), 
-                   rep("G4", 2+3+2+2), 
-                   rep("G5", 2+2))
-    
-    # gg2 first=T
-    # 1 by itself; 2 by itself; 3-4 together; 5 by itself; 6-9 together; 10-11 together
-    gg2_expect = c(rep("G2", 2),
-                   rep("G1", 4), 
-                   rep("G4", 2+2), 
-                   rep("G3", 2), 
-                   rep("G5", 2+3+2+2), 
-                   rep("G6", 2+2))
-    
-    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_heavy=FALSE, first=FALSE)
-    
-    gg2 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_heavy=FALSE, first=TRUE)
-                     
-    expect_equal(gg1[["vj_group"]], gg1_expect)
-    expect_equal(gg2[["vj_group"]], gg2_expect)
-})
 
 test_that("groupGenes, single-cell mode, heavy only", {
     
@@ -440,13 +410,26 @@ test_that("groupGenes, single-cell mode, heavy only", {
     # 10 IGHV4-59 IGHJ1 84
     # 11 IGHV4-59 IGHJ1 84
     
-    # 1 by itself, 2 by itself, 3-5 together, 6-11 together
-    gg1_expect = c(rep("G2", 2), 
-                   rep("G1", 4), 
-                   rep("G3", 2+2+2), 
-                   rep("G4", 2+3+2+2+2+2)) 
+    # Cell with CELL_ID==B has 2 heavy and 2 light chains
+    # expect error
+    expect_error(
+        singleCellValidation(data_t1, cell_id="CELL_ID",locus="LOCUS"),
+        regexp = "Only one heavy chain is allowed per cell"
+    )
+    expect_error(
+        gg1 <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
+                          only_heavy=TRUE, first=FALSE),
+        regexp = "Only one heavy chain is allowed per cell"
+    )
     
-    gg1 = groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+    # 1 by itself, 2 by itself, 3-5 together, 6-11 together
+    gg1_expect = c(rep("G1", 2), 
+                   # rep("G1", 4), # Cell B removed
+                   rep("G2", 2+2+2), 
+                   rep("G3", 2+3+2+2+2+2)) 
+    
+    gg1 = groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), v_call="V_CALL", j_call="J_CALL", 
                      junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                      only_heavy=TRUE, first=FALSE)
     
@@ -454,60 +437,51 @@ test_that("groupGenes, single-cell mode, heavy only", {
     
 })
 
-# Commented out because we are creating a new test
-# test_that("groupGenes, mixed bulk and single cell", {
-#     
-#     # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
-#     db <- data.frame(
-#         subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
-#         v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
-#         j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
-#         junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
-#         locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
-#         cell_id=c(1,2,3,NA,NA,1,NA),
-#         junction_length=12
-#     )
-#     
-#     # cell_id=NULL, only_heavy=T
-#     a <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#              cell_id=NULL, locus="locus", only_heavy=TRUE,
-#              first=FALSE)
-#     expect_equal(a[['vj_group']], c("G2","G1","G1","G1","G1","G3","G3"))
-#     
-#     # cell_id=NULL, only_heavy=F
-#     b <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id=NULL, locus="locus", only_heavy=FALSE,
-#                first=FALSE)
-#     
-#     # Should match a, becasue only_heavy only relevant for single cell
-#     expect_equal(a,b)
-#     
-#     # cell_id='cell_id', only_heavy=T
-#     c <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id="cell_id", locus="locus", only_heavy=TRUE,
-#                first=FALSE) 
-#     # Should match a, because mix bulk-sc -> bulk mode
-#     expect_equal(c,a)
-#     
-#     # subset to single-cell sequences
-#     d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-#                     cell_id="cell_id", locus="locus", only_heavy=TRUE,
-#                     first=FALSE)    
-#     expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
-#     
-#     # cell_id='cell_id', only_heavy=F
-#     e <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-#                cell_id="cell_id", locus="locus", only_heavy=FALSE,
-#                first=FALSE)  
-#     # Should match b, because mix bulk-sc -> bulk mode
-#     expect_equal(e,b)    
-#     
-#     # Suset to single-cell sequences
-#     f <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-#                     cell_id="cell_id", locus="locus", only_heavy=FALSE,
-#                     first=FALSE)
-# 
-# })
+test_that("groupGenes, mixed bulk and single cell", {
+
+    # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
+    db <- data.frame(
+        subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
+        v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
+        j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
+        junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
+        locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
+        cell_id=c(1,2,3,NA,NA,1,NA),
+        junction_length=12
+    )
+
+    # TODO
+    # Should match a, because mix bulk-sc -> bulk mode
+    # expect_equal(c,a)
+
+    # subset to single-cell sequences
+    d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                    cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                    first=FALSE)
+    expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
+    
+    expect_warning(d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                    cell_id="cell_id", locus="locus", only_heavy=FALSE,
+                    first=FALSE))
+    
+    expect_warning(d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                                      cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                                      first=FALSE, split_light=TRUE))
+    expect_equal(d[['vj_group']], d_oh[['vj_group']], d_sl[['vj_group']])
+
+    # TODO SSNN 7/16/2024
+    # Run tests with the same data used in scoper
+
+    # Bulk mode cell_id=NULL
+    ## first=T
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=T)
+    expect_equal(gg[["vj_group"]],
+                 gg[["expected_group_cell_id-null_first-T"]])
+    ## first=F
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=F)
+    expect_equal(gg[["vj_group"]], 
+                 gg[["expected_group_cell_id-null_first-F"]])
+})
 
 
 #### AIRR-format migration tests ####
@@ -565,33 +539,16 @@ test_that("groupGenes, AIRR-format migration", {
     rm(db_c, db_a, newDb_c, newDb_a)
 
     # 2 
+    # Cell with CELL_ID==B has 2 heavy and 2 light chains
     load(file.path("..", "data-tests", "db_sc.rda")) # data_t1, data_t2
     load(file.path("..", "data-tests", "db_sc_airr.rda")) # data_t1_airr, data_t2_airr
-    
-    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_heavy=FALSE, first=FALSE)
-    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
-                          junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_heavy=FALSE, first=FALSE)
-    
-    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
-    
-    # 3
-    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_heavy=FALSE, first=TRUE)
-    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
-                          junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_heavy=FALSE, first=TRUE)
-    
-    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
-    
-    # 4
-    newDb_c <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
+
+    newDb_c <- groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), 
+                          v_call="V_CALL", j_call="J_CALL", 
                           junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
                           only_heavy=TRUE, first=FALSE)
-    newDb_a <- groupGenes(data_t1_airr, v_call="v_call", j_call="j_call", 
+    newDb_a <- groupGenes(data_t1_airr %>% dplyr::filter(cell_id != "B"),
+                          v_call="v_call", j_call="j_call", 
                           junc_len="len", cell_id="cell_id", locus="locus", 
                           only_heavy=TRUE, first=FALSE)
     

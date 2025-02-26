@@ -24,7 +24,7 @@ test_that("countClones", {
 	             tolerance=0.01)
 
 	# With copy numbers and multiple groups
-	clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
+    clones <- countClones(db, groups=c("SAMPLE", "ISOTYPE"), copy="DUPCOUNT", clone="CLONE")
 
 	expect_equal(clones$seq_count[1:6], c(23, 15, 5, 3, 4, 1))
 	expect_equal(clones$copy_count[1:6], c(53, 43, 24, 11, 11, 10))
@@ -36,6 +36,7 @@ test_that("countClones", {
 	db_toy <- tibble::tibble(SEQUENCE_ID=1:10, 
 	                          GROUP=c(rep("A", 3), rep("B", 7)),
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
+                              LOCUS=rep("IGH", 10),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
 	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
@@ -60,10 +61,11 @@ test_that("countClones", {
 	             tolerance=0.01)
 	
 	# Test how NAs are handled
-	db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12), 
+	db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
 	                         sample = c("S1", "S2", "S4", "S3", "S2", "S3", "S4", "S4", "S3", "S4", "S0", "S0"),
-	                         dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), 
-	                         clone_id = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, NA, NA), 
+	                         dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+                             locus = c(rep("IGH", 12)),
+	                         clone_id = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, NA, NA),
 	                         stringsAsFactors=F)
 	
 	expect_warning(clones <- countClones(db_some_na), NULL)
@@ -86,10 +88,10 @@ test_that("countClones", {
 	             c(3, 2, 2, 1, 1, 1, 1, 1),
 	             tolerance=0.001)
 	
-	
 	db_all_na <- data.frame(sequence_id = c(1, 2, 3),
 	                        sample = c("S1", "S2", "S2"),
-	                        dupcount = c(1, 1, 1), 
+	                        dupcount = c(1, 1, 1),
+                            locus = c(rep("IGH", 3)),
 	                        clone_id = c(NA, NA, NA), 
 	                        stringsAsFactors=F)
 	
@@ -113,7 +115,6 @@ test_that("countClones", {
 	             c(2, 1),
 	             tolerance=0.001)
 })
-
 
 #### calcInferredDiversity ####
 
@@ -436,6 +437,10 @@ expect_warning(
     db <- readChangeoDb(example_file),
 regexp="airr::read_rearrangement")
 
+expect_warning(db_mixed_cloned <- airr::read_rearrangement(file.path("..", "data-tests", "db_test_cloned.tsv")))
+db_sc_cloned <- db_mixed_cloned %>% dplyr::filter(!is.na(cell_id)) %>% dplyr::mutate("umi_count" = 2)
+db_bulk_cloned <- db_mixed_cloned %>% dplyr::select(-cell_id)
+
 #### calcCoverage ####
 
 test_that("calcCoverage", {
@@ -470,6 +475,7 @@ test_that("countClones", {
 	db_toy <- tibble::tibble(SEQUENCE_ID=1:10, 
 	                          GROUP=c(rep("A", 3), rep("B", 7)),
 	                          CLONE=as.character(c(rep(1, 5), 2, 2, 3, 4, 5)),
+                              LOCUS=rep("IGH", 10),
 	                          COPY=10:1)
 	ungrouped_toy <- tibble::tibble(CLONE=as.character(1:5), 
 	                                 seq_count=as.integer(c(5, 2, 1, 1, 1)),
@@ -484,8 +490,8 @@ test_that("countClones", {
 	                               copy_freq=c(sum(10:8)/sum(10:8), 
 	                                           sum(7:6)/sum(7:1), sum(5:4)/sum(7:1), 3/sum(7:1), 2/sum(7:1), 1/sum(7:1)))
 	# Check toy ungrouped
-	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY") %>% ungroup(), 
-	             ungrouped_toy, 
+	expect_equal(countClones(db_toy, clone="CLONE", copy="COPY"), 
+	             ungrouped_toy,
 	             tolerance=0.01)
 
 	# Check toy grouped
@@ -494,6 +500,40 @@ test_that("countClones", {
 	             tolerance=0.01)
 })
 
+test_that("countClones with mixed data", {
+    expect_warning(clones <- countClones(db_mixed_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(11,2,2,1),
+        seq_freq = c(11/16,2/16,2/16,1/16)
+    )
+    expect_equal(clones,
+                    clones_expect,
+                    tolerance=0.01)
+})
+
+test_that("countClones with sc data", {
+    expect_warning(clones <- countClones(db_sc_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(10,2,2,1),
+        seq_freq = c(10/15,2/15,2/15,1/15)
+    )
+})
+
+test_that("countClones with bulk data", {
+    expect_warning(clones <- countClones(db_bulk_cloned))
+    clones_expect <- tibble::tibble(
+        clone_id = c("1","2","4","3"),
+        seq_count = c(11,2,2,1),
+        seq_freq = c(11/16,2/16,2/16,1/16)
+    )
+
+})
+
+test_that("countClones with sc data and specified copy fails", {
+    expect_error(clones <- countClones(db_sc_cloned, copy="umi_count"))
+})
 
 #### calcInferredDiversity ####
 

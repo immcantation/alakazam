@@ -32,6 +32,7 @@ NULL
 #' @param    uniform   if \code{TRUE} then uniformly resample each group to the same 
 #'                     number of observations. If \code{FALSE} then allow each group to
 #'                     be resampled to its original size or, if specified, \code{max_size}.
+#' @param    cell_id   name of the \code{data} column containing cell identifiers. 
 #' @param    progress  if \code{TRUE} show a progress bar.
 #' 
 #' @return   A \link{DiversityCurve} object summarizing the diversity scores.
@@ -85,9 +86,11 @@ NULL
 #' @export
 rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
                             min_q=0, max_q=4, step_q=0.05, min_n=30, max_n=NULL,
-                            ci=0.95, nboot=2000, uniform=TRUE, progress=FALSE) {
+                            ci=0.95, nboot=2000, uniform=TRUE, 
+                            cell_id="cell_id",
+                            progress=FALSE) {
     .Deprecated("alphaDiversity")
-    bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci)
+    bootstrap_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, uniform=uniform, ci=ci, cell_id=cell_id)
     diversity_obj <- alphaDiversity(bootstrap_obj, ci=ci, min_q=min_q, max_q=max_q, step_q)
 
     return(diversity_obj)
@@ -116,6 +119,7 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' @param    nboot     number of bootstrap realizations to perform.
 #' @param    ci        confidence interval to calculate; the value must be between 0 and 1.
 #' @param    progress  if \code{TRUE} show a progress bar.
+#' @param    cell_id   the name of the \code{data} column containing cell identifiers.
 #' 
 #' @return   A \link{DiversityCurve} object containing slot test with p-values and summary 
 #'             statistics.
@@ -176,10 +180,11 @@ rarefyDiversity <- function(data, group, clone="CLONE", copy=NULL,
 #' 
 #' @export
 testDiversity <- function(data, q, group, clone="CLONE", copy=NULL,
-                          min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95) {
+                          min_n=30, max_n=NULL, nboot=2000, progress=FALSE, ci=0.95,
+                          cell_id="cell_id") {
     .Deprecated("alphaDiversity")
 
-    abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci)
+    abundance_obj <- estimateAbundance(data, group=group, clone=clone, copy=copy, nboot=nboot, min_n=min_n, max_n=max_n, ci=ci, cell_id=cell_id)
     diversity_obj <- alphaDiversity(abundance_obj, min_q=q, max_q=q, step_q=1, ci=ci)
 
     return(diversity_obj)
