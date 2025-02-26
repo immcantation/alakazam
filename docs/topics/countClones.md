@@ -15,6 +15,7 @@ data,
 groups = NULL,
 copy = NULL,
 clone = "clone_id",
+cell_id = "cell_id",
 remove_na = TRUE
 )
 ```
@@ -36,6 +37,10 @@ is determined by the sum of copy numbers within each clonal group.
 
 clone
 :   name of the `data` column containing clone identifiers.
+
+cell_id
+:   name of the `data` column containing cell identifiers. If
+`cell_id` column is not present the function will assume bulk data.
 
 remove_na
 :   removes rows with `NA` values in the clone column if `TRUE` and issues a warning. 

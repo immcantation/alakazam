@@ -20,6 +20,7 @@ max_n = NULL,
 uniform = TRUE,
 ci = 0.95,
 nboot = 200,
+cell_id = "cell_id",
 progress = FALSE
 )
 ```
@@ -63,6 +64,10 @@ ci
 
 nboot
 :   number of bootstrap realizations to generate.
+
+cell_id
+:   name of the `data` column containing cell identifiers. If
+`cell_id=NULL` then the function will assume bulk data.
 
 progress
 :   if `TRUE` show a progress bar.

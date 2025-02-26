@@ -91,9 +91,8 @@ plotAbundanceCurve(abund, legend_title="Sample")
 See also
 -------------------
 
-See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for 
-generating the input abundance distribution.
-Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
+See [AbundanceCurve](AbundanceCurve-class.md) for the input object and [estimateAbundance](estimateAbundance.md) for
+generating the input abundance distribution. Plotting is performed with [ggplot](http://www.rdocumentation.org/packages/ggplot2/topics/ggplot).
 
 
 

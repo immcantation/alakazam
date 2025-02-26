@@ -42,7 +42,7 @@ containing the following columns:
 + `group`:  group identifier.
 + `clone_id` or `CLONE`:  clone identifier. 
 + `p`:      relative abundance of the clone.
-+ `lower`:  lower confidence inverval bound.
++ `lower`:  lower confidence interval bound.
 + `upper`:  upper confidence interval bound.
 + `rank`:   the rank of the clone abundance.
 

@@ -18,6 +18,7 @@ copy = NULL,
 clone = NULL,
 fill = FALSE,
 mode = c("gene", "allele", "family", "asis"),
+cell_id = "cell_id",
 remove_na = TRUE
 )
 ```
@@ -51,7 +52,7 @@ ambiguous alleles within a clone will not be accurately represented.
 
 fill
 :   logical of `c(TRUE, FALSE)` specifying when if groups (when specified)
-lacking a particular gene should be counted as 0 if TRUE or not (omitted)
+lacking a particular gene should be counted as 0 if TRUE or not (omitted).
 
 mode
 :   one of `c("gene", "family", "allele", "asis")` defining
@@ -60,6 +61,9 @@ to return counts for genes (calling `getGene`),
 families (calling `getFamily`), alleles (calling 
 `getAllele`) or using the value as it is in the column
 `gene`, without any processing.
+
+cell_id
+:   name of the `data` column containing the cell identifiers for each sequence.
 
 remove_na
 :   removes rows with `NA` values in the gene column if `TRUE` and issues a warning. 

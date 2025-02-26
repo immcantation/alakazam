@@ -24,6 +24,7 @@ max_n = NULL,
 ci = 0.95,
 nboot = 2000,
 uniform = TRUE,
+cell_id = "cell_id",
 progress = FALSE
 )
 ```
@@ -74,6 +75,9 @@ uniform
 :   if `TRUE` then uniformly resample each group to the same 
 number of observations. If `FALSE` then allow each group to
 be resampled to its original size or, if specified, `max_size`.
+
+cell_id
+:   name of the `data` column containing cell identifiers.
 
 progress
 :   if `TRUE` show a progress bar.

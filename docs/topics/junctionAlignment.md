@@ -124,6 +124,7 @@ CACGGCCGTGTATTACTGTGCGAGAGA",
 )
 
 db <- junctionAlignment(SingleDb, germline_db)
+
 ```
 
 

@@ -20,10 +20,13 @@ data,
 v_call = "v_call",
 j_call = "j_call",
 junc_len = NULL,
+sequence_alignment = NULL,
 cell_id = NULL,
+split_light = FALSE,
 locus = "locus",
 only_heavy = TRUE,
-first = FALSE
+first = FALSE,
+ninformative = 250
 )
 ```
 
@@ -47,12 +50,19 @@ If `NULL` then 1-stage partitioning is perform
 considering only the V and J genes is performed. 
 See Details for further clarification.
 
+sequence_alignment
+:   name of the column containing the sequence alignment.
+
 cell_id
 :   name of the column containing cell identifiers or barcodes. 
 If specified, grouping will be performed in single-cell mode
 with the behavior governed by the `locus` and 
 `only_heavy` arguments. If set to `NULL` then the 
 bulk sequencing data is assumed.
+
+split_light
+:   A deprecated parameter. This would split clones by the light chain.
+For similar function use dowser::resolveLightChains
 
 locus
 :   name of the column containing locus information. 
@@ -69,6 +79,10 @@ first
 is used. if `FALSE` the union of ambiguous gene 
 assignments is used to group all sequences with any 
 overlapping gene calls.
+
+ninformative
+:   The number of informative sites in a given alignment 
+required proper grouping.
 
 
 

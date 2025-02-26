@@ -94,6 +94,7 @@ Ig and TCR sequence annotation
 + [getAllele](getSegment.md):            Get V(D)J allele names.
 + [getGene](getSegment.md):              Get V(D)J gene names.
 + [getFamily](getSegment.md):            Get V(D)J family names.
++ [junctionAlignment](junctionAlignment.md): Junction alignment properties 
 
 
 
@@ -144,6 +145,41 @@ Bioinformatics. 2015 Oct 15;31(20):3356-8.
 
 
 
+
+See also
+-------------------
+
+Useful links:
+
++  [https://alakazam.readthedocs.io/](https://alakazam.readthedocs.io/)
++  Report bugs at [https://github.com/immcantation/alakazam/issues](https://github.com/immcantation/alakazam/issues)
+
+
+
+
+
+Author
+-------------------
+
+**Maintainer**: Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
+
+Authors:
+
++  Namita Gupta [namita.gupta@yale.edu](namita.gupta@yale.edu)
++  Nima Nouri [nima.nouri@yale.edu](nima.nouri@yale.edu)
++  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
++  Julian Zhou [julian.zhou@bulldogs.yale.edu](julian.zhou@bulldogs.yale.edu)
++  Kenneth Hoehn [kenneth.hoehn@yale.edu](kenneth.hoehn@yale.edu)
++  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
++  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
+
+
+Other contributors:
+
++  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
++  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
++  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu) [contributor]
++  Gisela Gabernet [gisela.gabernet@yale.edu](gisela.gabernet@yale.edu) [contributor]
 
 
 

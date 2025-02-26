@@ -32,7 +32,7 @@
 #' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning. 
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts 
 #'                        and relative abundances.
-#' @param   cell_id  name of hte \code{data} column containing the cell identifiers for each sequence.
+#' @param   cell_id  name of the \code{data} column containing the cell identifiers for each sequence.
 #' 
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies 
 #'           with columns:

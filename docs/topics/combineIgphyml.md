@@ -40,7 +40,7 @@ Only parameters shared among all objects will be returned.
 Details
 -------------------
 
-`combineIgphyml` combines repertoire-wide parameter estimates from mutliple igphyml
+`combineIgphyml` combines repertoire-wide parameter estimates from multiple igphyml
 objects produced by readIgphyml into a dataframe that can be easily used for plotting and 
 other hypothesis testing analyses.
 

@@ -21,7 +21,8 @@ min_n = 30,
 max_n = NULL,
 nboot = 2000,
 progress = FALSE,
-ci = 0.95
+ci = 0.95,
+cell_id = "cell_id"
 )
 ```
 
@@ -63,6 +64,9 @@ progress
 
 ci
 :   confidence interval to calculate; the value must be between 0 and 1.
+
+cell_id
+:   the name of the `data` column containing cell identifiers.
 
 
 
