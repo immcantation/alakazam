@@ -13,7 +13,7 @@ $(document).ready(function () {
     }
 
     // Load this package announcements and insert into a new div
-    loadAnnouncements("announcements.html", "#_1");
+    loadAnnouncements("https://raw.githubusercontent.com/immcantation/alakazam/refs/heads/master/announcements.html", "#_1");
 
     // Load Immcantation announcements and insert into a new div
     loadAnnouncements("https://raw.githubusercontent.com/immcantation/immcantation/refs/heads/master/announcements.html", "#_1");
