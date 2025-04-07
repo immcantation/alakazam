@@ -25,8 +25,7 @@ cell_id = NULL,
 split_light = FALSE,
 locus = "locus",
 only_heavy = TRUE,
-first = FALSE,
-ninformative = 250
+first = FALSE
 )
 ```
 
@@ -80,9 +79,6 @@ is used. if `FALSE` the union of ambiguous gene
 assignments is used to group all sequences with any 
 overlapping gene calls.
 
-ninformative
-:   The number of informative sites in a given alignment 
-required proper grouping.
 
 
 

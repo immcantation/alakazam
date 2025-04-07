@@ -638,8 +638,6 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #'                         is used. if \code{FALSE} the union of ambiguous gene 
 #'                         assignments is used to group all sequences with any 
 #'                         overlapping gene calls.
-#' @param   ninformative   The number of informative sites in a given alignment 
-#'                         required proper grouping.
 #'
 #' @return   Returns a modified data.frame with disjoint union indices 
 #'           in a new \code{vj_group} column. 
@@ -710,7 +708,7 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #' @export
 groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                        sequence_alignment=NULL,cell_id=NULL, split_light = FALSE,
-                       locus="locus", only_heavy=TRUE, first=FALSE, ninformative = 250) {
+                       locus="locus", only_heavy=TRUE, first=FALSE) {
     
     # CGJ 6/24/24 -- onlyHeavy warning
     # Deprecation/Removal of only_heavy = FALSE
@@ -748,36 +746,6 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     check <- checkColumns(data, c(v_call, j_call, junc_len, sequence_alignment, locus))
     if (check!=TRUE) { stop(paste("A column or some combination of columns v_call, j_call,",
                                   "junc_len, sequence_alignment, and locus were not found in the data")) }
-    
-    # check for ambiguous sequences that could cause clonal group clumping
-    # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
-    if (!is.null(sequence_alignment)) {
-        ambiguous_count <- 0
-        for(i in nrow(data)){
-            n_informative <- lengths(regmatches(data[[sequence_alignment]][i],
-                                                gregexpr("[ACTG]", data[[sequence_alignment]][i])))
-            
-            if(n_informative < ninformative){
-                ambiguous_count <- ambiguous_count + 1
-            }
-        }
-        if(ambiguous_count > 0){
-            warning(ambiguous_count, " ambiguous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
-        }
-    }
-    
-    # check for ambiguous sequences that could cause clonal group clumping
-    # CGJ 6/29/23 -- also added the requirement of sequence_alignment in function
-    if (!is.null(sequence_alignment)) {
-        for(i in nrow(data)){
-            n_informative <- lengths(regmatches(data[[sequence_alignment]][i], 
-                                                gregexpr("[ACTG]", data[[sequence_alignment]][i])))
-            if(n_informative < 250){
-                warning("Ambigous sequence alignments have been found. Please consider removing the sequences with less than 250 informative sites")
-            }
-        }        
-    }
-    
     # CGJ 4/12/24
     # check for factors here rather than after the indexing/one-to-one annotation check
     # NULL will disappear when doing c()
