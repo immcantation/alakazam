@@ -1,0 +1,48 @@
+{
+    "name": "Testing Container",
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "ms-vscode.cpptools",
+                "ms-azuretools.vscode-docker",
+                "sanjulaganepola.github-local-actions",
+                "reditorsupport.r"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "editor.formatOnSave": true, // Enable format on save
+                "files.exclude": { // Hide unnecessary files
+                    "**/.DS_Store": true,
+                    "**/__pycache__": true
+                },
+                "editor.tabSize": 4 // Set tab size to 4 spaces
+            }
+        }
+    },
+    "containerEnv": {
+        "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+    },
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "REMOTE_USER": "${localEnv:USER}",
+            "REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
+            "REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
+        },
+        "options": [
+            "--no-cache"
+        ]
+    },
+    "runArgs": [
+        "--privileged",
+        "--name",
+        "alakazam_devcontainer"
+    ],
+    "remoteUser": "${localEnv:USER}",
+    "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/test/postCreateCommand.sh && sudo bash -c 'dockerd &' &>/dev/null"
+}
