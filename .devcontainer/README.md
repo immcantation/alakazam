@@ -11,6 +11,7 @@ This project includes **two `.devcontainer` configurations** to set up consisten
 1. Install [Docker](https://docs.docker.com/get-docker/).
 2. Install [Visual Studio Code](https://code.visualstudio.com/).
 3. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for VS Code.
+4. Set the environment variable GITHUB_TOKEN, with a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). 
 
 ## Steps to Use the Dev Container
 
