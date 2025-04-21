@@ -72,7 +72,7 @@ install.packages("BiocManager")
 BiocManager::install("alakazam")
 ```
 
-If you still encouner issues with missing dependencies, you can use the (Posit Public Package Manager)[https://packagemanager.posit.co/client/#/] to identify and install them manually. 
+If you still encouner issues with missing dependencies, you can use the [Posit Public Package Manager](https://packagemanager.posit.co/client/#/) to identify and install them manually. 
 
 
 If problems persist while installing alakazam, feel free to contact us [here](https://immcantation.readthedocs.io/en/stable/about.html) for support.
