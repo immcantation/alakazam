@@ -64,3 +64,15 @@ document()
 build()
 install()
 ```
+
+Some users might experience issues with alakazam if certain dependencies are not installed correctly. One straightforward way to ensure all required packages are available is to install install alakazam via Bioconductor:
+
+```{r}
+install.packages("BiocManager")
+BiocManager::install("alakazam")
+```
+
+If you still encouner issues with missing dependencies, you can use the (Posit Public Package Manager)[https://packagemanager.posit.co/client/#/] to identify and install them manually. 
+
+
+If problems persist while installing alakazam, feel free to contact us [here](https://immcantation.readthedocs.io/en/stable/about.html) for support.
