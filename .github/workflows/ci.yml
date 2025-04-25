@@ -10,6 +10,8 @@ jobs:
 
   unittest:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     container:
       image: immcantation/test:devel
     steps:
@@ -17,7 +19,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Document
         run: |
-          install.packages('lifecycle')
           devtools::document()
         shell: Rscript {0}
       - name: Update buildignore
