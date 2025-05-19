@@ -629,7 +629,8 @@ singleCellValidation <- function(data, locus="locus", cell_id="cell_id"){
 #' @param    locus         name of the column containing locus information. 
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
-#' @param    only_heavy    use only the IGH (BCR) or TRB/TRD (TCR) sequences 
+#' @param    only_heavy    This is deprecated. Only heavy chains will be used in clustering.
+#'                         Use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 #'                         for grouping. Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
 #' @param    split_light   A deprecated parameter. This would split clones by the light chain.
