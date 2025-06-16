@@ -43,3 +43,5 @@ Contact
 
 For help and questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
 or use the [issue tracker](https://github.com/immcantation/alakazam/issues).
+
+To receive alerts about Immcantation releases, news, events, and tutorials, join the [Immcantation News](https://groups.google.com/g/immcantation-news) Google Group. [Membership settings](https://groups.google.com/g/immcantation-news/membership) can be adjusted to change the frequency of email updates.
