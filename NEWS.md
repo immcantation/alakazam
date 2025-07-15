@@ -4,6 +4,9 @@ Version 1.3.1: August 1, 2024
 Documentation:
 
 + This is a documentation-only update to address changes in Read the Docs.
++ groupGenes has deprecated `only_heavy` and `split_light`. 
++ groupGenes now only clusters on heavy chains
++ If you want to split clones further by light chain information use dowser::resolveLightChains
 
 Version 1.3.0: September 29, 2023
 -------------------------------------------------------------------------------

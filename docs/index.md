@@ -28,8 +28,11 @@ Alakazam serves five main purposes:
 Contact
 -------------------------------------------------------------------------------
 
-For help and questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com)
-or use the [issue tracker](https://github.com/immcantation/alakazam/issues).
+If you need help or have any questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com).
+
+If you have discovered a bug or have a feature request, you can open an issue using the [issue tracker](https://github.com/immcantation/alakazam/issues).
+
+To receive alerts about Immcantation releases, news, events, and tutorials, join the [Immcantation News](https://groups.google.com/g/immcantation-news) Google Group. [Membership settings](https://groups.google.com/g/immcantation-news/membership) can be adjusted to change the frequency of email updates.
 
 
 ## Dependencies
@@ -46,10 +49,10 @@ or use the [issue tracker](https://github.com/immcantation/alakazam/issues).
 [Nima Nouri](mailto:nima.nouri@yale.edu) (aut)  
 [Ruoyi Jiang](mailto:ruoyi.jiang@yale.edu) (aut)  
 [Julian Zhou](mailto:julian.zhou@bulldogs.yale.edu) (aut)  
-[Kenneth Hoehn](mailto:kenneth.hoehn@yale.edu) (aut)  
+[Kenneth Hoehn](mailto:kenneth.b.hoehn@dartmouth.edu) (aut)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (ctb)  
 [Edel Aron](mailto:edel.aron@yale.edu) (ctb)  
-[Cole Jensen](mailto:cole.jensen@yale.edu) (ctb)  
+[Cole Jensen](mailto:cole.jensen@yale.edu) (aut)  
 [Gisela Gabernet](mailto:gisela.gabernet@yale.edu) (ctb)  
 [Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)

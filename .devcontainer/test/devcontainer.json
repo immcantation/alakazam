@@ -44,5 +44,6 @@
         "alakazam_devcontainer"
     ],
     "remoteUser": "${localEnv:USER}",
-    "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/test/postCreateCommand.sh && sudo bash -c 'dockerd &' &>/dev/null"
+    "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/test/postCreateCommand.sh",
+    "postStartCommand": "sudo bash -c 'dockerd &' &>/dev/null"
 }
