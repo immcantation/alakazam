@@ -16,3 +16,8 @@ Rscript -e 'install.packages(c("languageserver", "versions"))'
 if [ -f "tests/setup/install_dep.R" ]; then
     Rscript tests/setup/install_dep.R
 fi
+
+echo -e "\n\033[1;32m============================================================"
+echo -e " IMPORTANT: To install this R package, run in R console:"
+echo -e "   devtools::install('.')"
+echo -e "============================================================\033[0m\n"
