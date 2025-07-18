@@ -571,7 +571,7 @@ phylipToGraph <- function(edges, clone) {
 #'                                      slot of the input \code{clone} for observed sequences. 
 #'                                      The germline (root) vertex is assigned the name 
 #'                                      "Germline" and inferred intermediates are assigned
-#'                                      names with the format {"Inferred1", "Inferred2", ...}.
+#'                                      names with the format \{"Inferred1", "Inferred2", ...\}.
 #'             \item  \code{sequence}:  value in the \code{sequence} column of the \code{data} 
 #'                                      slot of the input \code{clone} for observed sequences.
 #'                                      The germline (root) vertex is assigned the sequence
