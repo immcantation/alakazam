@@ -74,10 +74,10 @@
 #'                     mode="allele", fill=TRUE)
 #'
 #'@export
-countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE, first=TRUE,
+countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALSE,
                        mode=c("gene", "allele", "family", "asis"), cell_id="cell_id", remove_na=TRUE) {
     # TODO: expose getSegment params here
-    # TODO: add and document collapse=TRUE
+    # TODO: add and document first=TRUE and collapse=TRUE
     # TODO: get frequency within each of the locus (IGH, IGK, IGL, TRB, TRA, TRD, TRG), get first three letters from the gene call.
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
