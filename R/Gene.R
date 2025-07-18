@@ -143,7 +143,7 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
                 dplyr::group_by(!!!rlang::syms(c(groups))) %>%
                 dplyr::summarize(cell_count=n()) %>%
                 dplyr::ungroup() %>%
-                dplyr::select(!!!rlang::syms(c(groups)), cell_count)
+                dplyr::select(!!!rlang::syms(c(groups, "cell_count")))
             gene_tab_count <- data %>% 
                 dplyr::select(!!!rlang::syms(c(groups, gene, cell_id))) %>%
                 dplyr::distinct() %>%
@@ -152,12 +152,12 @@ countGenes <- function(data, gene, groups=NULL, copy=NULL, clone=NULL, fill=FALS
             if (nrow(cell_num) > 1){
                 gene_tab <- gene_tab_count %>%
                     dplyr::left_join(cell_num, by=groups) %>%
-                    dplyr::mutate(seq_freq=seq_count/cell_count) %>%
-                    dplyr::arrange(desc(seq_count))
+                    dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/!!rlang::sym("cell_count")) %>%
+                    dplyr::arrange(desc(!!rlang::sym("seq_count")))
             } else {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::mutate(seq_freq=seq_count/cell_num$cell_count) %>%
-                    dplyr::arrange(desc(seq_count))
+                    dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/cell_num[["cell_count"]]) %>%
+                    dplyr::arrange(desc(!!rlang::sym("seq_count")))
             }
             
         } else {
