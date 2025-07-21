@@ -56,7 +56,6 @@ Imports:
     graphics,
     grid,
     igraph (>= 1.5.0),
-    lifecycle,
     Matrix (>= 1.3-0),
     methods,
     progress,
