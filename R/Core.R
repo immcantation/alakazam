@@ -340,7 +340,7 @@ baseTheme <- function(sizing=c("figure", "window")) {
 #' @param   ncol   number of columns in the plot.
 #' @return  NULL
 #' 
-#' @seealso \link{ggplot}.
+#' @seealso \link[ggplot2]{ggplot}.
 #' 
 #' @references
 #' Modified from:

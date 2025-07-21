@@ -1137,7 +1137,7 @@ betaDiversity <- function(data, comparisons, min_q=0, max_q=4, step_q=0.1, ci=0.
 #' 
 #' @seealso  
 #' See \link{AbundanceCurve} for the input object and \link{estimateAbundance} for
-#' generating the input abundance distribution. Plotting is performed with \link{ggplot}.
+#' generating the input abundance distribution. Plotting is performed with \link[ggplot2]{ggplot}.
 #'           
 #' @examples
 #' # Estimate abundance by sample and plot
@@ -1273,7 +1273,7 @@ plotAbundanceCurve <- function(data, colors=NULL, main_title="Rank Abundance",
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  See \link{alphaDiversity} and \link{alphaDiversity} for generating 
-#'           \link{DiversityCurve} objects for input. Plotting is performed with \link{ggplot}.
+#'           \link{DiversityCurve} objects for input. Plotting is performed with \link[ggplot2]{ggplot}.
 #' 
 #' @examples
 #' # Calculate diversity
@@ -1415,7 +1415,7 @@ plotDiversityCurve <- function(data, colors=NULL, main_title="Diversity",
 #' @return   A \code{ggplot} object defining the plot.
 #' 
 #' @seealso  See \link{alphaDiversity} for generating input.
-#'           Plotting is performed with \link{ggplot}.
+#'           Plotting is performed with \link[ggplot2]{ggplot}.
 #' 
 #' @examples
 #' # Calculate diversity
