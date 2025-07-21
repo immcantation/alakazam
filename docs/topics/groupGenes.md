@@ -69,7 +69,8 @@ Only applicable to single-cell data.
 Ignored if `cell_id=NULL`.
 
 only_heavy
-:   use only the IGH (BCR) or TRB/TRD (TCR) sequences 
+:   This is deprecated. Only heavy chains will be used in clustering.
+Use only the IGH (BCR) or TRB/TRD (TCR) sequences 
 for grouping. Only applicable to single-cell data.
 Ignored if `cell_id=NULL`.
 
@@ -78,7 +79,6 @@ first
 is used. if `FALSE` the union of ambiguous gene 
 assignments is used to group all sequences with any 
 overlapping gene calls.
-
 
 
 
