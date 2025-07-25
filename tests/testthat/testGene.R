@@ -136,6 +136,19 @@ test_that("countGenes", {
                  c(1, 2),
                  tolerance=0.001)
     
+    # testing addition of collapse and first flags
+    
+    genes <- countGenes(db, gene="J_CALL", mode="allele", first = F)
+    expect_equal(genes$seq_freq, 
+                 c(0.283, 0.213, 0.183, 0.133, 0.123, 0.0233, 0.020, 0.010, 0.010),
+                 tolerance=0.001)
+    
+    genes <- countGenes(db, gene="V_CALL", mode="gene", first = F, collapse = F)
+    expect_equal(genes$seq_freq, 
+                 c(0.31, 0.233, 0.17, 0.11, 0.0867, 0.0333, 0.0167, 0.0133, 0.00667,
+                   0.00667, 0.00667, 0.0033, 0.0033),
+                 tolerance=0.001)
+    
 })
 
 test_that("countGenes works for single-cell", {
