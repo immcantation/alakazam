@@ -724,7 +724,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
       only_heavy <- TRUE
     }
     if(split_light){
-      warning(paste('split_light = TRUE is deprecated. Please use split_light = FALSE.',
+      warning(paste('split_light = TRUE is deprecated. Running as if split_light = FALSE',
                     'After clonal identification, light chain groups can be found with dowser::resolveLightChains'))
       split_light <- FALSE
     }
