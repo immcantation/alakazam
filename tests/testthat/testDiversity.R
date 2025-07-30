@@ -157,6 +157,7 @@ test_that("estimateAbundance-current", {
 
 	
 #### alphaDiversity ####
+#change
 
 test_that("alphaDiversity", {
     # Test diversity
@@ -841,4 +842,52 @@ test_that("testDiversity reproduces v0.2.11 results", {
     expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
     expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
-
+# Use the dataset "data_mixed.rds" to test function estimateAbundance() for single cell, bulk and mixed data 
+data_mixed <- readRDS(file.path("..", "data-tests", "data_mixed.rds"))
+test_that("estimateAbundance-mixed", {
+	set.seed(90)
+	abund <- estimateAbundance(data_mixed, ci=0.95, nboot=100, clone="clone_id")
+	expect_equal(abund@abundance$p[1:5], 
+	             c(0.00577, 0.00279, 0.00147, 0.00147, 0.00146),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
+	             c(0.001340229, 0, 0, 0, 0, 0),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[45:50],
+	             c(0.00096, 0.00088, 0.00098, 0.00098, 0.00102, 0.00098),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203), check.attributes = FALSE)
+	
+})
+data_sc <- data_mixed %>% dplyr::filter(datatype == "singleCell")
+data_bulk <- data_mixed %>% dplyr::filter(datatype == "bulk")
+test_that("estimateAbundance-sc", {
+	set.seed(90)
+	abund <- estimateAbundance(data_sc, ci=0.95, nboot=100, clone="clone_id")
+	expect_equal(abund@abundance$p[1:5], 
+	             c(0.00284, 0.00276, 0.00244, 0.00232, 0.00018),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
+	             c(0, 0, 0, 0, 0, 0),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[45:50],
+	             c(0.00105, 0.001208, 0.00105, 0.00105, 0.00105, 0.00105),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203), check.attributes = FALSE)
+	
+})
+test_that("estimateAbundance-bulk", {
+	set.seed(90)
+	abund <- estimateAbundance(data_bulk, ci=0.95, nboot=100, clone="clone_id")
+	expect_equal(abund@abundance$p[1:5], 
+	             c(0.00984, 0.00274, 0.00270, 0.00270, 0.00270),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3,8:10)],
+	             c(0.00086, 0, 0, 0, 0, 0),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[45:50],
+	             c(0.00192, 0.00181, 0.00192, 0.00201, 0.00181, 0.00181),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[200:203], c(200, 201, 202, 203), check.attributes = FALSE)
+	
+})
