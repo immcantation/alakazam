@@ -157,6 +157,7 @@ test_that("estimateAbundance-current", {
 
 	
 #### alphaDiversity ####
+#change
 
 test_that("alphaDiversity", {
     # Test diversity
@@ -841,4 +842,129 @@ test_that("testDiversity reproduces v0.2.11 results", {
     expect_equal(div@tests$pvalue, 0.88, tolerance=0.05)
     expect_equal(div@diversity$d, c(78.63, 79.80), tolerance=0.05)
 })
+
+
+test_that("estimateAbundance-mixed", {
+	set.seed(90)
+	abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	expect_equal(abund@abundance$p[1:5], 
+	             c(0.69500, 0.11750, 0.10375, 0.04375, 0.04000),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3)],
+	             c(0.4671344, 0, 0),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[2:5],
+	             c(0.2735016, 0.2399798, 0.1503706, 0.1329823),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[1:5], c(1,  2,  3,  4,  5), check.attributes = FALSE)
+	
+})
+
+test_that("estimateAbundance-sc", {
+
+	set.seed(90)
+	abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	expect_equal(abund@abundance$p[1:5], 
+	             c(0.68000000, 0.11933333, 0.11000000, 0.04733333, 0.04333333),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3)],
+	             c(0.430833, 0.0000000, 0.0000000),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[2:5],
+	             c(0.2836650, 0.2613061, 0.1607507, 0.1439901),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[1:5], c(1,  2,  3,  4,  5), check.attributes = FALSE)
+	
+})
+test_that("estimateAbundance-bulk", {
+	set.seed(90)
+	abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	expect_equal(abund@abundance$p[1:4], 
+	             c(0.67357143, 0.14035714, 0.11250000, 0.07357143),
+	             tolerance=0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$lower[c(1:3)],
+	             c(0.501816121, 0.012458845, 0.005633074),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$upper[2:4],
+	             c( 0.2682554, 0.2193669, 0.1607731),
+	             tolerance = 0.001, check.attributes = FALSE)
+	expect_equal(abund@abundance$rank[1:4], c(1,  2,  3,  4), check.attributes = FALSE)
+	
+})
+
+test_that("alphaDiversity-mixed", {
+    # Test diversity
+    set.seed(5)
+	abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	div <- alphaDiversity(abund, step_q=1, max_q=10)
+	obs <- data.frame(div@diversity[c(1,3,9), ])
+	exp <- data.frame("group" = c("All", "All", "All"),
+                      "q" = c(0, 2, 8),
+        	          "d" = c(3.570000, 1.943491, 1.567165),
+	                  "d_sd" = c(0.7946157, 0.5334659, 0.3656269),
+        	          "d_lower" = c(2.0125818, 0.8979167, 0.8505499),
+        	          "d_upper" = c(5.127418, 2.989065, 2.283781),
+        	          "e" = c(1.0000000, 0.5443952, 0.4389819),
+        	          "e_lower" = c(0.5637484, 0.2515173, 0.2382493),
+        	          "e_upper" = c(1.4362516, 0.8372730, 0.6397146),
+        	          stringsAsFactors = F)
+	
+	expect_equal(colnames(obs), colnames(exp))
+	expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
+
+	# Test diversity p-values
+	# Verify two-steps == one-step
+    # Not performed above tested since there all the sample belong to the same group in the testing mixed data
+})
+
+test_that("alphaDiversity-sc", {
+    # Test diversity
+    set.seed(5)
+	abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	div <- alphaDiversity(abund, step_q=1, max_q=10)
+	obs <- data.frame(div@diversity[c(1,3,9), ])
+	exp <- data.frame("group" = c("All", "All", "All"),
+                      "q" = c(0, 2, 8),
+        	          "d" = c(3.580000, 2.022895, 1.629327),
+	                  "d_sd" = c(0.7936618, 0.5732313, 0.4164018),
+        	          "d_lower" = c(2.0244515, 0.8993822, 0.8131947),
+        	          "d_upper" = c(5.135548, 3.146408, 2.445460),
+        	          "e" = c(1.0000000, 0.5650544, 0.4551193),
+        	          "e_lower" = c(0.5654893, 0.2512241, 0.2271494),
+        	          "e_upper" = c(1.4345107, 0.8788848, 0.6830893),
+        	          stringsAsFactors = F)
+	
+	expect_equal(colnames(obs), colnames(exp))
+	expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
+
+	# Test diversity p-values
+	# Verify two-steps == one-step
+    # Not performed above tested since there all the sample belong to the same group in the testing mixed data
+})
+
+test_that("alphaDiversity-bulk", {
+    # Test diversity
+    set.seed(5)
+	abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	div <- alphaDiversity(abund, step_q=1, max_q=10)
+	obs <- data.frame(div@diversity[c(1,3,9), ])
+	exp <- data.frame("group" = c("All", "All", "All"),
+                      "q" = c(0, 2, 8),
+        	          "d" = c(3.860000, 1.976337, 1.568243),
+	                  "d_sd" = c(0.3487351, 0.3777932, 0.2492464),
+        	          "d_lower" = c(3.176492, 1.235876, 1.079729),
+        	          "d_upper" = c(4.543508, 2.716798, 2.056757),
+        	          "e" = c(1.0000000, 0.5120044, 0.4062806),
+        	          "e_lower" = c(0.8229253, 0.3201751, 0.2797226),
+        	          "e_upper" = c(1.1770747, 0.7038337, 0.5328386),
+        	          stringsAsFactors = F)
+	
+	expect_equal(colnames(obs), colnames(exp))
+	expect_equal(obs, exp, tolerance=0.001, check.attributes=F)
+
+	# Test diversity p-values
+	# Verify two-steps == one-step
+    # Not performed above tested since there all the sample belong to the same group in the testing mixed data
+})
+
 
