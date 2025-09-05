@@ -192,10 +192,10 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
             data$locus <- substr(data[[gene]], 1, 3)
             locus_tab <- data %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
-                dplyr::summarize(locus_count = n())
+                dplyr::summarize(locus_count = n(), .groups = "drop")
             gene_tab_count <- data %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
-                dplyr::summarize(seq_count = n())
+                dplyr::summarize(seq_count = n(), .groups = "drop")
             if (nrow(locus_tab > 1)) {
                 gene_tab <- gene_tab_count %>%
                     dplyr::left_join(locus_tab, by = c(groups, "locus")) %>%
@@ -219,10 +219,10 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                 dplyr::ungroup()
             locus_tab <- clone_gene_tab %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
-                dplyr::summarize(locus_clone_count = n())
+                dplyr::summarize(locus_clone_count = n(), .groups = "drop")
             gene_tab_count <- clone_gene_tab %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
-                dplyr::summarize(clone_count = n())
+                dplyr::summarize(clone_count = n(), .groups = "drop")
             if (nrow(locus_tab > 1)) {
                 gene_tab <- gene_tab_count %>%
                     dplyr::left_join(locus_tab, by = c(groups, "locus")) %>%
@@ -247,13 +247,13 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
                 dplyr::summarize(
                     locus_count = length(!!rlang::sym(gene)),
-                    locus_copy_count = sum(!!rlang::sym(copy), na.rm = TRUE)
+                    locus_copy_count = sum(!!rlang::sym(copy), na.rm = TRUE), .groups = "drop"
                 )
             gene_tab_count <- data %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
                 dplyr::summarize(
                     seq_count = length(!!rlang::sym(gene)),
-                    copy_count = sum(!!rlang::sym(copy), na.rm = TRUE)
+                    copy_count = sum(!!rlang::sym(copy), na.rm = TRUE), .groups = "drop"
                 )
             if (nrow(locus_tab > 1)) {
                 gene_tab <- gene_tab_count %>%
