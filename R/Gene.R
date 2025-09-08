@@ -1184,16 +1184,20 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 # 5         S1            IGHV1-2*01 IGHJ1*01 TGTAAACCCTGG   IGH    <NA>              12     <NA>
                 # 6         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK       1              12       G2
                 # 7         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK    <NA>              12     <NA>
-                if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0) {
+                # account for the NA cell_ids length being longer than 1
+                for(i in 1:length(i_orig_h)){
+                  i_orig_h_temp <- i_orig_h[i]
+                  if (!is.na(data_orig[[cell_id]][i_orig_h_temp]) & length(i_orig_l) != 0) {
                     # sanity check
-                    stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
-                } else{
+                    stopifnot( all( data_orig[[cell_id]][c(i_orig_h_temp, i_orig_l)] == cell_id_uniq[i_cell] ) )
+                  } else{
                     # just the heavy chain
-                    if (is.na(data_orig[[cell_id]][i_orig_h])) {
-                        stopifnot(is.na(cell_id_uniq[i_cell]))
+                    if (is.na(data_orig[[cell_id]][i_orig_h_temp])) {
+                      stopifnot(is.na(cell_id_uniq[i_cell]))
                     }else{
-                        stopifnot(data_orig[[cell_id]][i_orig_h] == cell_id_uniq[i_cell])
+                      stopifnot(data_orig[[cell_id]][i_orig_h_temp] == cell_id_uniq[i_cell])
                     }
+                  }
                 }
                 # grouping
                 data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
