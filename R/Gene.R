@@ -1162,7 +1162,28 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 }
                 
                 # sanity check 
-                # both chains are present in the cell 
+                # both chains are present in the cell
+                # ssnn: TODO BUG This sanity check doesn't work for mixed data
+                # Error in if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) !=  : 
+                #              the condition has length > 1
+                # Debug shows: 
+                # !is.na(data_orig[[cell_id]][i_orig_h])
+                # [1] FALSE FALSE
+                # Browse[1]> data
+                #   cell_id                           v_call            j_call vj_group
+                # 1       1                       IGHV1-1*01          IGHJ2*01       G2
+                # 2       2                       IGHV1-1*01          IGHJ1*01       G1
+                # 3       3                       IGHV1-2*01          IGHJ1*01       G1
+                # 4    <NA> IGHV1-1*01,IGHV1-2*01;IGHV1-2*01 IGHJ1*01;IGHJ1*01       G1
+                # Browse[1]> data_orig
+                #   subject_id                v_call   j_call     junction locus cell_id junction_length vj_group
+                # 1         S1            IGHV1-1*01 IGHJ2*01 TGTAAAAAATGG   IGH       1              12       G2
+                # 2         S1            IGHV1-1*01 IGHJ1*01 TGTAAAAAATGG   IGH       2              12       G1
+                # 3         S1            IGHV1-2*01 IGHJ1*01 TGTAAAACCTGG   IGH       3              12       G1
+                # 4         S1 IGHV1-1*01,IGHV1-2*01 IGHJ1*01 TGTAAACCCTGG   IGH    <NA>              12     <NA>
+                # 5         S1            IGHV1-2*01 IGHJ1*01 TGTAAACCCTGG   IGH    <NA>              12     <NA>
+                # 6         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK       1              12       G2
+                # 7         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK    <NA>              12     <NA>
                 if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0) {
                     # sanity check
                     stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
