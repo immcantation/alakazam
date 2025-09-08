@@ -775,9 +775,9 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
     # Initialize mixed
     mixed <- FALSE
     single_cell <- FALSE
-    if (!is.null(cell_id) & !is.null(locus)){
+    if (!is.null(cell_id) & !is.null(locus)) {
         # single cell fields exist
-        if(sum(is.na(data[[cell_id]])) == 0) {
+        if (sum(is.na(data[[cell_id]])) == 0) {
             # all rows have cell_id data
             single_cell <- TRUE
             
@@ -790,7 +790,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
             }
-        } else if(any(!is.na(data[[cell_id]]))){
+        } else if (any(!is.na(data[[cell_id]]))) {
             # some rows have cell_id data, and some NA
             single_cell <- TRUE
             mixed <- TRUE
@@ -823,7 +823,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         # - index wrt data of heavy chain
         # - index wrt data of light chain(s)
         cell_id_uniq <- unique(data[[cell_id]])
-        if(mixed){
+        if (mixed) {
             cell_seq_idx <- sapply(cell_id_uniq, function(x){
                 if(is.na(x)){
                     # heavy chain
@@ -857,7 +857,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         
         # Check for cells with two heavy chains 
         # singleCellValdiation 4/12/24
-        if(!mixed){
+        if (!mixed) {
             data <- singleCellValidation(data, locus = locus, cell_id = cell_id)
         }
         
@@ -1140,7 +1140,7 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
         data_orig$vj_group <- NA
         
         # map back to data_orig
-        if(!mixed){
+        if (!mixed) {
             for (i_cell in 1:nrow(data)) {
                 # wrt data_orig
                 i_orig_h <- cell_seq_idx[[i_cell]][["heavy"]]
@@ -1156,19 +1156,19 @@ groupGenes <- function(data, v_call="v_call", j_call="j_call", junc_len=NULL,
                 i_orig_l <- cell_seq_idx[[i_cell]][["light"]]
                 
                 # if it's just the light chain give in an NA and skip
-                if(length(i_orig_h) == 0 & length(i_orig_l) == 1){
+                if (length(i_orig_h) == 0 & length(i_orig_l) == 1) {
                     data_orig$vj_group[i_orig_l] <- NA
                     next
                 }
                 
                 # sanity check 
                 # both chains are present in the cell 
-                if(!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0){
+                if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) != 0) {
                     # sanity check
                     stopifnot( all( data_orig[[cell_id]][c(i_orig_h, i_orig_l)] == cell_id_uniq[i_cell] ) )
                 } else{
                     # just the heavy chain
-                    if(is.na(data_orig[[cell_id]][i_orig_h])){
+                    if (is.na(data_orig[[cell_id]][i_orig_h])) {
                         stopifnot(is.na(cell_id_uniq[i_cell]))
                     }else{
                         stopifnot(data_orig[[cell_id]][i_orig_h] == cell_id_uniq[i_cell])
