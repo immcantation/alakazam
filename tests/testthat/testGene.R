@@ -439,7 +439,6 @@ test_that("groupGenes, single-cell mode, heavy only", {
 
 test_that("groupGenes, mixed bulk and single cell", {
 
-    # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
     db <- data.frame(
         subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
         v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
