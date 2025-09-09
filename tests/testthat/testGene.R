@@ -248,12 +248,67 @@ test_that("countGenes", {
         tolerance = 0.001
     )
 
-    genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", copy = "dupcount")
+    genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene")
     expect_equal(genes$seq_freq,
         c(
-            0.4, 0.3, 0.3, 0.3, 0.2, 0.667, 0.2, 0.2, 1, 0.1, 0.333, 0.5, 0.5, 0.333, 0.333, 0.333
+            0.6, 0.6, 0.4, 0.4, 1, 1, 0.667, 1, 0.333
         ),
         tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", copy = "dupcount")
+    expect_equal(genes$copy_freq,
+        c(
+            0.556, 0.364, 0.318, 0.273, 1, 0.667, 0.8, 0.667, 0.167, 0.167, 0.333, 0.111, 0.045, 0.2, 0.167, 0.167
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene", copy = "dupcount")
+    expect_equal(genes$copy_freq,
+        c(
+            0.636, 0.778, 0.364, 1, 1, 0.833, 1, 0.222, 0.167
+        ),
+        tolerance = 0.001
+    )
+
+    # case with all clone IDs provided
+    genes <- countGenes(db_hl %>% dplyr::filter(!is.na(clone)), gene = "v_call", groups = "sample", mode = "gene", clone = "clone")
+    expect_equal(genes$clone_freq,
+        c(
+            0.5, 0.333, 0.333, 0.333, 0.25, 0.25
+        ),
+        tolerance = 0.001
+    )
+
+    # case with some clone IDs provided
+    expect_warning(
+        genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", clone = "clone"),
+        "Found 10 sequences without clonal assignments. These sequences will be removed before counting clone frequencies."
+    )
+    expect_equal(genes$clone_freq,
+        c(
+            0.5, 0.333, 0.333, 0.333, 0.25, 0.25
+        ),
+        tolerance = 0.001
+    )
+
+    expect_warning(
+        genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene", clone = "clone"),
+        "Found 10 sequences without clonal assignments. These sequences will be removed before counting clone frequencies."
+    )
+    expect_equal(genes$clone_freq,
+        c(
+            0.667, 0.5, 0.5, 0.333
+        ),
+        tolerance = 0.001
+    )
+
+    # test if all NA
+    db_hl$clone_na <- rep(NA, nrow(db_hl))
+    expect_error(
+        genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", clone = "clone_na"),
+        "No clone IDs are present in the data."
     )
 })
 

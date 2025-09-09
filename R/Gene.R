@@ -207,11 +207,23 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                     dplyr::arrange(desc(seq_count))
             }
         } else if (!is.null(clone) & is.null(copy)) {
+            # test if no clone IDs are given
+            if (all(is.na(data[[clone]]))) {
+                stop("No clone IDs are present in the data.")
+            } else if (any(is.na(data[[clone]]))) {
+                num_na_clone <- sum(is.na(data[[clone]]))
+                warning(paste0(
+                    "Found ", num_na_clone, " sequences without clonal assignments. ",
+                    "These sequences will be removed before counting clone frequencies."
+                ))
+                data <- data %>%
+                    dplyr::filter(!is.na(!!rlang::sym(clone)))
+            }
             # get locus
             data$locus <- substr(data[[gene]], 1, 3)
             # Find count of genes within each clone and keep first with maximum count
             clone_gene_tab <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", clone, gene))) %>% # will split IGK/IGL with NA
+                dplyr::group_by(!!!rlang::syms(c(groups, "locus", clone, gene))) %>%
                 dplyr::mutate(clone_gene_count = n()) %>%
                 dplyr::ungroup() %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, "locus", clone))) %>%
@@ -230,8 +242,8 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                     dplyr::arrange(desc(clone_count))
             } else {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::mutate(seq_freq = seq_count / locus_tab$locus_count) %>%
-                    dplyr::arrange(desc(seq_count))
+                    dplyr::mutate(clone_freq = clone_count / locus_tab$locus_clone_count) %>%
+                    dplyr::arrange(desc(clone_count))
             }
         } else {
             if (!is.null(clone) & !is.null(copy)) {
@@ -281,6 +293,9 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
             tidyr::complete(!!!rlang::syms(as.list(c(groups, gene))),
                 fill = list(seq_count = 0, seq_freq = 0, copy_count = 0, copy_freq = 0, clone_count = 0, clone_freq = 0)
             )
+        # fill in the loci
+        gene_tab$locus <- substr(gene_tab[[gene]], 1, 3)
+        # TODO: correct locus count, locus copy count, locus clone count if needed?
     }
 
     # Rename gene column
