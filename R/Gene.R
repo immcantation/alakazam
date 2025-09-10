@@ -2,11 +2,11 @@
 
 #### Calculation functions ####
 
-#' Tabulates V(D)J allele, gene or family usage. If sequences from multiple loci are
-#' present, the frequency is calculated within each locus.
+#' Tabulates V(D)J allele, gene or family usage within each locus. 
 #'
 #' Determines the count and relative abundance of V(D)J alleles, genes or families within
-#' groups.
+#' groups. If sequences from multiple loci are present, the frequency is calculated within 
+#' each locus.
 #'
 #' @param    data    data.frame with AIRR-format or Change-O style columns.
 #' @param    gene    column containing allele assignments. Only the first allele in the
