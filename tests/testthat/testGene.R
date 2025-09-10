@@ -140,8 +140,17 @@ test_that("countGenes", {
     )
 
     genes <- countGenes(db_some_na, gene = "v_call", mode = "gene", remove_na = FALSE)
+    # A locus cannot be determined if the gene is NA. When determining the denominator (locus_count), 
+    # these sequences will be considered separately as their own "NA" locus.
+    # Example:
+    #  locus gene    seq_count locus_count seq_freq
+    # <chr> <chr>       <int>       <int>    <dbl>
+    #1 IGH   IGHV1-1         3           8    0.375
+    #2 IGH   IGHV1-2         3           8    0.375
+    #3 IGH   IGHV1-3         2           8    0.25 
+    #4 NA    NA              2           2    1 
     expect_equal(genes$seq_freq,
-        c(0.3, 0.3, 0.2, 0.2),
+        c(0.375, 0.375, 0.25, 1),
         tolerance = 0.001
     )
 
