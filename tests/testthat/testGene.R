@@ -1,261 +1,511 @@
 ExampleDb <- file.path("..", "data-tests", "ExampleDb.gz")
 db <- readChangeoDb(ExampleDb)
-expect_warning(db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv")),
-               "db_test.tsv is not in the Change-O format")
+expect_warning(
+    db_gg <- readChangeoDb(file.path("..", "data-tests", "db_test.tsv")),
+    "db_test.tsv is not in the Change-O format"
+)
 
 ### countGenes ####
 
 test_that("countGenes", {
     # Without copy numbers
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family")
-    expect_equal(genes$seq_freq, 
-                 c(0.76, 0.87, 0.24, 0.05, 0.05, 0.02, 0.01),
-                 tolerance=0.001)
-    
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene")
-    expect_equal(genes$seq_freq, 
-                 c(0.41, 0.35, 0.24, 0.33, 0.26, 0.11, 0.10, 0.05, 0.05,
-                   0.04, 0.02, 0.02, 0.01, 0.01),
-                 tolerance=0.001)
-    
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele")
-    expect_equal(genes$seq_freq, 
-                 c(0.350, 0.325, 0.215, 0.330, 0.085, 0.150, 0.100, 0.100, 0.070,
-                   0.050, 0.050, 0.025, 0.040, 0.030, 0.020, 0.020,
-                   0.010, 0.010, 0.010, 0.010),
-                 tolerance=0.01)
-    
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "family")
+    expect_equal(genes$seq_freq,
+        c(0.76, 0.87, 0.24, 0.05, 0.05, 0.02, 0.01),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "gene")
+    expect_equal(genes$seq_freq,
+        c(
+            0.41, 0.35, 0.24, 0.33, 0.26, 0.11, 0.10, 0.05, 0.05,
+            0.04, 0.02, 0.02, 0.01, 0.01
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "allele")
+    expect_equal(genes$seq_freq,
+        c(
+            0.350, 0.325, 0.215, 0.330, 0.085, 0.150, 0.100, 0.100, 0.070,
+            0.050, 0.050, 0.025, 0.040, 0.030, 0.020, 0.020,
+            0.010, 0.010, 0.010, 0.010
+        ),
+        tolerance = 0.01
+    )
+
     # With copy numbers and multiple groups
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="family")
-    expect_equal(genes$seq_freq, 
-                 c(0.78, 0.95, 0.95, 0.22, 0.63, 0.37, 0.60, 0.20, 0.40, 0.67,
-                   0.60, 0.80, 0.40, 0.33, 0.03, 0.05, 0.01, 0.01),
-                 tolerance=0.01)
-    
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="gene")
-    expect_equal(round(genes$seq_freq,2)[1:12], 
-                 c(0.61, 0.75, 0.22, 0.54, 0.40, 0.37, 0.17,
-                   0.20, 0.15, 0.20, 0.60, 0.20),
-                 tolerance=0.01)
-    
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="allele")
-    expect_equal(genes$seq_freq[1:12], 
-                 c(0.61, 0.72, 0.16, 0.41, 0.40, 0.37, 0.06, 0.20, 0.08, 0.20, 0.50, 0.08),
-                 tolerance=0.01)
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "family"
+    )
+    expect_equal(genes$seq_freq,
+        c(
+            0.78, 0.95, 0.95, 0.22, 0.63, 0.37, 0.60, 0.20, 0.40, 0.67,
+            0.60, 0.80, 0.40, 0.33, 0.03, 0.05, 0.01, 0.01
+        ),
+        tolerance = 0.01
+    )
+
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "gene"
+    )
+    expect_equal(round(genes$seq_freq, 2)[1:12],
+        c(
+            0.61, 0.75, 0.22, 0.54, 0.40, 0.37, 0.17,
+            0.20, 0.15, 0.20, 0.60, 0.20
+        ),
+        tolerance = 0.01
+    )
+
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "allele"
+    )
+    expect_equal(genes$seq_freq[1:12],
+        c(0.61, 0.72, 0.16, 0.41, 0.40, 0.37, 0.06, 0.20, 0.08, 0.20, 0.50, 0.08),
+        tolerance = 0.01
+    )
 
     # Testing of fill
 
     # Without copy numbers
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="family", fill = T)
-    expect_equal(genes$seq_freq, 
-                 c(0.02,0.87,0.05,0.05,0.01,0,0.76,0,0.24,0),
-                 tolerance=0.001)
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "family", fill = T)
+    expect_equal(genes$seq_freq,
+        c(0.02, 0.87, 0.05, 0.05, 0.01, 0, 0.76, 0, 0.24, 0),
+        tolerance = 0.001
+    )
 
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="gene", fill = T)
-    expect_equal(genes$seq_freq, 
-                 c(0.02,0.04,0.01,0.1,0.11,0.26,0.33,0.02,0,0.05,0.05,0.01,0,0,
-                    0,0,0.41,0,0,0,0.35,0,0.24,0),
-                 tolerance=0.001)
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "gene", fill = T)
+    expect_equal(genes$seq_freq,
+        c(
+            0.02, 0.04, 0.01, 0.1, 0.11, 0.26, 0.33, 0.02, 0, 0.05, 0.05, 0.01, 0, 0,
+            0, 0, 0.41, 0, 0, 0, 0.35, 0, 0.24, 0
+        ),
+        tolerance = 0.001
+    )
 
-    genes <- countGenes(db, gene="V_CALL", groups="SAMPLE", mode="allele", fill = T)
-    expect_equal(genes$seq_freq, 
-                 c(0.02,0.01,0.03,0.01,0.1,0.07,0.04,0.01,0.1,0.15,0.33,0.02,0,
-                    0.05,0.05,0,0.01,0,0,0,0,0,0.085,0.325,0,0,0,0,0,0.35,0,0.215,0.025,0),
-                 tolerance=0.01)
+    genes <- countGenes(db, gene = "V_CALL", groups = "SAMPLE", mode = "allele", fill = T)
+    expect_equal(genes$seq_freq,
+        c(
+            0.02, 0.01, 0.03, 0.01, 0.1, 0.07, 0.04, 0.01, 0.1, 0.15, 0.33, 0.02, 0,
+            0.05, 0.05, 0, 0.01, 0, 0, 0, 0, 0, 0.085, 0.325, 0, 0, 0, 0, 0, 0.35, 0, 0.215, 0.025, 0
+        ),
+        tolerance = 0.01
+    )
 
     # With copy numbers and multiple groups
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="family", fill = T)
-    expect_equal(round(genes$seq_freq,2)[1:12], 
-                 c(0,0.8,0,0.2,0,0,0.6,0.4,0,0,0,0.6),
-                 tolerance=0.01)
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "family", fill = T
+    )
+    expect_equal(round(genes$seq_freq, 2)[1:12],
+        c(0, 0.8, 0, 0.2, 0, 0, 0.6, 0.4, 0, 0, 0, 0.6),
+        tolerance = 0.01
+    )
 
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="gene", fill = T)
-    expect_equal(round(genes$seq_freq,2)[1:12], 
-                 c(0,0,0,0.2,0,0,0.6,0,0,0,0.2,0),
-                 tolerance=0.01)
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "gene", fill = T
+    )
+    expect_equal(round(genes$seq_freq, 2)[1:12],
+        c(0, 0, 0, 0.2, 0, 0, 0.6, 0, 0, 0, 0.2, 0),
+        tolerance = 0.01
+    )
 
-    genes <- countGenes(db, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                        copy="DUPCOUNT", mode="allele", fill = T)
-    expect_equal(genes$seq_freq[1:12], 
-                 c(0,0,0,0,0.2,0,0,0,0,0,0.6,0),
-                 tolerance=0.01)
+    genes <- countGenes(db,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "allele", fill = T
+    )
+    expect_equal(genes$seq_freq[1:12],
+        c(0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0, 0.6, 0),
+        tolerance = 0.01
+    )
 
     # Test how NAs are handled
-    db_some_na <- data.frame(sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 
-                             sample = c("S1", "S2", "S4", "S3", "S2", "S3", "S4", "S4", "S3", "S4"),
-                             v_call = c("IGHV1-1", NA, "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2", NA), 
-                             dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1), 
-                             clone = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4), 
-                             stringsAsFactors=F)
-    
-    expect_warning(genes <- countGenes(db_some_na, gene="v_call", mode="gene"), NULL)
-    expect_equal(genes$seq_freq, 
-                 c(0.375, 0.375, 0.25),
-                 tolerance=0.001)
-    
-    genes <- countGenes(db_some_na, gene="v_call", mode="gene", remove_na = FALSE)
-    expect_equal(genes$seq_freq, 
-                 c(0.3, 0.3, 0.2, 0.2),
-                 tolerance=0.001)
-    
-    genes <- countGenes(db_some_na, gene="v_call", mode="gene", copy = "clone", remove_na = FALSE)
-    expect_equal(genes$copy_count, 
-                 c(10, 7, 7, 6),
-                 tolerance=0.001)
-    
-    genes <- countGenes(db_some_na, gene="v_call", mode="gene", groups = "sample", fill = TRUE, remove_na = FALSE)
-    expect_equal(genes$seq_count, 
-                 c(1, 0, 0, 0, 0, 1, 0, 1, 0, 2, 1, 0, 2, 0, 1, 1),
-                 tolerance=0.001)
-    
-    db_all_na <- data.frame(sequence_id = c(1, 2, 3),
-                            sample = c("S1", "S2", "S2"),
-                            v_call = c(NA, NA, NA), 
-                            dupcount = c(1, 1, 1), 
-                            clone = c(1, 1, 1), 
-                            stringsAsFactors=F)
-    
-    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene"), "The column v_call contains no data")
-    expect_equal(nrow(genes), 
-                 0,
-                 tolerance=0.001)
-    
-    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", remove_na=FALSE), "The column v_call contains no data")
-    expect_equal(genes$seq_count, 
-                 3,
-                 tolerance=0.001)
-    
-    expect_warning(genes <- countGenes(db_all_na, gene="v_call", mode="gene", groups = "sample", copy = "dupcount", fill = TRUE,  remove_na = FALSE), 
-                   "The column v_call contains no data")
-    expect_equal(genes$copy_count, 
-                 c(1, 2),
-                 tolerance=0.001)
-    
+    db_some_na <- data.frame(
+        sequence_id = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+        sample = c("S1", "S2", "S4", "S3", "S2", "S3", "S4", "S4", "S3", "S4"),
+        v_call = c("IGHV1-1", NA, "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2", NA),
+        dupcount = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+        clone = c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4),
+        stringsAsFactors = F
+    )
+
+    expect_warning(genes <- countGenes(db_some_na, gene = "v_call", mode = "gene"), NULL)
+    expect_equal(genes$seq_freq,
+        c(0.375, 0.375, 0.25),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_some_na, gene = "v_call", mode = "gene", remove_na = FALSE)
+    # A locus cannot be determined if the gene is NA. When determining the denominator (locus_count),
+    # these sequences will be considered separately as their own "NA" locus.
+    # Example:
+    #  locus gene    seq_count locus_count seq_freq
+    # <chr> <chr>       <int>       <int>    <dbl>
+    # 1 IGH   IGHV1-1         3           8    0.375
+    # 2 IGH   IGHV1-2         3           8    0.375
+    # 3 IGH   IGHV1-3         2           8    0.25
+    # 4 NA    NA              2           2    1
+    expect_equal(genes$seq_freq,
+        c(0.375, 0.375, 0.25, 1),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_some_na, gene = "v_call", mode = "gene", copy = "clone", remove_na = FALSE)
+    expect_equal(genes$copy_count,
+        c(10, 7, 7, 6),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_some_na, gene = "v_call", mode = "gene", groups = "sample", fill = TRUE, remove_na = FALSE)
+    expect_equal(genes$seq_count,
+        c(1, 0, 0, 0, 0, 1, 0, 1, 0, 2, 1, 0, 2, 0, 1, 1),
+        tolerance = 0.001
+    )
+
+    db_all_na <- data.frame(
+        sequence_id = c(1, 2, 3),
+        sample = c("S1", "S2", "S2"),
+        v_call = c(NA, NA, NA),
+        dupcount = c(1, 1, 1),
+        clone = c(1, 1, 1),
+        stringsAsFactors = F
+    )
+
+    expect_warning(genes <- countGenes(db_all_na, gene = "v_call", mode = "gene"), "The column v_call contains no data")
+    expect_equal(nrow(genes),
+        0,
+        tolerance = 0.001
+    )
+
+    expect_warning(genes <- countGenes(db_all_na, gene = "v_call", mode = "gene", remove_na = FALSE), "The column v_call contains no data")
+    expect_equal(genes$seq_count,
+        3,
+        tolerance = 0.001
+    )
+
+    expect_warning(
+        genes <- countGenes(db_all_na, gene = "v_call", mode = "gene", groups = "sample", copy = "dupcount", fill = TRUE, remove_na = FALSE),
+        "The column v_call contains no data"
+    )
+    expect_equal(genes$copy_count,
+        c(1, 2),
+        tolerance = 0.001
+    )
+
+    # testing addition of collapse and first flags
+
+    genes <- countGenes(db, gene = "J_CALL", mode = "allele", first = FALSE)
+    expect_equal(genes$seq_freq,
+        c(0.283, 0.213, 0.183, 0.133, 0.123, 0.0233, 0.020, 0.010, 0.010),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db, gene = "V_CALL", mode = "gene", first = FALSE, collapse = FALSE)
+    expect_equal(genes$seq_freq,
+        c(
+            0.31, 0.233, 0.17, 0.11, 0.0867, 0.0333, 0.0167, 0.0133, 0.00667,
+            0.00667, 0.00667, 0.0033, 0.0033
+        ),
+        tolerance = 0.001
+    )
+
+    # test bulk percentages now being by locus
+    # need data with mixed loci
+    db_hl <- data.frame(
+        sequence_id = c(1:30),
+        sample = c(rep("S1", 15), rep("S2", 15)),
+        v_call = c(
+            "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-3", "IGHV1-3", "IGHV2-1,IGHV2-2", "IGHV2-2", "IGHV2-2",
+            "IGKV1-1", "IGKV1-2", "IGKV1-1,IGKV1-2", "IGLV1-1", "IGLV2-1",
+            "IGHV1-2", "IGHV1-2", "IGHV3-1", "IGHV3-1", "IGHV2-1,IGHV2-2", "IGHV2-1", "IGHV2-2", "IGHV2-2", "IGHV2-2", "IGHV3-1",
+            "IGKV1-1", "IGKV1-2", "IGKV2-1", "IGLV1-1", "IGLV1-1"
+        ),
+        j_call = c(
+            "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2",
+            "IGKJ1", "IGKJ1", "IGKJ1", "IGLJ1", "IGLJ1",
+            "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2", "IGHJ2",
+            "IGKJ1", "IGKJ2", "IGKJ2", "IGLJ1", "IGLJ1"
+        ),
+        dupcount = c(
+            1, 1, 5, 1, 1, 1, 5, 1, 5, 1, 1, 4, 1, 4, 1,
+            1, 1, 1, 1, 1, 2, 2, 4, 4, 1, 1, 4, 1, 4, 1
+        ),
+        clone = c(
+            1, 1, 1, 1, 2, 2, 2, 3, 3, 3, NA, NA, NA, NA, NA,
+            4, 4, 5, 5, 6, 6, 6, 6, 6, 7, NA, NA, NA, NA, NA
+        ),
+        stringsAsFactors = F
+    )
+
+    genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "family")
+    expect_equal(genes$seq_freq,
+        c(
+            0.7, 0.5, 0.3, 1, 0.3, 0.2, 0.667, 1, 0.5, 0.5, 0.333
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene")
+    expect_equal(genes$seq_freq,
+        c(
+            0.4, 0.3, 0.3, 0.3, 0.2, 0.667, 0.2, 0.2, 1, 0.1, 0.333, 0.5, 0.5, 0.333, 0.333, 0.333
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene")
+    expect_equal(genes$seq_freq,
+        c(
+            0.6, 0.6, 0.4, 0.4, 1, 1, 0.667, 1, 0.333
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", copy = "dupcount")
+    expect_equal(genes$copy_freq,
+        c(
+            0.556, 0.364, 0.318, 0.273, 1, 0.667, 0.8, 0.667, 0.167, 0.167, 0.333, 0.111, 0.045, 0.2, 0.167, 0.167
+        ),
+        tolerance = 0.001
+    )
+
+    genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene", copy = "dupcount")
+    expect_equal(genes$copy_freq,
+        c(
+            0.636, 0.778, 0.364, 1, 1, 0.833, 1, 0.222, 0.167
+        ),
+        tolerance = 0.001
+    )
+
+    # case with all clone IDs provided
+    genes <- countGenes(db_hl %>% dplyr::filter(!is.na(clone)), gene = "v_call", groups = "sample", mode = "gene", clone = "clone")
+    expect_equal(genes$clone_freq,
+        c(
+            0.5, 0.333, 0.333, 0.333, 0.25, 0.25
+        ),
+        tolerance = 0.001
+    )
+
+    # case with some clone IDs provided
+    expect_warning(
+        genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", clone = "clone"),
+        "Found 10 sequences without clonal assignments. These sequences will be removed before counting clone frequencies."
+    )
+    expect_equal(genes$clone_freq,
+        c(
+            0.5, 0.333, 0.333, 0.333, 0.25, 0.25
+        ),
+        tolerance = 0.001
+    )
+
+    expect_warning(
+        genes <- countGenes(db_hl, gene = "j_call", groups = "sample", mode = "gene", clone = "clone"),
+        "Found 10 sequences without clonal assignments. These sequences will be removed before counting clone frequencies."
+    )
+    expect_equal(genes$clone_freq,
+        c(
+            0.667, 0.5, 0.5, 0.333
+        ),
+        tolerance = 0.001
+    )
+
+    # test if all NA
+    db_hl$clone_na <- rep(NA, nrow(db_hl))
+    expect_error(
+        genes <- countGenes(db_hl, gene = "v_call", groups = "sample", mode = "gene", clone = "clone_na"),
+        "No clone IDs are present in the data."
+    )
 })
 
 test_that("countGenes works for single-cell", {
     # Without copy numbers
-    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="family"), "Mixed bulk and single-cell data")
-    expect_equal(round(genes$seq_freq,2), 
-                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
-                 tolerance=0.001)
-    
-    expect_warning(genes <- countGenes(db_gg, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
-    expect_equal(round(genes$seq_freq,2), 
-                 c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
-                 tolerance=0.001)
-    
+    expect_warning(genes <- countGenes(db_gg, gene = "v_call", groups = "subject_id", mode = "family"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq, 2),
+        c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+        tolerance = 0.001
+    )
+
+    expect_warning(genes <- countGenes(db_gg, gene = "v_call", groups = "subject_id", mode = "gene"), "Mixed bulk and single-cell data")
+    expect_equal(round(genes$seq_freq, 2),
+        c(0.83, 0.50, 0.11, 0.11, 0.06, 0.06),
+        tolerance = 0.001
+    )
+
     added_cell <- data.frame(
-        subject_id = c("S2","S2","S2"),
-        v_call = c("IGHV1-1","IGKV1-1","IGKV1-1"),
-        j_call = c("IGHJ1-1","IGKJ1-1","IGKJ1-1"),
-        cell_id = c(30,30,30)
+        subject_id = c("S2", "S2", "S2"),
+        v_call = c("IGHV1-1", "IGKV1-1", "IGKV1-1"),
+        j_call = c("IGHJ1-1", "IGKJ1-1", "IGKJ1-1"),
+        cell_id = c(30, 30, 30)
     )
 
     # Specific use case for identical light V gene within 1 cell that should be counted only once
     db_gg_multilight <- db_gg %>%
-                        dplyr::select(c("subject_id","v_call","j_call","cell_id")) %>%
-                        dplyr::bind_rows(db_gg, added_cell)
-    expect_warning(genes <- countGenes(db_gg_multilight, gene="v_call", groups="subject_id", mode="gene"), "Mixed bulk and single-cell data")
-    expect_equal(genes$seq_freq, 
-                 c(0.8, 0.5, 0.1, 0.1, 0.05, 0.05, 1,1),
-                 tolerance=0.001)
+        dplyr::select(c("subject_id", "v_call", "j_call", "cell_id")) %>%
+        dplyr::bind_rows(db_gg, added_cell)
+    expect_warning(genes <- countGenes(db_gg_multilight, gene = "v_call", groups = "subject_id", mode = "gene"), "Mixed bulk and single-cell data")
+    expect_equal(genes$seq_freq,
+        c(0.8, 0.5, 0.1, 0.1, 0.05, 0.05, 1, 1),
+        tolerance = 0.001
+    )
 })
 
 ### getSegment ####
 
 test_that("getSegment", {
     # Light chain tests
-    kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
-                    "Homsap IGKJ5*01 F")
-    
-    expect_equal(getAllele(kappa_call), 
-                 c("IGKV1-39*01", "IGKJ5*01"))
-    expect_equal(getAllele(kappa_call, first=FALSE),
-                 c("IGKV1-39*01,IGKV1-39*02", "IGKJ5*01"))
-    expect_equal(getAllele(kappa_call, first=FALSE, strip_d=FALSE),
-                 c("IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01", "IGKJ5*01" ))
-    
-    expect_equal(getGene(kappa_call), 
-                 c("IGKV1-39", "IGKJ5" ))
-    expect_equal(getGene(kappa_call, first=FALSE),
-                 c("IGKV1-39", "IGKJ5"))
-    expect_equal(getGene(kappa_call, first=FALSE, strip_d=FALSE),
-                 c("IGKV1D-39,IGKV1-39", "IGKJ5"))
-    expect_equal(getGene(kappa_call, first=FALSE, strip_d=TRUE),
-                 c("IGKV1-39", "IGKJ5"))    
-    
-    expect_equal(getFamily(kappa_call), 
-                 c("IGKV1", "IGKJ5"))
-    expect_equal(getFamily(kappa_call, first=FALSE), 
-                 c("IGKV1", "IGKJ5"))
-    expect_equal(getFamily(kappa_call, first=FALSE, collapse=FALSE),
-                 c("IGKV1,IGKV1,IGKV1", "IGKJ5"))
-    expect_equal(getFamily(kappa_call, first=FALSE, strip_d=FALSE),
-                 c("IGKV1D,IGKV1", "IGKJ5"))
+    kappa_call <- c(
+        "Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
+        "Homsap IGKJ5*01 F"
+    )
 
-    expect_equal(getLocus(kappa_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
-                 c("IGK", "IGK"))    
-    expect_equal(getLocus(kappa_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
-                 c("IGK,IGK,IGK", "IGK"))
-    
-    expect_equal(getChain(kappa_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
-                 c("VL", "VL"))
-    expect_equal(getChain(kappa_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
-                 c("VL,VL,VL", "VL"))
-    
+    expect_equal(
+        getAllele(kappa_call),
+        c("IGKV1-39*01", "IGKJ5*01")
+    )
+    expect_equal(
+        getAllele(kappa_call, first = FALSE),
+        c("IGKV1-39*01,IGKV1-39*02", "IGKJ5*01")
+    )
+    expect_equal(
+        getAllele(kappa_call, first = FALSE, strip_d = FALSE),
+        c("IGKV1D-39*01,IGKV1-39*02,IGKV1-39*01", "IGKJ5*01")
+    )
+
+    expect_equal(
+        getGene(kappa_call),
+        c("IGKV1-39", "IGKJ5")
+    )
+    expect_equal(
+        getGene(kappa_call, first = FALSE),
+        c("IGKV1-39", "IGKJ5")
+    )
+    expect_equal(
+        getGene(kappa_call, first = FALSE, strip_d = FALSE),
+        c("IGKV1D-39,IGKV1-39", "IGKJ5")
+    )
+    expect_equal(
+        getGene(kappa_call, first = FALSE, strip_d = TRUE),
+        c("IGKV1-39", "IGKJ5")
+    )
+
+    expect_equal(
+        getFamily(kappa_call),
+        c("IGKV1", "IGKJ5")
+    )
+    expect_equal(
+        getFamily(kappa_call, first = FALSE),
+        c("IGKV1", "IGKJ5")
+    )
+    expect_equal(
+        getFamily(kappa_call, first = FALSE, collapse = FALSE),
+        c("IGKV1,IGKV1,IGKV1", "IGKJ5")
+    )
+    expect_equal(
+        getFamily(kappa_call, first = FALSE, strip_d = FALSE),
+        c("IGKV1D,IGKV1", "IGKJ5")
+    )
+
+    expect_equal(
+        getLocus(kappa_call, first = FALSE, strip_d = FALSE, collapse = TRUE),
+        c("IGK", "IGK")
+    )
+    expect_equal(
+        getLocus(kappa_call, first = FALSE, strip_d = FALSE, collapse = FALSE),
+        c("IGK,IGK,IGK", "IGK")
+    )
+
+    expect_equal(
+        getChain(kappa_call, first = FALSE, strip_d = FALSE, collapse = TRUE),
+        c("VL", "VL")
+    )
+    expect_equal(
+        getChain(kappa_call, first = FALSE, strip_d = FALSE, collapse = FALSE),
+        c("VL,VL,VL", "VL")
+    )
+
     # Heavy chain tests
-    heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
-                    "Homsap IGHD1-1*01 F", 
-                    "Homsap IGHJ1*01 F")
-    
-    expect_equal(getAllele(heavy_call, first=FALSE),
-                 c("IGHV1-69*01", "IGHD1-1*01", "IGHJ1*01" ))
-    expect_equal(getAllele(heavy_call, first=FALSE, strip_d=FALSE),
-                 c("IGHV1-69*01,IGHV1-69D*01", "IGHD1-1*01", "IGHJ1*01"))
-    
-    expect_equal(getGene(heavy_call, first=FALSE), 
-                 c("IGHV1-69", "IGHD1-1", "IGHJ1"))
-    expect_equal(getGene(heavy_call, first=FALSE, strip_d=FALSE),
-                 c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1"))
-    expect_equal(getGene(heavy_call, first=FALSE, strip_d=TRUE),
-                 c("IGHV1-69", "IGHD1-1", "IGHJ1"))    
-    
-    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
-                 c("IGH", "IGH", "IGH"))    
-    expect_equal(getLocus(heavy_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
-                 c("IGH,IGH", "IGH", "IGH"))    
+    heavy_call <- c(
+        "Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F",
+        "Homsap IGHD1-1*01 F",
+        "Homsap IGHJ1*01 F"
+    )
 
-    expect_equal(getChain(heavy_call, first=FALSE, strip_d=FALSE, collapse=TRUE),
-                 c("VH", "VH", "VH"))        
-    expect_equal(getChain(heavy_call, first=FALSE, strip_d=FALSE, collapse=FALSE),
-                 c("VH,VH", "VH", "VH"))    
-    
+    expect_equal(
+        getAllele(heavy_call, first = FALSE),
+        c("IGHV1-69*01", "IGHD1-1*01", "IGHJ1*01")
+    )
+    expect_equal(
+        getAllele(heavy_call, first = FALSE, strip_d = FALSE),
+        c("IGHV1-69*01,IGHV1-69D*01", "IGHD1-1*01", "IGHJ1*01")
+    )
+
+    expect_equal(
+        getGene(heavy_call, first = FALSE),
+        c("IGHV1-69", "IGHD1-1", "IGHJ1")
+    )
+    expect_equal(
+        getGene(heavy_call, first = FALSE, strip_d = FALSE),
+        c("IGHV1-69,IGHV1-69D", "IGHD1-1", "IGHJ1")
+    )
+    expect_equal(
+        getGene(heavy_call, first = FALSE, strip_d = TRUE),
+        c("IGHV1-69", "IGHD1-1", "IGHJ1")
+    )
+
+    expect_equal(
+        getLocus(heavy_call, first = FALSE, strip_d = FALSE, collapse = TRUE),
+        c("IGH", "IGH", "IGH")
+    )
+    expect_equal(
+        getLocus(heavy_call, first = FALSE, strip_d = FALSE, collapse = FALSE),
+        c("IGH,IGH", "IGH", "IGH")
+    )
+
+    expect_equal(
+        getChain(heavy_call, first = FALSE, strip_d = FALSE, collapse = TRUE),
+        c("VH", "VH", "VH")
+    )
+    expect_equal(
+        getChain(heavy_call, first = FALSE, strip_d = FALSE, collapse = FALSE),
+        c("VH,VH", "VH", "VH")
+    )
+
     # Filtering non-localized genes
-    nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
-                 "Homosap IGHV2-30*01 F,Homsap IGHV3-NL1*01 F",
-                 "IGHV1-NL1*01")
-    
-    expect_equal(getAllele(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3-30-3*01,IGHV3-30*01", "IGHV2-30*01", ""))
-                 
-    expect_equal(getGene(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3-30-3,IGHV3-30", "IGHV2-30", ""))
-    
-    expect_equal(getFamily(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGHV3", "IGHV2", ""))
-    
-    expect_equal(getLocus(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("IGH", "IGH", ""))
-    
-    expect_equal(getChain(nl_call, first=FALSE, omit_nl=TRUE),
-                 c("VH", "VH", ""))
-    
+    nl_call <- c(
+        "IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01",
+        "Homosap IGHV2-30*01 F,Homsap IGHV3-NL1*01 F",
+        "IGHV1-NL1*01"
+    )
+
+    expect_equal(
+        getAllele(nl_call, first = FALSE, omit_nl = TRUE),
+        c("IGHV3-30-3*01,IGHV3-30*01", "IGHV2-30*01", "")
+    )
+
+    expect_equal(
+        getGene(nl_call, first = FALSE, omit_nl = TRUE),
+        c("IGHV3-30-3,IGHV3-30", "IGHV2-30", "")
+    )
+
+    expect_equal(
+        getFamily(nl_call, first = FALSE, omit_nl = TRUE),
+        c("IGHV3", "IGHV2", "")
+    )
+
+    expect_equal(
+        getLocus(nl_call, first = FALSE, omit_nl = TRUE),
+        c("IGH", "IGH", "")
+    )
+
+    expect_equal(
+        getChain(nl_call, first = FALSE, omit_nl = TRUE),
+        c("VH", "VH", "")
+    )
+
     # Test for issue found in TIgGER
     # If there's no allele info,
     # getAllele should return the same input value
@@ -266,299 +516,358 @@ test_that("getSegment", {
     # getAllele("IGHV1-01") returned IGHV1-01
     getAllele(getGene("IGHV1-01*02")) == getGene("IGHV1-01*02")
     getAllele(getGene("TRAV38-2/DV8*01")) == getGene("TRAV38-2/DV8*01")
-    
+
     # Test that getSegment works well with c_call and strip_d=TRUE
     # and it doesn't convert IGHD into IGH
     expect_equal(getGene("IGHD"), "IGHD")
     expect_equal(getAllele("IGHD"), "IGHD")
-    gene <- countGenes(data.frame("c_call"="IGHD", stringsAsFactors = F),gene="c_call", mode="gene")
-    asis <- countGenes(data.frame("c_call"="IGHD", stringsAsFactors = F),gene="c_call", mode="asis")
-    expect_equal(gene[['gene']], "IGHD")
-    expect_equal(asis[['gene']], "IGHD")
-    
+    gene <- countGenes(data.frame("c_call" = "IGHD", stringsAsFactors = F), gene = "c_call", mode = "gene")
+    asis <- countGenes(data.frame("c_call" = "IGHD", stringsAsFactors = F), gene = "c_call", mode = "asis")
+    expect_equal(gene[["gene"]], "IGHD")
+    expect_equal(asis[["gene"]], "IGHD")
+
     # Test for IMGT temporary designation nomenclature
     tmp_call <- c("IGHV9S3*01", "IGKV10S12*01")
-    expect_equal(getAllele(tmp_call),
-                 c("IGHV9S3*01", "IGKV10S12*01"))
-    expect_equal(getGene(tmp_call),
-                 c("IGHV9S3", "IGKV10S12"))
-    expect_equal(getFamily(tmp_call),
-                 c("IGHV9", "IGKV10"))
-    
-    
+    expect_equal(
+        getAllele(tmp_call),
+        c("IGHV9S3*01", "IGKV10S12*01")
+    )
+    expect_equal(
+        getGene(tmp_call),
+        c("IGHV9S3", "IGKV10S12")
+    )
+    expect_equal(
+        getFamily(tmp_call),
+        c("IGHV9", "IGKV10")
+    )
+
+
     # Test Mus musculus
     # ADEGMC
-    mm_alleles <- c("IGHA*01", 
-                    "IGHD*01","IGHD5-1-1*01",
-                    "IGHE*01",
-                    "IGHG1*01","IGHG2A*01",
-                    "IGHM*01",
-                    "IGKC*01")
-    mm_genes <- c("IGHA",
-                  "IGHD","IGHD5-1-1",
-                  "IGHE",
-                  "IGHG1","IGHG2A",
-                  "IGHM",
-                  "IGKC")
-    mm_families <- c("IGHA",
-                  "IGHD","IGHD5",
-                  "IGHE",
-                  "IGHG1","IGHG2A",
-                  "IGHM",
-                  "IGKC")    
-    expect_equal(getGene(mm_alleles),mm_genes)
-    expect_equal(getFamily(mm_alleles),mm_families)
-    
-    
+    mm_alleles <- c(
+        "IGHA*01",
+        "IGHD*01", "IGHD5-1-1*01",
+        "IGHE*01",
+        "IGHG1*01", "IGHG2A*01",
+        "IGHM*01",
+        "IGKC*01"
+    )
+    mm_genes <- c(
+        "IGHA",
+        "IGHD", "IGHD5-1-1",
+        "IGHE",
+        "IGHG1", "IGHG2A",
+        "IGHM",
+        "IGKC"
+    )
+    mm_families <- c(
+        "IGHA",
+        "IGHD", "IGHD5",
+        "IGHE",
+        "IGHG1", "IGHG2A",
+        "IGHM",
+        "IGKC"
+    )
+    expect_equal(getGene(mm_alleles), mm_genes)
+    expect_equal(getFamily(mm_alleles), mm_families)
+
+
     # Test for TCR
-    expect_equal(getGene(c("TRBV29-1*01","TRAV12-1*01")),
-                 c("TRBV29-1","TRAV12-1"))
-    expect_equal(getFamily(c("TRBV29-1*01","TRAV12-1*01")),
-                 c("TRBV29","TRAV12"))    
-                 
+    expect_equal(
+        getGene(c("TRBV29-1*01", "TRAV12-1*01")),
+        c("TRBV29-1", "TRAV12-1")
+    )
+    expect_equal(
+        getFamily(c("TRBV29-1*01", "TRAV12-1*01")),
+        c("TRBV29", "TRAV12")
+    )
 })
 
 ### sortGenes ####
 
 test_that("sortGenes", {
-    genes <- c("IGHV1-69D*01", "IGHV1-69*01", "IGHV4-38-2*01", "IGHV1-69-2*01",
-            "IGHV2-5*01", "IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
-            "IGHV1-2","IGHV1-2*02","IGHV1-69*02")
+    genes <- c(
+        "IGHV1-69D*01", "IGHV1-69*01", "IGHV4-38-2*01", "IGHV1-69-2*01",
+        "IGHV2-5*01", "IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05",
+        "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02"
+    )
     # Sort genes by name
-    expected <- c("IGHV1-2", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2*02",
-                  "IGHV1-69*01", "IGHV1-69D*01", "IGHV1-69*02", "IGHV1-69-2*01",
-                  "IGHV1-NL1*01", "IGHV2-5*01", "IGHV4-38-2*01")
+    expected <- c(
+        "IGHV1-2", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2*02",
+        "IGHV1-69*01", "IGHV1-69D*01", "IGHV1-69*02", "IGHV1-69-2*01",
+        "IGHV1-NL1*01", "IGHV2-5*01", "IGHV4-38-2*01"
+    )
     sorted <- sortGenes(genes)
     expect_equal(sorted, expected)
-    
+
     # Sort genes by position in the locus
-    expected_locus <- c("IGHV1-NL1*01", "IGHV1-69-2*01", "IGHV1-69*01", 
-                        "IGHV1-69D*01", "IGHV1-69*02", "IGHV4-38-2*01",
-                        "IGHV2-5*01", "IGHV1-2", "IGHV1-2*01,IGHV1-2*05", 
-                        "IGHV1-2*02")
-    sorted_locus <- sortGenes(genes, method="pos")
+    expected_locus <- c(
+        "IGHV1-NL1*01", "IGHV1-69-2*01", "IGHV1-69*01",
+        "IGHV1-69D*01", "IGHV1-69*02", "IGHV4-38-2*01",
+        "IGHV2-5*01", "IGHV1-2", "IGHV1-2*01,IGHV1-2*05",
+        "IGHV1-2*02"
+    )
+    sorted_locus <- sortGenes(genes, method = "pos")
     expect_equal(sorted_locus, expected_locus)
-    
 })
 
 ### groupGenes ####
 
 test_that("groupGenes heavy only", {
     # make a data frame
-    db <- data.frame(SEQUENCE_ID = c(1,2,3,4,5,6,7,8), 
-                     V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"), 
-                     J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"),
-                     stringsAsFactors=F)
+    db <- data.frame(
+        SEQUENCE_ID = c(1, 2, 3, 4, 5, 6, 7, 8),
+        V_CALL = c("IGHV1-1", "IGHV1-1,IGHV1-2", "IGHV1-2,IGHV1-3", "IGHV1-2", "IGHV1-3", "IGHV1-3", "IGHV1-1,IGHV1-2", "IGHV1-2"),
+        J_CALL = c("IGHJ1", "IGHJ2", "IGHJ1", "IGHJ1", "IGHJ1", "IGHJ2", "IGHJ1", "IGHJ2"),
+        stringsAsFactors = F
+    )
     db$LOCUS <- getLocus(db$V_CALL)
     # group VJ genes
     db <- groupGenes(db,
-                     v_call="V_CALL",
-                     j_call="J_CALL",
-                     locus="LOCUS",
-                     first=F)
+        v_call = "V_CALL",
+        j_call = "J_CALL",
+        locus = "LOCUS",
+        first = F
+    )
     # test
-    #expected <- c(2, 3, 2, 2, 2, 1, 2, 3)
+    # expected <- c(2, 3, 2, 2, 2, 1, 2, 3)
     # same underlying spirit as before
-    expected <- c("G1","G2","G1","G1","G1","G3","G1","G2")
+    expected <- c("G1", "G2", "G1", "G1", "G1", "G3", "G1", "G2")
     expect_equal(db$vj_group, expected)
-
 })
 
 
 test_that("groupGenes, when 1 row ", {
     # Tests fix for rowSums when 1 row
-    db <- structure(list(sample_id = "UW0343__S", sequence_id = "assemble12_0", 
-                   subject_id = "S1", v_call = "IGHV3-30*02,IGHV3-30-5*02", 
-                   j_call = "IGHJ6*03", junction = "TGTGCGAAAGTCCCCGTGGGGACTGCCTCTTACATGGACGCCTGG", 
-                   cell_id = NA_character_, single_cell = FALSE, locus = "IGH", 
-                   junction_length = 45L), row.names = c(NA, -1L
-                   ), class = c("tbl_df", "tbl", "data.frame"))
-    ft <- groupGenes(db, junc_len="junction_length",
-                  cell_id="cell_id", locus="locus", only_heavy=T,
-                  first=TRUE)
-    ff <- groupGenes(db, junc_len="junction_length",
-                     cell_id="cell_id", locus="locus", only_heavy=T,
-                     first=FALSE)
-    expect_equal(ft,ff)
+    db <- structure(list(
+        sample_id = "UW0343__S", sequence_id = "assemble12_0",
+        subject_id = "S1", v_call = "IGHV3-30*02,IGHV3-30-5*02",
+        j_call = "IGHJ6*03", junction = "TGTGCGAAAGTCCCCGTGGGGACTGCCTCTTACATGGACGCCTGG",
+        cell_id = NA_character_, single_cell = FALSE, locus = "IGH",
+        junction_length = 45L
+    ), row.names = c(NA, -1L), class = c("tbl_df", "tbl", "data.frame"))
+    ft <- groupGenes(db,
+        junc_len = "junction_length",
+        cell_id = "cell_id", locus = "locus", only_heavy = T,
+        first = TRUE
+    )
+    ff <- groupGenes(db,
+        junc_len = "junction_length",
+        cell_id = "cell_id", locus = "locus", only_heavy = T,
+        first = FALSE
+    )
+    expect_equal(ft, ff)
 })
 
 
 
 test_that("groupGenes, single-cell mode, heavy only", {
-    
     # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
     load(file.path("..", "data-tests", "db_sc.rda")) # data_t1
-    
+
     # manual deduction
-    # 1 
-    # IGHV3-11 IGHJ4 93 
-    # 2 
-    # IGHV3-7 IGHJ1 24 
+    # 1
+    # IGHV3-11 IGHJ4 93
+    # 2
+    # IGHV3-7 IGHJ1 24
     # IGHV3-6 IGHJ1 24  (first=F)
-    # IGHV1-4 IGHJ3 27 
+    # IGHV1-4 IGHJ3 27
     # IGHV1-4 IGHJ4 27  (first=F)
-    # 
+    #
     # 3 IGHV3-7 IGHJ5 90
     # 4 IGHV3-7 IGHJ5 90
     # 5 IGHV3-7 IGHJ5 90
-    # 
-    # 6 IGHV4-59 IGHJ1 84 
-    # 7 IGHV4-59 IGHJ1 84 
-    # 8 IGHV4-59 IGHJ1 84 
-    # 9 IGHV4-59 IGHJ1 84 
-    # 
+    #
+    # 6 IGHV4-59 IGHJ1 84
+    # 7 IGHV4-59 IGHJ1 84
+    # 8 IGHV4-59 IGHJ1 84
+    # 9 IGHV4-59 IGHJ1 84
+    #
     # 10 IGHV4-59 IGHJ1 84
     # 11 IGHV4-59 IGHJ1 84
-    
+
     # Cell with CELL_ID==B has 2 heavy and 2 light chains
     # expect error
     expect_error(
-        singleCellValidation(data_t1, cell_id="CELL_ID",locus="LOCUS"),
+        singleCellValidation(data_t1, cell_id = "CELL_ID", locus = "LOCUS"),
         regexp = "Only one heavy chain is allowed per cell"
     )
     expect_error(
-        gg1 <- groupGenes(data_t1, v_call="V_CALL", j_call="J_CALL", 
-                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_heavy=TRUE, first=FALSE),
+        gg1 <- groupGenes(data_t1,
+            v_call = "V_CALL", j_call = "J_CALL",
+            junc_len = "LEN", cell_id = "CELL_ID", locus = "LOCUS",
+            only_heavy = TRUE, first = FALSE
+        ),
         regexp = "Only one heavy chain is allowed per cell"
     )
-    
+
     # 1 by itself, 2 by itself, 3-5 together, 6-11 together
-    gg1_expect = c(rep("G1", 2), 
-                   # rep("G1", 4), # Cell B removed
-                   rep("G2", 2+2+2), 
-                   rep("G3", 2+3+2+2+2+2)) 
-    
-    gg1 = groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), v_call="V_CALL", j_call="J_CALL", 
-                     junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                     only_heavy=TRUE, first=FALSE)
-    
+    gg1_expect <- c(
+        rep("G1", 2),
+        # rep("G1", 4), # Cell B removed
+        rep("G2", 2 + 2 + 2),
+        rep("G3", 2 + 3 + 2 + 2 + 2 + 2)
+    )
+
+    gg1 <- groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"),
+        v_call = "V_CALL", j_call = "J_CALL",
+        junc_len = "LEN", cell_id = "CELL_ID", locus = "LOCUS",
+        only_heavy = TRUE, first = FALSE
+    )
+
     expect_equal(gg1[["vj_group"]], gg1_expect)
-    
 })
 
 test_that("groupGenes, mixed bulk and single cell", {
-
+    # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
     db <- data.frame(
-        subject_id=c("S1","S1","S1","S1","S1", "S1", "S1"),
-        v_call=c("IGHV1-1*01","IGHV1-1*01","IGHV1-2*01","IGHV1-1*01,IGHV1-2*01","IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
-        j_call=c("IGHJ2*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGHJ1*01","IGKJ1*01", "IGKJ1*01"),
-        junction=c("TGTAAAAAATGG","TGTAAAAAATGG","TGTAAAACCTGG","TGTAAACCCTGG","TGTAAACCCTGG","TGTCCCCCCTGG","TGTCCCCCCTGG"),
-        locus=c("IGH","IGH","IGH","IGH","IGH","IGK","IGK"),
-        cell_id=c(1,2,3,NA,NA,1,NA),
-        junction_length=12
+        subject_id = c("S1", "S1", "S1", "S1", "S1", "S1", "S1"),
+        v_call = c("IGHV1-1*01", "IGHV1-1*01", "IGHV1-2*01", "IGHV1-1*01,IGHV1-2*01", "IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
+        j_call = c("IGHJ2*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGKJ1*01", "IGKJ1*01"),
+        junction = c("TGTAAAAAATGG", "TGTAAAAAATGG", "TGTAAAACCTGG", "TGTAAACCCTGG", "TGTAAACCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG"),
+        locus = c("IGH", "IGH", "IGH", "IGH", "IGH", "IGK", "IGK"),
+        cell_id = c(1, 2, 3, NA, NA, 1, NA),
+        junction_length = 12
     )
 
     # subset to single-cell sequences
-    d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-                    cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                    first=FALSE)
-    expect_equal(d[['vj_group']], c("G2","G1","G3","G2"))
-    
-    expect_warning(d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-                    cell_id="cell_id", locus="locus", only_heavy=FALSE,
-                    first=FALSE),
-                   "only_heavy = FALSE is deprecated")
-    
-    expect_warning(d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-                                      cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                                      first=FALSE, split_light=TRUE),
-                   "split_light = TRUE is deprecated")
-    expect_equal(d[['vj_group']], d_oh[['vj_group']], d_sl[['vj_group']])
-    
+    d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+        first = FALSE
+    )
+    expect_equal(d[["vj_group"]], c("G2", "G1", "G3", "G2"))
+
+    expect_warning(
+        d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+            v_call = "v_call", j_call = "j_call", junc_len = NULL,
+            cell_id = "cell_id", locus = "locus", only_heavy = FALSE,
+            first = FALSE
+        ),
+        "only_heavy = FALSE is deprecated"
+    )
+
+    expect_warning(
+        d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+            v_call = "v_call", j_call = "j_call", junc_len = NULL,
+            cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+            first = FALSE, split_light = TRUE
+        ),
+        "split_light = TRUE is deprecated"
+    )
+    expect_equal(d[["vj_group"]], d_oh[["vj_group"]], d_sl[["vj_group"]])
+
     # bulk data
-    d_bulk <- groupGenes(db  %>% dplyr::filter(is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                          first=FALSE)
+    d_bulk <- groupGenes(db %>% dplyr::filter(is.na(cell_id)),
+        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+        first = FALSE
+    )
 
     # mixed data
-    d_mixed <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                          first=FALSE)
-    
+    d_mixed <- groupGenes(db,
+        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+        first = FALSE
+    )
+
     # TODO SSNN 7/16/2024
     # Run tests with the same data used in scoper
 
     # Bulk mode cell_id=NULL
     ## first=T
-    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=T)
-    expect_equal(gg[["vj_group"]],
-                 gg[["expected_group_cell_id-null_first-T"]])
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id = NULL, first = T)
+    expect_equal(
+        gg[["vj_group"]],
+        gg[["expected_group_cell_id-null_first-T"]]
+    )
     ## first=F
-    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id=NULL, first=F)
-    expect_equal(gg[["vj_group"]], 
-                 gg[["expected_group_cell_id-null_first-F"]])
+    gg <- groupGenes(db_gg %>% select(-cell_id), cell_id = NULL, first = F)
+    expect_equal(
+        gg[["vj_group"]],
+        gg[["expected_group_cell_id-null_first-F"]]
+    )
 })
 
 
 #### AIRR-format migration tests ####
 
 test_that("countGenes, AIRR-format migration", {
-    
     db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
     expect_warning(
         db_a <- readChangeoDb(
-            file.path("..", "data-tests", "ExampleDb_airr.gz")),
+            file.path("..", "data-tests", "ExampleDb_airr.gz")
+        ),
         regexp = "airr::read_rearrangement"
     )
-    
+
     # 1
-    genes_c <- countGenes(db_c, gene="V_CALL", groups="SAMPLE", mode="allele")
-    genes_a <- countGenes(db_a, gene="v_call", groups="sample", mode="allele")
-    
-    expect_true(all(genes_c==genes_a))
-    
+    genes_c <- countGenes(db_c, gene = "V_CALL", groups = "SAMPLE", mode = "allele")
+    genes_a <- countGenes(db_a, gene = "v_call", groups = "sample", mode = "allele")
+
+    expect_true(all(genes_c == genes_a))
+
     # 2
-    genes_c <- countGenes(db_c, gene="V_CALL", groups=c("SAMPLE", "ISOTYPE"), 
-                          copy="DUPCOUNT", mode="family")
-    genes_a <- countGenes(db_a, gene="v_call", groups=c("sample", "isotype"), 
-                          copy="duplicate_count", mode="family")
-    
-    expect_true(all(genes_c==genes_a))
-    
+    genes_c <- countGenes(db_c,
+        gene = "V_CALL", groups = c("SAMPLE", "ISOTYPE"),
+        copy = "DUPCOUNT", mode = "family"
+    )
+    genes_a <- countGenes(db_a,
+        gene = "v_call", groups = c("sample", "isotype"),
+        copy = "duplicate_count", mode = "family"
+    )
+
+    expect_true(all(genes_c == genes_a))
+
     # 3
-    genes_c <- countGenes(db_c, gene="V_CALL", groups="SAMPLE", 
-                          mode="allele", fill=TRUE)
-    genes_a <- countGenes(db_a, gene="v_call", groups="sample", 
-                          mode="allele", fill=TRUE)
-    
-    expect_true(all(genes_c==genes_a))
-    
+    genes_c <- countGenes(db_c,
+        gene = "V_CALL", groups = "SAMPLE",
+        mode = "allele", fill = TRUE
+    )
+    genes_a <- countGenes(db_a,
+        gene = "v_call", groups = "sample",
+        mode = "allele", fill = TRUE
+    )
+
+    # genes_c uses "SAMPLE", genes_a uses "sample"
+    # make colnames same case for comparison
+    colnames(genes_c) <- tolower(colnames(genes_c))
+    expect_true(all.equal(genes_c, genes_a[rownames(genes_c), names(genes_c)]))
 })
 
 test_that("groupGenes, AIRR-format migration", {
-
-    # 1 
+    # 1
     db_c <- readChangeoDb(file.path("..", "data-tests", "ExampleDb.gz"))
     expect_warning(
         db_a <- readChangeoDb(file.path("..", "data-tests", "ExampleDb_airr.gz")),
-        regexp="airr::read_rearrangement"
+        regexp = "airr::read_rearrangement"
     )
-    
+
     db_c$LOCUS <- getLocus(db$V_CALL)
 
-    newDb_c <- groupGenes(db_c, v_call="V_CALL", j_call="J_CALL", locus="LOCUS")
-    newDb_a <- groupGenes(db_a, v_call="v_call", j_call="j_call")
-    
+    newDb_c <- groupGenes(db_c, v_call = "V_CALL", j_call = "J_CALL", locus = "LOCUS")
+    newDb_a <- groupGenes(db_a, v_call = "v_call", j_call = "j_call")
+
     # newDb_c and newDb_a not directly comparable b/c diff ncol
-    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
-    
+    expect_true(all(newDb_c[["vj_group"]] == newDb_a[["vj_group"]]))
+
     rm(db_c, db_a, newDb_c, newDb_a)
 
-    # 2 
+    # 2
     # Cell with CELL_ID==B has 2 heavy and 2 light chains
     load(file.path("..", "data-tests", "db_sc.rda")) # data_t1, data_t2
     load(file.path("..", "data-tests", "db_sc_airr.rda")) # data_t1_airr, data_t2_airr
 
-    newDb_c <- groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"), 
-                          v_call="V_CALL", j_call="J_CALL", 
-                          junc_len="LEN", cell_id="CELL_ID", locus="LOCUS", 
-                          only_heavy=TRUE, first=FALSE)
+    newDb_c <- groupGenes(data_t1 %>% dplyr::filter(CELL_ID != "B"),
+        v_call = "V_CALL", j_call = "J_CALL",
+        junc_len = "LEN", cell_id = "CELL_ID", locus = "LOCUS",
+        only_heavy = TRUE, first = FALSE
+    )
     newDb_a <- groupGenes(data_t1_airr %>% dplyr::filter(cell_id != "B"),
-                          v_call="v_call", j_call="j_call", 
-                          junc_len="len", cell_id="cell_id", locus="locus", 
-                          only_heavy=TRUE, first=FALSE)
-    
-    expect_true(all(newDb_c[["vj_group"]]==newDb_a[["vj_group"]]))
-    
+        v_call = "v_call", j_call = "j_call",
+        junc_len = "len", cell_id = "cell_id", locus = "locus",
+        only_heavy = TRUE, first = FALSE
+    )
+
+    expect_true(all(newDb_c[["vj_group"]] == newDb_a[["vj_group"]]))
 })
