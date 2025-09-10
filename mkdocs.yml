@@ -22,10 +22,12 @@ markdown_extensions:
       baselevel: 1
       toc_depth: 1-4
       permalink: True
+docs_dir: docs
 extra_javascript:
   - path: js/custom.js
     defer: true
-docs_dir: docs
+extra_css:
+  - css/custom.css
 nav:
   - 'Immcantation Portal': https://immcantation.readthedocs.io/
   - 'About':

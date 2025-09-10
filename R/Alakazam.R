@@ -92,7 +92,6 @@
 #' }
 #' 
 #' @name     alakazam
-#' @docType  package
 #' @references
 #' \enumerate{
 #'   \item  Vander Heiden JA, Yaari G, et al. pRESTO: a toolkit for processing 

@@ -38,6 +38,7 @@ Authors:
 +  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
 +  Julian Zhou [julian.zhou@bulldogs.yale.edu](julian.zhou@bulldogs.yale.edu)
 +  Kenneth Hoehn [kenneth.hoehn@yale.edu](kenneth.hoehn@yale.edu)
++  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu)
 +  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
 +  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
 
@@ -46,7 +47,6 @@ Other contributors:
 
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
 +  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
-+  Cole Jensen [cole.jensen@yale.edu](cole.jensen@yale.edu) [contributor]
 +  Gisela Gabernet [gisela.gabernet@yale.edu](gisela.gabernet@yale.edu) [contributor]
 
 

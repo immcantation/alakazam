@@ -730,10 +730,6 @@ test_that("groupGenes, mixed bulk and single cell", {
         junction_length = 12
     )
 
-    # TODO
-    # Should match a, because mix bulk-sc -> bulk mode
-    # expect_equal(c,a)
-
     # subset to single-cell sequences
     d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
         v_call = "v_call", j_call = "j_call", junc_len = NULL,
@@ -741,20 +737,30 @@ test_that("groupGenes, mixed bulk and single cell", {
         first = FALSE
     )
     expect_equal(d[["vj_group"]], c("G2", "G1", "G3", "G2"))
-
+    
     expect_warning(d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
-        v_call = "v_call", j_call = "j_call", junc_len = NULL,
-        cell_id = "cell_id", locus = "locus", only_heavy = FALSE,
-        first = FALSE
-    ))
-
+                    v_call="v_call", j_call="j_call", junc_len=NULL,
+                    cell_id="cell_id", locus="locus", only_heavy=FALSE,
+                    first=FALSE),
+                   "only_heavy = FALSE is deprecated")
+    
     expect_warning(d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
-        v_call = "v_call", j_call = "j_call", junc_len = NULL,
-        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
-        first = FALSE, split_light = TRUE
-    ))
-    expect_equal(d[["vj_group"]], d_oh[["vj_group"]], d_sl[["vj_group"]])
+                                      v_call="v_call", j_call="j_call", junc_len=NULL,
+                                      cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                                      first=FALSE, split_light=TRUE),
+                   "split_light = TRUE is deprecated")
+    expect_equal(d[['vj_group']], d_oh[['vj_group']], d_sl[['vj_group']])
+    
+    # bulk data
+    d_bulk <- groupGenes(db  %>% dplyr::filter(is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
+                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                          first=FALSE)
 
+    # mixed data
+    d_mixed <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
+                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
+                          first=FALSE)
+    
     # TODO SSNN 7/16/2024
     # Run tests with the same data used in scoper
 

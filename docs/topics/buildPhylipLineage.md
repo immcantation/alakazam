@@ -82,7 +82,7 @@ Vertex attributes:
 slot of the input `clone` for observed sequences. 
 The germline (root) vertex is assigned the name 
 "Germline" and inferred intermediates are assigned
-names with the format "Inferred1", "Inferred2", ....
+names with the format {"Inferred1", "Inferred2", ...}.
 + `sequence`:  value in the `sequence` column of the `data` 
 slot of the input `clone` for observed sequences.
 The germline (root) vertex is assigned the sequence
