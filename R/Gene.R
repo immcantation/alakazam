@@ -2,7 +2,8 @@
 
 #### Calculation functions ####
 
-#' Tabulates V(D)J allele, gene or family usage.
+#' Tabulates V(D)J allele, gene or family usage. If sequences from multiple loci are
+#' present, the frequency is calculated within each locus.
 #'
 #' Determines the count and relative abundance of V(D)J alleles, genes or families within
 #' groups.
@@ -29,6 +30,9 @@
 #'                   \code{gene}, without any processing.
 #' @param    fill    logical of \code{c(TRUE, FALSE)} specifying when if groups (when specified)
 #'                   lacking a particular gene should be counted as 0 if TRUE or not (omitted).
+#' @param    first   if TRUE return only the first allele/gene/family call for computing the frequency; if FALSE return all calls delimited by commas.
+#' @param    collapse  if TRUE check for duplicates and return only unique allele/gene/family assignments per sequence; if
+#'                   FALSE return all assignments (faster). Has no effect if first=TRUE.
 #' @param   remove_na    removes rows with \code{NA} values in the gene column if \code{TRUE} and issues a warning.
 #'                        Otherwise, keeps those rows and considers \code{NA} as a gene in the final counts
 #'                        and relative abundances.
@@ -37,6 +41,7 @@
 #' @return   A data.frame summarizing family, gene or allele counts and frequencies
 #'           with columns:
 #'           \itemize{
+#'             \item \code{locus}:        locus of the gene (IGH, IGK, IGL, TRA, TRB, TRD, TRG). Note that frequencies are calculated within each locus.
 #'             \item \code{gene}:         name of the family, gene or allele.
 #'             \item \code{seq_count}:    total number of sequences for the gene.
 #'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
@@ -82,9 +87,7 @@
 #' @export
 countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fill = FALSE, first = TRUE, collapse = TRUE,
                        mode = c("gene", "allele", "family", "asis"), cell_id = "cell_id", remove_na = TRUE) {
-    # TODO: expose getSegment params here
-    # TODO: add and document first=TRUE and collapse=TRUE
-    # TODO: get frequency within each of the locus (IGH, IGK, IGL, TRB, TRA, TRD, TRG), get first three letters from the gene call.
+
     ## DEBUG
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)
@@ -154,19 +157,19 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                 dplyr::summarize(cell_count = n()) %>%
                 dplyr::ungroup() %>%
                 dplyr::select(!!!rlang::syms(c(groups, "cell_count")))
-            gene_tab_count <- data %>% 
+            gene_tab_count <- data %>%
                 dplyr::select(!!!rlang::syms(c(groups, gene, cell_id))) %>%
                 dplyr::distinct() %>%
                 dplyr::group_by(!!!rlang::syms(c(groups, gene))) %>%
                 dplyr::summarize(seq_count = n())
             if (nrow(cell_num) > 1) {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::left_join(cell_num, by=groups) %>%
-                    dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/!!rlang::sym("cell_count")) %>%
+                    dplyr::left_join(cell_num, by = groups) %>%
+                    dplyr::mutate(seq_freq = !!rlang::sym("seq_count") / !!rlang::sym("cell_count")) %>%
                     dplyr::arrange(desc(!!rlang::sym("seq_count")))
             } else {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::mutate(seq_freq=!!rlang::sym("seq_count")/cell_num[["cell_count"]]) %>%
+                    dplyr::mutate(seq_freq = !!rlang::sym("seq_count") / cell_num[["cell_count"]]) %>%
                     dplyr::arrange(desc(!!rlang::sym("seq_count")))
             }
         } else {
@@ -1314,9 +1317,9 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
                 # sanity check
                 # both chains are present in the cell
                 # ssnn: TODO BUG This sanity check doesn't work for mixed data
-                # Error in if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) !=  : 
+                # Error in if (!is.na(data_orig[[cell_id]][i_orig_h]) & length(i_orig_l) !=  :
                 #              the condition has length > 1
-                # Debug shows: 
+                # Debug shows:
                 # !is.na(data_orig[[cell_id]][i_orig_h])
                 # [1] FALSE FALSE
                 # Browse[1]> data
@@ -1335,19 +1338,19 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
                 # 6         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK       1              12       G2
                 # 7         S1            IGKV1-1*01 IGKJ1*01 TGTCCCCCCTGG   IGK    <NA>              12     <NA>
                 # account for the NA cell_ids length being longer than 1
-                for(i in 1:length(i_orig_h)){
-                  i_orig_h_temp <- i_orig_h[i]
-                  if (!is.na(data_orig[[cell_id]][i_orig_h_temp]) & length(i_orig_l) != 0) {
-                    # sanity check
-                    stopifnot( all( data_orig[[cell_id]][c(i_orig_h_temp, i_orig_l)] == cell_id_uniq[i_cell] ) )
-                  } else{
-                    # just the heavy chain
-                    if (is.na(data_orig[[cell_id]][i_orig_h_temp])) {
-                      stopifnot(is.na(cell_id_uniq[i_cell]))
-                    }else{
-                      stopifnot(data_orig[[cell_id]][i_orig_h_temp] == cell_id_uniq[i_cell])
+                for (i in 1:length(i_orig_h)) {
+                    i_orig_h_temp <- i_orig_h[i]
+                    if (!is.na(data_orig[[cell_id]][i_orig_h_temp]) & length(i_orig_l) != 0) {
+                        # sanity check
+                        stopifnot(all(data_orig[[cell_id]][c(i_orig_h_temp, i_orig_l)] == cell_id_uniq[i_cell]))
+                    } else {
+                        # just the heavy chain
+                        if (is.na(data_orig[[cell_id]][i_orig_h_temp])) {
+                            stopifnot(is.na(cell_id_uniq[i_cell]))
+                        } else {
+                            stopifnot(data_orig[[cell_id]][i_orig_h_temp] == cell_id_uniq[i_cell])
+                        }
                     }
-                  }
                 }
                 # grouping
                 data_orig$vj_group[c(i_orig_h, i_orig_l)] <- data$vj_group[i_cell]
