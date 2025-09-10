@@ -140,15 +140,15 @@ test_that("countGenes", {
     )
 
     genes <- countGenes(db_some_na, gene = "v_call", mode = "gene", remove_na = FALSE)
-    # A locus cannot be determined if the gene is NA. When determining the denominator (locus_count), 
+    # A locus cannot be determined if the gene is NA. When determining the denominator (locus_count),
     # these sequences will be considered separately as their own "NA" locus.
     # Example:
     #  locus gene    seq_count locus_count seq_freq
     # <chr> <chr>       <int>       <int>    <dbl>
-    #1 IGH   IGHV1-1         3           8    0.375
-    #2 IGH   IGHV1-2         3           8    0.375
-    #3 IGH   IGHV1-3         2           8    0.25 
-    #4 NA    NA              2           2    1 
+    # 1 IGH   IGHV1-1         3           8    0.375
+    # 2 IGH   IGHV1-2         3           8    0.375
+    # 3 IGH   IGHV1-3         2           8    0.25
+    # 4 NA    NA              2           2    1
     expect_equal(genes$seq_freq,
         c(0.375, 0.375, 0.25, 1),
         tolerance = 0.001
@@ -737,30 +737,40 @@ test_that("groupGenes, mixed bulk and single cell", {
         first = FALSE
     )
     expect_equal(d[["vj_group"]], c("G2", "G1", "G3", "G2"))
-    
-    expect_warning(d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
-                    v_call="v_call", j_call="j_call", junc_len=NULL,
-                    cell_id="cell_id", locus="locus", only_heavy=FALSE,
-                    first=FALSE),
-                   "only_heavy = FALSE is deprecated")
-    
-    expect_warning(d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
-                                      v_call="v_call", j_call="j_call", junc_len=NULL,
-                                      cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                                      first=FALSE, split_light=TRUE),
-                   "split_light = TRUE is deprecated")
-    expect_equal(d[['vj_group']], d_oh[['vj_group']], d_sl[['vj_group']])
-    
+
+    expect_warning(
+        d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+            v_call = "v_call", j_call = "j_call", junc_len = NULL,
+            cell_id = "cell_id", locus = "locus", only_heavy = FALSE,
+            first = FALSE
+        ),
+        "only_heavy = FALSE is deprecated"
+    )
+
+    expect_warning(
+        d_sl <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+            v_call = "v_call", j_call = "j_call", junc_len = NULL,
+            cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+            first = FALSE, split_light = TRUE
+        ),
+        "split_light = TRUE is deprecated"
+    )
+    expect_equal(d[["vj_group"]], d_oh[["vj_group"]], d_sl[["vj_group"]])
+
     # bulk data
-    d_bulk <- groupGenes(db  %>% dplyr::filter(is.na(cell_id)), v_call="v_call", j_call="j_call", junc_len=NULL,
-                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                          first=FALSE)
+    d_bulk <- groupGenes(db %>% dplyr::filter(is.na(cell_id)),
+        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+        first = FALSE
+    )
 
     # mixed data
-    d_mixed <- groupGenes(db, v_call="v_call", j_call="j_call", junc_len=NULL,
-                          cell_id="cell_id", locus="locus", only_heavy=TRUE,
-                          first=FALSE)
-    
+    d_mixed <- groupGenes(db,
+        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+        first = FALSE
+    )
+
     # TODO SSNN 7/16/2024
     # Run tests with the same data used in scoper
 
@@ -818,11 +828,11 @@ test_that("countGenes, AIRR-format migration", {
         gene = "v_call", groups = "sample",
         mode = "allele", fill = TRUE
     )
-    
+
     # genes_c uses "SAMPLE", genes_a uses "sample"
     # make colnames same case for comparison
     colnames(genes_c) <- tolower(colnames(genes_c))
-    expect_true(dplyr::all_equal(genes_c, genes_a))
+    expect_true(all.equal(genes_c, genes_a[rownames(genes_c), names(genes_c)]))
 })
 
 test_that("groupGenes, AIRR-format migration", {
