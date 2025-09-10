@@ -812,8 +812,11 @@ test_that("countGenes, AIRR-format migration", {
         gene = "v_call", groups = "sample",
         mode = "allele", fill = TRUE
     )
-
-    expect_true(all(genes_c == genes_a))
+    
+    # genes_c uses "SAMPLE", genes_a uses "sample"
+    # make colnames same case for comparison
+    colnames(genes_c) <- tolower(colnames(genes_c))
+    expect_true(dplyr::all_equal(genes_c, genes_a))
 })
 
 test_that("groupGenes, AIRR-format migration", {
