@@ -778,10 +778,10 @@ singleCellValidation <- function(data, locus = "locus", cell_id = "cell_id") {
 #' or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an
 #' error message and stops.
 #'
-#' Under single-cell mode with paired chained sequences, there is a choice of whether
+#' Under single-cell mode with paired chained sequences, there was a choice of whether
 #' grouping should be done by (a) using IGH (BCR) or TRB/TRD (TCR) sequences only or
 #' (b) using IGH plus IGK/IGL (BCR) or TRB/TRD plus TRA/TRG (TCR).
-#' This is governed by the \code{only_heavy} argument.
+#' This was governed by the \code{only_heavy} argument, now deprecated.
 #'
 #' Specifying \code{junc_len} will force \code{groupGenes} to perform a 1-stage partitioning of the
 #' sequences/cells based on V gene, J gene, and junction length simultaneously.
@@ -1012,6 +1012,8 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
             data[[cell_id]][i_cell] <- cell_id_uniq[i_cell]
 
             # heavy chain V, J, junc_len
+            # If the cell doesn't have heavy chain data, the gene
+            # calls assigned with paste0 will be "" (empty strings)
             data[[v_call]][i_cell] <- paste0(data_orig[[v_call]][i_cell_h],
                 collapse = separator_between_seq
             )
@@ -1051,6 +1053,12 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
 
     # Check NA(s) in columns
     bool_na <- rowSums(is.na(data[, c(cols_for_grouping_heavy, cols_for_grouping_light)])) > 0
+    # Check for empty strings as well. They happen
+    # if a single cell cell_id only has light chain data.
+    # If not removed, the group identifiers can have numbering not correlative e.g G2, G3, and no G1.
+    bool_empty <- rowSums(data[, c(cols_for_grouping_heavy, cols_for_grouping_light)] == "") > 0
+    # consider empty as NA
+    bool_na <- bool_na | bool_empty
     if (any(bool_na)) {
         entityName <- ifelse(single_cell, " cell(s)", " sequence(s)")
         msg <- paste0(

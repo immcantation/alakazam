@@ -721,22 +721,25 @@ test_that("groupGenes, single-cell mode, heavy only", {
 test_that("groupGenes, mixed bulk and single cell", {
     # TODO: add other sc cell with different L to test only_heavy T/F and fix tests
     db <- data.frame(
-        subject_id = c("S1", "S1", "S1", "S1", "S1", "S1", "S1"),
-        v_call = c("IGHV1-1*01", "IGHV1-1*01", "IGHV1-2*01", "IGHV1-1*01,IGHV1-2*01", "IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01"),
-        j_call = c("IGHJ2*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGKJ1*01", "IGKJ1*01"),
-        junction = c("TGTAAAAAATGG", "TGTAAAAAATGG", "TGTAAAACCTGG", "TGTAAACCCTGG", "TGTAAACCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG"),
-        locus = c("IGH", "IGH", "IGH", "IGH", "IGH", "IGK", "IGK"),
-        cell_id = c(1, 2, 3, NA, NA, 1, NA),
+        subject_id = c("S1", "S1", "S1", "S1", "S1", "S1", "S1", "S1"),
+        v_call = c("IGHV1-1*01", "IGHV1-1*01", "IGHV1-2*01", "IGHV1-1*01,IGHV1-2*01", "IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01","IGKV1-1*01"),
+        j_call = c("IGHJ2*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGKJ1*01", "IGKJ1*01", "IGKJ1*01"),
+        junction = c("TGTAAAAAATGG", "TGTAAAAAATGG", "TGTAAAACCTGG", "TGTAAACCCTGG", "TGTAAACCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG"),
+        locus = c("IGH", "IGH", "IGH", "IGH", "IGH", "IGK", "IGK", "IGK"),
+        cell_id = c(1, 2, 3, NA, NA, 1, NA, 4),
         junction_length = 12
     )
 
     # subset to single-cell sequences
-    d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
-        v_call = "v_call", j_call = "j_call", junc_len = NULL,
-        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
-        first = FALSE
-    )
-    expect_equal(d[["vj_group"]], c("G2", "G1", "G3", "G2"))
+    # expect warning, one cell has only light chain and will be assigned group NA
+    expect_warning(
+        d <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
+                        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+                        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+                        first = FALSE),
+                        pattern="NA(s) found in one or more of "
+        )
+    expect_equal(d[["vj_group"]], c("G2", "G1", "G3", "G2", NA))
 
     expect_warning(
         d_oh <- groupGenes(db %>% dplyr::filter(!is.na(cell_id)),
@@ -765,12 +768,15 @@ test_that("groupGenes, mixed bulk and single cell", {
     )
 
     # mixed data
-    d_mixed <- groupGenes(db,
-        v_call = "v_call", j_call = "j_call", junc_len = NULL,
-        cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
-        first = FALSE
+    expect_warning(
+        d_mixed <- groupGenes(db,
+                              v_call = "v_call", j_call = "j_call", junc_len = NULL,
+                              cell_id = "cell_id", locus = "locus", only_heavy = TRUE,
+                              first = FALSE
+        ),
+        pattern="NA(s) found in one or more of "
     )
-
+    expect_equal(d_mixed[["vj_group"]], c("G2", "G1", "G1", "G1", "G1", "G2", NA, NA))
     # TODO SSNN 7/16/2024
     # Run tests with the same data used in scoper
 
