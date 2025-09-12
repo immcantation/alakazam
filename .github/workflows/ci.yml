@@ -31,7 +31,7 @@ jobs:
         run: |
             options(crayon.enabled=TRUE)
             result <- rcmdcheck::rcmdcheck(
-              args = c("--as-cran", "--run-donttest", "--timings"), 
+              args = c("--no-manual", "--as-cran", "--run-donttest", "--timings"), 
               error_on = "warning", 
               check_dir = "check"
             )
