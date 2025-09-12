@@ -48,6 +48,10 @@ jobs:
               quit(status = 1)
             }
         shell: Rscript {0}
+      - name: testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash        
       # - name: Install
       #   run: |
       #     devtools::install()
