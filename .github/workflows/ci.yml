@@ -33,7 +33,7 @@ jobs:
             result <- rcmdcheck::rcmdcheck(
               args = c("--as-cran", "--run-donttest", "--timings"), 
               error_on = "warning", 
-              check_dir = "check")
+              check_dir = "check"
             )
             if (result$status == 1) {
               if (grepl("Execution halted\\n$", result$stdout) ) {
