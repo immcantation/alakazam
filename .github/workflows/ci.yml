@@ -26,12 +26,11 @@ jobs:
             sed -i '/test/ d' .Rbuildignore
         shell: bash
       - name: Check
-        env:
-          _R_CHECK_CRAN_INCOMING_: false
-        run: |
-          options(crayon.enabled=TRUE)
-          rcmdcheck::rcmdcheck(args = c("--as-cran", "--run-donttest", "--timings"), error_on="warning", check_dir="check")
-        shell: Rscript {0}
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--as-cran", "--run-donttest", "--timings")'
+          error-on: 'warning'
+          check-dir: '"check"'
       # - name: Install
       #   run: |
       #     devtools::install()
