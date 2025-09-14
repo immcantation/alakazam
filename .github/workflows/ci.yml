@@ -25,28 +25,24 @@ jobs:
         run: |
             sed -i '/test/ d' .Rbuildignore
         shell: bash
-      - name: Check
+      - name: Run Tests
+        run: |
+            devtools::test() 
+        shell: Rscript {0}
+      - name: CRAN check
         env:
           _R_CHECK_CRAN_INCOMING_: false
         run: |
-            options(crayon.enabled=TRUE)
-            result <- rcmdcheck::rcmdcheck(
-              args = c("--no-manual", "--as-cran", "--run-donttest", "--timings"), 
-              error_on = "warning", 
-              check_dir = "check"
-            )
-            if (result$status == 1) {
-              if (grepl("Execution halted\\n$", result$stdout) ) {
-                cat("R CMD check halted\n")
-                quit(status = 1)
-              }
-              cat("R CMD check failed\n")
-              quit(status = 1)
-            }
-            if (length(result$errors) > 0 | length(result$warnings) > 0) {
-              cat("R CMD check failed\n")
-              quit(status = 1)
-            }
+              options(crayon.enabled=TRUE)
+              rcmdcheck::rcmdcheck(
+                args = c("--no-manual", 
+                          "--no-tests", 
+                          "--as-cran", 
+                          "--run-donttest", 
+                          "--timings"),
+                error_on = "warning", 
+                check_dir = "check"
+              )
         shell: Rscript {0}
       - name: testthat output
         if: always()
