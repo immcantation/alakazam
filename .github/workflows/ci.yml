@@ -27,7 +27,7 @@ jobs:
         shell: bash
       - name: Run Tests
         run: |
-            devtools::test() 
+            testthat::test_local()
         shell: Rscript {0}
       - name: CRAN check
         env:
