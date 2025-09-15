@@ -846,7 +846,11 @@ test_that("testDiversity reproduces v0.2.11 results", {
 
 test_that("estimateAbundance-mixed", {
 	set.seed(90)
-	abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+    expect_warning(
+        abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+        regexp="NA(s) found in 2 row(s) of the clone_id column and excluded from tabulation",
+        fixed=TRUE
+    )
 	expect_equal(abund@abundance$p[1:5], 
 	             c(0.69500, 0.11750, 0.10375, 0.04375, 0.04000),
 	             tolerance=0.001, check.attributes = FALSE)
@@ -863,7 +867,12 @@ test_that("estimateAbundance-mixed", {
 test_that("estimateAbundance-sc", {
 
 	set.seed(90)
-	abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+    # seq18 has clone_id=NA
+    expect_warning(
+        abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+        regexp="NA(s) found in 1 row(s) of the clone_id column and excluded from tabulation",
+        fixed=TRUE
+    )
 	expect_equal(abund@abundance$p[1:5], 
 	             c(0.68000000, 0.11933333, 0.11000000, 0.04733333, 0.04333333),
 	             tolerance=0.001, check.attributes = FALSE)
@@ -878,7 +887,11 @@ test_that("estimateAbundance-sc", {
 })
 test_that("estimateAbundance-bulk", {
 	set.seed(90)
-	abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+	expect_warning(
+	    abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+	    regexp="NA(s) found in 2 row(s) of the clone_id column and excluded from tabulation",
+	    fixed=TRUE
+	)
 	expect_equal(abund@abundance$p[1:4], 
 	             c(0.67357143, 0.14035714, 0.11250000, 0.07357143),
 	             tolerance=0.001, check.attributes = FALSE)
@@ -895,7 +908,11 @@ test_that("estimateAbundance-bulk", {
 test_that("alphaDiversity-mixed", {
     # Test diversity
     set.seed(5)
-	abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+    expect_warning(
+	    abund <- estimateAbundance(db_mixed_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+	    "NA(s) found in 2 row(s) of the clone_id column and excluded from tabulation",
+	    fixed=TRUE
+    )
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9), ])
 	exp <- data.frame("group" = c("All", "All", "All"),
@@ -920,7 +937,11 @@ test_that("alphaDiversity-mixed", {
 test_that("alphaDiversity-sc", {
     # Test diversity
     set.seed(5)
-	abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+    expect_warning(
+        abund <- estimateAbundance(db_sc_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+        regexp="NA(s) found in 1 row(s) of the clone_id column and excluded from tabulation",
+        fixed=TRUE
+    )
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9), ])
 	exp <- data.frame("group" = c("All", "All", "All"),
@@ -945,7 +966,11 @@ test_that("alphaDiversity-sc", {
 test_that("alphaDiversity-bulk", {
     # Test diversity
     set.seed(5)
-	abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2)
+    expect_warning(
+        abund <- estimateAbundance(db_bulk_cloned, ci=0.95, nboot=100, clone="clone_id", min_n = 2),
+        regexp="NA(s) found in 2 row(s) of the clone_id column and excluded from tabulation",
+        fixed=TRUE
+    )
 	div <- alphaDiversity(abund, step_q=1, max_q=10)
 	obs <- data.frame(div@diversity[c(1,3,9), ])
 	exp <- data.frame("group" = c("All", "All", "All"),
