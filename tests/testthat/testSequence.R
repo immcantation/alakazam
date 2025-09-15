@@ -262,7 +262,7 @@ test_that("maskSeqGaps", {
     expect_equal(maskSeqGaps(c("ATG-C", "CC..C")),
                  c("ATGNC", "CCNNC"))
     
-    expect_equal(maskSeqGaps("--ATG-C-"), "NNATGNCN")
+    expect_equal(maskSeqGaps("--ATG-CC"), "NNATGNCN")
     expect_equal(maskSeqGaps("--ATG-C-", outer_only=TRUE), "NNATG-CN")
 })
 
