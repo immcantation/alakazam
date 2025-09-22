@@ -92,7 +92,7 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
     # data=ExampleDb; gene="c_call"; groups=NULL; mode="gene"; clone="clone_id"
     # data=subset(db, clond_id == 3138)
     # Hack for visibility of dplyr variables
-    . <- NULL
+    # . <- NULL
 
     # Check input
     mode <- match.arg(mode)
