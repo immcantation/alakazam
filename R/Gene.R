@@ -826,12 +826,10 @@ singleCellValidation <- function(data, locus = "locus", cell_id = "cell_id") {
 #'
 #' @export
 groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NULL,
-                       sequence_alignment = NULL, cell_id = NULL, split_light = FALSE,
-                       locus = "locus", only_heavy = TRUE, first = FALSE) {
+                    sequence_alignment = NULL, cell_id = NULL, split_light = FALSE,
+                    locus = "locus", only_heavy = TRUE, first = FALSE) {
     # CGJ 6/24/24 -- onlyHeavy warning
     # Deprecation/Removal of only_heavy = FALSE
-    # TODO update docs and release notes
-    # TODO consider using stop
     if (!only_heavy) {
         warning("only_heavy = FALSE is deprecated. Running as if only_heavy = TRUE")
         only_heavy <- TRUE

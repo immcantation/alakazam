@@ -1,12 +1,30 @@
+Version 1.4.0: September 22, 2025
+-------------------------------------------------------------------------------
+
+General:
+
++ Development of `alakazam` has moved to GitHub: https://github.com/immcantation/alakazam.
++ Adjusted data processing and error handling to accommodate for mixed data (bulk and single
+  cell sequences in the same data.frame).
+
+Gene:
+
++ **Deprecation**: `groupGenes` has deprecated the `only_heavy` and `split_light` 
+  arguments and now exclusively clusters sequences based on heavy chains. For users 
+  who need to split clones further by light chain information, use the 
+  `dowser::resolveLightChains` function.
+
++ Enhanced `countGenes` to count sequences by locus for bulk data when both `copy=NULL` 
+  and `clone=NULL`. The `first` and `collapse` arguments (utilized by `getGene`, 
+  `getAllele`, and `getFamily`) are now exposed to provide better control over how 
+  sequences are counted when multiple gene calls are present.
+
 Version 1.3.1: August 1, 2024
 -------------------------------------------------------------------------------
 
 Documentation:
 
 + This is a documentation-only update to address changes in Read the Docs.
-+ groupGenes has deprecated `only_heavy` and `split_light`. 
-+ groupGenes now only clusters on heavy chains
-+ If you want to split clones further by light chain information use dowser::resolveLightChains
 
 Version 1.3.0: September 29, 2023
 -------------------------------------------------------------------------------
