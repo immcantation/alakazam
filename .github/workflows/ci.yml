@@ -55,14 +55,14 @@ jobs:
                 check_dir = "check"
               )
         shell: Rscript {0}
-      - name: Build documentation
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -r docs/topics docs/vignettes
-          Rscript docs/build.R
-          git add docs/*
-          git commit -m "Build documentation [skip ci]" || echo "No changes to commit"
+      # - name: Build documentation
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      #     git rm -r docs/topics docs/vignettes
+      #     Rscript docs/build.R
+      #     git add docs/*
+      #     git commit -m "Build documentation [skip ci]" || echo "No changes to commit"
 
       - name: Update container
         run: |
