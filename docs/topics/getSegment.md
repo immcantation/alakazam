@@ -3,9 +3,9 @@
 Description
 --------------------
 
-`getSegment` performs generic matching of delimited segment calls with a custom 
-regular expression. [getAllele](getSegment.md), [getGene](getSegment.md) and [getFamily](getSegment.md) extract 
-the allele, gene and family names, respectively, from a character vector of 
+`getSegment` performs generic matching of delimited segment calls with a custom
+regular expression. [getAllele](getSegment.md), [getGene](getSegment.md) and [getFamily](getSegment.md) extract
+the allele, gene and family names, respectively, from a character vector of
 immunoglobulin (Ig) or TCR segment allele calls in IMGT format.
 
 
@@ -83,18 +83,18 @@ segment_regex
 :   string defining the segment match regular expression.
 
 first
-:   if `TRUE` return only the first call in 
-`segment_call`; if `FALSE` return all calls 
+:   if `TRUE` return only the first call in
+`segment_call`; if `FALSE` return all calls
 delimited by commas.
 
 collapse
-:   if `TRUE` check for duplicates and return only unique 
-segment assignments; if `FALSE` return all assignments 
+:   if `TRUE` check for duplicates and return only unique
+segment assignments; if `FALSE` return all assignments
 (faster). Has no effect if `first=TRUE`.
 
 strip_d
-:   if `TRUE` remove the "D" from the end of gene annotations 
-(denoting a duplicate gene in the locus); 
+:   if `TRUE` remove the "D" from the end of gene annotations
+(denoting a duplicate gene in the locus);
 if `FALSE` do not alter gene names.
 
 omit_nl
@@ -102,7 +102,7 @@ omit_nl
 Only applies at the gene or allele level.
 
 sep
-:   character defining both the input and output segment call 
+:   character defining both the input and output segment call
 delimiter.
 
 
@@ -126,8 +126,10 @@ Examples
 
 ```R
 # Light chain examples
-kappa_call <- c("Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
-"Homsap IGKJ5*01 F")
+kappa_call <- c(
+"Homsap IGKV1D-39*01 F,Homsap IGKV1-39*02 F,Homsap IGKV1-39*01",
+"Homsap IGKJ5*01 F"
+)
 
 getAllele(kappa_call)
 
@@ -141,7 +143,7 @@ getAllele(kappa_call)
 
 
 ```R
-getAllele(kappa_call, first=FALSE)
+getAllele(kappa_call, first = FALSE)
 
 ```
 
@@ -153,7 +155,7 @@ getAllele(kappa_call, first=FALSE)
 
 
 ```R
-getAllele(kappa_call, first=FALSE, strip_d=FALSE)
+getAllele(kappa_call, first = FALSE, strip_d = FALSE)
 
 ```
 
@@ -179,7 +181,7 @@ getGene(kappa_call)
 
 
 ```R
-getGene(kappa_call, first=FALSE)
+getGene(kappa_call, first = FALSE)
 
 ```
 
@@ -191,7 +193,7 @@ getGene(kappa_call, first=FALSE)
 
 
 ```R
-getGene(kappa_call, first=FALSE, strip_d=FALSE)
+getGene(kappa_call, first = FALSE, strip_d = FALSE)
 
 ```
 
@@ -216,7 +218,7 @@ getFamily(kappa_call)
 
 
 ```R
-getFamily(kappa_call, first=FALSE)
+getFamily(kappa_call, first = FALSE)
 
 ```
 
@@ -228,7 +230,7 @@ getFamily(kappa_call, first=FALSE)
 
 
 ```R
-getFamily(kappa_call, first=FALSE, collapse=FALSE)
+getFamily(kappa_call, first = FALSE, collapse = FALSE)
 
 ```
 
@@ -240,7 +242,7 @@ getFamily(kappa_call, first=FALSE, collapse=FALSE)
 
 
 ```R
-getFamily(kappa_call, first=FALSE, strip_d=FALSE)
+getFamily(kappa_call, first = FALSE, strip_d = FALSE)
 
 ```
 
@@ -279,11 +281,13 @@ getChain(kappa_call)
 ```R
 
 # Heavy chain examples
-heavy_call <- c("Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F", 
-"Homsap IGHD1-1*01 F", 
-"Homsap IGHJ1*01 F")
+heavy_call <- c(
+"Homsap IGHV1-69*01 F,Homsap IGHV1-69D*01 F",
+"Homsap IGHD1-1*01 F",
+"Homsap IGHJ1*01 F"
+)
 
-getAllele(heavy_call, first=FALSE)
+getAllele(heavy_call, first = FALSE)
 
 ```
 
@@ -295,7 +299,7 @@ getAllele(heavy_call, first=FALSE)
 
 
 ```R
-getAllele(heavy_call, first=FALSE, strip_d=FALSE)
+getAllele(heavy_call, first = FALSE, strip_d = FALSE)
 
 ```
 
@@ -309,7 +313,7 @@ getAllele(heavy_call, first=FALSE, strip_d=FALSE)
 
 ```R
 
-getGene(heavy_call, first=FALSE)
+getGene(heavy_call, first = FALSE)
 
 ```
 
@@ -321,7 +325,7 @@ getGene(heavy_call, first=FALSE)
 
 
 ```R
-getGene(heavy_call, first=FALSE, strip_d=FALSE)
+getGene(heavy_call, first = FALSE, strip_d = FALSE)
 
 ```
 
@@ -372,11 +376,13 @@ getChain(heavy_call)
 ```R
 
 # Filtering non-localized genes
-nl_call <- c("IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01", 
+nl_call <- c(
+"IGHV3-NL1*01,IGHV3-30-3*01,IGHV3-30*01",
 "Homosap IGHV3-30*01 F,Homsap IGHV3-NL1*01 F",
-"IGHV1-NL1*01")
+"IGHV1-NL1*01"
+)
 
-getAllele(nl_call, first=FALSE, omit_nl=TRUE)
+getAllele(nl_call, first = FALSE, omit_nl = TRUE)
 
 ```
 
@@ -389,7 +395,7 @@ getAllele(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```R
-getGene(nl_call, first=FALSE, omit_nl=TRUE)
+getGene(nl_call, first = FALSE, omit_nl = TRUE)
 
 ```
 
@@ -401,7 +407,7 @@ getGene(nl_call, first=FALSE, omit_nl=TRUE)
 
 
 ```R
-getFamily(nl_call, first=FALSE, omit_nl=TRUE)
+getFamily(nl_call, first = FALSE, omit_nl = TRUE)
 
 ```
 

@@ -2,17 +2,6 @@
 [![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam)
 [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 
-**IMPORTANT!** 
-Alakazam has moved to https://github.com/immcantation/alakazam
-
-To update Git configuration settings use:
-
-```
-   git config user.email "your-gh-user@email.com"
-   git config user.name "your-gh-user-name"
-   git remote set-url origin git@github.com:immcantation/alakazam.git
-```
-
 Alakazam
 -------------------------------------------------------------------------------
 

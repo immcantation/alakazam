@@ -77,14 +77,14 @@ plotEdgeTest(x, color="steelblue", style="hist")
 
 ```
 
-![2](plotEdgeTest-2.png)
+*Warning*:Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.![3](plotEdgeTest-3.png)
 
 ```R
 plotEdgeTest(x, style="cdf")
 
 ```
 
-![4](plotEdgeTest-4.png)
+![5](plotEdgeTest-5.png)
 
 
 See also
