@@ -44,7 +44,7 @@
 #'             \item \code{locus}:        locus of the gene (IGH, IGK, IGL, TRA, TRB, TRD, TRG). Note that frequencies are calculated within each locus.
 #'             \item \code{gene}:         name of the family, gene or allele.
 #'             \item \code{seq_count}:    total number of sequences for the gene in the locus.
-#' #'          \item \code{locus_count}:  total number of sequences in the locus.
+#'             \item \code{locus_count}:  total number of sequences in the locus.
 #'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
 #'             \item \code{copy_count}:   sum of the copy counts in the \code{copy} column.
