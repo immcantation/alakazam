@@ -71,10 +71,10 @@
 #' genes <- countGenes(ExampleDb, gene = "v_call", groups = "sample_id", mode = "allele")
 #'
 #' # With copy numbers and multiple groups
-# ' genes <- countGenes(ExampleDb,
-# '     gene = "v_call", groups = c("sample_id", "c_call"),
-# '     copy = "duplicate_count", mode = "family"
-# ' )
+#' genes <- countGenes(ExampleDb,
+#'     gene = "v_call", groups = c("sample_id", "c_call"),
+#'     copy = "duplicate_count", mode = "family"
+#' )
 #'
 #' # Count by clone
 #' genes <- countGenes(ExampleDb,
