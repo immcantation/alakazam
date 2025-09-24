@@ -43,12 +43,16 @@
 #'           \itemize{
 #'             \item \code{locus}:        locus of the gene (IGH, IGK, IGL, TRA, TRB, TRD, TRG). Note that frequencies are calculated within each locus.
 #'             \item \code{gene}:         name of the family, gene or allele.
-#'             \item \code{seq_count}:    total number of sequences for the gene.
+#'             \item \code{seq_count}:    total number of sequences for the gene in the locus.
+#' #'          \item \code{locus_count}:  total number of sequences in the locus.
 #'             \item \code{seq_freq}:     frequency of the gene as a fraction of the total
 #'                                        number of sequences within each grouping.
 #'             \item \code{copy_count}:   sum of the copy counts in the \code{copy} column.
 #'                                        for each gene. Only present if the \code{copy}
 #'                                        argument is specified.
+#'             \item \code{locus_copy_count}: sum of the copy counts in the \code{copy} column.
+#'                                        for all gene in the locus. Only present if the 
+#'                                        \code{copy} argument is specified.
 #'             \item \code{copy_freq}:    frequency of the gene as a fraction of the total
 #'                                        copy number within each group. Only present if
 #'                                        the \code{copy} argument is specified.
@@ -67,10 +71,10 @@
 #' genes <- countGenes(ExampleDb, gene = "v_call", groups = "sample_id", mode = "allele")
 #'
 #' # With copy numbers and multiple groups
-#' genes <- countGenes(ExampleDb,
-#'     gene = "v_call", groups = c("sample_id", "c_call"),
-#'     copy = "duplicate_count", mode = "family"
-#' )
+# ' genes <- countGenes(ExampleDb,
+# '     gene = "v_call", groups = c("sample_id", "c_call"),
+# '     copy = "duplicate_count", mode = "family"
+# ' )
 #'
 #' # Count by clone
 #' genes <- countGenes(ExampleDb,
