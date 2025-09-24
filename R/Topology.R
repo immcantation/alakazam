@@ -639,7 +639,7 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
             ylab("Number of realizations") + 
             geom_histogram(bins=50, fill=color, color=NA) +
             geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
-                       color="firebrick", linetype=3, size=0.75) + 
+                       color="firebrick", linetype=3, linewidth=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     } else if (style == "cdf") {    
         # Plot ECDF of edge null distribution
@@ -648,11 +648,11 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
             ggtitle(main_title) +
             xlab("Number of edges") +
             ylab("P-value") +
-            stat_ecdf(color=color, size=1) +
+            stat_ecdf(color=color, linewidth=1) +
             geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), color="firebrick", 
-                       linetype=3, size=0.75) + 
+                       linetype=3, linewidth=0.75) + 
             geom_hline(data=obs_sum, aes(yintercept=!!rlang::sym("pvalue")), color="steelblue", 
-                       linetype=3, size=0.75) + 
+                       linetype=3, linewidth=0.75) + 
             facet_grid("Child ~ Parent", labeller=label_both, scales="free")
     }
     
@@ -725,7 +725,7 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
             ylab("Number of realizations") + 
             geom_histogram(fill=color, color=NA, bins=50) +
             geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
-                       color="firebrick", linetype=3, size=0.75) + 
+                       color="firebrick", linetype=3, linewidth=0.75) + 
             facet_wrap("Annotation", ncol=1, scales="free_y")
     } else if (style == "cdf") {
         # Plot ECDF of MRCA null distribution
@@ -734,11 +734,11 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
             ggtitle(main_title) +
             xlab("Number of MRCAs") +
             ylab("P-value") +
-            stat_ecdf(color=color, size=1) +
+            stat_ecdf(color=color, linewidth=1) +
             geom_vline(data=obs_sum, aes(xintercept=!!rlang::sym("count")), 
-                       color="firebrick", linetype=3, size=0.75) + 
+                       color="firebrick", linetype=3, linewidth=0.75) + 
             geom_hline(data=obs_sum, aes(yintercept=!!rlang::sym("pvalue")), 
-                       color="steelblue", linetype=3, size=0.75) + 
+                       color="steelblue", linetype=3, linewidth=0.75) + 
             facet_wrap("Annotation", nrow=1, scales="free_y")
     }
     
@@ -883,7 +883,7 @@ plotSubtrees <- function(graphs, field, stat, root="Germline", exclude=c("Germli
         p1 <- p1 + geom_violin(aes(fill=!!rlang::sym(field)), adjust=1.5, scale="width", trim=T, 
                                width=0.7, alpha=0.8) +
             geom_errorbarh(aes(xmin=after_stat(x) - 0.4, xmax=after_stat(x) + 0.4), color="black", 
-                           stat="summary", fun="mean", size=1.25, height=0, alpha=0.9)
+                           stat="summary", fun="mean", linewidth=1.25, height=0, alpha=0.9)
     }
 
     # Set colors and legend
