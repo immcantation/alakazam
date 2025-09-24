@@ -91,12 +91,16 @@ with columns:
 
 +  `locus`:        locus of the gene (IGH, IGK, IGL, TRA, TRB, TRD, TRG). Note that frequencies are calculated within each locus.
 +  `gene`:         name of the family, gene or allele.
-+  `seq_count`:    total number of sequences for the gene.
++  `seq_count`:    total number of sequences for the gene in the locus.
++  `locus_count`:  total number of sequences in the locus.
 +  `seq_freq`:     frequency of the gene as a fraction of the total
 number of sequences within each grouping.
 +  `copy_count`:   sum of the copy counts in the `copy` column.
 for each gene. Only present if the `copy`
 argument is specified.
++  `locus_copy_count`: sum of the copy counts in the `copy` column.
+for all gene in the locus. Only present if the 
+`copy` argument is specified.
 +  `copy_freq`:    frequency of the gene as a fraction of the total
 copy number within each group. Only present if
 the `copy` argument is specified.

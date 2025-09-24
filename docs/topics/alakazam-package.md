@@ -48,6 +48,9 @@ Other contributors:
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu) [contributor]
 +  Edel Aron [edel.aron@yale.edu](edel.aron@yale.edu) [contributor]
 +  Gisela Gabernet [gisela.gabernet@yale.edu](gisela.gabernet@yale.edu) [contributor]
++  Caroline Sullivan [caroline.sullivan@yale.edu](caroline.sullivan@yale.edu) [contributor]
++  Hailong Meng [hailong.meng@yale.edu](hailong.meng@yale.edu) [contributor]
++  Burhan Sabuwala [burhan.sabuwala@yale.edu](burhan.sabuwala@yale.edu) [contributor]
 
 
 

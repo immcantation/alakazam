@@ -128,7 +128,7 @@ columns, if present, must be of type `character` (as opposed to `factor`).
 It is assumed that ambiguous gene assignments are separated by commas.
 
 All rows containing `NA` values in any of the `v_call`, `j_call`, and `junc_len`
-(if `junc_len != NULL`) columns will be excluded from the group analysis. A warning will be issued when a row
+(if `junc_len != NULL`) columns will be removed. A warning will be issued when a row
 containing an `NA` is removed.
 
 
