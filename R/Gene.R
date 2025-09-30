@@ -142,7 +142,7 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
         data_sc <- data %>% dplyr::filter(!is.na(!!rlang::sym(cell_id)))
         data_sc[[cell_id]] <- as.character(data_sc[[cell_id]])
         data_blk <- data %>% dplyr::filter(is.na(!!rlang::sym(cell_id)))
-        if (nrow(data_blk > 0)) {
+        if (nrow(data_blk) > 0) {
             warning(paste0(
                 "Mixed bulk and single-cell data detected.\n",
                 "Sequences with '", cell_id, "' NA will be counted individually towards the total number of sequences.\n",
