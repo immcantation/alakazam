@@ -536,6 +536,18 @@ test_that("countClones with sc data and specified copy fails", {
     expect_error(clones <- countClones(db_sc_cloned, copy="umi_count"))
 })
 
+test_that("countClones with sc data and factor grouping variables", {
+    # Test for issue: countClones throws error with single cell data and factors in grouping variables
+    db_sc_factor <- db_sc_cloned %>% 
+        dplyr::mutate(sample_id = factor("a", levels = "a"))
+    
+    expect_warning(clones <- countClones(db_sc_factor, groups = "sample_id"))
+    expect_true(is.data.frame(clones))
+    expect_true(nrow(clones) > 0)
+    expect_true("sample_id" %in% names(clones))
+    expect_equal(sum(clones$seq_count), 15)
+})
+
 #### calcInferredDiversity ####
 
 test_that("calcDiversity", {
