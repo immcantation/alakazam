@@ -1,3 +1,11 @@
+Version 1.4.1: October 1, 2025
+-------------------------------------------------------------------------------
+
+Gene and Diversity:
+
++ Fixed a bug in `countClones` and `countGenes` where parentheses were 
+  misplaced, causing comparisons to be evaluated incorrectly.
+
 Version 1.4.0: September 22, 2025
 -------------------------------------------------------------------------------
 

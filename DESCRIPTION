@@ -1,7 +1,7 @@
 Package: alakazam
 Type: Package
-Version: 1.4.0.999
-Date: 2025-09-30
+Version: 1.4.1
+Date: 2025-10-01
 Authors@R: c(person("Susanna", "Marquez", role=c("cre", "aut"), 
                     email="susanna.marquez@yale.edu"),
              person("Namita", "Gupta", role=c("aut"), 
