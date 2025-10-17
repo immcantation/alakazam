@@ -1,3 +1,15 @@
+Version 1.4.1.999: Unreleased
+-------------------------------------------------------------------------------
+
+General:
+
++ Fixed a bug in `collapseDuplicates` that triggered an error when all
+  sequences in a group were classified as ambiguous, resulting in a 
+  dimension-dropping issue during data.frame subsetting.
+
+causing a dimension 
+  dropping related error when subsetting a data.frame.
+
 Version 1.4.1: October 1, 2025
 -------------------------------------------------------------------------------
 
