@@ -327,7 +327,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Exclude ambiguous sequences from clustering
     if (!dry & discard_count > 0) {
-            d_mat <- d_mat[-ambig_rows, -ambig_rows]
+            d_mat <- d_mat[-ambig_rows, -ambig_rows, drop = FALSE]  # 'drop = FALSE' to keep dataframe structure if only one sequence is left 
             data <- data[!data_ambig_rows,]
     }
     
