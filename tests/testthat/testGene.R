@@ -870,7 +870,7 @@ test_that("groupGenes, AIRR-format migration", {
         regexp = "airr::read_rearrangement"
     )
 
-    db_c$LOCUS <- getLocus(db$V_CALL)
+    db_c$LOCUS <- getLocus(db_c$V_CALL)
 
     newDb_c <- groupGenes(db_c, v_call = "V_CALL", j_call = "J_CALL", locus = "LOCUS")
     newDb_a <- groupGenes(db_a, v_call = "v_call", j_call = "j_call")
