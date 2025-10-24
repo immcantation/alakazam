@@ -872,18 +872,6 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
                 "A cell_id column was found in the data, but was not specified. All values are NA."
             ))
         }
-        # if (nmissing > 0) {
-        #     stop(paste(
-        #         "A cell_id column was found in the data, but was not specified.",
-        #         "Additionally, the data appears to have paired and unpaired cell data.",
-        #         "This data type requires the single cell workflow, please specify the cell_id and rerun."
-        #     ))
-        # } else {
-        #     stop(paste(
-        #         "A cell_id column was found in the data, but was not specified.",
-        #         "Please specify the cell_id column and rerun."
-        #     ))
-        # }
     }
 
     # Check base input
