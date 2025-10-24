@@ -953,8 +953,6 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
                 stop("The locus column contains invalid loci annotations.")
             }
         }
-    } else {
-        single_cell <- FALSE
     }
 
     # only set if `single_cell` & `only_heavy`
