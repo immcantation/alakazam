@@ -851,21 +851,39 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     # through the SC pathway
     # Let the user know that data seems to have single cell sequences, but they didn't set up
     # the function to run in single cell mode
-    # TODO update docs and release notes
     if (is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)) {
         nmissing <- sum(is.na(data$cell_id))
-        if (nmissing > 0) {
+        if (nmissing < nrow(data) & nmissing > 0) {
+            # cell_id values are partially missing
             stop(paste(
                 "A cell_id column was found in the data, but was not specified.",
                 "Additionally, the data appears to have paired and unpaired cell data.",
                 "This data type requires the single cell workflow, please specify the cell_id and rerun."
             ))
-        } else {
+        } else if (nmissing == 0) {
+            # all cell_id values are present
             stop(paste(
                 "A cell_id column was found in the data, but was not specified.",
-                "Please specify the cell_id column and rerun."
+                "This data type requires the single cell workflow, please specify the cell_id and rerun."
+            ))
+        } else {
+            # all cell_id values are missing
+            warning(paste(
+                "A cell_id column was found in the data, but was not specified. All values are NA."
             ))
         }
+        # if (nmissing > 0) {
+        #     stop(paste(
+        #         "A cell_id column was found in the data, but was not specified.",
+        #         "Additionally, the data appears to have paired and unpaired cell data.",
+        #         "This data type requires the single cell workflow, please specify the cell_id and rerun."
+        #     ))
+        # } else {
+        #     stop(paste(
+        #         "A cell_id column was found in the data, but was not specified.",
+        #         "Please specify the cell_id column and rerun."
+        #     ))
+        # }
     }
 
     # Check base input
