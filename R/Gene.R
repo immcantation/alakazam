@@ -1279,8 +1279,26 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     # this is the grouping
     # source: https://stackoverflow.com/questions/35772846/obtaining-connected-components-in-r
 
-    g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE)
+    # Create igraph object from adjacency matrix
+    if (sum(rowSums(mtx_adj) > 0) == nrow(mtx_adj)) {
+        # This "if" is to ignore a warning in the special case
+        # that all sequences are isolated (only diagonal elements).
+        # When mtx_adj is a diagonal matrix and diag=FALSE (no self-links), 
+        # the diagonal will be zeroed out and max, used somewhere in the igraph function, 
+        # will return an error like "no non-missing arguments to max"
+        withCallingHandlers(
+            g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE),
+            warning = function(w) {
+                if (grepl("no non-missing arguments to max", w$message)) {
+                    invokeRestart("muffleWarning")
+                }
+            }
+        )
+    } else {
+        g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE)
+    }
     # plot(g, vertex.size=10, vertex.label.cex=1, vertex.color="skyblue", vertex.label.color="black", vertex.frame.color="transparent", edge.arrow.mode=0)
+
 
     connected <- igraph::components(g)
     VJL_groups <- igraph::groups(connected)
