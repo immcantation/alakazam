@@ -660,6 +660,27 @@ test_that("groupGenes, when 1 row ", {
 })
 
 
+test_that("groupGenes all cell_id values are NA", {
+    db <- data.frame(
+        subject_id = c("S1", "S1", "S1", "S1", "S1", "S1", "S1", "S1"),
+        v_call = c("IGHV1-1*01", "IGHV1-1*01", "IGHV1-2*01", "IGHV1-1*01,IGHV1-2*01", "IGHV1-2*01", "IGKV1-1*01", "IGKV1-1*01","IGKV1-1*01"),
+        j_call = c("IGHJ2*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGHJ1*01", "IGKJ1*01", "IGKJ1*01", "IGKJ1*01"),
+        junction = c("TGTAAAAAATGG", "TGTAAAAAATGG", "TGTAAAACCTGG", "TGTAAACCCTGG", "TGTAAACCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG", "TGTCCCCCCTGG"),
+        locus = c("IGH", "IGH", "IGH", "IGH", "IGH", "IGK", "IGK", "IGK"),
+        cell_id = c(NA, NA, NA, NA, NA, NA, NA, NA),
+        junction_length = 12
+    )
+
+    expect_warning(
+        groupGenes(db,
+                        v_call = "v_call", j_call = "j_call", junc_len = NULL,
+                        locus = "locus", only_heavy = TRUE,
+                        first = FALSE),
+        "A cell_id column was found in the data, but was not specified. All values are NA."
+    )    
+})
+
+
 
 test_that("groupGenes, single-cell mode, heavy only", {
     # (in theory, should be 1 heavy per cell; but code-wise there is no restriction for groupGenes)
@@ -849,7 +870,7 @@ test_that("groupGenes, AIRR-format migration", {
         regexp = "airr::read_rearrangement"
     )
 
-    db_c$LOCUS <- getLocus(db$V_CALL)
+    db_c$LOCUS <- getLocus(db_c$V_CALL)
 
     newDb_c <- groupGenes(db_c, v_call = "V_CALL", j_call = "J_CALL", locus = "LOCUS")
     newDb_a <- groupGenes(db_a, v_call = "v_call", j_call = "j_call")

@@ -851,19 +851,25 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     # through the SC pathway
     # Let the user know that data seems to have single cell sequences, but they didn't set up
     # the function to run in single cell mode
-    # TODO update docs and release notes
     if (is.null(cell_id) & "cell_id" %in% colnames(data) & !is.null(locus)) {
         nmissing <- sum(is.na(data$cell_id))
-        if (nmissing > 0) {
+        if (nmissing < nrow(data) & nmissing > 0) {
+            # cell_id values are partially missing
             stop(paste(
                 "A cell_id column was found in the data, but was not specified.",
                 "Additionally, the data appears to have paired and unpaired cell data.",
                 "This data type requires the single cell workflow, please specify the cell_id and rerun."
             ))
-        } else {
+        } else if (nmissing == 0) {
+            # all cell_id values are present
             stop(paste(
                 "A cell_id column was found in the data, but was not specified.",
-                "Please specify the cell_id column and rerun."
+                "This data type requires the single cell workflow, please specify the cell_id and rerun."
+            ))
+        } else {
+            # all cell_id values are missing
+            warning(paste(
+                "A cell_id column was found in the data, but was not specified. All values are NA."
             ))
         }
     }
@@ -947,8 +953,6 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
                 stop("The locus column contains invalid loci annotations.")
             }
         }
-    } else {
-        single_cell <- FALSE
     }
 
     # only set if `single_cell` & `only_heavy`
@@ -1261,8 +1265,26 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     # this is the grouping
     # source: https://stackoverflow.com/questions/35772846/obtaining-connected-components-in-r
 
-    g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE)
+    # Create igraph object from adjacency matrix
+    if (sum(rowSums(mtx_adj) > 0) == nrow(mtx_adj)) {
+        # This "if" is to ignore a warning in the special case
+        # that all sequences are isolated (only diagonal elements).
+        # When mtx_adj is a diagonal matrix and diag=FALSE (no self-links), 
+        # the diagonal will be zeroed out and max, used somewhere in the igraph function, 
+        # will return an error like "no non-missing arguments to max"
+        withCallingHandlers(
+            g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE),
+            warning = function(w) {
+                if (grepl("no non-missing arguments to max", w$message)) {
+                    invokeRestart("muffleWarning")
+                }
+            }
+        )
+    } else {
+        g <- igraph::graph_from_adjacency_matrix(adjmatrix = mtx_adj, mode = "undirected", diag = FALSE)
+    }
     # plot(g, vertex.size=10, vertex.label.cex=1, vertex.color="skyblue", vertex.label.color="black", vertex.frame.color="transparent", edge.arrow.mode=0)
+
 
     connected <- igraph::components(g)
     VJL_groups <- igraph::groups(connected)
