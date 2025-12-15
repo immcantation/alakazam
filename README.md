@@ -1,4 +1,4 @@
-[![CRAN status](https://www.r-pkg.org/badges/version/alakazam)](https://cran.r-project.org/package=alakazam)
+[![](https://www.r-pkg.org/badges/version/alakazam)](https://cran.r-project.org/package=alakazam)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam)
 [![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam)
 [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
