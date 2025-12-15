@@ -1,5 +1,20 @@
 # Release Notes
 
+Version 1.4.2: December  15, 2025
+-------------------------------------------------------------------------------
+
+General:
+
++ Fixed a bug in `collapseDuplicates` that triggered an error when all
+  sequences in a group were classified as ambiguous, resulting in a 
+  dimension-dropping issue during data.frame subsetting.
+
+Gene:
+
++ In `groupGenes`, the logic for detecting single cell data has been updated. 
+  Instead of throwing an error when an empty `cell_id` column is found, 
+  a warning will now be issued.
+
 Version 1.4.1: October 1, 2025
 -------------------------------------------------------------------------------
 
