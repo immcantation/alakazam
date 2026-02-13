@@ -196,16 +196,18 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
     } else {
         if (is.null(copy) & is.null(clone)) {
             # Tabulate sequence abundance by locus
-            data$locus <- substr(data[[gene]], 1, 3)
+            if (!"locus" %in% colnames(data)){
+              data$locus <- substr(data[[gene]], 1, 3)
+            }
             locus_tab <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus")))) %>%
                 dplyr::summarize(locus_count = n(), .groups = "drop")
             gene_tab_count <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus", gene)))) %>%
                 dplyr::summarize(seq_count = n(), .groups = "drop")
             if (nrow(locus_tab) > 1) {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::left_join(locus_tab, by = c(groups, "locus")) %>%
+                    dplyr::left_join(locus_tab, by = unique(c(groups, "locus"))) %>%
                     dplyr::mutate(seq_freq = !!rlang::sym("seq_count") / !!rlang::sym("locus_count")) %>%
                     dplyr::arrange(desc(!!rlang::sym("seq_count")))
             } else {
@@ -227,24 +229,26 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                     dplyr::filter(!is.na(!!rlang::sym(clone)))
             }
             # get locus
-            data$locus <- substr(data[[gene]], 1, 3)
+            if (!"locus" %in% colnames(data)){
+               data$locus <- substr(data[[gene]], 1, 3)
+            }
             # Find count of genes within each clone and keep first with maximum count
             clone_gene_tab <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", clone, gene))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus", clone, gene)))) %>%
                 dplyr::mutate(clone_gene_count = n()) %>%
                 dplyr::ungroup() %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", clone))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus", clone)))) %>%
                 dplyr::slice(which.max(!!rlang::sym("clone_gene_count"))) %>%
                 dplyr::ungroup()
             locus_tab <- clone_gene_tab %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus")))) %>%
                 dplyr::summarize(locus_clone_count = n(), .groups = "drop")
             gene_tab_count <- clone_gene_tab %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus", gene)))) %>%
                 dplyr::summarize(clone_count = n(), .groups = "drop")
             if (nrow(locus_tab) > 1) {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::left_join(locus_tab, by = c(groups, "locus")) %>%
+                    dplyr::left_join(locus_tab, by = unique(c(groups, "locus"))) %>%
                     dplyr::mutate(clone_freq = !!rlang::sym("clone_count") / !!rlang::sym("locus_clone_count")) %>%
                     dplyr::arrange(desc(!!rlang::sym("clone_count")))
             } else {
@@ -260,23 +264,25 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
                 )
             }
             # get locus
-            data$locus <- substr(data[[gene]], 1, 3)
+            if (!"locus" %in% colnames(data)){
+              data$locus <- substr(data[[gene]], 1, 3)
+            }
             # Tabulate copy abundance by locus and gene
             locus_tab <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus"))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus")))) %>%
                 dplyr::summarize(
                     locus_count = length(!!rlang::sym(gene)),
                     locus_copy_count = sum(!!rlang::sym(copy), na.rm = TRUE), .groups = "drop"
                 )
             gene_tab_count <- data %>%
-                dplyr::group_by(!!!rlang::syms(c(groups, "locus", gene))) %>%
+                dplyr::group_by(!!!rlang::syms(unique(c(groups, "locus", gene)))) %>%
                 dplyr::summarize(
                     seq_count = length(!!rlang::sym(gene)),
                     copy_count = sum(!!rlang::sym(copy), na.rm = TRUE), .groups = "drop"
                 )
             if (nrow(locus_tab) > 1) {
                 gene_tab <- gene_tab_count %>%
-                    dplyr::left_join(locus_tab, by = c(groups, "locus")) %>%
+                    dplyr::left_join(locus_tab, by = unique(c(groups, "locus"))) %>%
                     dplyr::mutate(
                         seq_freq = !!rlang::sym("seq_count") / !!rlang::sym("locus_count"),
                         copy_freq = !!rlang::sym("copy_count") / !!rlang::sym("locus_copy_count")
