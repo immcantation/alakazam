@@ -31,7 +31,7 @@ jobs:
         shell: Rscript {0}
       - name: Check usage
         run: |
-          devtools::install()
+          devtools::install(upgrade = "never")
           pkg_name <- read.dcf("DESCRIPTION")[1, "Package"]
           library(pkg_name, character.only=T)
           usage_out <- capture.output(codetools::checkUsagePackage(pack=pkg_name))
