@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 #include <iostream>
-#include <map>
+#include <array>
 #include <vector>
 
 using namespace Rcpp;
@@ -8,9 +8,9 @@ using namespace Rcpp;
 
 namespace {
 
-void buildDistLookupMaps(const NumericMatrix& dist_mat,
-                         std::map<std::string, int>& rows_map,
-                         std::map<std::string, int>& cols_map) {
+void buildDistLookup(const NumericMatrix& dist_mat,
+                     std::array<int, 256>& row_idx,
+                     std::array<int, 256>& col_idx) {
     List dist_mat_dims = dist_mat.attr("dimnames");
     CharacterVector dist_mat_rownames = dist_mat_dims[0];
     CharacterVector dist_mat_colnames = dist_mat_dims[1];
@@ -18,15 +18,15 @@ void buildDistLookupMaps(const NumericMatrix& dist_mat,
     int num_rows = dist_mat_rownames.size();
     int num_cols = dist_mat_colnames.size();
 
-    rows_map.clear();
-    cols_map.clear();
+    row_idx.fill(-1);
+    col_idx.fill(-1);
 
     for (int i = 0; i < num_rows; i++) {
         std::string this_row = as<std::string>(dist_mat_rownames[i]);
         if (this_row.empty()) {
             throw std::range_error("Empty row name in dist_mat.");
         }
-        rows_map[this_row] = i;
+        row_idx[static_cast<unsigned char>(this_row[0])] = i;
     }
 
     for (int i = 0; i < num_cols; i++) {
@@ -34,15 +34,23 @@ void buildDistLookupMaps(const NumericMatrix& dist_mat,
         if (this_col.empty()) {
             throw std::range_error("Empty column name in dist_mat.");
         }
-        cols_map[this_col] = i;
+        col_idx[static_cast<unsigned char>(this_col[0])] = i;
     }
 }
 
-double seqDistWithMaps(const std::string& seq1,
-                       const std::string& seq2,
-                       const NumericMatrix& dist_mat,
-                       const std::map<std::string, int>& rows_map,
-                       const std::map<std::string, int>& cols_map) {
+void encodeSequenceToInt(const std::string& seq,
+                         std::vector<unsigned char>& encoded) {
+    encoded.resize(seq.size());
+    for (size_t i = 0; i < seq.size(); i++) {
+        encoded[i] = static_cast<unsigned char>(seq[i]);
+    }
+}
+
+double seqDistWithMaps(const std::vector<unsigned char>& seq1,
+                       const std::vector<unsigned char>& seq2,
+                          const NumericMatrix& dist_mat,
+                          const std::array<int, 256>& row_idx,
+                          const std::array<int, 256>& col_idx) {
     int len_seq1 = seq1.size();
     int len_seq2 = seq2.size();
 
@@ -55,23 +63,13 @@ double seqDistWithMaps(const std::string& seq1,
     double d_sum = 0;
 
     for (int i = 0; i < len_seq1; i++) {
-        int r_idx;
-        std::string row_string;
-        row_string += static_cast<char>(seq1[i]);
-        auto search_row = rows_map.find(row_string);
-        if (search_row != rows_map.end()) {
-            r_idx = search_row->second;
-        } else {
+        int r_idx = row_idx[seq1[i]];
+        if (r_idx < 0) {
             throw std::range_error("Character not found in dist_mat.");
         }
 
-        int c_idx;
-        std::string col_string;
-        col_string += static_cast<char>(seq2[i]);
-        auto search_col = cols_map.find(col_string);
-        if (search_col != cols_map.end()) {
-            c_idx = search_col->second;
-        } else {
+        int c_idx = col_idx[seq2[i]];
+        if (c_idx < 0) {
             throw std::range_error("Character not found in dist_mat.");
         }
 
@@ -221,10 +219,14 @@ LogicalMatrix pairwiseEqual(StringVector seq) {
 // [[Rcpp::export]]
 double seqDistRcpp(std::string seq1, std::string seq2, 
                    NumericMatrix dist_mat) {
-    std::map<std::string, int> rows_map;
-    std::map<std::string, int> cols_map;
-    buildDistLookupMaps(dist_mat, rows_map, cols_map);
-    return seqDistWithMaps(seq1, seq2, dist_mat, rows_map, cols_map);
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
+    std::vector<unsigned char> seq1_int;
+    std::vector<unsigned char> seq2_int;
+    encodeSequenceToInt(seq1, seq1_int);
+    encodeSequenceToInt(seq2, seq2_int);
+    return seqDistWithMaps(seq1_int, seq2_int, dist_mat, row_idx, col_idx);
 }
 
 
@@ -235,21 +237,22 @@ NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
     NumericMatrix rmat(seq.length(), seq.length());
 
     int n_seq = seq.length();
-    std::vector<std::string> seq_cpp(n_seq);
+    std::vector<std::vector<unsigned char>> seq_int(n_seq);
     for (int i = 0; i < n_seq; i++) {
-        seq_cpp[i] = as<std::string>(seq[i]);
+        std::string seq_i = as<std::string>(seq[i]);
+        encodeSequenceToInt(seq_i, seq_int[i]);
     }
 
-    std::map<std::string, int> rows_map;
-    std::map<std::string, int> cols_map;
-    buildDistLookupMaps(dist_mat, rows_map, cols_map);
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
     
     for (int i = 0; i < rmat.nrow(); i++) {
         for (int j = 0; j < i; j++) {
-            const std::string& row_seq = seq_cpp[i];
-            const std::string& col_seq = seq_cpp[j];
+            const std::vector<unsigned char>& row_seq = seq_int[i];
+            const std::vector<unsigned char>& col_seq = seq_int[j];
 
-            double distance = seqDistWithMaps(row_seq, col_seq, dist_mat, rows_map, cols_map);
+            double distance = seqDistWithMaps(row_seq, col_seq, dist_mat, row_idx, col_idx);
             
             // write to output matrix
             rmat(i,j) = distance;
@@ -275,18 +278,19 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
     m = indx.size(); //number of rows
     n = seq.size();  //number of columns
 
-    std::vector<std::string> seq_cpp(n);
+    std::vector<std::vector<unsigned char>> seq_int(n);
     for (i = 0; i < n; i++) {
-        seq_cpp[i] = as<std::string>(seq[i]);
+        std::string seq_i = as<std::string>(seq[i]);
+        encodeSequenceToInt(seq_i, seq_int[i]);
     }
 
     // allocate the main matrix
     NumericMatrix rmat(m,n);
     std::fill(rmat.begin(), rmat.end(), NA_REAL);
 
-    std::map<std::string, int> rows_map;
-    std::map<std::string, int> cols_map;
-    buildDistLookupMaps(dist_mat, rows_map, cols_map);
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
 
     // sort and push indices back by 1 to match c++ indexing
     std::sort(indx.begin(), indx.end());
@@ -299,13 +303,13 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
     // begin filling rmat
     for (i = 0; i < m; i++) {
         int row_id = indx[i];
-        const std::string& row_seq = seq_cpp[row_id];
+        const std::vector<unsigned char>& row_seq = seq_int[row_id];
         for (j = 0; j < n; j++) {
             if (!R_IsNA(rmat(i,j))) continue;
             if (row_id == j) rmat(i,j) = 0;
             else {
-                const std::string& col_seq = seq_cpp[j];
-                rmat(i,j) = seqDistWithMaps(row_seq, col_seq, dist_mat, rows_map, cols_map);
+                const std::vector<unsigned char>& col_seq = seq_int[j];
+                rmat(i,j) = seqDistWithMaps(row_seq, col_seq, dist_mat, row_idx, col_idx);
                 if (pos[j] < m) rmat(pos[j],indx[i]) = rmat(i,j);
             }
         }
