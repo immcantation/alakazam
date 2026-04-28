@@ -1,3 +1,11 @@
+Version 1.4.3: April 28, 2026
+-------------------------------------------------------------------------------
+
+Gene:
+
++ Fixed a bug in `countGenes` where specifying `locus` in the `groups` argument
+  caused a "duplicated locus" error, as `locus` is included internally by default.
+
 Version 1.4.2: December  15, 2025
 -------------------------------------------------------------------------------
 
