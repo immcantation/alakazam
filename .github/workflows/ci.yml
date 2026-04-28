@@ -10,6 +10,8 @@ jobs:
 
   unittest:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     container:
@@ -17,6 +19,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history needed so the doc-commit push is not rejected
+          # due to a shallow clone being behind the remote.
+          fetch-depth: 0
       - name: Document
         run: |
           devtools::document()
@@ -55,16 +61,32 @@ jobs:
       #           check_dir = "check"
       #         )
       #   shell: Rscript {0}
-      # - name: Build documentation
-      #   run: |
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      #     git rm -r docs/topics docs/vignettes
-      #     Rscript docs/build.R
-      #     git add docs/*
-      #     git commit -m "Build documentation [skip ci]" || echo "No changes to commit"
-
+      - name: Render Readthedocs documentation
+        run: |
+          rm -rf docs/topics/* docs/vignettes/*
+          Rscript docs/build.R
+          # Re-compress png files to a deterministic form to
+          # avoid committing .png files that differ only in compression values
+          dnf install -y optipng
+          find docs -name '*.png' -exec optipng -o0 -strip all {} \;
+        shell: bash
+      - name: Commit rendered docs
+        # Only commit rendered docs on pushes to master, not on PRs or local `act` runs.
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
+        run: |
+          # Container jobs mount the workspace as a different owner; mark it safe for git.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          CHANGES=$(git status --porcelain docs/ | wc -l)
+          if [[ "${CHANGES}" -gt 0 ]]; then
+            git add docs/
+            git commit -m "[skip ci] Auto-render docs."
+            git push
+          fi
+        shell: bash
       - name: Update container
+        # Only trigger the Docker Hub build on pushes to master, not on PRs or local `act` runs.
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
           curl -H "Content-Type:application/json" --data '{"docker_tag":"devel"}' -X POST https://hub.docker.com/api/build/v1/source/${{ secrets.DOCKERHUB_REPO }}/trigger/${{ secrets.DOCKERHUB_TRIGGER }}/call/
-          
