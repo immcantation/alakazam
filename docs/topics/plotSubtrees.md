@@ -107,7 +107,7 @@ plotSubtrees(graphs, "sample_id", "out", style="v")
 
 ```
 
-*`height` was translated to `width`.*![3](plotSubtrees-3.png)
+![2](plotSubtrees-2.png)
 
 ```R
 
@@ -116,7 +116,7 @@ plotSubtrees(graphs, "sample_id", "size", style="v")
 
 ```
 
-*`height` was translated to `width`.*![6](plotSubtrees-6.png)
+![4](plotSubtrees-4.png)
 
 ```R
 
@@ -125,7 +125,7 @@ plotSubtrees(graphs, "c_call", "depth", style="b")
 
 ```
 
-![8](plotSubtrees-8.png)
+![6](plotSubtrees-6.png)
 
 
 See also

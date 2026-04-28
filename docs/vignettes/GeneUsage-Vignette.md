@@ -46,7 +46,7 @@ head(gene, n=4)
 ```
 
 ```
-## # A tibble: 4 × 6
+## # A tibble: 4 x 6
 ##   sample_id locus gene     seq_count locus_count seq_freq
 ##   <chr>     <chr> <chr>        <int>       <int>    <dbl>
 ## 1 +7d       IGH   IGHV3-49       698         999    0.699
@@ -132,7 +132,7 @@ head(family, n=4)
 ```
 
 ```
-## # A tibble: 4 × 7
+## # A tibble: 4 x 7
 ##   sample_id c_call locus gene  clone_count locus_clone_count clone_freq
 ##   <chr>     <chr>  <chr> <chr>       <int>             <int>      <dbl>
 ## 1 -1h       IGHM   IGH   IGHV3         222               532      0.417
@@ -180,14 +180,14 @@ head(family, n=4)
 ```
 
 ```
-## # A tibble: 4 × 10
+## # A tibble: 4 x 10
 ##   sample_id c_call locus gene  seq_count copy_count locus_count locus_copy_count
 ##   <chr>     <chr>  <chr> <chr>     <int>      <dbl>       <int>            <dbl>
 ## 1 +7d       IGHG   IGH   IGHV3       516       1587         528             1613
 ## 2 +7d       IGHA   IGH   IGHV3       240       1224         266             1309
 ## 3 -1h       IGHM   IGH   IGHV3       237        250         563              648
 ## 4 -1h       IGHM   IGH   IGHV4       110        162         563              648
-## # ℹ 2 more variables: seq_freq <dbl>, copy_freq <dbl>
+## # i 2 more variables: seq_freq <dbl>, copy_freq <dbl>
 ```
 
 The output `data.frame` includes the `seq_count` and `seq_freq` columns as previously defined, 

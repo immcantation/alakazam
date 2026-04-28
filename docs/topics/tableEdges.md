@@ -62,7 +62,7 @@ tableEdges(graph, "c_call")
 
 
 ```
-# A tibble: 4 × 3
+# A tibble: 4 x 3
 # Groups:   parent [3]
   parent    child     count
   <chr>     <chr>     <int>
@@ -83,7 +83,7 @@ tableEdges(graph, "c_call", exclude=c("Germline", NA))
 
 
 ```
-# A tibble: 3 × 3
+# A tibble: 3 x 3
 # Groups:   parent [2]
   parent    child     count
   <chr>     <chr>     <int>
@@ -103,7 +103,7 @@ tableEdges(graph, "c_call", indirect=TRUE, exclude=c("Germline", NA))
 
 
 ```
-# A tibble: 3 × 3
+# A tibble: 3 x 3
 # Groups:   parent [2]
   parent    child     count
   <chr>     <chr>     <int>

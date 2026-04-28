@@ -58,7 +58,7 @@ head(clones, 5)
 ```
 
 ```
-## # A tibble: 5 × 4
+## # A tibble: 5 x 4
 ## # Groups:   sample_id [1]
 ##   sample_id clone_id seq_count seq_freq
 ##   <chr>        <dbl>     <int>    <dbl>
@@ -85,7 +85,7 @@ head(clones, 5)
 ```
 
 ```
-## # A tibble: 5 × 7
+## # A tibble: 5 x 7
 ## # Groups:   sample_id, c_call [2]
 ##   sample_id c_call clone_id seq_count copy_count seq_freq copy_freq
 ##   <chr>     <chr>     <dbl>     <int>      <dbl>    <dbl>     <dbl>
@@ -182,27 +182,27 @@ print(isotype_test@tests)
 ```
 
 ```
-## # A tibble: 18 × 5
+## # A tibble: 18 x 5
 ##    test         q     delta_mean delta_sd pvalue
 ##    <chr>        <chr>      <dbl>    <dbl>  <dbl>
-##  1 IGHA != IGHD 0         139.       7.90   0   
-##  2 IGHA != IGHD 1         184.       8.96   0   
-##  3 IGHA != IGHD 2         190.      12.8    0   
-##  4 IGHA != IGHG 0           4.53     8.03   0.64
-##  5 IGHA != IGHG 1          24.5      6.35   0   
-##  6 IGHA != IGHG 2          26.9      4.66   0   
-##  7 IGHA != IGHM 0         158.       7.33   0   
-##  8 IGHA != IGHM 1         210.       6.46   0   
-##  9 IGHA != IGHM 2         228.       7.39   0   
-## 10 IGHD != IGHG 0         134.       8.10   0   
-## 11 IGHD != IGHG 1         159.       9.54   0   
-## 12 IGHD != IGHG 2         164.      13.4    0   
-## 13 IGHD != IGHM 0          19.0      6.44   0   
-## 14 IGHD != IGHM 1          26.6      9.36   0   
-## 15 IGHD != IGHM 2          37.6     14.5    0.02
-## 16 IGHG != IGHM 0         153.       6.42   0   
-## 17 IGHG != IGHM 1         186.       6.15   0   
-## 18 IGHG != IGHM 2         201.       7.38   0
+##  1 IGHA != IGHD 0         139.       8.08    0  
+##  2 IGHA != IGHD 1         184.       8.47    0  
+##  3 IGHA != IGHD 2         190.      10.9     0  
+##  4 IGHA != IGHG 0           4.33     8.64    0.6
+##  5 IGHA != IGHG 1          24.4      6.91    0  
+##  6 IGHA != IGHG 2          27.0      5.09    0  
+##  7 IGHA != IGHM 0         159.       6.68    0  
+##  8 IGHA != IGHM 1         211.       5.54    0  
+##  9 IGHA != IGHM 2         229.       5.93    0  
+## 10 IGHD != IGHG 0         135.       7.07    0  
+## 11 IGHD != IGHG 1         159.       8.08    0  
+## 12 IGHD != IGHG 2         163.      11.3     0  
+## 13 IGHD != IGHM 0          19.7      5.17    0  
+## 14 IGHD != IGHM 1          27.6      7.65    0  
+## 15 IGHD != IGHM 2          39.4     12.2     0  
+## 16 IGHG != IGHM 0         155.       6.50    0  
+## 17 IGHG != IGHM 1         187.       6.52    0  
+## 18 IGHG != IGHM 2         202.       7.39    0
 ```
 
 ``` r

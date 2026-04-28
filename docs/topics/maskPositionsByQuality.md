@@ -62,17 +62,17 @@ maskPositionsByQuality(db, min_quality=90, quality_num="quality_alignment_num")
 
 *Number of masked sequences: 1*
 ```
-# A tibble: 1 × 37
+# A tibble: 1 x 37
   sequence_id       sequence            rev_comp productive v_call d_call j_call
   <chr>             <chr>               <lgl>    <lgl>      <chr>  <chr>  <chr> 
-1 CGCTTTTCGGATTGGAA GGCTTTCTGAGAGTCATG… FALSE    TRUE       IGHV4… IGHD3… IGHJ4…
-# ℹ 30 more variables: sequence_alignment <chr>, germline_alignment <chr>,
+1 CGCTTTTCGGATTGGAA GGCTTTCTGAGAGTCATG~ FALSE    TRUE       IGHV4~ IGHD3~ IGHJ4~
+# i 30 more variables: sequence_alignment <chr>, germline_alignment <chr>,
 #   junction <chr>, junction_aa <chr>, v_cigar <chr>, d_cigar <chr>,
 #   j_cigar <chr>, stop_codon <lgl>, vj_in_frame <lgl>, locus <chr>,
 #   junction_length <int>, np1_length <int>, np2_length <int>,
 #   v_sequence_start <int>, v_sequence_end <int>, v_germline_start <int>,
 #   v_germline_end <int>, d_sequence_start <int>, d_sequence_end <int>,
-#   d_germline_start <int>, d_germline_end <int>, j_sequence_start <int>, …
+#   d_germline_start <int>, d_germline_end <int>, j_sequence_start <int>, ...
 
 ```
 
