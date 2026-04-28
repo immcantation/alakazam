@@ -103,14 +103,19 @@ Examples
 
 ```R
 # Group by sample identifier in two steps
-abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
+set.seed(123)
+abund2 <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 div <- alphaDiversity(abund, step_q=1, max_q=10)
+
+```
+
+**Error**: object 'abund' not found
+```R
 plotDiversityCurve(div, legend_title="Sample")
 
 ```
 
-![2](alphaDiversity-2.png)
-
+**Error**: object 'div' not found
 ```R
 
 # Grouping by isotype rather than sample identifier in one step
@@ -120,7 +125,7 @@ plotDiversityCurve(div, legend_title="Isotype")
 
 ```
 
-![4](alphaDiversity-4.png)
+![6](alphaDiversity-6.png)
 
 
 See also
