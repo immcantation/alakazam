@@ -902,7 +902,7 @@ helperTest <- function(div_df, q, group="group") {
 #' @examples
 #' # Group by sample identifier in two steps
 #' set.seed(123)
-#' abund2 <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
+#' abund <- estimateAbundance(ExampleDb, group="sample_id", nboot=100)
 #' div <- alphaDiversity(abund, step_q=1, max_q=10)
 #' plotDiversityCurve(div, legend_title="Sample")
 #'                    
