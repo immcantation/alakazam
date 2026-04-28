@@ -342,6 +342,7 @@ tableEdges <- function(graph, field, indirect=FALSE, exclude=NULL) {
 #'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
 #' 
 #' # Permute annotations and plot new tree
+#' set.seed(123)
 #' g <- permuteLabels(graph, "c_call")
 #' plot(g, layout=layout_as_tree, vertex.label=V(g)$c_call,
 #'      vertex.size=50, edge.arrow.mode=0, vertex.color="grey80")
