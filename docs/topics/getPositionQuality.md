@@ -59,7 +59,7 @@ head(getPositionQuality(db))
 
 ```
 
-*Warning*:NAs introduced by coercion
+
 ```
   position quality_alignment_num       sequence_id nt
 1        1                    90 CGCTTTTCGGATTGGAA  C

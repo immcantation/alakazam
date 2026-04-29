@@ -39,7 +39,7 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 
 **Depends:** ggplot2  
 **Imports:** airr, ape, dplyr, graphics, grid, igraph, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils, Biostrings, GenomicAlignments, IRanges  
-**Suggests:** knitr, rmarkdown, testthat
+**Suggests:** cigarillo, knitr, rmarkdown, testthat
 
 
 ## Authors

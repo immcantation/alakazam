@@ -51,13 +51,6 @@ per position.
 quality <- getPositionQuality(db, sequence_id="sequence_id", 
                               sequence="sequence_alignment",
                               quality_num="quality_alignment_num")
-```
-
-```
-## Warning in FUN(X[[i]], ...): NAs introduced by coercion
-```
-
-``` r
 head(quality)
 ```
 
