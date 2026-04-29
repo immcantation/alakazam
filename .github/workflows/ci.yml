@@ -104,11 +104,10 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          CHANGES=$(git status --porcelain docs/ | wc -l)
-          if [[ "${CHANGES}" -gt 0 ]]; then
-            git add docs/
-            # Don't commit changes to makeTempDir.md since it is expected to differ and causes unnecessary commits.
-            git restore --staged docs/topics/makeTempDir.md || true
+          git add docs/
+          # Don't commit changes to makeTempDir.md since it is expected to differ and causes unnecessary commits.
+          git restore --staged docs/topics/makeTempDir.md || true
+          if ! git diff --cached --quiet; then
             git commit -m "[skip ci] Auto-render docs."
             git push
           fi
