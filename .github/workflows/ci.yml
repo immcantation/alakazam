@@ -107,6 +107,8 @@ jobs:
           CHANGES=$(git status --porcelain docs/ | wc -l)
           if [[ "${CHANGES}" -gt 0 ]]; then
             git add docs/
+            # Don't commit changes to makeTempDir.md since it is expected to differ and causes unnecessary commits.
+            git restore --staged docs/topics/makeTempDir.md || true
             git commit -m "[skip ci] Auto-render docs."
             git push
           fi
