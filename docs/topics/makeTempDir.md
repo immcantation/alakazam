@@ -33,13 +33,14 @@ Examples
 -------------------
 
 ```R
+### Not run:
 makeTempDir("Clone50")
 
 ```
 
 
 ```
-[1] "/tmp/RtmpzH9Axf/Clone50-temp-5d06ac51769"
+[1] "/tmp/Rtmp6iiQCR/Clone50-temp-114b73ee1fa"
 
 ```
 
