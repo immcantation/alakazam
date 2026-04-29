@@ -501,7 +501,8 @@ getPositionQuality <- function(data,
    bind_rows(lapply(1:nrow(data), function(i) {
       seq_id <- data[[sequence_id]][i]
       seq_len <- nchar(data[[sequence]][i])
-      qual_values <- as.numeric(strsplit(data[[quality_num]][i],",")[[1]])
+      qual_parts <- strsplit(data[[quality_num]][i],",")[[1]]
+      qual_values <- as.numeric(replace(qual_parts, qual_parts == "NA", NA))
       nt <- strsplit(data[[sequence]],"")[[1]]
       if (seq_len != length(qual_values)) {
          stop("Different length, for sequence: ", seq_id,". seq: ", sequence, ". qual: ", quality_num)
