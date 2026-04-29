@@ -137,7 +137,9 @@ writeChangeoDb <- function(data, file) {
 #'           \link{dir.create}.
 #' 
 #' @examples
+#' \dontrun{
 #' makeTempDir("Clone50")
+#' }
 #' 
 #' @export
 makeTempDir <- function(prefix) {
