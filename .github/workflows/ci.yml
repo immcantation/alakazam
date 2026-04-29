@@ -23,6 +23,10 @@ jobs:
           # Full history needed so the doc-commit push is not rejected
           # due to a shallow clone being behind the remote.
           fetch-depth: 0
+      - name: Install and document airr
+        run: |
+          install.packages("airr")
+        shell: Rscript {0}
       - name: Document
         run: |
           devtools::document()
