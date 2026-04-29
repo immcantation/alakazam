@@ -1,5 +1,12 @@
-Version 1.4.3: April 28, 2026
+Version 1.4.3: April 29, 2026
 -------------------------------------------------------------------------------
+
+General:
+
++ Updated CIGAR string parsing in `readFastqDb` to support both `GenomicAlignments` 
+  (< 1.45.5) and the new `cigarillo` package (`>= 1.45.5`), which replaced 
+  `explodeCigarOps()`/`explodeCigarOpLengths()` with equivalent functions. 
+  `cigarillo` is now listed as a suggested dependency.
 
 Gene:
 
