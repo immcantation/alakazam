@@ -56,20 +56,21 @@ jobs:
                 check_dir = "check"
               )
         shell: Rscript {0}
-
-
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+      - name: Build package tarball without tests
+        run: |
+          echo -e '\n^test' >> .Rbuildignore
+          R CMD build .
+        shell: bash
       - name: Upload package tarball artifact
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         uses: actions/upload-artifact@v4
         with:
           name: package-tarball
-          path: check/*.tar.gz
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-        
+          path: ./*.tar.gz
       - name: Check usage
         run: |
           devtools::install(upgrade = "never")
