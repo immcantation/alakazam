@@ -138,6 +138,64 @@ test_that("seqDist: long IMGT-gapped sequences", {
     }
 })
 
+#### seqMismatch ####
+
+test_that("seqMismatchCountRcpp", {
+    samples <- c("ACGT", "ACGT", "ACGT", "ACGT", "ACG", "acgt", NA)
+    germlines <- c("ACGA", "ACNT", "AC-T", "AC.T", "ACGT", "ACGA", "ACGT")
+    
+    # Ignore Ns, gaps and dots
+    expect_equal(seqMismatchCountRcpp(samples, germlines),
+                 c(1L, 0L, 0L, 0L, 0L, 1L, NA_integer_))
+    
+    # Recycle a single germline
+    expect_equal(seqMismatchCountRcpp(c("ACGT", "ACGA", "ACGG"), "ACGG"),
+                 c(1L, 1L, 0L))
+    
+    # Unequal lengths are compared through the shorter sequence
+    expect_equal(seqMismatchCountRcpp("ACG", "ACGT"), 0L)
+    
+    expect_error(seqMismatchCountRcpp(c("A", "C"), c("A", "C", "G")),
+                 "Number of input sequences does not match number of germlines")
+})
+
+test_that("seqMismatchMatrixRcpp", {
+    samples <- c(q1="ACGT", q2="ACGT", q3="acgt", q4=NA)
+    germlines <- c(g1="ACGA", g2="ACNT", g3="ACGG")
+    
+    obs <- seqMismatchMatrixRcpp(samples, germlines)
+    expect_equal(obs,
+                 matrix(c(1L, 1L, 1L, NA_integer_,
+                          0L, 0L, 0L, NA_integer_,
+                          1L, 1L, 1L, NA_integer_),
+                        nrow=4, ncol=3),
+                 check.attributes=F)
+    
+    expect_equal(rownames(obs), names(samples))
+    expect_equal(colnames(obs), names(germlines))
+    expect_equal(unname(obs[, "g1"]),
+                 seqMismatchCountRcpp(unname(samples), unname(germlines["g1"])))
+})
+
+test_that("seqMismatchPositionsRcpp", {
+    samples <- c("ACGT", "ACGT", "ACGT", "acgt", NA)
+    germlines <- c("ACGA", "ACNT", "ACGG", "ACGA", "ACGT")
+    
+    obs <- seqMismatchPositionsRcpp(samples, germlines)
+    
+    expect_equal(obs[[1]], 4L)
+    expect_equal(obs[[2]], integer(0))
+    expect_equal(obs[[3]], 4L)
+    expect_equal(obs[[4]], 4L)
+    expect_null(obs[[5]])
+    
+    # Recycle a single germline
+    obs <- seqMismatchPositionsRcpp(c("ACGT", "ACGA", "ACGG"), "ACGG")
+    expect_equal(obs[[1]], 4L)
+    expect_equal(obs[[2]], 4L)
+    expect_equal(obs[[3]], integer(0))
+})
+
 #### pairwiseDist ####
 
 test_that("pairwiseDist Nucleotide", {
