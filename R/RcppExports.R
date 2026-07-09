@@ -71,3 +71,11 @@ nonsquareDistRcpp <- function(seq, indx, dist_mat) {
     .Call(`_alakazam_nonsquareDistRcpp`, seq, indx, dist_mat)
 }
 
+countSeqsWithInvalidBases_rcpp <- function(seqs) {
+    .Call(`_alakazam_countSeqsWithInvalidBases_rcpp`, seqs)
+}
+
+fastDist_rcpp <- function(seqs) {
+    .Call(`_alakazam_fastDist_rcpp`, seqs)
+}
+

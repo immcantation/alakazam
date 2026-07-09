@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fastDist.cpp — Algorithm Explanation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f6f6f4;
+    --bg3: #efefec;
+    --text: #1a1a18;
+    --text2: #5a5a56;
+    --text3: #8a8a84;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --success-bg: #eaf3de; --success-text: #27500a; --success-border: #639922;
+    --danger-bg: #fcebeb;  --danger-text: #a32d2d;  --danger-border: #e24b4a;
+    --info-bg: #e6f1fb;    --info-text: #0c447c;    --info-border: #378add;
+    --radius: 8px; --radius-lg: 12px;
+    --mono: 'Courier New', Courier, monospace;
+    --sans: system-ui, -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1c; --bg2: #27271f; --bg3: #2e2e28;
+      --text: #e8e8e0; --text2: #a0a098; --text3: #666660;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --success-bg: #173404; --success-text: #c0dd97; --success-border: #3b6d11;
+      --danger-bg: #501313;  --danger-text: #f7c1c1;  --danger-border: #a32d2d;
+      --info-bg: #042c53;    --info-text: #b5d4f4;    --info-border: #185fa5;
+    }
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--sans);
+         font-size: 15px; line-height: 1.7; max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  h1 { font-size: 26px; font-weight: 600; margin-bottom: 0.25rem; }
+  h2 { font-size: 20px; font-weight: 600; margin: 2.5rem 0 0.75rem; border-bottom: 0.5px solid var(--border); padding-bottom: 0.4rem; }
+  h3 { font-size: 16px; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+  p  { margin-bottom: 0.9rem; }
+
+  .subtitle { color: var(--text2); font-size: 14px; margin-bottom: 2rem; }
+
+  code { font-family: var(--mono); font-size: 13px; background: var(--bg2);
+         padding: 2px 6px; border-radius: 4px; border: 0.5px solid var(--border); }
+  pre  { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius);
+         padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0 1.25rem; }
+  pre code { background: none; border: none; padding: 0; font-size: 13px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.25rem; font-size: 14px; }
+  th { background: var(--bg2); font-weight: 500; text-align: left; }
+  th, td { padding: 8px 12px; border: 0.5px solid var(--border); }
+  tr:nth-child(even) td { background: var(--bg2); }
+
+  .callout { background: var(--bg2); border-left: 3px solid var(--border2);
+             border-radius: 0 var(--radius) var(--radius) 0; padding: 0.9rem 1.1rem;
+             margin: 1rem 0 1.25rem; font-size: 14px; }
+
+  /* ── widget styles ── */
+  .widget { border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+            padding: 1.5rem; margin: 2rem 0; background: var(--bg); }
+  .widget-title { font-size: 13px; font-weight: 500; color: var(--text2); text-transform: uppercase;
+                  letter-spacing: 0.06em; margin-bottom: 1.25rem; }
+
+  .seq-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .seq-label { width: 48px; color: var(--text2); font-size: 12px; font-family: var(--mono); }
+  .cell { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+          border-radius: 6px; font-weight: 600; font-size: 14px; border: 1.5px solid transparent;
+          transition: all 0.25s; font-family: var(--mono); }
+  .cell.dim { opacity: 0.13; }
+  .cell.hl  { border-color: var(--text); }
+  .cA  { background: #e6f1fb; color: #0c447c; }
+  .cC  { background: #eaf3de; color: #27500a; }
+  .cG  { background: #eeedfe; color: #3c3489; }
+  .cT  { background: #faeeda; color: #633806; }
+  .cN  { background: #f1efe8; color: #444441; }
+  .cQ  { background: #fbeaf0; color: #72243e; }
+  @media (prefers-color-scheme: dark) {
+    .cA { background: #042c53; color: #b5d4f4; }
+    .cC { background: #173404; color: #c0dd97; }
+    .cG { background: #26215c; color: #cfcbf6; }
+    .cT { background: #412402; color: #fac775; }
+    .cN { background: #2c2c2a; color: #d3d1c7; }
+    .cQ { background: #4b1528; color: #f4c0d1; }
+  }
+
+  .col-labels { display: flex; gap: 8px; margin-left: 56px; margin-bottom: 4px; }
+  .col-lbl { width: 38px; text-align: center; font-size: 11px; color: var(--text2); font-family: var(--mono); }
+  .col-lbl.active { color: var(--text); font-weight: 600; }
+
+  .controls { display: flex; align-items: center; gap: 10px; margin: 1.25rem 0 1rem; flex-wrap: wrap; }
+  .btn { padding: 6px 16px; border: 0.5px solid var(--border2); border-radius: var(--radius);
+         background: transparent; color: var(--text); cursor: pointer; font-size: 13px;
+         font-family: var(--sans); transition: background 0.15s; }
+  .btn:hover { background: var(--bg2); }
+  .btn.primary { background: var(--info-bg); color: var(--info-text); border-color: var(--info-border); }
+  .step-lbl { font-size: 12px; color: var(--text2); font-family: var(--mono); }
+
+  .progress { display: flex; gap: 5px; }
+  .pip { width: 26px; height: 4px; border-radius: 2px; background: var(--border); transition: background 0.2s; }
+  .pip.done   { background: #1d9e75; }
+  .pip.active { background: #378add; }
+
+  .panel { background: var(--bg2); border-radius: var(--radius-lg); padding: 14px 16px; margin: 1rem 0; }
+  .panel-hd { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em;
+              margin-bottom: 10px; font-family: var(--sans); font-weight: 500; }
+
+  .buckets { display: flex; flex-wrap: wrap; gap: 12px; }
+  .bucket  { display: flex; flex-direction: column; gap: 4px; min-width: 56px; }
+  .bk-name { font-size: 11px; color: var(--text2); }
+  .bk-seqs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .badge   { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; font-family: var(--mono); }
+  .empty-bk { color: var(--text3); font-size: 12px; font-style: italic; }
+
+  .pairs-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pbadge { padding: 4px 10px; border-radius: 4px; font-size: 12px;
+            border: 0.5px solid var(--border); background: var(--bg); color: var(--text); font-family: var(--mono); }
+  .pbadge.match { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+  .pbadge.skip  { background: var(--bg2); color: var(--text3); text-decoration: line-through; }
+
+  .tri-grid { display: inline-grid; gap: 5px; }
+  .tri-row  { display: flex; gap: 5px; align-items: center; }
+  .tri-cell { width: 54px; height: 32px; display: flex; align-items: center; justify-content: center;
+              border-radius: 4px; font-size: 12px; border: 0.5px solid var(--border);
+              transition: all 0.35s; font-family: var(--mono); }
+  .tri-cell.updated { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+  .tri-cell.blank   { background: transparent; border-color: transparent; }
+  .tri-cell.dist    { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-border); }
+  .tri-lbl  { font-size: 11px; color: var(--text2); width: 38px; font-family: var(--mono); }
+  .note { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.6; }
+
+  hr.sep { border: none; border-top: 0.5px solid var(--border); margin: 1rem 0; }
+</style>
+</head>
+<body>
+
+<h1>fastDist.cpp</h1>
+<p class="subtitle">Algorithm explanation with interactive walkthrough</p>
+
+<h2>Overview</h2>
+<p>
+  <code>fastDist.cpp</code> implements two R-callable C++ functions via Rcpp for working with aligned DNA sequences.
+  The core function, <code>fastDist_rcpp</code>, computes a pairwise <strong>Hamming distance matrix</strong>
+  for N sequences of equal length L. It returns a flat integer vector in R's lower-triangle <code>dist</code> format,
+  ready to be passed directly to <code>structure(..., class="dist")</code>.
+</p>
+
+<h2>Helper: <code>code_char</code></h2>
+<p>Encodes each nucleotide character as a small integer for fast comparison:</p>
+<table>
+  <tr><th>Character</th><th>Code</th><th>Meaning</th></tr>
+  <tr><td>A</td><td>0</td><td>Adenine</td></tr>
+  <tr><td>C</td><td>1</td><td>Cytosine</td></tr>
+  <tr><td>G</td><td>2</td><td>Guanine</td></tr>
+  <tr><td>T</td><td>3</td><td>Thymine</td></tr>
+  <tr><td>N</td><td>4</td><td>Ambiguous — any base</td></tr>
+  <tr><td>?</td><td>5</td><td>Unknown — do not assume</td></tr>
+  <tr><td>anything else</td><td>255</td><td>Invalid — triggers error</td></tr>
+</table>
+
+<h2>Function 1: <code>countSeqsWithInvalidBases_rcpp</code></h2>
+<p>
+  A validation pass. Loops over a vector of sequences and counts how many contain characters outside
+  the allowed set (A, C, G, T, N, ?). NA strings are also counted as invalid.
+</p>
+
+<h2>Function 2: <code>fastDist_rcpp</code></h2>
+
+<h3>Step 1 — Encode</h3>
+<p>
+  All N sequences (each of length L) are encoded into a flat <code>uint8</code> array of shape N×L (row-major)
+  using <code>code_char</code>. This makes column-wise access cache-friendly.
+</p>
+
+<h3>Step 2 — Column-wise bucket counting</h3>
+<p>
+  Rather than the naïve O(N²×L) loop comparing every pair at every position, the algorithm works
+  <em>column by column</em> and uses a bucketing trick:
+</p>
+<p>For each alignment column <em>p</em>:</p>
+<ol style="margin-left:1.5rem; margin-bottom:1rem;">
+  <li style="margin-bottom:0.5rem;">Sequences are partitioned into 6 buckets by their symbol at that column (A, C, G, T, N, ?).</li>
+  <li style="margin-bottom:0.5rem;">Pairs <strong>within the same known-base bucket</strong> (A–A, C–C, G–G, T–T) get +1 in the match triangle — they agree here.</li>
+  <li style="margin-bottom:0.5rem;">Pairs where <strong>one sequence has N and the other has a known base</strong> also get +1 — N is treated as matching anything known (standard IUPAC convention).</li>
+  <li style="margin-bottom:0.5rem;">Pairs where <strong>both sequences have ?</strong> also get +1.</li>
+  <li>All other pairs get nothing — they disagree or are too ambiguous to call.</li>
+</ol>
+
+<div class="callout">
+  <strong>Why this is fast:</strong> The naïve approach iterates all N(N−1)/2 pairs for every position.
+  This approach iterates only N sequences per column to fill the buckets, then iterates within/across
+  small bucket sizes — much cheaper when sequences share bases at each column, which is typical in aligned biological data.
+</div>
+
+<h3>Matching rules summary</h3>
+<table>
+  <tr><th>Pair type</th><th>Credit</th><th>Rationale</th></tr>
+  <tr><td>A–A, C–C, G–G, T–T</td><td>+1</td><td>Identical known base</td></tr>
+  <tr><td>N vs known base</td><td>+1</td><td>N could be that base (IUPAC)</td></tr>
+  <tr><td>? vs ?</td><td>+1</td><td>Two unknowns assumed to match</td></tr>
+  <tr><td>A vs C, G vs T, etc.</td><td>0</td><td>Genuine mismatch</td></tr>
+  <tr><td>N vs N</td><td>0</td><td>Two unknowns don't confirm agreement</td></tr>
+  <tr><td>N vs ?</td><td>0</td><td>Both ambiguous — no credit</td></tr>
+  <tr><td>? vs known base</td><td>0</td><td>Unknown treated conservatively</td></tr>
+</table>
+
+<p>
+  Note the asymmetry between <strong>N</strong> and <strong>?</strong>: N says "I could be anything, assume I match a known base,"
+  while ? says "I'm unknown — don't assume anything." This makes ? strictly more conservative than N.
+</p>
+
+<h3>Step 3 — Convert matches to distances</h3>
+<p>
+  After all L columns are processed, each triangle entry holds the number of positions where two sequences
+  are considered to agree. The final conversion is simply:
+</p>
+<pre><code>distance(i, j) = L − matches(i, j)</code></pre>
+
+<h3>Output format</h3>
+<p>
+  The returned <code>IntegerVector</code> is a flat lower-triangle in <strong>column-major order</strong>,
+  matching R's built-in <code>dist</code> object storage. The index formula for pair (i, j) with i &gt; j (0-indexed) is:
+</p>
+<pre><code>tri_idx(i, j) = j*N − j*(j+1)/2 + (i−j) − 1</code></pre>
+
+<h2>Interactive Walkthrough</h2>
+<p>
+  The widget below steps through the algorithm on a concrete example of 4 sequences of length 5,
+  including one <code>?</code> character. Use the <strong>next / prev</strong> buttons to advance through
+  each column's bucket-and-credit phase. The triangle updates live as matches accumulate, and the
+  final step converts match counts to Hamming distances.
+</p>
+<p><strong>Input sequences:</strong></p>
+<pre><code>Seq 0:  A C G T N
+Seq 1:  A G G T A
+Seq 2:  C C G ? A
+Seq 3:  A C T T N</code></pre>
+
+<!-- ── WIDGET ── -->
+<div class="widget">
+  <div class="widget-title">Step-by-step: column bucketing &amp; match accumulation</div>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+    <div class="progress" id="progress"></div>
+    <span class="step-lbl" id="step-desc"></span>
+  </div>
+
+  <div class="col-labels" id="col-labels"></div>
+  <div id="seq-grid"></div>
+
+  <div class="controls">
+    <button class="btn" id="btn-prev">← prev</button>
+    <button class="btn primary" id="btn-next">next →</button>
+    <span class="step-lbl" id="step-counter"></span>
+  </div>
+
+  <hr class="sep">
+
+  <div class="panel" id="bucket-panel">
+    <div class="panel-hd">Buckets at this column</div>
+    <div class="buckets" id="buckets-display"></div>
+  </div>
+
+  <div class="panel" id="pairs-panel">
+    <div class="panel-hd">Pairs credited (+1 match)</div>
+    <div class="pairs-list" id="pairs-display"></div>
+    <div class="note" id="pairs-note"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hd">Triangle (match counts → distances)</div>
+    <div id="tri-display"></div>
+    <div class="note" id="tri-note" style="margin-top:8px;"></div>
+  </div>
+</div>
+<!-- ── END WIDGET ── -->
+
+<h2>Source reference</h2>
+<p>Key functions in <code>fastDist.cpp</code>:</p>
+<table>
+  <tr><th>Function</th><th>Purpose</th></tr>
+  <tr><td><code>code_char(c)</code></td><td>Maps A/C/G/T/N/? to 0–5; returns 255 for invalid characters</td></tr>
+  <tr><td><code>countSeqsWithInvalidBases_rcpp(seqs)</code></td><td>Returns count of sequences containing invalid characters or NA</td></tr>
+  <tr><td><code>fastDist_rcpp(seqs)</code></td><td>Returns lower-triangle Hamming distance vector in R <code>dist</code> format</td></tr>
+</table>
+
+<script>
+const seqs=[['A','C','G','T','N'],['A','G','G','T','A'],['C','C','G','?','A'],['A','C','T','T','N']];
+const L=5,N=4;
+const seqNames=['Seq 0','Seq 1','Seq 2','Seq 3'];
+const cc={'A':'cA','C':'cC','G':'cG','T':'cT','N':'cN','?':'cQ'};
+const pairOrder=[[1,0],[2,0],[3,0],[2,1],[3,1],[3,2]];
+
+function triIdx(i,j){if(i<j){let t=i;i=j;j=t;}return pairOrder.findIndex(p=>p[0]===i&&p[1]===j);}
+
+function getBuckets(col){
+  const b={A:[],C:[],G:[],T:[],N:[],Q:[]};
+  for(let i=0;i<N;i++){const ch=seqs[i][col];if(ch==='?')b.Q.push(i);else b[ch].push(i);}
+  return b;
+}
+
+function getCredited(col){
+  const b=getBuckets(col),cr=[];
+  ['A','C','G','T'].forEach(base=>{const v=b[base];for(let ii=1;ii<v.length;ii++)for(let jj=0;jj<ii;jj++)cr.push({i:v[ii],j:v[jj],reason:'both '+base});});
+  const K=[...b.A,...b.C,...b.G,...b.T];
+  b.N.forEach(ni=>{K.forEach(ki=>{if(ni!==ki)cr.push({i:ni,j:ki,reason:'N vs known'});});});
+  const Q=b.Q;for(let ii=1;ii<Q.length;ii++)for(let jj=0;jj<ii;jj++)cr.push({i:Q[ii],j:Q[jj],reason:'? vs ?'});
+  return cr;
+}
+
+const steps=[{col:-1,phase:'intro'}];
+for(let p=0;p<L;p++){steps.push({col:p,phase:'bucket'});steps.push({col:p,phase:'credit'});}
+steps.push({col:-1,phase:'convert'});
+
+let stepIdx=0,triState=new Array(6).fill(0),triUpd=new Array(6).fill(-1);
+
+function el(id){return document.getElementById(id);}
+function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
+
+function renderProgress(){
+  const p=el('progress');p.innerHTML='';
+  steps.forEach((_,i)=>{const d=mk('div','pip'+(i<stepIdx?' done':i===stepIdx?' active':''));p.appendChild(d);});
+}
+
+function renderGrid(hcol){
+  const cl=el('col-labels');cl.innerHTML='';
+  for(let p=0;p<L;p++){const d=mk('div','col-lbl'+(p===hcol?' active':''),'p='+p);cl.appendChild(d);}
+  const g=el('seq-grid');g.innerHTML='';
+  for(let i=0;i<N;i++){
+    const row=mk('div','seq-row');
+    row.appendChild(mk('div','seq-label',seqNames[i]));
+    for(let p=0;p<L;p++){
+      const ch=seqs[i][p];
+      const c=mk('div','cell '+(cc[ch]||'cN'),ch);
+      if(hcol>=0&&p!==hcol)c.classList.add('dim');
+      if(p===hcol)c.classList.add('hl');
+      row.appendChild(c);
+    }
+    g.appendChild(row);
+  }
+}
+
+function renderBuckets(col){
+  const pnl=el('bucket-panel');
+  if(col<0){pnl.style.display='none';return;}
+  pnl.style.display='';
+  const b=getBuckets(col),d=el('buckets-display');d.innerHTML='';
+  const names={A:'A',C:'C',G:'G',T:'T',N:'N',Q:'?'};
+  Object.entries(names).forEach(([key,label])=>{
+    const seqsIn=b[key],bkt=mk('div','bucket');
+    bkt.appendChild(mk('div','bk-name',label));
+    const bs=mk('div','bk-seqs');
+    if(seqsIn.length===0){bs.appendChild(mk('div','empty-bk','—'));}
+    else seqsIn.forEach(si=>{const badge=mk('div','badge '+(cc[seqs[si][col]]||'cN'),'S'+si);bs.appendChild(badge);});
+    bkt.appendChild(bs);d.appendChild(bkt);
+  });
+}
+
+function renderPairs(col,phase){
+  const pnl=el('pairs-panel'),d=el('pairs-display'),note=el('pairs-note');
+  if(col<0){pnl.style.display='none';return;}
+  pnl.style.display='';d.innerHTML='';note.textContent='';
+  if(phase==='bucket'){note.textContent='Buckets built. Credits will be applied on the next step.';return;}
+  const cr=getCredited(col);
+  if(cr.length===0){d.appendChild(mk('div','empty-bk','No pairs credited at this column.'));}
+  else cr.forEach(({i,j,reason})=>{d.appendChild(mk('div','pbadge match',`(S${i},S${j}) — ${reason}`));});
+  const crSet=new Set(cr.map(({i,j})=>triIdx(i,j)));
+  pairOrder.filter(([i,j])=>!crSet.has(triIdx(i,j))).forEach(([i,j])=>{d.appendChild(mk('div','pbadge skip',`(S${i},S${j})`));});
+  if(pairOrder.some(([i,j])=>!crSet.has(triIdx(i,j))))
+    note.textContent='Struck-through: mismatch or ambiguous — no credit at this column.';
+}
+
+function renderTri(phase){
+  const d=el('tri-display'),note=el('tri-note');d.innerHTML='';
+  const isDist=phase==='convert';
+  const vals=triState.map(v=>isDist?L-v:v);
+  const g=mk('div','tri-grid');
+  const hrow=mk('div','tri-row');hrow.appendChild(mk('div','tri-lbl',''));
+  ['S0','S1','S2'].forEach(l=>{const c=mk('div','tri-cell blank',l);c.style.fontSize='11px';c.style.color='var(--text2)';g.appendChild;hrow.appendChild(c);});
+  g.appendChild(hrow);
+  [[1,[0]],[2,[0,1]],[3,[0,1,2]]].forEach(([ri,cjs])=>{
+    const row=mk('div','tri-row');row.appendChild(mk('div','tri-lbl','S'+ri));
+    cjs.forEach(j=>{
+      const idx=triIdx(ri,j),c=mk('div','tri-cell',vals[idx]);
+      if(isDist)c.classList.add('dist');
+      else if(triUpd[idx]===stepIdx)c.classList.add('updated');
+      row.appendChild(c);
+    });
+    for(let b=cjs.length;b<3;b++)row.appendChild(mk('div','tri-cell blank',''));
+    g.appendChild(row);
+  });
+  d.appendChild(g);
+  note.textContent=isDist?'distance = L − matches = 5 − matches. Red = final Hamming distances.':
+    phase==='credit'?'Green = updated this step. Values accumulate across all columns.':
+    'Match counts accumulate here as columns are processed.';
+}
+
+function applyStep(){
+  const s=steps[stepIdx];
+  triUpd=triUpd.map(()=>-1);
+  el('step-counter').textContent=`step ${stepIdx+1} / ${steps.length}`;
+  if(s.phase==='intro'){
+    el('step-desc').textContent='4 sequences, length 5. We process one column at a time.';
+    renderGrid(-1);renderBuckets(-1);renderPairs(-1,'intro');
+  } else if(s.phase==='bucket'){
+    el('step-desc').textContent=`Column p=${s.col}: partition sequences into base buckets.`;
+    renderGrid(s.col);renderBuckets(s.col);renderPairs(s.col,'bucket');
+  } else if(s.phase==='credit'){
+    el('step-desc').textContent=`Column p=${s.col}: credit matching pairs (+1 each).`;
+    renderGrid(s.col);renderBuckets(s.col);renderPairs(s.col,'credit');
+    getCredited(s.col).forEach(({i,j})=>{const idx=triIdx(i,j);triState[idx]++;triUpd[idx]=stepIdx;});
+  } else {
+    el('step-desc').textContent='All columns done. Convert match counts to Hamming distances.';
+    renderGrid(-1);renderBuckets(-1);renderPairs(-1,'convert');
+  }
+  renderTri(s.phase);
+  renderProgress();
+}
+
+el('btn-next').onclick=()=>{if(stepIdx<steps.length-1){stepIdx++;applyStep();}};
+el('btn-prev').onclick=()=>{
+  if(stepIdx>0){
+    triState=new Array(6).fill(0);const t=stepIdx-1;stepIdx=0;
+    for(let s=0;s<=t;s++){if(steps[s].phase==='credit')getCredited(steps[s].col).forEach(({i,j})=>{triState[triIdx(i,j)]++;});}
+    stepIdx=t;applyStep();
+  }
+};
+
+applyStep();
+</script>
+</body>
+</html>

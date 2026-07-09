@@ -78,6 +78,7 @@
 #'   \item  \link{seqEqual}:       Test two sequences for equivalence.
 #'   \item  \link{pairwiseDist}:   Calculate a matrix of pairwise Hamming distances for a 
 #'                                 set of sequences.
+#'   \item  \link{fastDist}:       Faster calculation of pairwise distances between sequences of the same length and contain only "ACTGN?"
 #'   \item  \link{pairwiseEqual}:  Calculate a logical matrix of pairwise equivalence for a 
 #'                                 set of sequences.
 #' }
