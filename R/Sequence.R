@@ -1035,7 +1035,7 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #' 
 #' \code{fastDist} calculates all pairwise distance between a set of sequences of the same length and contain only "ACTGN?".
 #'
-#' @param    seq       character vector containing a DNA sequences.
+#' @param    seqs       character vector containing a DNA sequences.
 #'
 #' @return   Packed lower triangular matrix of distance between each entry in \code{seq}. 
 #'           If \code{seq} is a named vector, row and columns names will be added 
