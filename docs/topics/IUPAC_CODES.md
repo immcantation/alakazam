@@ -34,12 +34,6 @@ ambiguous character.
 + `DNA_IUPAC`:  Ordered DNA to ambiguous characters
 
 
-An object of class `list` of length 15.
-
-An object of class `list` of length 25.
-
-An object of class `list` of length 15.
-
 
 
 

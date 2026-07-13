@@ -91,6 +91,42 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type seqs(seqsSEXP);
     rcpp_result_gen = Rcpp::wrap(fastDist_rcpp(seqs));
+// seqMismatchCountRcpp
+IntegerVector seqMismatchCountRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchCountRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    rcpp_result_gen = Rcpp::wrap(seqMismatchCountRcpp(samples, germlines, ignore));
+    return rcpp_result_gen;
+END_RCPP
+}
+// seqMismatchMatrixRcpp
+IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchMatrixRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    rcpp_result_gen = Rcpp::wrap(seqMismatchMatrixRcpp(samples, germlines, ignore));
+    return rcpp_result_gen;
+END_RCPP
+}
+// seqMismatchPositionsRcpp
+List seqMismatchPositionsRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchPositionsRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    rcpp_result_gen = Rcpp::wrap(seqMismatchPositionsRcpp(samples, germlines, ignore));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -103,6 +139,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_nonsquareDistRcpp", (DL_FUNC) &_alakazam_nonsquareDistRcpp, 3},
     {"_alakazam_countSeqsWithInvalidBases_rcpp", (DL_FUNC) &_alakazam_countSeqsWithInvalidBases_rcpp, 1},
     {"_alakazam_fastDist_rcpp", (DL_FUNC) &_alakazam_fastDist_rcpp, 1},
+    {"_alakazam_seqMismatchCountRcpp", (DL_FUNC) &_alakazam_seqMismatchCountRcpp, 3},
+    {"_alakazam_seqMismatchMatrixRcpp", (DL_FUNC) &_alakazam_seqMismatchMatrixRcpp, 3},
+    {"_alakazam_seqMismatchPositionsRcpp", (DL_FUNC) &_alakazam_seqMismatchPositionsRcpp, 3},
     {NULL, NULL, 0}
 };
 
