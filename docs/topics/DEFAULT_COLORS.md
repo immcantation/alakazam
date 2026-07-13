@@ -34,12 +34,6 @@ Named character vectors with hexcode colors as values.
 `c("TRA", "TRB", "TRD", "TRG")`.
 
 
-An object of class `character` of length 4.
-
-An object of class `character` of length 7.
-
-An object of class `character` of length 4.
-
 
 
 Examples

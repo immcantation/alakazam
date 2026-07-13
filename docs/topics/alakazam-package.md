@@ -33,6 +33,7 @@ Author
 
 Authors:
 
++  Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
 +  Namita Gupta [namita.gupta@yale.edu](namita.gupta@yale.edu)
 +  Nima Nouri [nima.nouri@yale.edu](nima.nouri@yale.edu)
 +  Ruoyi Jiang [ruoyi.jiang@yale.edu](ruoyi.jiang@yale.edu)
