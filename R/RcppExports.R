@@ -71,12 +71,6 @@ nonsquareDistRcpp <- function(seq, indx, dist_mat) {
     .Call(`_alakazam_nonsquareDistRcpp`, seq, indx, dist_mat)
 }
 
-countSeqsWithInvalidBases_rcpp <- function(seqs) {
-    .Call(`_alakazam_countSeqsWithInvalidBases_rcpp`, seqs)
-}
-
-fastDist_rcpp <- function(seqs) {
-    .Call(`_alakazam_fastDist_rcpp`, seqs)
 #' Count mismatches between sample and germline sequences.
 #'
 #' \code{seqMismatchCountRcpp} counts Hamming-style mismatches between paired sample and
@@ -138,5 +132,13 @@ seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("
 #' @export
 seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
     .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore)
+}
+
+countSeqsWithInvalidBases_rcpp <- function(seqs) {
+    .Call(`_alakazam_countSeqsWithInvalidBases_rcpp`, seqs)
+}
+
+fastDist_rcpp <- function(seqs) {
+    .Call(`_alakazam_fastDist_rcpp`, seqs)
 }
 
