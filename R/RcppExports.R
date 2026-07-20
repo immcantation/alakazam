@@ -87,6 +87,13 @@ nonsquareDistRcpp <- function(seq, indx, dist_mat) {
 #' @details  Comparisons are case-insensitive. Sequences of unequal length are
 #'           compared through the length of the shorter sequence.
 #'
+#' @examples
+#' # Single germline recycled across samples
+#' seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
+#'
+#' # Paired germlines and custom ignore characters
+#' seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+#'
 #' @export
 seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
     .Call(`_alakazam_seqMismatchCountRcpp`, samples, germlines, ignore)
@@ -107,6 +114,13 @@ seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N
 #'
 #' @details  Comparisons are case-insensitive. Sequences of unequal length are
 #'           compared through the length of the shorter sequence.
+#'
+#' @examples
+#' # All samples against all germlines
+#' seqMismatchMatrixRcpp(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
+#'
+#' # Custom ignore characters
+#' seqMismatchMatrixRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 #'
 #' @export
 seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {

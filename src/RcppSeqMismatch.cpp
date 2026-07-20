@@ -107,6 +107,13 @@ inline std::vector<int> findMismatchPositions(std::string sample,
 //' @details  Comparisons are case-insensitive. Sequences of unequal length are
 //'           compared through the length of the shorter sequence.
 //'
+//' @examples
+//' # Single germline recycled across samples
+//' seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
+//'
+//' # Paired germlines and custom ignore characters
+//' seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+//'
 //' @export
 // [[Rcpp::export]]
 IntegerVector seqMismatchCountRcpp(CharacterVector samples,
@@ -160,6 +167,13 @@ IntegerVector seqMismatchCountRcpp(CharacterVector samples,
 //'
 //' @details  Comparisons are case-insensitive. Sequences of unequal length are
 //'           compared through the length of the shorter sequence.
+//'
+//' @examples
+//' # All samples against all germlines
+//' seqMismatchMatrixRcpp(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
+//'
+//' # Custom ignore characters
+//' seqMismatchMatrixRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 //'
 //' @export
 // [[Rcpp::export]]
