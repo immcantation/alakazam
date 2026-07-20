@@ -134,3 +134,11 @@ seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( 
     .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore)
 }
 
+countSeqsWithInvalidBases_rcpp <- function(seqs) {
+    .Call(`_alakazam_countSeqsWithInvalidBases_rcpp`, seqs)
+}
+
+fastDist_rcpp <- function(seqs) {
+    .Call(`_alakazam_fastDist_rcpp`, seqs)
+}
+

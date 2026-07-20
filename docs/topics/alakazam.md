@@ -107,6 +107,7 @@ Sequence distance calculation
 + [seqEqual](seqEqual.md):       Test two sequences for equivalence.
 + [pairwiseDist](pairwiseDist.md):   Calculate a matrix of pairwise Hamming distances for a 
 set of sequences.
++ [fastDist](fastDist.md): Faster calculation of pairwise distances between sequences of the same length and contain only "ACTGN?"
 + [pairwiseEqual](pairwiseEqual.md):  Calculate a logical matrix of pairwise equivalence for a 
 set of sequences.
 

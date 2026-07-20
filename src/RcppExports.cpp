@@ -111,6 +111,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// countSeqsWithInvalidBases_rcpp
+int countSeqsWithInvalidBases_rcpp(CharacterVector seqs);
+RcppExport SEXP _alakazam_countSeqsWithInvalidBases_rcpp(SEXP seqsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type seqs(seqsSEXP);
+    rcpp_result_gen = Rcpp::wrap(countSeqsWithInvalidBases_rcpp(seqs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fastDist_rcpp
+IntegerVector fastDist_rcpp(CharacterVector seqs);
+RcppExport SEXP _alakazam_fastDist_rcpp(SEXP seqsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type seqs(seqsSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastDist_rcpp(seqs));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_seqEqual", (DL_FUNC) &_alakazam_seqEqual, 3},
@@ -121,6 +143,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_seqMismatchCountRcpp", (DL_FUNC) &_alakazam_seqMismatchCountRcpp, 3},
     {"_alakazam_seqMismatchMatrixRcpp", (DL_FUNC) &_alakazam_seqMismatchMatrixRcpp, 3},
     {"_alakazam_seqMismatchPositionsRcpp", (DL_FUNC) &_alakazam_seqMismatchPositionsRcpp, 3},
+    {"_alakazam_countSeqsWithInvalidBases_rcpp", (DL_FUNC) &_alakazam_countSeqsWithInvalidBases_rcpp, 1},
+    {"_alakazam_fastDist_rcpp", (DL_FUNC) &_alakazam_fastDist_rcpp, 1},
     {NULL, NULL, 0}
 };
 
