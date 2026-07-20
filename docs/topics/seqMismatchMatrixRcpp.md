@@ -48,6 +48,40 @@ compared through the length of the shorter sequence.
 
 
 
+Examples
+-------------------
+
+```R
+# All samples against all germlines
+seqMismatchMatrixRcpp(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
+
+```
+
+
+```
+     [,1] [,2]
+[1,]    0    1
+[2,]    0    0
+
+```
+
+
+```R
+
+# Custom ignore characters
+seqMismatchMatrixRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+
+```
+
+
+```
+     [,1] [,2]
+[1,]    1    2
+[2,]    2    3
+
+```
+
+
 
 
 

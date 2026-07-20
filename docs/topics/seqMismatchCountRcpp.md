@@ -48,6 +48,36 @@ compared through the length of the shorter sequence.
 
 
 
+Examples
+-------------------
+
+```R
+# Single germline recycled across samples
+seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
+
+```
+
+
+```
+[1] 0 0
+
+```
+
+
+```R
+
+# Paired germlines and custom ignore characters
+seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+
+```
+
+
+```
+[1] 1 3
+
+```
+
+
 
 
 
