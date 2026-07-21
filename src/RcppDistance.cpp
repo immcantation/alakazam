@@ -1,9 +1,92 @@
 #include <Rcpp.h>
 #include <iostream>
-#include <map>
+#include <array>
+#include <vector>
 
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]]
+
+namespace {
+
+void buildDistLookup(const NumericMatrix& dist_mat,
+                     std::array<int, 256>& row_idx,
+                     std::array<int, 256>& col_idx) {
+    List dist_mat_dims = dist_mat.attr("dimnames");
+    CharacterVector dist_mat_rownames = dist_mat_dims[0];
+    CharacterVector dist_mat_colnames = dist_mat_dims[1];
+
+    int num_rows = dist_mat_rownames.size();
+    int num_cols = dist_mat_colnames.size();
+
+    row_idx.fill(-1);
+    col_idx.fill(-1);
+
+    for (int i = 0; i < num_rows; i++) {
+        std::string this_row = as<std::string>(dist_mat_rownames[i]);
+        if (this_row.empty()) {
+            throw std::range_error("Empty row name in dist_mat.");
+        }
+        row_idx[static_cast<unsigned char>(this_row[0])] = i;
+    }
+
+    for (int i = 0; i < num_cols; i++) {
+        std::string this_col = as<std::string>(dist_mat_colnames[i]);
+        if (this_col.empty()) {
+            throw std::range_error("Empty column name in dist_mat.");
+        }
+        col_idx[static_cast<unsigned char>(this_col[0])] = i;
+    }
+}
+
+void encodeSequenceToInt(const std::string& seq,
+                         std::vector<unsigned char>& encoded) {
+    encoded.resize(seq.size());
+    for (size_t i = 0; i < seq.size(); i++) {
+        encoded[i] = static_cast<unsigned char>(seq[i]);
+    }
+}
+
+double seqDistWithMaps(const std::vector<unsigned char>& seq1,
+                       const std::vector<unsigned char>& seq2,
+                          const NumericMatrix& dist_mat,
+                          const std::array<int, 256>& row_idx,
+                          const std::array<int, 256>& col_idx) {
+    int len_seq1 = seq1.size();
+    int len_seq2 = seq2.size();
+
+    if (len_seq1 != len_seq2) {
+        throw std::range_error("Sequences of different length.");
+    }
+
+    int d_seen = 0;
+    int indels = 0;
+    double d_sum = 0;
+
+    for (int i = 0; i < len_seq1; i++) {
+        int r_idx = row_idx[seq1[i]];
+        if (r_idx < 0) {
+            throw std::range_error("Character not found in dist_mat.");
+        }
+
+        int c_idx = col_idx[seq2[i]];
+        if (c_idx < 0) {
+            throw std::range_error("Character not found in dist_mat.");
+        }
+
+        double d_i = dist_mat(r_idx, c_idx);
+
+        if (d_i > 0) {
+            d_sum = d_sum + d_i;
+        } else if ((d_i == -1) & (d_seen != -1)) {
+            indels++;
+        }
+        d_seen = d_i;
+    }
+
+    return d_sum + indels;
+}
+
+} // namespace
 
 
 //' Test DNA sequences for equality.
@@ -136,94 +219,14 @@ LogicalMatrix pairwiseEqual(StringVector seq) {
 // [[Rcpp::export]]
 double seqDistRcpp(std::string seq1, std::string seq2, 
                    NumericMatrix dist_mat) {
-
-    // Check that seq1 and seq2 have same length
-    int len_seq1 = seq1.length();
-    int len_seq2 = seq2.length();
-    
-    if (len_seq1 != len_seq2) {
-        throw std::range_error("Sequences of different length.");  
-    }
-    
-    int len_seqs = len_seq1;
-    
-    List dist_mat_dims = dist_mat.attr("dimnames");
-    //print (dist_mat_dims);
-    CharacterVector dist_mat_rownames = dist_mat_dims[0];
-    CharacterVector dist_mat_colnames = dist_mat_dims[1];
-    int num_rows = dist_mat_rownames.size();
-    int num_cols = dist_mat_colnames.size();
-    
-    List row_key_idx;
-    List col_key_idx;
-    
-    std::map<std::string, int> rows_map;
-    std::map<std::string, int> cols_map;
-    
-    for (int i = 0; i < num_rows; i++)
-    {
-        //const char *this_col = dist_mat_colnames[i].c_str();
-        std::string this_row = as<std::string>(dist_mat_rownames[i]);
-        rows_map[this_row] = i;
-    }  
-    
-    for (int i = 0; i < num_cols; i++)
-    {
-        //const char *this_col = dist_mat_colnames[i].c_str();
-        std::string this_col = as<std::string>(dist_mat_colnames[i]);
-        cols_map[this_col] = i;
-    } 
-    
-    int d_seen = 0;
-    int indels = 0;
-    // sum(d[d>0])
-    double d_sum = 0;
-    
-    for (int i = 0; i < len_seqs; i++)
-    {
-        // find row index
-        int row_idx;
-        char row_char = (char)seq1[i];
-        std::string row_string;
-        row_string+=row_char;
-        auto search_row = rows_map.find(row_string);
-        if(search_row != rows_map.end()) {
-            row_idx = search_row->second;
-        }
-        else {
-            throw std::range_error("Character not found in dist_mat.");  
-        }
-        
-        // find col index
-        int col_idx;
-        char col_char = (char)seq2[i];
-        std::string col_string;
-        col_string+=col_char;
-        auto search_col = cols_map.find(col_string);
-        if(search_col != cols_map.end()) {
-            col_idx = search_col->second;
-        }
-        else {
-            throw std::range_error("Character not found in dist_mat.");  
-        }    
-        
-        // distance for current i
-        double d_i = dist_mat(row_idx, col_idx);
-        
-        if (d_i > 0){
-            // Sum distance
-            d_sum = d_sum + d_i;
-        } 
-        else if ( (d_i == -1 ) &  (d_seen != -1) )
-        {
-            // Count indel
-            indels++;
-        }  
-        d_seen = d_i;
-    }
-    
-    double distance = d_sum + indels;
-    return (distance);
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
+    std::vector<unsigned char> seq1_int;
+    std::vector<unsigned char> seq2_int;
+    encodeSequenceToInt(seq1, seq1_int);
+    encodeSequenceToInt(seq2, seq2_int);
+    return seqDistWithMaps(seq1_int, seq2_int, dist_mat, row_idx, col_idx);
 }
 
 
@@ -232,15 +235,24 @@ double seqDistRcpp(std::string seq1, std::string seq2,
 NumericMatrix pairwiseDistRcpp(StringVector seq, NumericMatrix dist_mat) {
     // allocate the matrix we will return
     NumericMatrix rmat(seq.length(), seq.length());
+
+    int n_seq = seq.length();
+    std::vector<std::vector<unsigned char>> seq_int(n_seq);
+    for (int i = 0; i < n_seq; i++) {
+        std::string seq_i = as<std::string>(seq[i]);
+        encodeSequenceToInt(seq_i, seq_int[i]);
+    }
+
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
     
     for (int i = 0; i < rmat.nrow(); i++) {
         for (int j = 0; j < i; j++) {
-            
-            // check seq equal
-            std::string row_seq = as<std::string>(seq[i]);
-            std::string col_seq = as<std::string>(seq[j]);
-            
-            double distance = seqDistRcpp(row_seq, col_seq, dist_mat);
+            const std::vector<unsigned char>& row_seq = seq_int[i];
+            const std::vector<unsigned char>& col_seq = seq_int[j];
+
+            double distance = seqDistWithMaps(row_seq, col_seq, dist_mat, row_idx, col_idx);
             
             // write to output matrix
             rmat(i,j) = distance;
@@ -262,13 +274,24 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
 {
     // defien variables
     int m, n, i, j;
-    std::string row_seq, col_seq;
     // extract the sizes. Note: This should be satisfied (n<=m)
     m = indx.size(); //number of rows
     n = seq.size();  //number of columns
+
+    std::vector<std::vector<unsigned char>> seq_int(n);
+    for (i = 0; i < n; i++) {
+        std::string seq_i = as<std::string>(seq[i]);
+        encodeSequenceToInt(seq_i, seq_int[i]);
+    }
+
     // allocate the main matrix
     NumericMatrix rmat(m,n);
     std::fill(rmat.begin(), rmat.end(), NA_REAL);
+
+    std::array<int, 256> row_idx;
+    std::array<int, 256> col_idx;
+    buildDistLookup(dist_mat, row_idx, col_idx);
+
     // sort and push indices back by 1 to match c++ indexing
     std::sort(indx.begin(), indx.end());
     indx = indx - 1;
@@ -279,13 +302,14 @@ NumericMatrix nonsquareDistRcpp(StringVector seq, NumericVector indx, NumericMat
     }
     // begin filling rmat
     for (i = 0; i < m; i++) {
-        row_seq = as<std::string>(seq[indx[i]]);     //row sequence 
+        int row_id = indx[i];
+        const std::vector<unsigned char>& row_seq = seq_int[row_id];
         for (j = 0; j < n; j++) {
             if (!R_IsNA(rmat(i,j))) continue;
-            if (indx[i] == j) rmat(i,j) = 0; 
+            if (row_id == j) rmat(i,j) = 0;
             else {
-                col_seq = as<std::string>(seq[j]); //col sequence
-                rmat(i,j) = seqDistRcpp(row_seq, col_seq, dist_mat);
+                const std::vector<unsigned char>& col_seq = seq_int[j];
+                rmat(i,j) = seqDistWithMaps(row_seq, col_seq, dist_mat, row_idx, col_idx);
                 if (pos[j] < m) rmat(pos[j],indx[i]) = rmat(i,j);
             }
         }
