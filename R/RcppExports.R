@@ -38,25 +38,32 @@ seqEqual <- function(seq1, seq2, ignore = as.character( c("N","-",".","?"))) {
 #' \code{pairwiseEqual} determined pairwise equivalence between a pairs in a 
 #' set of sequences, excluding ambiguous positions (Ns and gaps).
 #'
-#' @param    seq  character vector containing a DNA sequences.
+#' @param    seq     character vector containing a DNA sequences.
+#' @param    ignore  vector of characters to ignore when testing for equality.
+#'                   Default is to ignore c("N","-",".","?")
 #'
-#' @return   A logical matrix of equivalence between each entry in \code{seq}. 
+#' @return   A logical matrix of equivalence between each entry in \code{seq}.
 #'           Values are \code{TRUE} when sequences are equivalent and \code{FALSE}
 #'           when they are not.
-#' 
+#'
 #' @seealso  Uses \link{seqEqual} for testing equivalence between pairs.
 #'           See \link{pairwiseDist} for generating a sequence distance matrix.
-#'           
+#'
 #' @examples
 #' # Gaps and Ns will match any character
 #' seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
 #' d <- pairwiseEqual(seq)
 #' rownames(d) <- colnames(d) <- seq
 #' d
-#' 
+#'
+#' # Ignore only Ns, so that gaps are not treated as matching any character
+#' d <- pairwiseEqual(seq, ignore="N")
+#' rownames(d) <- colnames(d) <- seq
+#' d
+#'
 #' @export
-pairwiseEqual <- function(seq) {
-    .Call(`_alakazam_pairwiseEqual`, seq)
+pairwiseEqual <- function(seq, ignore = as.character( c("N","-",".","?"))) {
+    .Call(`_alakazam_pairwiseEqual`, seq, ignore)
 }
 
 seqDistRcpp <- function(seq1, seq2, dist_mat) {

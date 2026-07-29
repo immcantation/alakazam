@@ -226,6 +226,13 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     if (any(duplicated(data[[id]]))) {
         stop("All values in the id column are not unique")
     }
+    # Only the first character of each ignore value is used when testing equality
+    if (!is.character(ignore)) {
+        stop("The ignore argument must be a character vector")
+    }
+    if (any(stri_length(ignore) > 1, na.rm=TRUE)) {
+        warning("Only the first character of each value in ignore is used.")
+    }
     # Verify column classes and exit if they are incorrect
     if (!is.null(text_fields)) {
         if (!all(sapply(subset(data, select=text_fields), is.character))) {
@@ -372,7 +379,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         cat("\n")
     }
     
-    # Define function to count informative positions in sequences
+    # Define function to count informative positions in sequences.
+    # Independent of ignore, which defines equality, not information content.
     .informativeLength <- function(x) {
         stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
@@ -404,7 +412,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Build distance matrix
     exact_duplicates <- any(duplicated(data[[seq]]))
-    d_mat <- pairwiseEqual(unique(data[[seq]]))
+    d_mat <- pairwiseEqual(unique(data[[seq]]), ignore=ignore)
     colnames(d_mat) <- rownames(d_mat) <- unique(data[[seq]])
     n_uniqueseq <- nrow(d_mat)
     

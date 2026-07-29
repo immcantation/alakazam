@@ -298,6 +298,26 @@ test_that("seqEqual", {
     expect_false(seqEqual("AT--T", "ATGGC", ignore="N"))
 })
 
+#### pairwiseEqual ####
+
+test_that("pairwiseEqual", {
+    seq <- c(A="ATGGC", B="ATGGG", C="ATGGG", D="AT--C", E="NTGGG")
+
+    # Gaps and Ns match any character
+    obs <- pairwiseEqual(seq)
+    expect_equal(obs[, "A"], c(A=TRUE, B=FALSE, C=FALSE, D=TRUE, E=FALSE))
+    expect_equal(obs[, "E"], c(A=FALSE, B=TRUE, C=TRUE, D=FALSE, E=TRUE))
+
+    # Ignoring only Ns means gaps must match exactly
+    obs <- pairwiseEqual(seq, ignore="N")
+    expect_equal(obs[, "A"], c(A=TRUE, B=FALSE, C=FALSE, D=FALSE, E=FALSE))
+    expect_equal(obs[, "E"], c(A=FALSE, B=TRUE, C=TRUE, D=FALSE, E=TRUE))
+
+    # An empty ignore requires exact identity
+    obs <- pairwiseEqual(seq, ignore=character(0))
+    expect_equal(obs[, "B"], c(A=FALSE, B=TRUE, C=TRUE, D=FALSE, E=FALSE))
+})
+
 #### translateDNA ####
 
 test_that("translateDNA", {
@@ -579,6 +599,57 @@ test_that("collapseDuplicates: fields", {
     expect_output(collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
                                      fields="TYPE", verbose=TRUE),
                   "FUNCTION> collapseDuplicates")
+})
+
+test_that("collapseDuplicates: ignore", {
+    # A differs from C only at gap positions, and from B only at an N position
+    db_ig <- data.frame(SEQUENCE_ID=c("A", "B", "C"),
+                        SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "CCCCTG--"),
+                        stringsAsFactors=FALSE)
+
+    # Default ignores both Ns and gaps, so all three are duplicates
+    expect_equal(collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")$SEQUENCE_ID,
+                 "A")
+
+    # Ignoring only Ns keeps the gapped sequence separate
+    obs <- collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", ignore="N")
+    expect_equal(sort(obs$SEQUENCE_ID), c("A", "C"))
+
+    # Ignoring both again collapses everything
+    expect_equal(collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                    ignore=c("N", "-"))$SEQUENCE_ID,
+                 "A")
+
+    # An empty ignore requires exact identity
+    expect_equal(collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                    ignore=character(0))$SEQUENCE_ID,
+                 c("A", "B", "C"))
+
+    # ignore is respected in the dry run
+    obs_dry <- collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                  ignore="N", dry=TRUE)
+    expect_equal(obs_dry$collapse_class, c("duplicated", "duplicated", "unique"))
+    expect_equal(obs_dry$collapse_pass, c(TRUE, FALSE, TRUE))
+
+    # ignore does not change which sequence of a cluster is retained, which is
+    # always the one with the fewest N, -, . and ? characters
+    db_sf <- data.frame(SEQUENCE_ID=c("A", "B"),
+                        SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGG"),
+                        GERMLINE_IMGT=c("AAAANNNN", "AAAAAA--"),
+                        stringsAsFactors=FALSE)
+    for (ig in list(c("N", "-", ".", "?"), "N", character(0))) {
+        expect_equal(collapseDuplicates(db_sf, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                        seq_fields="GERMLINE_IMGT", ignore=ig)$GERMLINE_IMGT,
+                     "AAAAAA--")
+    }
+
+    # Only the first character of each ignore value is used
+    expect_warning(collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                      ignore="N-"),
+                   "first character")
+    expect_error(collapseDuplicates(db_ig, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                    ignore=1),
+                 "character vector")
 })
 
 #### extractVRegion ####
