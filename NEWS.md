@@ -1,3 +1,12 @@
+Version 1.4.3.999: Unreleased
+-------------------------------------------------------------------------------
+
+Sequence:
+
++ Added the `fields` argument to `collapseDuplicates`, specifying columns 
+  (e.g. `c_call`) whose values must match for sequences to be collapsed 
+  together.
+
 Version 1.4.3: April 29, 2026
 -------------------------------------------------------------------------------
 

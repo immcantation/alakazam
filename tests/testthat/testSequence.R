@@ -484,7 +484,101 @@ test_that("collapseDuplicates", {
     expect_equal(col$SEQUENCE_ID, expect)
     col_dry <- collapseDuplicates(test, dry=T, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")
     expect_equal(col_dry$SEQUENCE_ID[col_dry$collapse_pass], expect)
-    
+
+})
+
+test_that("collapseDuplicates: fields", {
+    db_f <- data.frame(SEQUENCE_ID=c("A", "B", "C"),
+                       SEQUENCE_IMGT=rep("CCCCTGGG", 3),
+                       TYPE=c("IgM", "IgG", "IgG"),
+                       COUNT=c(1, 2, 3),
+                       stringsAsFactors=FALSE)
+
+    # Identical sequences with a different TYPE are not collapsed together
+    obs <- collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                              num_fields="COUNT", fields="TYPE", add_count=TRUE)
+    expect_equal(nrow(obs), 2)
+    expect_equal(obs$SEQUENCE_ID, c("A", "B"))
+    expect_equal(obs$COUNT[obs$TYPE == "IgG"], 5)
+    expect_equal(obs$collapse_count[obs$TYPE == "IgG"], 2)
+    expect_equal(obs$collapse_count[obs$TYPE == "IgM"], 1)
+
+    # The same sequences are collapsed when fields is not specified
+    expect_equal(nrow(collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                         num_fields="COUNT")), 1)
+
+    # fields=NULL is identical to omitting fields
+    expect_equal(collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT", fields=NULL),
+                 collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT"))
+
+    # NA values in the TYPE column define their own group
+    db_na <- data.frame(SEQUENCE_ID=c("A", "B", "C", "D"),
+                        SEQUENCE_IMGT=rep("CCCCTGGG", 4),
+                        TYPE=c("IgM", NA, NA, "IgG"),
+                        COUNT=1:4,
+                        stringsAsFactors=FALSE)
+    obs <- collapseDuplicates(db_na, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                              num_fields="COUNT", fields="TYPE", add_count=TRUE)
+    expect_equal(nrow(obs), 3)
+    expect_true(any(is.na(obs$TYPE)))
+    expect_equal(obs$collapse_count[is.na(obs$TYPE)], 2)
+    expect_equal(sum(obs$COUNT), 10)
+    expect_equal(sum(obs$collapse_count), 4)
+
+    # Dry run returns the input, in the input order, with unique collapse_id values
+    obs_dry <- collapseDuplicates(db_na, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                  fields="TYPE", dry=TRUE)
+    expect_equal(nrow(obs_dry), nrow(db_na))
+    expect_equal(obs_dry$SEQUENCE_ID, db_na$SEQUENCE_ID)
+    expect_equal(obs_dry$TYPE, db_na$TYPE)
+    expect_equal(obs_dry$collapse_class, c("unique", "duplicated", "duplicated", "unique"))
+    expect_equal(sum(obs_dry$collapse_pass), 3)
+    expect_false(any(is.na(obs_dry$collapse_id)))
+    expect_equal(length(unique(obs_dry$collapse_id)), 3)
+    expect_equal(obs_dry$collapse_id[2], obs_dry$collapse_id[3])
+
+    # Ambiguous sequences are resolved within each group.
+    # D is ambiguous across the whole set, but is alone in the IgA group.
+    db_amb <- data.frame(SEQUENCE_ID=LETTERS[1:5],
+                         SEQUENCE_IMGT=c("CCCCTGGG", "CCCCTGGN", "NAACTGGN", "NNNCTGNN", "NAACTGNG"),
+                         TYPE=c("IgM", "IgG", "IgG", "IgA", "IgG"),
+                         COUNT=1:5,
+                         stringsAsFactors=FALSE)
+    expect_equal(collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT")$SEQUENCE_ID,
+                 c("A", "C"))
+    obs <- collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                              text_fields="TYPE", num_fields="COUNT", fields="TYPE")
+    expect_equal(obs$SEQUENCE_ID, c("A", "B", "C", "D"))
+    expect_equal(obs$COUNT[obs$SEQUENCE_ID == "C"], 8)
+    obs_dry <- collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                  fields="TYPE", dry=TRUE)
+    expect_equal(obs_dry$SEQUENCE_ID, db_amb$SEQUENCE_ID)
+    expect_equal(obs_dry$collapse_class,
+                 c("unique", "unique", "duplicated", "unique", "duplicated"))
+    expect_equal(obs_dry$collapse_pass, c(TRUE, TRUE, TRUE, TRUE, FALSE))
+    expect_equal(length(unique(obs_dry$collapse_id)), 4)
+
+    # Multiple fields; COUNT is unique per row, so nothing is collapsed
+    obs <- collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                              fields=c("TYPE", "COUNT"))
+    expect_equal(nrow(obs), 5)
+
+    # A missing fields column is dropped, with a warning
+    expect_warning(obs <- collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                             fields=c("TYPE", "NOT_A_COLUMN")),
+                   "not found")
+    expect_equal(obs$SEQUENCE_ID, c("A", "B"))
+
+    # If none of the fields are found, the data is collapsed as a single group
+    expect_warning(obs <- collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                             fields="NOT_A_COLUMN"),
+                   "not found")
+    expect_equal(obs, collapseDuplicates(db_f, id="SEQUENCE_ID", seq="SEQUENCE_IMGT"))
+
+    # One verbose report per group
+    expect_output(collapseDuplicates(db_amb, id="SEQUENCE_ID", seq="SEQUENCE_IMGT",
+                                     fields="TYPE", verbose=TRUE),
+                  "FUNCTION> collapseDuplicates")
 })
 
 #### extractVRegion ####
