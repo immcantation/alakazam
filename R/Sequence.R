@@ -283,10 +283,12 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
                                          seq_fields=seq_fields, add_count=add_count,
                                          ignore=ignore, sep=sep, dry=dry, verbose=verbose)
         if (dry) {
-            # collapse_id restarts at 1 in every group; shift to keep them unique.
-            # The ids within a group are bounded by the number of sequences in it.
+            # collapse_id restarts at 1 in every group; shift by the previous
+            # group's actual max id (not its row count) so ids stay unique
+            # across groups with no gaps.
+            local_max <- .maxCollapseId(res[["collapse_id"]])
             res[["collapse_id"]] <- .offsetCollapseId(res[["collapse_id"]], id_offset)
-            id_offset <- id_offset + length(group_rows[[i]])
+            id_offset <- id_offset + local_max
         }
         group_list[[i]] <- res
     }
