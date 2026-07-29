@@ -246,6 +246,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     # all NA column, which is a valid single group for the purposes of fields.
     # Columns that don't exist are dropped, so that fields is empty, and the data
     # collapsed as a single group, when none of them are found.
+    fields <- unique(fields)
     missing_fields <- setdiff(fields, names(data))
     if (length(missing_fields) > 0) {
         warning("The column(s) ", paste(missing_fields, collapse=", "),
