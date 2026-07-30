@@ -149,13 +149,20 @@ getAAMatrix <- function(gap=0) {
 #' \code{dry=FALSE} case.
 #' 
 #' \itemize{
-#'   \item  \code{collapse_id}:     an identifier for the group of identical sequences.
+#'   \item  \code{collapse_id}:     an identifier for the group of identical sequences. A
+#'                                  sequence with \code{collapse_class="ambiguous"} belongs
+#'                                  to more than one group and receives multiple identifiers
+#'                                  delimited by \code{","}.
 #'   \item  \code{collapse_class}:  string defining how the sequence matches to the other in the set.
 #'                                  one of \code{"duplicated"} (has duplicates),
 #'                                  \code{"unique"} (no duplicates), \code{"ambiguous_duplicate"} 
 #'                                  (no duplicates after ambiguous sequences are removed), 
 #'                                  or \code{"ambiguous"} (matches multiple non-duplicate sequences).
 #'   \item  \code{collapse_pass}:   \code{TRUE} for the sequences that would be retained.
+#'   \item  \code{collapse_count}:  present only when \code{add_count=TRUE}. Because no
+#'                                  sequences are collapsed during a dry run, this is
+#'                                  \code{1} for every row and does not report
+#'                                  sizes of the groups of identical sequences.
 #' }
 #' 
 #' @seealso  Equality is tested with \link{seqEqual} and \link{pairwiseEqual}. 
