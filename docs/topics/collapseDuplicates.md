@@ -57,7 +57,7 @@ retained. Where a non-informative character is one of
 `seq` parameter which is used to determine duplicates.
 
 add_count
-:   if `TRUE` add the column `collpase_count` that 
+:   if `TRUE` add the column `collapase_count` that 
 indicates the number of sequences that were collapsed to build 
 each unique entry.
 
@@ -120,13 +120,20 @@ will be appended to the input defining the collapse action that would have been 
 `dry=FALSE` case.
 
 
-+ `collapse_id`:     an identifier for the group of identical sequences.
++ `collapse_id`:     an identifier for the group of identical sequences. A
+sequence with `collapse_class="ambiguous"` belongs
+to more than one group and receives multiple identifiers
+delimited by `","`.
 + `collapse_class`:  string defining how the sequence matches to the other in the set.
 one of `"duplicated"` (has duplicates),
 `"unique"` (no duplicates), `"ambiguous_duplicate"` 
 (no duplicates after ambiguous sequences are removed), 
 or `"ambiguous"` (matches multiple non-duplicate sequences).
 + `collapse_pass`:   `TRUE` for the sequences that would be retained.
++ `collapse_count`:  present only when `add_count=TRUE`. Because no
+sequences are collapsed during a dry run, this is
+`1` for every row and does not report
+sizes of the groups of identical sequences.
 
 
 
