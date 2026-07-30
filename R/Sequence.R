@@ -103,8 +103,8 @@ getAAMatrix <- function(gap=0) {
 #'                        retained. Where a non-informative character is one of 
 #'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
-#' @param    add_count    if \code{TRUE} add the column \code{collpase_count} that
-#'                        indicates the number of sequences that were collapsed to build
+#' @param    add_count    if \code{TRUE} add the column \code{collapase_count} that 
+#'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
 #' @param    fields       character vector of additional column names used to group
 #'                        sequences prior to identifying duplicates. If specified,
@@ -169,13 +169,20 @@ getAAMatrix <- function(gap=0) {
 #' \code{dry=FALSE} case.
 #' 
 #' \itemize{
-#'   \item  \code{collapse_id}:     an identifier for the group of identical sequences.
+#'   \item  \code{collapse_id}:     an identifier for the group of identical sequences. A
+#'                                  sequence with \code{collapse_class="ambiguous"} belongs
+#'                                  to more than one group and receives multiple identifiers
+#'                                  delimited by \code{","}.
 #'   \item  \code{collapse_class}:  string defining how the sequence matches to the other in the set.
 #'                                  one of \code{"duplicated"} (has duplicates),
 #'                                  \code{"unique"} (no duplicates), \code{"ambiguous_duplicate"} 
 #'                                  (no duplicates after ambiguous sequences are removed), 
 #'                                  or \code{"ambiguous"} (matches multiple non-duplicate sequences).
 #'   \item  \code{collapse_pass}:   \code{TRUE} for the sequences that would be retained.
+#'   \item  \code{collapse_count}:  present only when \code{add_count=TRUE}. Because no
+#'                                  sequences are collapsed during a dry run, this is
+#'                                  \code{1} for every row and does not report
+#'                                  sizes of the groups of identical sequences.
 #' }
 #' 
 #' @seealso  Equality is tested with \link{seqEqual} and \link{pairwiseEqual}. 
