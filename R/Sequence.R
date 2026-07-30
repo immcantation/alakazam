@@ -103,7 +103,7 @@ getAAMatrix <- function(gap=0) {
 #'                        retained. Where a non-informative character is one of 
 #'                        \code{c("N", "-", ".", "?")}. Note, this is distinct from the 
 #'                        \code{seq} parameter which is used to determine duplicates.
-#' @param    add_count    if \code{TRUE} add the column \code{collpase_count} that 
+#' @param    add_count    if \code{TRUE} add the column \code{collapase_count} that 
 #'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
 #' @param    ignore       vector of characters to ignore when testing for equality.
