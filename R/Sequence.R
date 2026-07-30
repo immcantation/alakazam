@@ -106,14 +106,24 @@ getAAMatrix <- function(gap=0) {
 #' @param    add_count    if \code{TRUE} add the column \code{collapase_count} that 
 #'                        indicates the number of sequences that were collapsed to build 
 #'                        each unique entry.
+#' @param    fields       character vector of additional column names used to group
+#'                        sequences prior to identifying duplicates. If specified,
+#'                        sequences will only be collapsed together if they are
+#'                        equivalent in the \code{seq} column and also share identical
+#'                        values in every one of the \code{fields} columns (see Details).
+#'                        Columns that are not found in \code{data} are ignored, with a
+#'                        warning; if none of them are found, all sequences are collapsed
+#'                        together as if \code{fields=NULL}.
 #' @param    ignore       vector of characters to ignore when testing for equality.
 #' @param    sep          character to use for delimiting collapsed annotations in the 
 #'                        \code{text_fields} columns. Defines both the input and output 
 #'                        delimiter.
 #' @param    dry          if \code{TRUE} perform dry run. Only labels the sequences without 
 #'                        collapsing them.
-#' @param    verbose      if \code{TRUE} report the number input, discarded and output 
-#'                        sequences; if \code{FALSE} process sequences silently.
+#' @param    verbose      if \code{TRUE} report the number input, discarded and output
+#'                        sequences; if \code{FALSE} process sequences silently. When
+#'                        \code{fields} is specified, one report is printed for each
+#'                        group of sequences.
 #'                        
 #' @return   A modified \code{data} data.frame with duplicate sequences removed and 
 #'           annotation fields collapsed if \code{dry=FALSE}. If \code{dry=TRUE}, 
@@ -132,10 +142,20 @@ getAAMatrix <- function(gap=0) {
 #' in the duplicate cluster. Sequence annotations, specified by \code{seq_fields}, are 
 #' collapsed by retaining the first sequence with the fewest number of N characters.
 #' 
-#' Columns that are not specified in either \code{text_fields}, \code{num_fields}, or 
-#' \code{seq_fields} will be retained, but the value will be chosen from a random entry 
+#' Columns that are not specified in either \code{text_fields}, \code{num_fields}, or
+#' \code{seq_fields} will be retained, but the value will be chosen from a random entry
 #' amongst all sequences in a cluster of duplicates.
-#' 
+#'
+#' If \code{fields} is specified, sequences are first grouped by the unique combinations
+#' of values in the \code{fields} columns, and duplicates are then identified separately
+#' within each group. As a result, sequences that are otherwise identical, but differ in
+#' one or more \code{fields} columns (for example, distinct \code{sample_id} or \code{c_call} isotype
+#' assignments), are kept as separate entries rather than being collapsed together.
+#' Sequences with an \code{NA} value in a \code{fields} column are grouped together.
+#' When \code{fields} is specified, the returned entries are ordered as they appeared
+#' in the input, and, if \code{dry=TRUE}, the \code{collapse_id} values are unique
+#' across groups and returned as character values.
+#'
 #' An ambiguous sequence is one that can be assigned to two different clusters, wherein
 #' the ambiguous sequence is equivalent to two sequences which are themselves 
 #' non-equivalent. Ambiguous sequences arise due to ambiguous characters at positions that
@@ -192,9 +212,13 @@ getAAMatrix <- function(gap=0) {
 #'                    sep="/", verbose=TRUE)
 #' 
 #' # Add count of duplicates
-#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
+#' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count",
 #'                    add_count=TRUE, verbose=TRUE)
-#' 
+#'
+#' # Use fields to prevent collapsing sequences that differ in sample_id or c_call
+#' collapseDuplicates(db, num_fields="duplicate_count",
+#'                    fields=c("sample_id", "c_call"), add_count=TRUE, verbose=TRUE)
+#'
 #' # Masking ragged ends may impact duplicate removal
 #' db$sequence_alignment <- maskSeqEnds(db$sequence_alignment)
 #' collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
@@ -203,11 +227,18 @@ getAAMatrix <- function(gap=0) {
 #' @export
 collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
                                text_fields=NULL, num_fields=NULL, seq_fields=NULL,
-                               add_count=FALSE, ignore=c("N", "-", ".", "?"), 
+                               add_count=FALSE, fields=NULL, ignore=c("N", "-", ".", "?"),
                                sep=",", dry=FALSE, verbose=FALSE) {
     # Stop if ids are not unique
     if (any(duplicated(data[[id]]))) {
         stop("All values in the id column are not unique")
+    }
+    # Only the first character of each ignore value is used when testing equality
+    if (!is.character(ignore)) {
+        stop("The ignore argument must be a character vector")
+    }
+    if (any(stri_length(ignore) > 1, na.rm=TRUE)) {
+        warning("Only the first character of each value in ignore is used.")
     }
     # Verify column classes and exit if they are incorrect
     if (!is.null(text_fields)) {
@@ -225,12 +256,125 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
             stop("All seq_fields columns must be of type 'character'")
         }
     }
+    # Existence check only. checkColumns() is not used here because it rejects an
+    # all NA column, which is a valid single group for the purposes of fields.
+    # Columns that don't exist are dropped, so that fields is empty, and the data
+    # collapsed as a single group, when none of them are found.
+    fields <- unique(fields)
+    missing_fields <- setdiff(fields, names(data))
+    if (length(missing_fields) > 0) {
+        warning("The column(s) ", paste(missing_fields, collapse=", "),
+                " were not found. Not grouping by these fields.")
+        fields <- setdiff(fields, missing_fields)
+    }
     seq_len <- stri_length(data[[seq]])
     if (any(seq_len != seq_len[1])) {
-        warning("All sequences are not the same length for data with first ", 
+        warning("All sequences are not the same length for data with first ",
                 id, " = ", data[[id]][1])
     }
-    
+
+    # Collapse the whole input as a single group
+    if (is.null(fields) || length(fields) == 0 || nrow(data) <= 1) {
+        return(.collapseDuplicatesSingle(data, id=id, seq=seq, text_fields=text_fields,
+                                         num_fields=num_fields, seq_fields=seq_fields,
+                                         add_count=add_count, ignore=ignore, sep=sep,
+                                         dry=dry, verbose=verbose))
+    }
+
+    # Split rows by the unique combinations of the fields values.
+    # NA values define their own group.
+    group_rows <- dplyr::group_rows(dplyr::group_by(data, !!!rlang::syms(fields)))
+    if (length(unlist(group_rows, use.names=FALSE)) != nrow(data)) {
+        stop("Failed to group all rows by the fields columns in collapseDuplicates")
+    }
+
+    # Collapse duplicates within each group
+    group_list <- vector("list", length(group_rows))
+    id_offset <- 0
+    for (i in seq_along(group_rows)) {
+        res <- .collapseDuplicatesSingle(data[group_rows[[i]], , drop=FALSE], id=id, seq=seq,
+                                         text_fields=text_fields, num_fields=num_fields,
+                                         seq_fields=seq_fields, add_count=add_count,
+                                         ignore=ignore, sep=sep, dry=dry, verbose=verbose)
+        if (dry) {
+            # collapse_id restarts at 1 in every group; shift by the previous
+            # group's actual max id (not its row count) so ids stay unique
+            # across groups with no gaps.
+            local_max <- .maxCollapseId(res[["collapse_id"]])
+            res[["collapse_id"]] <- .offsetCollapseId(res[["collapse_id"]], id_offset)
+            id_offset <- id_offset + local_max
+        }
+        group_list[[i]] <- res
+    }
+
+    # Write the annotations back into the unmodified input
+    if (dry) {
+        out <- data
+        extra_cols <- setdiff(names(group_list[[1]]), names(data))
+        out[["collapse_id"]] <- NA_character_
+        out[["collapse_class"]] <- NA_character_
+        out[["collapse_pass"]] <- NA
+        if ("collapse_count" %in% extra_cols) { out[["collapse_count"]] <- NA_real_ }
+        for (res in group_list) {
+            pos <- match(res[[id]], out[[id]])
+            for (f in extra_cols) { out[[f]][pos] <- res[[f]] }
+        }
+        return(out)
+    }
+
+    # Combine the groups and restore the input row order
+    out <- as.data.frame(bind_rows(group_list))
+    out <- out[order(match(out[[id]], data[[id]])), , drop=FALSE]
+    rownames(out) <- NULL
+
+    return(out)
+}
+
+
+# Shift collapse_id values by an offset, handling comma delimited ids
+#
+# @param   x       vector of collapse_id values.
+# @param   offset  integer to add to each id.
+# @return  A character vector of shifted ids.
+.offsetCollapseId <- function(x, offset) {
+    parts <- strsplit(as.character(x), ",", fixed=TRUE)
+    vapply(parts, function(p) {
+        if (length(p) == 0 || anyNA(p)) { return(NA_character_) }
+        paste(as.integer(p) + offset, collapse=",")
+    }, character(1))
+}
+
+
+# Find the largest collapse_id
+#
+# @param   x  vector of collapse_id values.
+# @return  The largest id as an integer, or 0 if there are none.
+.maxCollapseId <- function(x) {
+    v <- suppressWarnings(as.integer(unlist(strsplit(as.character(x), ",", fixed=TRUE))))
+    if (length(v) == 0 || all(is.na(v))) { return(0L) }
+
+    return(max(v, na.rm=TRUE))
+}
+
+
+# Collapse duplicate sequences within a single group
+#
+# The body of collapseDuplicates.
+#
+# @param   data         data.frame of sequences belonging to one group.
+# @param   id           name of the column containing sequence identifiers.
+# @param   seq          name of the column containing DNA sequences.
+# @param   text_fields  character vector of textual columns to collapse.
+# @param   num_fields   vector of numeric columns to collapse.
+# @param   seq_fields   vector of nucleotide sequence columns to collapse.
+# @param   add_count    if \code{TRUE} add the column \code{collapse_count}.
+# @param   ignore       vector of characters to ignore when testing for equality.
+# @param   sep          character to use for delimiting collapsed annotations.
+# @param   dry          if \code{TRUE} perform dry run.
+# @param   verbose      if \code{TRUE} report the collapse counts.
+# @return  A modified \code{data} data.frame, as described for collapseDuplicates.
+.collapseDuplicatesSingle <- function(data, id, seq, text_fields, num_fields, seq_fields,
+                                      add_count, ignore, sep, dry, verbose) {
     # Define verbose reporting function
     .printVerbose <- function(n_total, n_unique, n_discard) {
         cat(" FUNCTION> collapseDuplicates\n", sep="")
@@ -242,7 +386,8 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         cat("\n")
     }
     
-    # Define function to count informative positions in sequences
+    # Define function to count informative positions in sequences.
+    # Independent of ignore, which defines equality, not information content.
     .informativeLength <- function(x) {
         stri_length(gsub("[N\\-\\.\\?]", "", x, perl=TRUE))
     }
@@ -274,7 +419,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Build distance matrix
     exact_duplicates <- any(duplicated(data[[seq]]))
-    d_mat <- pairwiseEqual(unique(data[[seq]]))
+    d_mat <- pairwiseEqual(unique(data[[seq]]), ignore=ignore)
     colnames(d_mat) <- rownames(d_mat) <- unique(data[[seq]])
     n_uniqueseq <- nrow(d_mat)
     

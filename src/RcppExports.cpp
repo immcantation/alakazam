@@ -24,13 +24,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // pairwiseEqual
-LogicalMatrix pairwiseEqual(StringVector seq);
-RcppExport SEXP _alakazam_pairwiseEqual(SEXP seqSEXP) {
+LogicalMatrix pairwiseEqual(StringVector seq, CharacterVector ignore);
+RcppExport SEXP _alakazam_pairwiseEqual(SEXP seqSEXP, SEXP ignoreSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< StringVector >::type seq(seqSEXP);
-    rcpp_result_gen = Rcpp::wrap(pairwiseEqual(seq));
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    rcpp_result_gen = Rcpp::wrap(pairwiseEqual(seq, ignore));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -136,7 +137,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_seqEqual", (DL_FUNC) &_alakazam_seqEqual, 3},
-    {"_alakazam_pairwiseEqual", (DL_FUNC) &_alakazam_pairwiseEqual, 1},
+    {"_alakazam_pairwiseEqual", (DL_FUNC) &_alakazam_pairwiseEqual, 2},
     {"_alakazam_seqDistRcpp", (DL_FUNC) &_alakazam_seqDistRcpp, 3},
     {"_alakazam_pairwiseDistRcpp", (DL_FUNC) &_alakazam_pairwiseDistRcpp, 2},
     {"_alakazam_nonsquareDistRcpp", (DL_FUNC) &_alakazam_nonsquareDistRcpp, 3},

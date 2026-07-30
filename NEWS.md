@@ -1,3 +1,17 @@
+Version 1.4.3.999: Unreleased
+-------------------------------------------------------------------------------
+
+Sequence:
+
++ Added the `fields` argument to `collapseDuplicates`, specifying columns 
+  (e.g. `c_call`) whose values must match for sequences to be collapsed 
+  together.
++ Fixed the `ignore` argument of `collapseDuplicates`, which was never used. 
+  Sequence equality was always tested with the default 
+  `c("N", "-", ".", "?")`.
++ Added the `ignore` argument to `pairwiseEqual`, which previously always used 
+  the `seqEqual` default of `c("N", "-", ".", "?")`.
+
 Version 1.4.3: April 29, 2026
 -------------------------------------------------------------------------------
 
