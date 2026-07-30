@@ -18,6 +18,7 @@ text_fields = NULL,
 num_fields = NULL,
 seq_fields = NULL,
 add_count = FALSE,
+fields = NULL,
 ignore = c("N", "-", ".", "?"),
 sep = ",",
 dry = FALSE,
@@ -61,6 +62,16 @@ add_count
 indicates the number of sequences that were collapsed to build 
 each unique entry.
 
+fields
+:   character vector of additional column names used to group
+sequences prior to identifying duplicates. If specified,
+sequences will only be collapsed together if they are
+equivalent in the `seq` column and also share identical
+values in every one of the `fields` columns (see Details).
+Columns that are not found in `data` are ignored, with a
+warning; if none of them are found, all sequences are collapsed
+together as if `fields=NULL`.
+
 ignore
 :   vector of characters to ignore when testing for equality.
 
@@ -74,8 +85,10 @@ dry
 collapsing them.
 
 verbose
-:   if `TRUE` report the number input, discarded and output 
-sequences; if `FALSE` process sequences silently.
+:   if `TRUE` report the number input, discarded and output
+sequences; if `FALSE` process sequences silently. When
+`fields` is specified, one report is printed for each
+group of sequences.
 
 
 
@@ -103,9 +116,19 @@ Numeric annotations, specified by `num_fields`, are collapsed by summing all val
 in the duplicate cluster. Sequence annotations, specified by `seq_fields`, are 
 collapsed by retaining the first sequence with the fewest number of N characters.
 
-Columns that are not specified in either `text_fields`, `num_fields`, or 
-`seq_fields` will be retained, but the value will be chosen from a random entry 
+Columns that are not specified in either `text_fields`, `num_fields`, or
+`seq_fields` will be retained, but the value will be chosen from a random entry
 amongst all sequences in a cluster of duplicates.
+
+If `fields` is specified, sequences are first grouped by the unique combinations
+of values in the `fields` columns, and duplicates are then identified separately
+within each group. As a result, sequences that are otherwise identical, but differ in
+one or more `fields` columns (for example, distinct `sample_id` or `c_call` isotype
+assignments), are kept as separate entries rather than being collapsed together.
+Sequences with an `NA` value in a `fields` column are grouped together.
+When `fields` is specified, the returned entries are ordered as they appeared
+in the input, and, if `dry=TRUE`, the `collapse_id` values are unique
+across groups and returned as character values.
 
 An ambiguous sequence is one that can be assigned to two different clusters, wherein
 the ambiguous sequence is equivalent to two sequences which are themselves 
@@ -240,7 +263,7 @@ DISCARDED> 1
 ```R
 
 # Add count of duplicates
-collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count", 
+collapseDuplicates(db, text_fields=c("c_call", "sample_id"), num_fields="duplicate_count",
 add_count=TRUE, verbose=TRUE)
 
 ```
@@ -265,6 +288,63 @@ DISCARDED> 1
   collapse_count
 1              1
 2              2
+
+```
+
+
+```R
+
+# Use fields to prevent collapsing sequences that differ in sample_id or c_call
+collapseDuplicates(db, num_fields="duplicate_count",
+fields=c("sample_id", "c_call"), add_count=TRUE, verbose=TRUE)
+
+```
+
+
+```
+ FUNCTION> collapseDuplicates
+ FIRST_ID> B
+    TOTAL> 1
+   UNIQUE> 1
+COLLAPSED> 0
+DISCARDED> 0
+
+ FUNCTION> collapseDuplicates
+ FIRST_ID> A
+    TOTAL> 1
+   UNIQUE> 1
+COLLAPSED> 0
+DISCARDED> 0
+
+ FUNCTION> collapseDuplicates
+ FIRST_ID> D
+    TOTAL> 1
+   UNIQUE> 1
+COLLAPSED> 0
+DISCARDED> 0
+
+ FUNCTION> collapseDuplicates
+ FIRST_ID> C
+    TOTAL> 1
+   UNIQUE> 1
+COLLAPSED> 0
+DISCARDED> 0
+
+
+```
+
+
+```
+  sequence_id sequence_alignment c_call sample_id duplicate_count
+1           A           CCCCTGGG   IGHM        S1               1
+2           B           CCCCTGGN   IGHG        S1               2
+3           C           NAACTGGN   IGHG        S2               3
+4           D           NNNCTGNN   IGHA        S2               4
+  collapse_count
+1              1
+2              1
+3              1
+4              1
 
 ```
 

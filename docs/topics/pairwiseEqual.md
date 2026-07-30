@@ -10,7 +10,7 @@ set of sequences, excluding ambiguous positions (Ns and gaps).
 Usage
 --------------------
 ```
-pairwiseEqual(seq)
+pairwiseEqual(seq, ignore = as.character(c("N", "-", ".", "?")))
 ```
 
 Arguments
@@ -19,13 +19,17 @@ Arguments
 seq
 :   character vector containing a DNA sequences.
 
+ignore
+:   vector of characters to ignore when testing for equality.
+Default is to ignore c("N","-",".","?")
+
 
 
 
 Value
 -------------------
 
-A logical matrix of equivalence between each entry in `seq`. 
+A logical matrix of equivalence between each entry in `seq`.
 Values are `TRUE` when sequences are equivalent and `FALSE`
 when they are not.
 
@@ -50,6 +54,27 @@ ATGGC  TRUE FALSE FALSE  TRUE FALSE
 ATGGG FALSE  TRUE  TRUE FALSE  TRUE
 ATGGG FALSE  TRUE  TRUE FALSE  TRUE
 AT--C  TRUE FALSE FALSE  TRUE FALSE
+NTGGG FALSE  TRUE  TRUE FALSE  TRUE
+
+```
+
+
+```R
+
+# Ignore only Ns, so that gaps are not treated as matching any character
+d <- pairwiseEqual(seq, ignore="N")
+rownames(d) <- colnames(d) <- seq
+d
+
+```
+
+
+```
+      ATGGC ATGGG ATGGG AT--C NTGGG
+ATGGC  TRUE FALSE FALSE FALSE FALSE
+ATGGG FALSE  TRUE  TRUE FALSE  TRUE
+ATGGG FALSE  TRUE  TRUE FALSE  TRUE
+AT--C FALSE FALSE FALSE  TRUE FALSE
 NTGGG FALSE  TRUE  TRUE FALSE  TRUE
 
 ```
