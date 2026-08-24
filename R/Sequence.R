@@ -1204,6 +1204,32 @@ fastDist <- function(seqs) {
 }
 
 
+#' Faster calculation of pairwise distances between amino acid sequences of the same length
+#' 
+#' \code{fastDistAA} calculates all pairwise distance between a set of amino acid sequences of the same length. 
+#'
+#' @param    seqs       character vector containing an amino acid sequences.
+#'
+#' @return   Packed lower triangular matrix of distance between each entry in \code{seq}. 
+#'           If \code{seq} is a named vector, row and columns names will be added 
+#'           accordingly.
+#'           
+#' @examples
+#' fastDistAA(c(A="AEHGC*X", B="AEHGGIC", C="AXGGGIC", D="ATTNC-E", E="N.TGG**"))
+#' 
+#' @export
+fastDistAA <- function(seqs) {
+    n <- length(seqs)
+    v <- fastDistAA_rcpp(seqs)
+    structure(v,
+              class  = "dist",
+              Size   = n,
+              Labels = names(seqs),
+              Diag   = FALSE,
+              Upper  = FALSE)
+}
+
+
 #' Calculate pairwise distances between sequences
 #' 
 #' \code{nonsquareDist} calculates all pairwise distance between a set of sequences and a subset of it.
