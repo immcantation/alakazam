@@ -312,7 +312,7 @@ countGenes <- function(data, gene, groups = NULL, copy = NULL, clone = NULL, fil
     }
 
     # Rename gene column
-    gene_tab <- gene_tab %>% rename(dplyr::all_of(c("gene" = gene)))
+    gene_tab <- gene_tab %>% dplyr::rename(dplyr::all_of(c("gene" = gene)))
 
     return(gene_tab)
 }

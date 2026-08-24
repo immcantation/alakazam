@@ -450,7 +450,7 @@ estimateAbundance <- function(data, clone="clone_id", copy=NULL, group=NULL,
         group_tab <- clone_tab %>%
             group_by(!!rlang::sym(group)) %>%
             dplyr::summarize(count=sum(!!rlang::sym("clone_count"), na.rm=TRUE)) %>%
-            rename(group=!!rlang::sym(group))
+            dplyr::rename(group=!!rlang::sym(group))
     } else {
         group_tab <- data.frame(v="All", count=sum(clone_tab$clone_count, na.rm=T))
         names(group_tab)[1] <- "group"
