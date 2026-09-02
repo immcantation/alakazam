@@ -163,3 +163,11 @@ fastDist_rcpp <- function(seqs) {
     .Call(`_alakazam_fastDist_rcpp`, seqs)
 }
 
+countAASeqsWithInvalidChars_rcpp <- function(seqs) {
+    .Call(`_alakazam_countAASeqsWithInvalidChars_rcpp`, seqs)
+}
+
+fastDistAA_rcpp <- function(seqs) {
+    .Call(`_alakazam_fastDistAA_rcpp`, seqs)
+}
+

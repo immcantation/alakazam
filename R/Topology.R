@@ -425,7 +425,7 @@ testMRCA <- function(graphs, field, root="Germline", exclude=c("Germline", NA),
         # Summarize MRCA counts
         mrca_sum <- bind_rows(mrca_list, .id="GRAPH") %>%
             select(!!!rlang::syms(c("GRAPH", field))) %>%
-            rename(dplyr::all_of(c("annotation"=field))) %>%
+            dplyr::rename(dplyr::all_of(c("annotation"=field))) %>%
             group_by(!!rlang::sym("annotation")) %>%
             dplyr::summarize(count=n())
         
@@ -628,8 +628,8 @@ plotEdgeTest <- function(data, color="black", main_title="Edge Test",
     style <- match.arg(style)
     
     # Extract plot data
-    obs_sum <- rename(data@tests, "Parent"="parent", "Child"="child")
-    perm_sum <- rename(data@permutations, "Parent"="parent", "Child"="child")
+    obs_sum <- dplyr::rename(data@tests, "Parent"="parent", "Child"="child")
+    perm_sum <- dplyr::rename(data@permutations, "Parent"="parent", "Child"="child")
 
     if (style == "histogram") {
         # Plot edge null distribution
@@ -715,8 +715,8 @@ plotMRCATest <- function(data, color="black", main_title="MRCA Test",
     style <- match.arg(style)
     
     # Extract plot data
-    obs_sum <- rename(data@tests, "Annotation"="annotation")
-    perm_sum <- rename(data@permutations, "Annotation"="annotation")
+    obs_sum <- dplyr::rename(data@tests, "Annotation"="annotation")
+    perm_sum <- dplyr::rename(data@permutations, "Annotation"="annotation")
     
     if (style == "histogram") {
         # Plot MRCA null distribution

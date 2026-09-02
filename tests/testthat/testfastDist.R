@@ -56,4 +56,12 @@ test_that("fastDist matches pairwiseDist for ATCG sequences", {
 
     # Expect same results when comparing to pairwiseDist with check.attributes=F (ignoring dimnames)
     expect_equal(fast_single, single, check.attributes = FALSE)
+    
+    # --- Empty sequence list ---
+    seq_empty <- c()
+    expect_error(
+      fast_empty <- alakazam::fastDist(seq_empty),
+      "Sequence list is empty"
+    )
+    
 })
