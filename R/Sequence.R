@@ -1179,7 +1179,13 @@ seqDist <- function(seq1, seq2, dist_mat=getDNAMatrix()) {
 #' 
 #' @export
 pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
-    pairwiseDistRcpp(seq, dist_mat)
+    n <- length(seq)
+    if(n>0){
+      pairwiseDistRcpp(seq, dist_mat)
+    } else{
+      stop("Sequence list is empty")
+    }
+    
 }
 
 
@@ -1199,14 +1205,20 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #' @export
 fastDist <- function(seqs) {
     n <- length(seqs)
-    v <- fastDist_rcpp(seqs)
-    structure(v, class = "dist", Size = n, Labels = names(seqs), Diag = FALSE, Upper = FALSE)
+    if(n>0){
+      v <- fastDist_rcpp(seqs)
+      structure(v, class = "dist", Size = n, Labels = names(seqs), Diag = FALSE, Upper = FALSE)
+    } else {
+      stop("Sequence list is empty")
+    }
 }
 
 
 #' Faster calculation of pairwise distances between amino acid sequences of the same length
 #' 
-#' \code{fastDistAA} calculates all pairwise distances between a set of amino acid sequences of the same length. 
+#' \code{fastDistAA} calculates all pairwise distances among a set of amino acid sequences of the same length. 
+#' Amino acid sequences may contain the 20 standard amino acid characters and four special characters: (X, ., -, *).  
+#' The characters \code{X}, \code{-}, and \code{.} match any character, whereas standard amino acids and stop codon \code{*} match only themselves.
 #'
 #' @param    seqs       character vector containing an amino acid sequences.
 #'
@@ -1220,13 +1232,18 @@ fastDist <- function(seqs) {
 #' @export
 fastDistAA <- function(seqs) {
     n <- length(seqs)
-    v <- fastDistAA_rcpp(seqs)
-    structure(v,
-              class  = "dist",
-              Size   = n,
-              Labels = names(seqs),
-              Diag   = FALSE,
-              Upper  = FALSE)
+    if(n>0){
+      v <- fastDistAA_rcpp(seqs)
+      structure(v,
+                class  = "dist",
+                Size   = n,
+                Labels = names(seqs),
+                Diag   = FALSE,
+                Upper  = FALSE)
+    }
+    else{
+      stop("Amino acid sequence list is empty")
+      }
 }
 
 
@@ -1234,7 +1251,7 @@ fastDistAA <- function(seqs) {
 #' 
 #' \code{nonsquareDist} calculates all pairwise distance between a set of sequences and a subset of it.
 #'
-#' @param    seq       character vector containing a DNA sequences. The sequence vector needs to
+#' @param    seq       vector containing a DNA sequences of IUPAC characters. The sequence vector needs to
 #'                     be named.
 #' @param    indx      numeric vector containing the indices (a subset of indices of \code{seq}).
 #' @param    dist_mat  Character distance matrix. Defaults to a Hamming distance 

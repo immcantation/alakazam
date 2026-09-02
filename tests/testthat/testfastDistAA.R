@@ -37,4 +37,24 @@ test_that("fastDistAA matches pairwiseDist for amino acid sequences", {
   # Same results when comparing to pairwiseDist with check.attributes=F (ignoring dimnames)
   expect_equal(fast_distAA, pw_dist, check.attributes=F)
   
+  
+  # --- 1 sequence of length 10 contain only 20 standard AA and X, ., -, *---
+
+  seqs <- c("ACDEF*GHIK")
+  fast_distAA <- alakazam:::fastDistAA(seqs)
+  fast_distAA <- as.matrix(fast_distAA) 
+  pw_dist<- alakazam::pairwiseDist(seq = seqs, dist_mat = aa_mat)
+  
+  # Same results when comparing to pairwiseDist with check.attributes=F (ignoring dimnames)
+  expect_equal(fast_distAA, pw_dist, check.attributes=F)
+  
+  
+  # --- empty sequence list ---
+  seq_empty <- c()
+  
+  expect_error(
+    fast_distAA <- alakazam:::fastDistAA(seq_empty),
+    "Amino acid sequence list is empty"
+  )
+  
 })
