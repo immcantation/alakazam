@@ -1,6 +1,6 @@
 #### fastDistAA vs pairwiseDist ####
 
-test_that("fastDistAA matches pairwiseDist for amimo acid sequences", {
+test_that("fastDistAA matches pairwiseDist for amino acid sequences", {
   aa_mat <- alakazam::getAAMatrix(gap=0)
   
   # --- 10 random sequences of length 20 contain only 20 standard AA  ---

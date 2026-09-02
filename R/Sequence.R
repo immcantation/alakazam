@@ -1206,7 +1206,7 @@ fastDist <- function(seqs) {
 
 #' Faster calculation of pairwise distances between amino acid sequences of the same length
 #' 
-#' \code{fastDistAA} calculates all pairwise distance between a set of amino acid sequences of the same length. 
+#' \code{fastDistAA} calculates all pairwise distances between a set of amino acid sequences of the same length. 
 #'
 #' @param    seqs       character vector containing an amino acid sequences.
 #'
