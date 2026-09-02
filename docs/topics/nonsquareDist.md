@@ -16,7 +16,7 @@ Arguments
 -------------------
 
 seq
-:   character vector containing a DNA sequences. The sequence vector needs to
+:   vector containing a DNA sequences of IUPAC characters. The sequence vector needs to
 be named.
 
 indx
