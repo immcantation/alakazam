@@ -10,10 +10,9 @@ Sequence:
   acid sequences of equal length. The characters `X`, `-` and `.` match any 
   character, whereas the standard amino acids and the stop codon `*` match 
   only themselves.
-+ Added `seqMismatchCountRcpp`, `seqMismatchMatrixRcpp` and 
-  `seqMismatchPositionsRcpp` to count, tabulate and 
-  locate mismatches between sample and germline sequences, excluding ignored 
-  characters (`c("N", ".", "-")` by default).
++ Added `seqMismatchCount`, `seqMismatchMatrix` and `seqMismatchPositions` 
+  to count, tabulate and locate mismatches between sample and germline 
+  sequences, excluding ignored characters (`c("N", ".", "-")` by default).
 + Added the `fields` argument to `collapseDuplicates`, specifying columns 
   (e.g. `c_call`) whose values must match for sequences to be collapsed 
   together.

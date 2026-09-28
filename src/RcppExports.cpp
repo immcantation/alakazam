@@ -73,42 +73,42 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// seqMismatchCountRcpp
-IntegerVector seqMismatchCountRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
-RcppExport SEXP _alakazam_seqMismatchCountRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+// seqMismatchCount
+IntegerVector seqMismatchCount(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchCount(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
-    rcpp_result_gen = Rcpp::wrap(seqMismatchCountRcpp(samples, germlines, ignore));
+    rcpp_result_gen = Rcpp::wrap(seqMismatchCount(samples, germlines, ignore));
     return rcpp_result_gen;
 END_RCPP
 }
-// seqMismatchMatrixRcpp
-IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
-RcppExport SEXP _alakazam_seqMismatchMatrixRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+// seqMismatchMatrix
+IntegerMatrix seqMismatchMatrix(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchMatrix(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
-    rcpp_result_gen = Rcpp::wrap(seqMismatchMatrixRcpp(samples, germlines, ignore));
+    rcpp_result_gen = Rcpp::wrap(seqMismatchMatrix(samples, germlines, ignore));
     return rcpp_result_gen;
 END_RCPP
 }
-// seqMismatchPositionsRcpp
-List seqMismatchPositionsRcpp(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
-RcppExport SEXP _alakazam_seqMismatchPositionsRcpp(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
+// seqMismatchPositions
+List seqMismatchPositions(CharacterVector samples, CharacterVector germlines, CharacterVector ignore);
+RcppExport SEXP _alakazam_seqMismatchPositions(SEXP samplesSEXP, SEXP germlinesSEXP, SEXP ignoreSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type samples(samplesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type germlines(germlinesSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
-    rcpp_result_gen = Rcpp::wrap(seqMismatchPositionsRcpp(samples, germlines, ignore));
+    rcpp_result_gen = Rcpp::wrap(seqMismatchPositions(samples, germlines, ignore));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -163,9 +163,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_alakazam_seqDistRcpp", (DL_FUNC) &_alakazam_seqDistRcpp, 3},
     {"_alakazam_pairwiseDistRcpp", (DL_FUNC) &_alakazam_pairwiseDistRcpp, 2},
     {"_alakazam_nonsquareDistRcpp", (DL_FUNC) &_alakazam_nonsquareDistRcpp, 3},
-    {"_alakazam_seqMismatchCountRcpp", (DL_FUNC) &_alakazam_seqMismatchCountRcpp, 3},
-    {"_alakazam_seqMismatchMatrixRcpp", (DL_FUNC) &_alakazam_seqMismatchMatrixRcpp, 3},
-    {"_alakazam_seqMismatchPositionsRcpp", (DL_FUNC) &_alakazam_seqMismatchPositionsRcpp, 3},
+    {"_alakazam_seqMismatchCount", (DL_FUNC) &_alakazam_seqMismatchCount, 3},
+    {"_alakazam_seqMismatchMatrix", (DL_FUNC) &_alakazam_seqMismatchMatrix, 3},
+    {"_alakazam_seqMismatchPositions", (DL_FUNC) &_alakazam_seqMismatchPositions, 3},
     {"_alakazam_countSeqsWithInvalidBases_rcpp", (DL_FUNC) &_alakazam_countSeqsWithInvalidBases_rcpp, 1},
     {"_alakazam_fastDist_rcpp", (DL_FUNC) &_alakazam_fastDist_rcpp, 1},
     {"_alakazam_countAASeqsWithInvalidChars_rcpp", (DL_FUNC) &_alakazam_countAASeqsWithInvalidChars_rcpp, 1},

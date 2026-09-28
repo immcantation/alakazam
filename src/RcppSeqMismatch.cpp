@@ -93,7 +93,7 @@ inline std::vector<int> findMismatchPositions(std::string sample,
 
 //' Count mismatches between sample and germline sequences.
 //'
-//' \code{seqMismatchCountRcpp} counts Hamming-style mismatches between paired sample and
+//' \code{seqMismatchCount} counts Hamming-style mismatches between paired sample and
 //' germline sequences, excluding ignored characters.
 //'
 //' @param    samples    character vector containing sample sequences.
@@ -109,14 +109,14 @@ inline std::vector<int> findMismatchPositions(std::string sample,
 //'
 //' @examples
 //' # Single germline recycled across samples
-//' seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
+//' seqMismatchCount(c("ATGGC", "ATGGN"), "ATGGC")
 //'
 //' # Paired germlines and custom ignore characters
-//' seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+//' seqMismatchCount(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 //'
 //' @export
 // [[Rcpp::export]]
-IntegerVector seqMismatchCountRcpp(CharacterVector samples,
+IntegerVector seqMismatchCount(CharacterVector samples,
                                 CharacterVector germlines,
                                 CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
@@ -154,7 +154,7 @@ IntegerVector seqMismatchCountRcpp(CharacterVector samples,
 
 //' Count mismatches between samples and germlines.
 //'
-//' \code{seqMismatchMatrixRcpp} counts Hamming-style mismatches between each sample
+//' \code{seqMismatchMatrix} counts Hamming-style mismatches between each sample
 //' and each germline sequence, excluding ignored characters.
 //'
 //' @param    samples    character vector containing sample sequences.
@@ -170,14 +170,14 @@ IntegerVector seqMismatchCountRcpp(CharacterVector samples,
 //'
 //' @examples
 //' # All samples against all germlines
-//' seqMismatchMatrixRcpp(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
+//' seqMismatchMatrix(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
 //'
 //' # Custom ignore characters
-//' seqMismatchMatrixRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+//' seqMismatchMatrix(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 //'
 //' @export
 // [[Rcpp::export]]
-IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
+IntegerMatrix seqMismatchMatrix(CharacterVector samples,
                                       CharacterVector germlines,
                                       CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
@@ -217,7 +217,7 @@ IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
 
 //' Locate mismatches between sample and germline sequences.
 //'
-//' \code{seqMismatchPositionsRcpp} identifies Hamming-style mismatch positions between
+//' \code{seqMismatchPositions} identifies Hamming-style mismatch positions between
 //' paired sample and germline sequences, excluding ignored characters.
 //'
 //' @param    samples    character vector containing sample sequences.
@@ -233,7 +233,7 @@ IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
 //'
 //' @export
 // [[Rcpp::export]]
-List seqMismatchPositionsRcpp(CharacterVector samples,
+List seqMismatchPositions(CharacterVector samples,
                            CharacterVector germlines,
                            CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
