@@ -72,18 +72,13 @@ max_pos <- max(quality$position)
 ggplot(quality, aes(x=position,
                     y=quality_alignment_num,
                     color=nt)) +
-  geom_point() +
+  geom_point(na.rm=TRUE) +
   coord_cartesian(xlim=c(110,120)) +
   xlab("IMGT position") +
   ylab("Sequencing quality") +
   scale_fill_gradient(low = "light blue",  high = "dark red") +
   scale_x_continuous(breaks=c(min_pos:max_pos)) +
   alakazam::baseTheme()
-```
-
-```
-## Warning: Removed 27 rows containing missing values or values outside the scale range
-## (`geom_point()`).
 ```
 
 ![Sequence quality per IMGT position for one sequence.](figure/Fastq-Vignette-4-1.png)
