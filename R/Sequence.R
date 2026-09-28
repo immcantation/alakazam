@@ -1192,6 +1192,7 @@ pairwiseDist <- function(seq, dist_mat=getDNAMatrix()) {
 #' Faster calculation of pairwise distances between sequences of the same length and contain only "ACTGN?"
 #' 
 #' \code{fastDist} calculates all pairwise distance between a set of sequences of the same length and contain only "ACTGN?".
+#' Input is case-insensitive; lowercase characters are converted to uppercase before comparison.
 #'
 #' @param    seqs       character vector containing a DNA sequences.
 #'

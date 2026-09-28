@@ -49,6 +49,10 @@ test_that("fastDist matches pairwiseDist for ATCG sequences", {
     # Expect same results when comparing to pairwiseDist with check.attributes=F (ignoring dimnames)
     expect_equal(fast_mixed, pw_mixed, check.attributes=FALSE)
 
+    # --- Lowercase input: case-insensitive, same result as uppercase ---
+    fast_lower <- alakazam::fastDist(tolower(seqs_mixed))
+    expect_equal(as.matrix(fast_lower), fast_mixed)
+
     # --- Single sequence: 1x1 matrix, diagonal = 0 ---
     fast_single <- alakazam::fastDist("ACGT")
     fast_single <- as.matrix(fast_single)
