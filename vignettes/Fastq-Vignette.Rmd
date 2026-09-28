@@ -82,7 +82,7 @@ max_pos <- max(quality$position)
 ggplot(quality, aes(x=position,
                     y=quality_alignment_num,
                     color=nt)) +
-  geom_point() +
+  geom_point(na.rm=TRUE) +
   coord_cartesian(xlim=c(110,120)) +
   xlab("IMGT position") +
   ylab("Sequencing quality") +
