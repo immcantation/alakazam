@@ -114,14 +114,14 @@
 #' @import      methods
 #' @import      utils
 #' @importFrom  airr        read_rearrangement write_rearrangement
-#' @importFrom	ape 		read.fastq read.tree di2multi reorder.phylo root ladderize
+#' @importFrom  ape         read.fastq read.tree di2multi reorder.phylo root ladderize
 #' @importFrom  dplyr       do n desc %>%
 #'                          bind_cols bind_rows combine arrange left_join
 #'                          group_by ungroup
 #'                          filter slice select 
 #'                          mutate mutate_at 
-#' 							one_of
-#'							right_join rowwise
+#'                          one_of
+#'                          right_join rowwise
 #'                          summarize summarize_at all_of
 #'                          transmute rename
 #' @importFrom  igraph      V E graph_from_data_frame as_data_frame as_edgelist 
