@@ -121,7 +121,7 @@ IntegerVector fastDist_rcpp(CharacterVector seqs) {
   }
 
   // convert matches -> distances
-  for (int k = 0; k < tri_size; ++k)
+  for (size_t k = 0; k < tri_size; ++k)
     tri[k] = L - tri[k];
 
   return tri;
