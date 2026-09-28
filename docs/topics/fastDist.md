@@ -4,6 +4,7 @@ Description
 --------------------
 
 `fastDist` calculates all pairwise distance between a set of sequences of the same length and contain only "ACTGN?".
+Input is case-insensitive; lowercase characters are converted to uppercase before comparison.
 
 
 Usage

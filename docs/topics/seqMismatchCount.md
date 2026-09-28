@@ -1,0 +1,87 @@
+**seqMismatchCount** - *Count mismatches between sample and germline sequences*
+
+Description
+--------------------
+
+`seqMismatchCount` counts Hamming-style mismatches between paired sample and
+germline sequences, excluding ignored characters.
+
+
+Usage
+--------------------
+```
+seqMismatchCount(samples, germlines, ignore = c("N", ".", "-"))
+```
+
+Arguments
+-------------------
+
+samples
+:   character vector containing sample sequences.
+
+germlines
+:   character vector containing germline sequences. If length
+one, the germline is recycled across all samples.
+
+ignore
+:   vector of characters to ignore when counting mismatches.
+Default is to ignore `c("N", ".", "-")`.
+
+
+
+
+Value
+-------------------
+
+Integer vector of mismatch counts.
+
+
+Details
+-------------------
+
+Comparisons are case-insensitive. Sequences of unequal length are
+compared through the length of the shorter sequence.
+
+
+
+Examples
+-------------------
+
+```R
+# Single germline recycled across samples
+seqMismatchCount(c("ATGGC", "ATGGN"), "ATGGC")
+
+```
+
+
+```
+[1] 0 0
+
+```
+
+
+```R
+
+# Paired germlines and custom ignore characters
+seqMismatchCount(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+
+```
+
+
+```
+[1] 1 3
+
+```
+
+
+
+See also
+-------------------
+
+[seqMismatchMatrix](seqMismatchMatrix.md), [seqMismatchPositions](seqMismatchPositions.md)
+
+
+
+
+
+
