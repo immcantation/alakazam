@@ -11,33 +11,6 @@ inline uint8_t code_char(char c){
 }
 
 // [[Rcpp::export]]
-int countSeqsWithInvalidBases_rcpp(CharacterVector seqs) {
-  int N = seqs.size();
-  int bad = 0;
-
-  for (int i = 0; i < N; ++i) {
-    if (seqs[i] == NA_STRING) {
-      bad++;
-      continue;
-    }
-
-    std::string s = as<std::string>(seqs[i]);
-    bool invalid = false;
-    for (char ch : s) {
-      char up = (char)std::toupper((unsigned char)ch);
-      if (code_char(up) == 255) {
-        invalid = true;
-        break;
-      }
-    }
-
-    if (invalid) bad++;
-  }
-
-  return bad;
-}
-
-// [[Rcpp::export]]
 IntegerVector fastDist_rcpp(CharacterVector seqs) {
   int N = seqs.size();
 

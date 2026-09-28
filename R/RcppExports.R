@@ -90,16 +90,8 @@ seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( 
     .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore, count_trailing)
 }
 
-countSeqsWithInvalidBases_rcpp <- function(seqs) {
-    .Call(`_alakazam_countSeqsWithInvalidBases_rcpp`, seqs)
-}
-
 fastDist_rcpp <- function(seqs) {
     .Call(`_alakazam_fastDist_rcpp`, seqs)
-}
-
-countAASeqsWithInvalidChars_rcpp <- function(seqs) {
-    .Call(`_alakazam_countAASeqsWithInvalidChars_rcpp`, seqs)
 }
 
 fastDistAA_rcpp <- function(seqs) {
