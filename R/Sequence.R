@@ -1287,3 +1287,60 @@ fastDistAA <- function(seqs) {
 nonsquareDist <- function(seq, indx, dist_mat=getDNAMatrix()) {
     nonsquareDistRcpp(seq, indx, dist_mat)
 }
+
+#' Count or locate mismatches between sample and germline sequences
+#'
+#' \code{seqMismatchCount} counts Hamming-style mismatches between paired sample
+#' and germline sequences, \code{seqMismatchMatrix} counts them between every
+#' sample and every germline, and \code{seqMismatchPositions} returns the
+#' mismatch positions of paired sequences.
+#'
+#' @param    samples         character vector of sample sequences.
+#' @param    germlines       character vector of germline sequences. For
+#'                           \code{seqMismatchCount} and \code{seqMismatchPositions},
+#'                           a single germline is recycled across all samples.
+#' @param    ignore          vector of characters to ignore, in either sequence.
+#'                           Default is to ignore \code{c("N", "-", ".", "?")}.
+#' @param    count_trailing  if \code{TRUE}, sample positions past the end of a
+#'                           shorter germline count as mismatches, so a germline
+#'                           gains nothing from ending early. If \code{FALSE},
+#'                           sequences are compared only through the length of the
+#'                           shorter one.
+#'
+#' @return   \code{seqMismatchCount}: an integer vector of mismatch counts.
+#'           \code{seqMismatchMatrix}: an integer matrix of mismatch counts, samples
+#'           in rows and germlines in columns.
+#'           \code{seqMismatchPositions}: a list of integer vectors of 1-based
+#'           mismatch positions.
+#'
+#' @details  Comparisons are case-insensitive. A missing (\code{NA}) sample or
+#'           germline gives \code{NA}.
+#'
+#' @examples
+#' seqMismatchCount(c("ATGGC", "ATGGN"), "ATGGC")
+#' seqMismatchMatrix(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
+#' seqMismatchPositions("ATGGCA", "ATGG")
+#'
+#' # A germline that ends early is not rewarded for it
+#' seqMismatchMatrix("ATGGCA", c(full="ATGGCC", short="ATGG"))
+#' seqMismatchMatrix("ATGGCA", c(full="ATGGCC", short="ATGG"), count_trailing=TRUE)
+#'
+#' @export
+seqMismatchCount <- function(samples, germlines, ignore=c("N", "-", ".", "?"),
+                             count_trailing=FALSE) {
+    seqMismatchCountRcpp(samples, germlines, ignore=ignore, count_trailing=count_trailing)
+}
+
+#' @rdname seqMismatchCount
+#' @export
+seqMismatchMatrix <- function(samples, germlines, ignore=c("N", "-", ".", "?"),
+                              count_trailing=FALSE) {
+    seqMismatchMatrixRcpp(samples, germlines, ignore=ignore, count_trailing=count_trailing)
+}
+
+#' @rdname seqMismatchCount
+#' @export
+seqMismatchPositions <- function(samples, germlines, ignore=c("N", "-", ".", "?"),
+                                 count_trailing=FALSE) {
+    seqMismatchPositionsRcpp(samples, germlines, ignore=ignore, count_trailing=count_trailing)
+}

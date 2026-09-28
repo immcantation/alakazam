@@ -78,81 +78,16 @@ nonsquareDistRcpp <- function(seq, indx, dist_mat) {
     .Call(`_alakazam_nonsquareDistRcpp`, seq, indx, dist_mat)
 }
 
-#' Count mismatches between sample and germline sequences.
-#'
-#' \code{seqMismatchCountRcpp} counts Hamming-style mismatches between paired sample and
-#' germline sequences, excluding ignored characters.
-#'
-#' @param    samples    character vector containing sample sequences.
-#' @param    germlines  character vector containing germline sequences. If length
-#'                      one, the germline is recycled across all samples.
-#' @param    ignore     vector of characters to ignore when counting mismatches.
-#'                      Default is to ignore c("N", ".", "-").
-#'
-#' @return   Integer vector of mismatch counts.
-#'
-#' @details  Comparisons are case-insensitive. Sequences of unequal length are
-#'           compared through the length of the shorter sequence.
-#'
-#' @examples
-#' # Single germline recycled across samples
-#' seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
-#'
-#' # Paired germlines and custom ignore characters
-#' seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
-#'
-#' @export
-seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchCountRcpp`, samples, germlines, ignore)
+seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchCountRcpp`, samples, germlines, ignore, count_trailing)
 }
 
-#' Count mismatches between samples and germlines.
-#'
-#' \code{seqMismatchMatrixRcpp} counts Hamming-style mismatches between each sample
-#' and each germline sequence, excluding ignored characters.
-#'
-#' @param    samples    character vector containing sample sequences.
-#' @param    germlines  character vector containing germline sequences.
-#' @param    ignore     vector of characters to ignore when counting mismatches.
-#'                      Default is to ignore c("N", ".", "-").
-#'
-#' @return   Integer matrix of mismatch counts, with rows corresponding to
-#'           samples and columns corresponding to germlines.
-#'
-#' @details  Comparisons are case-insensitive. Sequences of unequal length are
-#'           compared through the length of the shorter sequence.
-#'
-#' @examples
-#' # All samples against all germlines
-#' seqMismatchMatrixRcpp(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
-#'
-#' # Custom ignore characters
-#' seqMismatchMatrixRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
-#'
-#' @export
-seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchMatrixRcpp`, samples, germlines, ignore)
+seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchMatrixRcpp`, samples, germlines, ignore, count_trailing)
 }
 
-#' Locate mismatches between sample and germline sequences.
-#'
-#' \code{seqMismatchPositionsRcpp} identifies Hamming-style mismatch positions between
-#' paired sample and germline sequences, excluding ignored characters.
-#'
-#' @param    samples    character vector containing sample sequences.
-#' @param    germlines  character vector containing germline sequences. If length
-#'                      one, the germline is recycled across all samples.
-#' @param    ignore     vector of characters to ignore when locating mismatches.
-#'                      Default is to ignore c("N", ".", "-").
-#'
-#' @return   List of integer vectors containing 1-based mismatch positions.
-#'
-#' @details  Comparisons are case-insensitive. Sequences of unequal length are
-#'           compared through the length of the shorter sequence.
-#'
-#' @export
-seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore)
+seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore, count_trailing)
 }
 
 countSeqsWithInvalidBases_rcpp <- function(seqs) {

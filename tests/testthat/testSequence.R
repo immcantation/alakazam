@@ -140,30 +140,30 @@ test_that("seqDist: long IMGT-gapped sequences", {
 
 #### seqMismatch ####
 
-test_that("seqMismatchCountRcpp", {
+test_that("seqMismatchCount", {
     samples <- c("ACGT", "ACGT", "ACGT", "ACGT", "ACG", "acgt", NA)
     germlines <- c("ACGA", "ACNT", "AC-T", "AC.T", "ACGT", "ACGA", "ACGT")
     
     # Ignore Ns, gaps and dots
-    expect_equal(seqMismatchCountRcpp(samples, germlines),
+    expect_equal(seqMismatchCount(samples, germlines),
                  c(1L, 0L, 0L, 0L, 0L, 1L, NA_integer_))
     
     # Recycle a single germline
-    expect_equal(seqMismatchCountRcpp(c("ACGT", "ACGA", "ACGG"), "ACGG"),
+    expect_equal(seqMismatchCount(c("ACGT", "ACGA", "ACGG"), "ACGG"),
                  c(1L, 1L, 0L))
     
     # Unequal lengths are compared through the shorter sequence
-    expect_equal(seqMismatchCountRcpp("ACG", "ACGT"), 0L)
+    expect_equal(seqMismatchCount("ACG", "ACGT"), 0L)
     
-    expect_error(seqMismatchCountRcpp(c("A", "C"), c("A", "C", "G")),
+    expect_error(seqMismatchCount(c("A", "C"), c("A", "C", "G")),
                  "Number of input sequences does not match number of germlines")
 })
 
-test_that("seqMismatchMatrixRcpp", {
+test_that("seqMismatchMatrix", {
     samples <- c(q1="ACGT", q2="ACGT", q3="acgt", q4=NA)
     germlines <- c(g1="ACGA", g2="ACNT", g3="ACGG")
     
-    obs <- seqMismatchMatrixRcpp(samples, germlines)
+    obs <- seqMismatchMatrix(samples, germlines)
     expect_equal(obs,
                  matrix(c(1L, 1L, 1L, NA_integer_,
                           0L, 0L, 0L, NA_integer_,
@@ -174,14 +174,14 @@ test_that("seqMismatchMatrixRcpp", {
     expect_equal(rownames(obs), names(samples))
     expect_equal(colnames(obs), names(germlines))
     expect_equal(unname(obs[, "g1"]),
-                 seqMismatchCountRcpp(unname(samples), unname(germlines["g1"])))
+                 seqMismatchCount(unname(samples), unname(germlines["g1"])))
 })
 
-test_that("seqMismatchPositionsRcpp", {
+test_that("seqMismatchPositions", {
     samples <- c("ACGT", "ACGT", "ACGT", "acgt", NA)
     germlines <- c("ACGA", "ACNT", "ACGG", "ACGA", "ACGT")
     
-    obs <- seqMismatchPositionsRcpp(samples, germlines)
+    obs <- seqMismatchPositions(samples, germlines)
     
     expect_equal(obs[[1]], 4L)
     expect_equal(obs[[2]], integer(0))
@@ -190,10 +190,26 @@ test_that("seqMismatchPositionsRcpp", {
     expect_null(obs[[5]])
     
     # Recycle a single germline
-    obs <- seqMismatchPositionsRcpp(c("ACGT", "ACGA", "ACGG"), "ACGG")
+    obs <- seqMismatchPositions(c("ACGT", "ACGA", "ACGG"), "ACGG")
     expect_equal(obs[[1]], 4L)
     expect_equal(obs[[2]], 4L)
     expect_equal(obs[[3]], integer(0))
+})
+
+test_that("seqMismatch ignore default and count_trailing", {
+    # "?" is ignored by default, as in seqEqual and collapseDuplicates
+    expect_equal(seqMismatchCount("AC?T", "ACGT"), 0L)
+    expect_equal(seqMismatchCount("AC?T", "ACGT", ignore="N"), 1L)
+
+    # A germline that ends early is compared only through its length...
+    samples <- c("ACGTAA", "ACGTAA")
+    expect_equal(seqMismatchCount(samples, c("ACGTCC", "ACGT")), c(2L, 0L))
+    # ...unless sample positions past its end count as mismatches
+    expect_equal(seqMismatchCount(samples, c("ACGTCC", "ACGT"), count_trailing=TRUE), c(2L, 2L))
+    expect_equal(seqMismatchCount("ACGTN.", "ACGT", count_trailing=TRUE), 0L)
+    expect_equal(unname(seqMismatchMatrix("ACGTAA", c("ACGTCC", "ACGT"), count_trailing=TRUE)),
+                 matrix(c(2L, 2L), nrow=1))
+    expect_equal(seqMismatchPositions("ACGTAA", "ACGT", count_trailing=TRUE)[[1]], c(5L, 6L))
 })
 
 #### pairwiseDist ####
