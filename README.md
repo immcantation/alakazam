@@ -1,12 +1,12 @@
 [![](https://www.r-pkg.org/badges/version/alakazam)](https://cran.r-project.org/package=alakazam)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/alakazam)](https://www.r-pkg.org/pkg/alakazam)
 [![](https://cranlogs.r-pkg.org/badges/alakazam)](https://www.r-pkg.org/pkg/alakazam)
 [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 
 Alakazam
 -------------------------------------------------------------------------------
 
-Alakazam is part of the [Immcantation](http://immcantation.readthedocs.io) 
+Alakazam is part of the [Immcantation](https://immcantation.readthedocs.io) 
 analysis framework for Adaptive Immune Receptor Repertoire sequencing 
 (AIRR-seq) and provides a set of tools to investigate lymphocyte 
 receptor clonal lineages, diversity, gene usage, and other repertoire level 
@@ -18,8 +18,8 @@ Alakazam serves five main purposes:
    framework. This includes common tasks such as file I/O, basic DNA sequence 
    manipulation, and interacting with V(D)J segment and gene annotations.
 2. Providing an R interface for interacting with the output of the 
-   [pRESTO](http://presto.readthedocs.io) and 
-   [Change-O](http://changeo.readthedocs.io) tool suites.
+   [pRESTO](https://presto.readthedocs.io) and 
+   [Change-O](https://changeo.readthedocs.io) tool suites.
 3. Performing clonal abundance and diversity analysis on lymphocyte 
    repertoires.
 4. Performing lineage reconstruction on clonal populations of Ig sequences 
