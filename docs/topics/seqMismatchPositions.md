@@ -1,20 +1,16 @@
-**seqMismatchPositionsRcpp** - *Locate mismatches between sample and germline sequences.*
+**seqMismatchPositions** - *Locate mismatches between sample and germline sequences*
 
 Description
 --------------------
 
-`seqMismatchPositionsRcpp` identifies Hamming-style mismatch positions between
+`seqMismatchPositions` identifies Hamming-style mismatch positions between
 paired sample and germline sequences, excluding ignored characters.
 
 
 Usage
 --------------------
 ```
-seqMismatchPositionsRcpp(
-samples,
-germlines,
-ignore = as.character(c("N", ".", "-"))
-)
+seqMismatchPositions(samples, germlines, ignore = c("N", ".", "-"))
 ```
 
 Arguments
@@ -29,7 +25,7 @@ one, the germline is recycled across all samples.
 
 ignore
 :   vector of characters to ignore when locating mismatches.
-Default is to ignore c("N", ".", "-").
+Default is to ignore `c("N", ".", "-")`.
 
 
 
@@ -48,6 +44,34 @@ compared through the length of the shorter sequence.
 
 
 
+Examples
+-------------------
+
+```R
+seqMismatchPositions(c("ATGGC", "ATGGN", "TTGGG"), "ATGGC")
+
+```
+
+
+```
+[[1]]
+integer(0)
+
+[[2]]
+integer(0)
+
+[[3]]
+[1] 1 5
+
+
+```
+
+
+
+See also
+-------------------
+
+[seqMismatchCount](seqMismatchCount.md), [seqMismatchMatrix](seqMismatchMatrix.md)
 
 
 

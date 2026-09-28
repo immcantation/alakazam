@@ -58,7 +58,7 @@ retained. Where a non-informative character is one of
 `seq` parameter which is used to determine duplicates.
 
 add_count
-:   if `TRUE` add the column `collapase_count` that 
+:   if `TRUE` add the column `collapse_count` that 
 indicates the number of sequences that were collapsed to build 
 each unique entry.
 

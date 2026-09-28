@@ -76,8 +76,8 @@ Diversity analysis
 
 
 + [countClones](countClones.md):          Calculate clonal abundance.
-+ [estimateAbundance](estimateAbundance.md):  	 Bootstrap clonal abundance curves.
-+ [alphaDiversity](alphaDiversity.md):  	 Generate clonal alpha diversity curves.
++ [estimateAbundance](estimateAbundance.md):    Bootstrap clonal abundance curves.
++ [alphaDiversity](alphaDiversity.md):       Generate clonal alpha diversity curves.
 + [plotAbundanceCurve](plotAbundanceCurve.md):   Plot clone size distribution as a rank-abundance 
 + [plotDiversityCurve](plotDiversityCurve.md):   Plot clonal diversity curves.
 + [plotDiversityTest](plotDiversityTest.md):    Plot testing at given diversity hill indices. 

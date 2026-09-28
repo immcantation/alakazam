@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <cctype>
 using namespace Rcpp;
 
 inline uint8_t code_char(char c){
@@ -42,6 +43,11 @@ IntegerVector fastDist_rcpp(CharacterVector seqs) {
 
   if (N == 0) stop("empty input");
 
+  for (int i = 0; i < N; ++i) {
+    if (seqs[i] == NA_STRING)
+      stop("Sequences must not contain NA (found at position %d)", i + 1);
+  }
+
   std::string s0 = as<std::string>(seqs[0]);
   int L = (int)s0.size();
   for (int i = 0; i < N; ++i) {
@@ -54,7 +60,7 @@ IntegerVector fastDist_rcpp(CharacterVector seqs) {
   for (int i = 0; i < N; ++i) {
     std::string s = as<std::string>(seqs[i]);
     for (int p = 0; p < L; ++p) {
-      uint8_t c = code_char(s[p]);
+      uint8_t c = code_char((char)std::toupper((unsigned char)s[p]));
       if (c == 255) stop("Only A,C,G,T,N,? are allowed");
       enc[(size_t)i * L + p] = c;
     }
@@ -121,7 +127,7 @@ IntegerVector fastDist_rcpp(CharacterVector seqs) {
   }
 
   // convert matches -> distances
-  for (int k = 0; k < tri_size; ++k)
+  for (size_t k = 0; k < tri_size; ++k)
     tri[k] = L - tri[k];
 
   return tri;

@@ -1,20 +1,16 @@
-**seqMismatchCountRcpp** - *Count mismatches between sample and germline sequences.*
+**seqMismatchCount** - *Count mismatches between sample and germline sequences*
 
 Description
 --------------------
 
-`seqMismatchCountRcpp` counts Hamming-style mismatches between paired sample and
+`seqMismatchCount` counts Hamming-style mismatches between paired sample and
 germline sequences, excluding ignored characters.
 
 
 Usage
 --------------------
 ```
-seqMismatchCountRcpp(
-samples,
-germlines,
-ignore = as.character(c("N", ".", "-"))
-)
+seqMismatchCount(samples, germlines, ignore = c("N", ".", "-"))
 ```
 
 Arguments
@@ -29,7 +25,7 @@ one, the germline is recycled across all samples.
 
 ignore
 :   vector of characters to ignore when counting mismatches.
-Default is to ignore c("N", ".", "-").
+Default is to ignore `c("N", ".", "-")`.
 
 
 
@@ -53,7 +49,7 @@ Examples
 
 ```R
 # Single germline recycled across samples
-seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
+seqMismatchCount(c("ATGGC", "ATGGN"), "ATGGC")
 
 ```
 
@@ -67,7 +63,7 @@ seqMismatchCountRcpp(c("ATGGC", "ATGGN"), "ATGGC")
 ```R
 
 # Paired germlines and custom ignore characters
-seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
+seqMismatchCount(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 
 ```
 
@@ -78,6 +74,11 @@ seqMismatchCountRcpp(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
 ```
 
 
+
+See also
+-------------------
+
+[seqMismatchMatrix](seqMismatchMatrix.md), [seqMismatchPositions](seqMismatchPositions.md)
 
 
 

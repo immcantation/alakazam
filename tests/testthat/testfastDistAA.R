@@ -56,5 +56,9 @@ test_that("fastDistAA matches pairwiseDist for amino acid sequences", {
     fast_distAA <- alakazam:::fastDistAA(seq_empty),
     "Amino acid sequence list is empty"
   )
+
+  # --- NA sequences are rejected, not read as the string "NA" ---
+  expect_error(alakazam:::fastDistAA(c("AEHG", NA)), "must not contain NA")
+  expect_error(alakazam:::fastDistAA(c("AE", NA, "HG")), "must not contain NA")
   
 })
