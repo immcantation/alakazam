@@ -43,6 +43,11 @@ IntegerVector fastDist_rcpp(CharacterVector seqs) {
 
   if (N == 0) stop("empty input");
 
+  for (int i = 0; i < N; ++i) {
+    if (seqs[i] == NA_STRING)
+      stop("Sequences must not contain NA (found at position %d)", i + 1);
+  }
+
   std::string s0 = as<std::string>(seqs[0]);
   int L = (int)s0.size();
   for (int i = 0; i < N; ++i) {

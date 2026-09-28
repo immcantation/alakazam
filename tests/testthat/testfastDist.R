@@ -67,5 +67,9 @@ test_that("fastDist matches pairwiseDist for ATCG sequences", {
       fast_empty <- alakazam::fastDist(seq_empty),
       "Sequence list is empty"
     )
+
+    # --- NA sequences are rejected, not read as the string "NA" ---
+    expect_error(alakazam::fastDist(c("ACGT", NA)), "must not contain NA")
+    expect_error(alakazam::fastDist(c("AC", NA, "GT")), "must not contain NA")
     
 })
