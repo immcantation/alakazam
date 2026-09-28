@@ -78,16 +78,16 @@ nonsquareDistRcpp <- function(seq, indx, dist_mat) {
     .Call(`_alakazam_nonsquareDistRcpp`, seq, indx, dist_mat)
 }
 
-seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchCountRcpp`, samples, germlines, ignore)
+seqMismatchCountRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchCountRcpp`, samples, germlines, ignore, count_trailing)
 }
 
-seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchMatrixRcpp`, samples, germlines, ignore)
+seqMismatchMatrixRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchMatrixRcpp`, samples, germlines, ignore, count_trailing)
 }
 
-seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( c("N", ".", "-"))) {
-    .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore)
+seqMismatchPositionsRcpp <- function(samples, germlines, ignore = as.character( c("N", "-", ".", "?")), count_trailing = FALSE) {
+    .Call(`_alakazam_seqMismatchPositionsRcpp`, samples, germlines, ignore, count_trailing)
 }
 
 countSeqsWithInvalidBases_rcpp <- function(seqs) {

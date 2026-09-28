@@ -42,7 +42,8 @@ inline bool isIgnored(char c, const std::vector<char>& ignore) {
 
 inline int countMismatches(std::string sample,
                           std::string germline,
-                          const std::vector<char>& ignore) {
+                          const std::vector<char>& ignore,
+                          bool count_trailing) {
     int sample_len = sample.length();
     int germline_len = germline.length();
     int len = std::min(sample_len, germline_len);
@@ -61,13 +62,23 @@ inline int countMismatches(std::string sample,
         }
     }
 
+    // Sample positions past the end of the germline cannot match it
+    if (count_trailing) {
+        for (int i = len; i < sample_len; i++) {
+            if (!isIgnored(sample[i], ignore)) {
+                count++;
+            }
+        }
+    }
+
     return count;
 }
 
 
 inline std::vector<int> findMismatchPositions(std::string sample,
                                               std::string germline,
-                                              const std::vector<char>& ignore) {
+                                              const std::vector<char>& ignore,
+                                              bool count_trailing) {
     int sample_len = sample.length();
     int germline_len = germline.length();
     int len = std::min(sample_len, germline_len);
@@ -87,15 +98,25 @@ inline std::vector<int> findMismatchPositions(std::string sample,
         }
     }
 
+    // Sample positions past the end of the germline cannot match it
+    if (count_trailing) {
+        for (int i = len; i < sample_len; i++) {
+            if (!isIgnored(sample[i], ignore)) {
+                pos.push_back(i + 1);
+            }
+        }
+    }
+
     return pos;
 }
 
 
-// seqMismatchCount
+// Internal; the documented, exported interface is seqMismatchCount() in R/Sequence.R.
 // [[Rcpp::export]]
 IntegerVector seqMismatchCountRcpp(CharacterVector samples,
-                                   CharacterVector germlines,
-                                   CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+                                CharacterVector germlines,
+                                CharacterVector ignore=CharacterVector::create("N", "-", ".", "?"),
+                                bool count_trailing=false) {
     int n = samples.length();
     int m = germlines.length();
 
@@ -122,18 +143,19 @@ IntegerVector seqMismatchCountRcpp(CharacterVector samples,
         std::string sample = as<std::string>(samples[i]);
         std::string germline = as<std::string>(germlines[germline_i]);
 
-        counts[i] = countMismatches(sample, germline, ignore_chars);
+        counts[i] = countMismatches(sample, germline, ignore_chars, count_trailing);
     }
 
     return counts;
 }
 
 
-// seqMismatchMatrix
+// Internal; the documented, exported interface is seqMismatchMatrix() in R/Sequence.R.
 // [[Rcpp::export]]
 IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
-                                    CharacterVector germlines,
-                                    CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+                                      CharacterVector germlines,
+                                      CharacterVector ignore=CharacterVector::create("N", "-", ".", "?"),
+                                bool count_trailing=false) {
     int n = samples.length();
     int m = germlines.length();
 
@@ -157,7 +179,7 @@ IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
             }
 
             std::string germline = as<std::string>(germlines[j]);
-            counts(i, j) = countMismatches(sample, germline, ignore_chars);
+            counts(i, j) = countMismatches(sample, germline, ignore_chars, count_trailing);
         }
     }
 
@@ -169,11 +191,12 @@ IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
 }
 
 
-// seqMismatchPositions
+// Internal; the documented, exported interface is seqMismatchPositions() in R/Sequence.R.
 // [[Rcpp::export]]
 List seqMismatchPositionsRcpp(CharacterVector samples,
-                              CharacterVector germlines,
-                              CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+                           CharacterVector germlines,
+                           CharacterVector ignore=CharacterVector::create("N", "-", ".", "?"),
+                                bool count_trailing=false) {
     int n = samples.length();
     int m = germlines.length();
 
@@ -200,7 +223,7 @@ List seqMismatchPositionsRcpp(CharacterVector samples,
         std::string sample = as<std::string>(samples[i]);
         std::string germline = as<std::string>(germlines[germline_i]);
 
-        positions[i] = wrap(findMismatchPositions(sample, germline, ignore_chars));
+        positions[i] = wrap(findMismatchPositions(sample, germline, ignore_chars, count_trailing));
     }
 
     return positions;

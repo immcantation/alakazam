@@ -196,6 +196,22 @@ test_that("seqMismatchPositions", {
     expect_equal(obs[[3]], integer(0))
 })
 
+test_that("seqMismatch ignore default and count_trailing", {
+    # "?" is ignored by default, as in seqEqual and collapseDuplicates
+    expect_equal(seqMismatchCount("AC?T", "ACGT"), 0L)
+    expect_equal(seqMismatchCount("AC?T", "ACGT", ignore="N"), 1L)
+
+    # A germline that ends early is compared only through its length...
+    samples <- c("ACGTAA", "ACGTAA")
+    expect_equal(seqMismatchCount(samples, c("ACGTCC", "ACGT")), c(2L, 0L))
+    # ...unless sample positions past its end count as mismatches
+    expect_equal(seqMismatchCount(samples, c("ACGTCC", "ACGT"), count_trailing=TRUE), c(2L, 2L))
+    expect_equal(seqMismatchCount("ACGTN.", "ACGT", count_trailing=TRUE), 0L)
+    expect_equal(unname(seqMismatchMatrix("ACGTAA", c("ACGTCC", "ACGT"), count_trailing=TRUE)),
+                 matrix(c(2L, 2L), nrow=1))
+    expect_equal(seqMismatchPositions("ACGTAA", "ACGT", count_trailing=TRUE)[[1]], c(5L, 6L))
+})
+
 #### pairwiseDist ####
 
 test_that("pairwiseDist Nucleotide", {
