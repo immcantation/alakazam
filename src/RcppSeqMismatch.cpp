@@ -91,34 +91,11 @@ inline std::vector<int> findMismatchPositions(std::string sample,
 }
 
 
-//' Count mismatches between sample and germline sequences.
-//'
-//' \code{seqMismatchCount} counts Hamming-style mismatches between paired sample and
-//' germline sequences, excluding ignored characters.
-//'
-//' @param    samples    character vector containing sample sequences.
-//' @param    germlines  character vector containing germline sequences. If length
-//'                      one, the germline is recycled across all samples.
-//' @param    ignore     vector of characters to ignore when counting mismatches.
-//'                      Default is to ignore c("N", ".", "-").
-//'
-//' @return   Integer vector of mismatch counts.
-//'
-//' @details  Comparisons are case-insensitive. Sequences of unequal length are
-//'           compared through the length of the shorter sequence.
-//'
-//' @examples
-//' # Single germline recycled across samples
-//' seqMismatchCount(c("ATGGC", "ATGGN"), "ATGGC")
-//'
-//' # Paired germlines and custom ignore characters
-//' seqMismatchCount(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
-//'
-//' @export
+// seqMismatchCount
 // [[Rcpp::export]]
-IntegerVector seqMismatchCount(CharacterVector samples,
-                                CharacterVector germlines,
-                                CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+IntegerVector seqMismatchCountRcpp(CharacterVector samples,
+                                   CharacterVector germlines,
+                                   CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
     int m = germlines.length();
 
@@ -152,34 +129,11 @@ IntegerVector seqMismatchCount(CharacterVector samples,
 }
 
 
-//' Count mismatches between samples and germlines.
-//'
-//' \code{seqMismatchMatrix} counts Hamming-style mismatches between each sample
-//' and each germline sequence, excluding ignored characters.
-//'
-//' @param    samples    character vector containing sample sequences.
-//' @param    germlines  character vector containing germline sequences.
-//' @param    ignore     vector of characters to ignore when counting mismatches.
-//'                      Default is to ignore c("N", ".", "-").
-//'
-//' @return   Integer matrix of mismatch counts, with rows corresponding to
-//'           samples and columns corresponding to germlines.
-//'
-//' @details  Comparisons are case-insensitive. Sequences of unequal length are
-//'           compared through the length of the shorter sequence.
-//'
-//' @examples
-//' # All samples against all germlines
-//' seqMismatchMatrix(c("ATGGC", "ATGGN"), c("ATGGC", "ATGGG"))
-//'
-//' # Custom ignore characters
-//' seqMismatchMatrix(c("ATG-C", "AT--C"), c("ATGGC", "ATGGG"), ignore="N")
-//'
-//' @export
+// seqMismatchMatrix
 // [[Rcpp::export]]
-IntegerMatrix seqMismatchMatrix(CharacterVector samples,
-                                      CharacterVector germlines,
-                                      CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+IntegerMatrix seqMismatchMatrixRcpp(CharacterVector samples,
+                                    CharacterVector germlines,
+                                    CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
     int m = germlines.length();
 
@@ -215,27 +169,11 @@ IntegerMatrix seqMismatchMatrix(CharacterVector samples,
 }
 
 
-//' Locate mismatches between sample and germline sequences.
-//'
-//' \code{seqMismatchPositions} identifies Hamming-style mismatch positions between
-//' paired sample and germline sequences, excluding ignored characters.
-//'
-//' @param    samples    character vector containing sample sequences.
-//' @param    germlines  character vector containing germline sequences. If length
-//'                      one, the germline is recycled across all samples.
-//' @param    ignore     vector of characters to ignore when locating mismatches.
-//'                      Default is to ignore c("N", ".", "-").
-//'
-//' @return   List of integer vectors containing 1-based mismatch positions.
-//'
-//' @details  Comparisons are case-insensitive. Sequences of unequal length are
-//'           compared through the length of the shorter sequence.
-//'
-//' @export
+// seqMismatchPositions
 // [[Rcpp::export]]
-List seqMismatchPositions(CharacterVector samples,
-                           CharacterVector germlines,
-                           CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
+List seqMismatchPositionsRcpp(CharacterVector samples,
+                              CharacterVector germlines,
+                              CharacterVector ignore=CharacterVector::create("N", ".", "-")) {
     int n = samples.length();
     int m = germlines.length();
 
