@@ -55,8 +55,8 @@
 #' @section  Diversity analysis:
 #' \itemize{
 #'   \item  \link{countClones}:          Calculate clonal abundance.
-#'   \item  \link{estimateAbundance}:  	 Bootstrap clonal abundance curves.
-#'   \item  \link{alphaDiversity}:  	 Generate clonal alpha diversity curves.
+#'   \item  \link{estimateAbundance}:    Bootstrap clonal abundance curves.
+#'   \item  \link{alphaDiversity}:       Generate clonal alpha diversity curves.
 #'   \item  \link{plotAbundanceCurve}:   Plot clone size distribution as a rank-abundance 
 #'   \item  \link{plotDiversityCurve}:   Plot clonal diversity curves.
 #'   \item  \link{plotDiversityTest}:    Plot testing at given diversity hill indices. 

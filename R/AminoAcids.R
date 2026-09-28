@@ -337,7 +337,7 @@ countOccurrences <- function(x, pattern) {
 #' @param   patterns    list of sequence patterns to count in each sequence. If the 
 #'                      list is named, then names will be assigned as the column names of 
 #'                      output data.frame.
-#' @param   nt		    if \code{TRUE} then \code{seq} are DNA sequences and and will be 
+#' @param   nt          if \code{TRUE} then \code{seq} are DNA sequences and and will be 
 #'                      translated before performing the pattern search.
 #' @param   trim        if \code{TRUE} remove the first and last codon or amino acid from 
 #'                      each sequence before the pattern search. If \code{FALSE} do
@@ -394,7 +394,7 @@ countPatterns <- function(seq, patterns, nt=TRUE, trim=FALSE, label="region") {
 #'                        to calculating all defined properties.
 #' @param   seq           \code{character} name of the column containing input 
 #'                        sequences.
-#' @param   nt      	  boolean, TRUE if the sequences (or sequence) are DNA and will be translated.
+#' @param   nt            boolean, TRUE if the sequences (or sequence) are DNA and will be translated.
 #' @param   trim          if \code{TRUE} remove the first and last codon/amino acids from each
 #'                        sequence before calculating properties. If \code{FALSE} do
 #'                        not modify input sequences.
