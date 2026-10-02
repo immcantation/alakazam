@@ -424,7 +424,7 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     n_uniqueseq <- nrow(d_mat)
     
     # Return input if no sequences are equal
-    if (!any(d_mat[lower.tri(d_mat, diag=F)]) & !exact_duplicates) {
+    if (!any(rowSums(d_mat) > 1) & !exact_duplicates) {
         if (verbose) { .printVerbose(nseq, nseq, 0) }
         if (dry) {
             data[['collapse_id']] <- 1:nrow(data)
