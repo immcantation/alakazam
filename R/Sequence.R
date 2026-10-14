@@ -417,14 +417,14 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         return(data)
     }
     
-    # Build distance matrix
-    exact_duplicates <- any(duplicated(data[[seq]]))
-    d_mat <- pairwiseEqual(unique(data[[seq]]), ignore=ignore)
-    colnames(d_mat) <- rownames(d_mat) <- unique(data[[seq]])
-    n_uniqueseq <- nrow(d_mat)
-    
+    # Find the sequences equal to each unique sequence. The graph holds only the
+    # equal pairs, which are rare, rather than a dense k x k matrix.
+    useq <- unique(data[[seq]])
+    g <- equalityGraph(useq, ignore=ignore)
+    row_u <- match(data[[seq]], useq)
+
     # Return input if no sequences are equal
-    if (!any(rowSums(d_mat) > 1) & !exact_duplicates) {
+    if (g$n_pairs == 0 && length(useq) == nseq) {
         if (verbose) { .printVerbose(nseq, nseq, 0) }
         if (dry) {
             data[['collapse_id']] <- 1:nrow(data)
@@ -434,189 +434,131 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
         return(data)
     }        
     
-    # Find sequences that will cluster ambiguously
-    ambig_rows <- numeric()
-    for (i in 1:n_uniqueseq) {
-        idx <- which(d_mat[i, ])
-        tmp_mat <- d_mat[idx, idx]
-        if (!all(tmp_mat)) { 
-            ambig_rows <- append(ambig_rows, i) 
-        }
-    }
-    discard_count <- length(ambig_rows)
-    
-    # from ambiguous rows in d_mat to 
-    # ambiguous rows in data
-    data_ambig_rows <- data[[seq]] %in% rownames(d_mat)[ambig_rows]
+    # Find sequences that will cluster ambiguously: those equal to two sequences
+    # that are not equal to each other
+    discard_count <- sum(g$ambiguous)
+    data_ambig_rows <- g$ambiguous[row_u]
     data_discard_count <- sum(data_ambig_rows)
     
-    if (dry & length(ambig_rows)>0) {
+    if (dry & discard_count > 0) {
         data[["collapse_class"]][data_ambig_rows] <- "ambiguous"
         data[["collapse_pass"]][data_ambig_rows] <- FALSE
     }
     
-    # Return single sequence if all or all but one sequence belong to ambiguous clusters 
-	if (nrow(data) - data_discard_count <= 1) {
-        inform_len <- data.frame(list("inform_len"=.informativeLength(data[[seq]])))
-        # For each ambiguous cluster, return the best sequence
-        g <- igraph::simplify(igraph::graph_from_adjacency_matrix(d_mat))
-        inform_len$clusters <- igraph::components(g)$membership[data[[seq]]]
-        inform_len$select_id <- 1:nrow(inform_len)
-        selected <- inform_len %>%
-            dplyr::group_by(!!rlang::sym("clusters")) %>%
-            dplyr::slice(which.max(!!rlang::sym("inform_len"))) %>%
-            dplyr::ungroup() %>%
-            dplyr::select(!!rlang::sym("select_id")) %>% unlist() 
+    # Return single sequence if all or all but one sequence belong to ambiguous clusters.
+    # For each connected group of sequences, select the most informative sequence
+    # (the first one if ties).
+    if (nrow(data) - data_discard_count <= 1) {
+        inform_len <- .informativeLength(data[[seq]])
+        clusters <- g$component[row_u]
+        ord <- order(clusters, -inform_len, seq_len(nseq))
+        selected <- ord[!duplicated(clusters[ord])]
         
         if (verbose) { .printVerbose(nseq, 0, discard_count - 1) }
         if (dry) {
-            data[["collapse_id"]] <- inform_len$clusters
+            data[["collapse_id"]] <- clusters
             data[["collapse_pass"]][selected] <- TRUE
         } else {
             return(data[selected, ])
         }
     }
     
-    # Exclude ambiguous sequences from clustering
-    if (!dry & discard_count > 0) {
-            d_mat <- d_mat[-ambig_rows, -ambig_rows, drop = FALSE]  # 'drop = FALSE' to keep dataframe structure if only one sequence is left 
-            data <- data[!data_ambig_rows,]
-    }
+    # Sets of duplicates among the sequences that are not ambiguous, numbered in
+    # order of their first sequence
+    set_ids <- sort(unique(g$set[!is.na(g$set)]))
+    row_set <- match(g$set[row_u], set_ids)
+    set_rows <- tabulate(row_set, nbins=length(set_ids))[row_set]
+    inform_len <- .informativeLength(data[[seq]])
     
-    # Cluster remaining sequences into unique and duplicate sets
-    dup_taxa <-  list()
-    uniq_taxa <- character()
-    done_taxa <- character()
-    taxa_names <- rownames(d_mat)
-    collapse_id <- 1
-    
-    for (taxa_i in 1:length(taxa_names)) {
-        
-        taxa <- taxa_names[taxa_i]
-        data_taxa_i <- which(data[[seq]] %in% taxa)
-        
-        # Skip taxa if previously assigned to a cluster
-        # or if ambiguous
-        # (ambiguous taxa don't get their own collapse_id)
-        if (taxa %in% done_taxa) { next }
-        if (dry & taxa_i %in% ambig_rows) { next }
-        
-        # Find all zero distance taxa
-        idx <- which(d_mat[taxa, ])
-        # Translate from d_mat idx to data idx
-        data_idx <- which(data[[seq]] %in% colnames(d_mat)[idx])
-        
-        # Update vector of clustered taxa
-        done_taxa <- c(done_taxa, taxa_names[idx])
-        
-        # Update collapse group
-        if (dry) {
-            data[["collapse_id"]][data_idx] <- paste(data[["collapse_id"]][data_idx], collapse_id, sep=",")
-        }
-        
-        if (dry) {
-            #idx_copy <- idx
-            data_idx_copy <- data_idx
-            idx <- idx[idx %in% ambig_rows == FALSE]
-            data_idx <- which(data[[seq]] %in% colnames(d_mat)[idx])
-        }
-        
-        if (length(data_idx) == 1) {
-            # Assign unique sequences to unique vector
-            uniq_taxa <- append(uniq_taxa, taxa_names[idx])
-            if (dry) {
-                if (length(data_idx_copy)==1) {
-                    ## 'truly' unique
-                    data[["collapse_class"]][data_taxa_i] <- "unique"    
-                } else {
-                    ## unique after ambiguous removal
-                    data[["collapse_class"]][data_taxa_i] <- "ambiguous_duplicate"
-                }
-                data[["collapse_pass"]][data_taxa_i] <- TRUE
-            }
-        } else if (length(data_idx) > 1) {
-            # Assign clusters of duplicates to duplicate list            
-            dup_taxa <- c(dup_taxa, list(taxa_names[idx]))    
-            if (dry) {
-                # Keep collpase_pass==TRUE for the sequence with the
-                # larger number of informative positions 
-                # (the first one if ties)
-                max_info_idx <- which.max(.informativeLength(data[[seq]][data_idx]))[1]
-                data[["collapse_class"]][data_idx] <- "duplicated"
-                data[["collapse_pass"]][data_idx[-max_info_idx]] <- FALSE
-            }
-        } else {
-            # Report error (should never occur)
-                stop("Error in distance matrix of collapseDuplicates")
-        }
-        
-        collapse_id <- collapse_id + 1
-    }
-   
     if (dry) {
-        data[["collapse_id"]] <-  sub("^NA,","",data[["collapse_id"]])
+        # Every row of a set, and every ambiguous row equal to it, gets its collapse_id
+        nb_from <- rep(seq_along(useq), g$degree)
+        nb_to <- g$adj
+        nb <- !g$ambiguous[nb_from] & g$ambiguous[nb_to]
+        amb_sets <- unique(data.frame(u=nb_to[nb], id=match(g$set[nb_from[nb]], set_ids)))
+        amb_sets <- amb_sets[order(amb_sets$u, amb_sets$id), ]
+        amb_ids <- vapply(split(amb_sets$id, amb_sets$u), paste, character(1), collapse=",")
+        
+        collapse_id <- data[["collapse_id"]]
+        new_id <- ifelse(data_ambig_rows, amb_ids[as.character(row_u)], as.character(row_set))
+        has_id <- !is.na(new_id)
+        collapse_id[has_id] <- paste(collapse_id[has_id], new_id[has_id], sep=",")
+        data[["collapse_id"]] <- sub("^NA,", "", collapse_id)
+        
+        # Sets of one row are unique, or unique once ambiguous sequences are removed
+        single <- !data_ambig_rows & set_rows == 1
+        data[["collapse_class"]][single] <- ifelse(g$degree[row_u[single]] == 0,
+                                                   "unique", "ambiguous_duplicate")
+        data[["collapse_pass"]][single] <- TRUE
+        
+        # Keep collapse_pass==TRUE for the sequence with the larger number of 
+        # informative positions (the first one if ties)
+        dup <- which(!data_ambig_rows & set_rows > 1)
+        ord <- dup[order(row_set[dup], -inform_len[dup], dup)]
+        data[["collapse_class"]][dup] <- "duplicated"
+        data[["collapse_pass"]][ord[duplicated(row_set[ord])]] <- FALSE
+        
         return(data)
     }
     
-    # Collapse duplicate sets and append entries to unique data.frame
-    unique_list <- list(data[data[[seq]] %in% uniq_taxa, ])
-    for (taxa in dup_taxa) {
-        # Define row indices of identical sequences
-        idx <- which(data[[seq]] %in% taxa)
-        tmp_df <- data[idx[1], ]
-
-        if (length(idx) > 1) {
-
-            # Initialize with data from most informative sequence
-            seq_set <- data[idx, c(id, seq)]
-            inform_len <- .informativeLength(seq_set[[seq]])
-            max_inform <- which.max(inform_len)[1] # if ties, pick first
-            tmp_df <- data[idx[max_inform], ]
-
-            # Define set of text fields for row
-            for (f in text_fields) {
+    # Exclude ambiguous sequences from clustering
+    keep <- !data_ambig_rows
+    data <- data[keep, ]
+    row_set <- row_set[keep]
+    set_rows <- set_rows[keep]
+    inform_len <- inform_len[keep]
+    
+    # Sets of one row are returned unchanged
+    unique_df <- data[set_rows == 1, ]
+    
+    # Collapse each set of duplicates into the row of its most informative sequence
+    # (the first one if ties)
+    dup <- which(set_rows > 1)
+    if (length(dup) > 0) {
+        dup_set <- row_set[dup]
+        members <- split(dup, dup_set)
+        ord <- dup[order(dup_set, -inform_len[dup], dup)]
+        dup_df <- data[ord[!duplicated(row_set[ord])], ]
+        
+        # Define set of text fields for row
+        for (f in text_fields) {
+            dup_df[[f]] <- vapply(members, function(idx) {
                 f_set <- na.omit(data[[f]][idx])
                 if (length(f_set) > 0) {
                     f_set <- unlist(strsplit(f_set, sep))
                     f_set <- sort(unique(f_set))
-                    f_val <- paste(f_set, collapse=sep)
+                    paste(f_set, collapse=sep)
                 } else {
-                    f_val <- NA
+                    NA_character_
                 }
-                tmp_df[, f] <- f_val
-            }
-
-            # Sum numeric fields
-            for (f in num_fields) {
-                f_set <- na.omit(data[[f]][idx])
-                if (length(f_set) > 0) {
-                    f_val <- sum(f_set)
-                } else {
-                    f_val <- NA
-                }
-                tmp_df[, f] <- f_val
-            }
-
-            # Select sequence fields with fewest Ns
-            for (f in seq_fields) {
-                f_set <- na.omit(data[[f]][idx])
-                if (length(f_set) > 0) {
-                    f_len <- .informativeLength(f_set)
-                    f_val <- f_set[which.max(f_len)]
-                } else {
-                    f_val <- NA
-                }
-                tmp_df[, f] <- f_val
-            }
-
+            }, character(1), USE.NAMES=FALSE)
         }
-
-        # Add row to unique list
-        unique_list <- c(unique_list, list(tmp_df))
+        
+        # Sum numeric fields
+        for (f in num_fields) {
+            f_val <- lapply(members, function(idx) {
+                f_set <- na.omit(data[[f]][idx])
+                if (length(f_set) > 0) { sum(f_set) } else { NA }
+            })
+            dup_df[[f]][] <- unlist(f_val, use.names=FALSE)
+        }
+        
+        # Select sequence fields with fewest Ns
+        for (f in seq_fields) {
+            f_val <- lapply(members, function(idx) {
+                f_set <- na.omit(data[[f]][idx])
+                if (length(f_set) > 0) { f_set[which.max(.informativeLength(f_set))] } else { NA }
+            })
+            dup_df[[f]][] <- unlist(f_val, use.names=FALSE)
+        }
+        
+        unique_df <- list(unique_df, dup_df)
+    } else {
+        unique_df <- list(unique_df)
     }
-
+    
     # Combine all rows into unique data.frame
-    unique_df <- as.data.frame(bind_rows(unique_list))
+    unique_df <- as.data.frame(bind_rows(unique_df))
     
     if (verbose) { .printVerbose(nseq, nrow(unique_df), discard_count) }
     return(unique_df)
