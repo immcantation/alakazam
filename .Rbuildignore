@@ -11,3 +11,4 @@ mkdocs.yml
 bitbucket-pipelines.yml
 announcements.html
 ^.*\.code-workspace$
+^COLLAPSE_SPARSE\.md$

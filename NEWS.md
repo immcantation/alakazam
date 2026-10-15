@@ -1,3 +1,18 @@
+Version 1.5.0.999: In development
+-------------------------------------------------------------------------------
+
+Sequence:
+
++ Reduced the memory and time used by `collapseDuplicates` on large groups of 
+  sequences. Equality was previously stored in a dense matrix of all pairs of 
+  unique sequences (`pairwiseEqual`), which needs 4 bytes per pair: about 
+  186 GB for 223,332 unique sequences, and about 1 TB for 511,028. Only the 
+  pairs of sequences that are equal are now stored. Equal pairs are rare in 
+  repertoire data, so memory is now proportional to the number of equal pairs 
+  rather than to the square of the number of sequences. On a group of 141,758 
+  unique sequences, peak memory fell from 151 GB to 1.7 GB and run time from 
+  2.5 h to 5 min. Results are unchanged, including for `dry=TRUE`.
+
 Version 1.5.0: September 28, 2026
 -------------------------------------------------------------------------------
 
