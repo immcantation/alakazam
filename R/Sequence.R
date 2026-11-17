@@ -419,9 +419,14 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
     
     # Find the sequences equal to each unique sequence. The graph holds only the
     # equal pairs, which are rare, rather than a dense k x k matrix.
-    useq <- unique(data[[seq]])
-    g <- equalityGraph(useq, ignore=ignore)
+    # A missing sequence is not equal to any sequence, including another NA, so
+    # each NA row is its own entry rather than sharing one unique value.
+    seq_na <- is.na(data[[seq]])
+    useq <- unique(data[[seq]][!seq_na])
     row_u <- match(data[[seq]], useq)
+    row_u[seq_na] <- length(useq) + seq_len(sum(seq_na))
+    useq <- c(useq, rep(NA_character_, sum(seq_na)))
+    g <- equalityGraph(useq, ignore=ignore)
 
     # Return input if no sequences are equal
     if (g$n_pairs == 0 && length(useq) == nseq) {

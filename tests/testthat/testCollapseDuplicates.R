@@ -95,3 +95,22 @@ test_that("collapseDuplicates is identical to the dense implementation", {
     # The all-ambiguous case was exercised
     expect_gt(n_amb_all, 10)
 })
+
+test_that("collapseDuplicates never treats NA sequences as equal", {
+    # NA once matched "CA" because it was compared as the string "NA", and
+    # NA rows collapsed with each other because they shared one unique value
+    expect_identical(equalityGraph(c("CA", NA, NA, "CA"))$degree, c(1L, 0L, 0L, 1L))
+
+    db <- data.frame(sequence_id=c("A", "B", "C", "D", "E"),
+                     sequence_alignment=c("ACGT", NA, "CA", NA, "AC"),
+                     duplicate_count=c(1, 2, 3, 4, 5),
+                     stringsAsFactors=FALSE)
+    res <- suppressWarnings(collapseDuplicates(db, num_fields="duplicate_count"))
+    expect_identical(res$sequence_id, db$sequence_id)
+    expect_identical(res$duplicate_count, db$duplicate_count)
+
+    dry <- suppressWarnings(collapseDuplicates(db, dry=TRUE))
+    expect_identical(dry$collapse_class, rep("unique", 5))
+    expect_true(all(dry$collapse_pass))
+    expect_identical(dry$collapse_id, 1:5)
+})
