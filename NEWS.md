@@ -12,6 +12,8 @@ Sequence:
   rather than to the square of the number of sequences. On a group of 141,758 
   unique sequences, peak memory fell from 151 GB to 1.7 GB and run time from 
   2.5 h to 5 min. Results are unchanged, including for `dry=TRUE`.
++ Fixed `collapseDuplicates` for missing (`NA`) sequences, which previously 
+  stopped with an error. Missing sequences are now not collapsed.
 
 Version 1.5.0: September 28, 2026
 -------------------------------------------------------------------------------

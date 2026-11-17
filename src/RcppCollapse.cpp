@@ -97,13 +97,20 @@ List equalityGraph(CharacterVector seq,
     }
 
     // Sequences of different lengths are never equal, so compare within lengths.
-    // seqEqual receives NA as the string "NA", so do the same.
+    // A missing sequence is never equal to any sequence, including another NA,
+    // so NA sequences get a length of their own that is skipped below.
+    const std::size_t NA_LEN = SIZE_MAX;
     std::vector<const char*> str(k);
     std::vector<std::size_t> len(k);
     for (int i = 0; i < k; i++) {
         SEXP e = STRING_ELT(seq, i);
-        str[i] = (e == NA_STRING) ? "NA" : CHAR(e);
-        len[i] = std::strlen(str[i]);
+        if (e == NA_STRING) {
+            str[i] = "";
+            len[i] = NA_LEN;
+        } else {
+            str[i] = CHAR(e);
+            len[i] = std::strlen(str[i]);
+        }
     }
     std::vector<int> by_len(k);
     std::iota(by_len.begin(), by_len.end(), 0);
@@ -117,6 +124,7 @@ List equalityGraph(CharacterVector seq,
         while (hi < (std::size_t)k && len[by_len[hi]] == len[by_len[lo]]) { hi++; }
         const std::size_t n = hi - lo;
         const std::size_t L = len[by_len[lo]];
+        if (L == NA_LEN) { lo = hi; continue; }
 
         PackedSeqs p;
         p.words = (L + 7) / 8;
