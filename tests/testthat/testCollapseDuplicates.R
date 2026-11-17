@@ -114,3 +114,30 @@ test_that("collapseDuplicates never treats NA sequences as equal", {
     expect_true(all(dry$collapse_pass))
     expect_identical(dry$collapse_id, 1:5)
 })
+
+test_that("collapseDuplicates accepts NA sequences in any position", {
+    # The length check compared every length to the first, so an NA first
+    # sequence stopped with "missing value where TRUE/FALSE needed"
+    db <- data.frame(sequence_id=c("A", "B", "C"),
+                     sequence_alignment=c(NA, "ACGT", "ACGN"),
+                     duplicate_count=c(1, 2, 3),
+                     stringsAsFactors=FALSE)
+    # Lengths of the non-NA sequences agree, so there is no warning
+    expect_silent(res <- collapseDuplicates(db, num_fields="duplicate_count"))
+    expect_identical(res$sequence_id, c("A", "B"))
+    expect_identical(res$duplicate_count, c(1, 5))
+
+    expect_silent(dry <- collapseDuplicates(db, dry=TRUE))
+    expect_identical(dry$collapse_class, c("unique", "duplicated", "duplicated"))
+    expect_identical(dry$collapse_pass, c(TRUE, TRUE, FALSE))
+
+    # Lengths that differ still give a warning when the first sequence is NA
+    db$sequence_alignment[3] <- "AC"
+    expect_warning(collapseDuplicates(db), "not the same length")
+
+    # All NA sequences: nothing is equal, every row is kept
+    db_na <- data.frame(sequence_id=c("A", "B"), sequence_alignment=c(NA, NA),
+                        stringsAsFactors=FALSE)
+    expect_silent(res_na <- collapseDuplicates(db_na))
+    expect_identical(res_na$sequence_id, c("A", "B"))
+})

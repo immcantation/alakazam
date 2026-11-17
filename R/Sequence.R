@@ -267,8 +267,9 @@ collapseDuplicates <- function(data, id="sequence_id", seq="sequence_alignment",
                 " were not found. Not grouping by these fields.")
         fields <- setdiff(fields, missing_fields)
     }
+    # Missing sequences have no length, so only the others are compared
     seq_len <- stri_length(data[[seq]])
-    if (any(seq_len != seq_len[1])) {
+    if (length(unique(seq_len[!is.na(seq_len)])) > 1) {
         warning("All sequences are not the same length for data with first ",
                 id, " = ", data[[id]][1])
     }
