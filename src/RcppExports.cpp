@@ -10,6 +10,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// equalityGraph
+List equalityGraph(CharacterVector seq, CharacterVector ignore);
+RcppExport SEXP _alakazam_equalityGraph(SEXP seqSEXP, SEXP ignoreSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type seq(seqSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type ignore(ignoreSEXP);
+    rcpp_result_gen = Rcpp::wrap(equalityGraph(seq, ignore));
+    return rcpp_result_gen;
+END_RCPP
+}
 // seqEqual
 bool seqEqual(std::string seq1, std::string seq2, CharacterVector ignore);
 RcppExport SEXP _alakazam_seqEqual(SEXP seq1SEXP, SEXP seq2SEXP, SEXP ignoreSEXP) {
@@ -139,6 +151,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_alakazam_equalityGraph", (DL_FUNC) &_alakazam_equalityGraph, 2},
     {"_alakazam_seqEqual", (DL_FUNC) &_alakazam_seqEqual, 3},
     {"_alakazam_pairwiseEqual", (DL_FUNC) &_alakazam_pairwiseEqual, 2},
     {"_alakazam_seqDistRcpp", (DL_FUNC) &_alakazam_seqDistRcpp, 3},
