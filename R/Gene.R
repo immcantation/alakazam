@@ -1497,12 +1497,19 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         considering only the V and J genes is performed.
 #'                         See Details for further clarification.
 #' @param    sequence_alignment name of the column containing the sequence alignment.
+#'                         Used to assign unpaired heavy chains to a light chain
+#'                         group. Heavy chain sequences with a clone id must not
+#'                         have \code{NA} or empty values in this column; the
+#'                         function stops with an error if they do.
 #' @param    cell_id       name of the column containing cell identifiers or barcodes.
 #'                         If specified, grouping will be performed in single-cell mode
 #'                         with the behavior governed by the \code{locus} and
 #'                         \code{only_heavy} arguments. If set to \code{NULL} then the
 #'                         bulk sequencing data is assumed.
 #' @param    clone         The clone id of the dataset as defined by heavy chains.
+#' @param    sequence_id   name of the column containing sequence identifiers.
+#'                         Values must be unique and not \code{NA}; they are used
+#'                         to match the light chain groups back to the input rows.
 #' @param    locus         name of the column containing locus information.
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
@@ -1511,7 +1518,13 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         assignments is used to group all sequences with any
 #'                         overlapping gene calls.
 #' @param    pad_ends      Pad the heavy chain sequences for hamming calculation?
-#' @param    nproc         Number of cores to use. 
+#' @param    nproc         Number of cores to use. Clones are processed in
+#'                         parallel with \code{parallel::mclapply}. Must be a
+#'                         positive integer. Values above 1 are not supported on
+#'                         Windows and fall back to 1 with a warning. Warnings
+#'                         raised while processing a clone are reported once
+#'                         per distinct message, naming the clones affected,
+#'                         and an error in any clone stops the function.
 #' 
 #' @return   Returns a modified data.frame with light chain subgroup indices in 
 #'           a new \code{vj_group_light} column. These labels are only unique within
@@ -1568,16 +1581,27 @@ sortGenes <- function(genes, method = c("name", "position")) {
 groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call", 
                             junc_len = NULL, sequence_alignment = "sequence_alignment",
                             cell_id = "cell_id", clone = "clone_id", locus = "locus",
+                            sequence_id = "sequence_id",
                             first = FALSE, pad_ends = TRUE, nproc = 1) {
-  
+
   # Check required columns
-  cols_to_check <- c(v_call, j_call, junc_len, sequence_alignment, locus, clone)
+  cols_to_check <- c(sequence_id, v_call, j_call, junc_len, sequence_alignment, locus, clone)
   check <- checkColumns(data, cols_to_check)
   if (check != TRUE) {
     stop(paste("One or more required columns were not found in the data:",
                paste(cols_to_check, collapse = ", ")))
   }
-  
+
+  # the results are matched back to the input rows by sequence_id
+  if (any(is.na(data[[sequence_id]]))) {
+    stop(paste0("The ", sequence_id, " column contains NA values. ",
+                "Each row must have a unique ", sequence_id, "."))
+  }
+  if (anyDuplicated(data[[sequence_id]])) {
+    stop(paste0("The ", sequence_id, " column contains duplicated values. ",
+                "Each row must have a unique ", sequence_id, "."))
+  }
+
   # cell_id handling
   if (is.null(cell_id) || !cell_id %in% colnames(data)) {
     warning(paste(
@@ -1605,19 +1629,34 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
   heavy_loci <- c("IGH", "TRB", "TRD")
   light_loci <- c("IGK", "IGL", "TRA", "TRG")
   
-  if (!is.numeric(nproc) || length(nproc) != 1 || is.na(nproc) || nproc < 1) {
+  if (!is.numeric(nproc) || length(nproc) != 1 || is.na(nproc) || nproc < 1 ||
+      nproc != round(nproc)) {
     stop("nproc must be a positive integer.")
   }
+  nproc <- as.integer(nproc)
   # mclapply forks, which Windows does not support
   if (nproc > 1 && .Platform$OS.type == "windows") {
     warning("nproc > 1 is not supported on Windows. Running with nproc = 1.")
-    nproc <- 1
+    nproc <- 1L
   }
 
-  data$vj_group_light <- NA
+  # heavy chain alignments are used to place unpaired heavy chains, so they
+  # must all be present
+  heavy_in_clone <- data[[locus]] %in% heavy_loci & !is.na(data[[clone]])
+  bad_alignment <- heavy_in_clone &
+    (is.na(data[[sequence_alignment]]) | data[[sequence_alignment]] == "")
+  if (any(bad_alignment)) {
+    stop(paste0(sum(bad_alignment), " heavy chain sequence(s) have NA or empty values in ",
+                "the ", sequence_alignment, " column. Remove or fix these sequences ",
+                "before running groupLightGenes."))
+  }
+
+  # keep the input (and its class, e.g. tibble or grouped_df) to return at the end
+  data_in <- data
 
   # work on a plain data.frame and integer row indices (tibbles drop rownames)
   data <- as.data.frame(dplyr::ungroup(data), stringsAsFactors = FALSE)
+  data$vj_group_light <- NA
 
   # row indices of each clone (split drops NA clone ids)
   clone_rows <- split(seq_len(nrow(data)), data[[clone]])
@@ -1636,9 +1675,9 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
                    "grouping. They are assigned the vj_group_light of their cell's heavy chain."))
   }
 
-  # process each clone on its own subset, nproc clones at a time. Returns the
-  # vj_group_light values for that clone's rows, in the order of x.
-  results <- parallel::mclapply(clone_rows, function(x) {
+  # process one clone on its own subset. Returns the vj_group_light values for
+  # that clone's rows, in the order of x.
+  process_clone <- function(x) {
     db_c <- data[x, , drop = FALSE]
     groups <- rep(NA_character_, nrow(db_c))
 
@@ -1660,19 +1699,13 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
     # run groupGenes on light chain rows in bulk mode
     db_l <- db_c[idx_l, c(v_call, j_call, junc_len, locus), drop = FALSE]
     db_l$row_idx <- idx_l
-    db_l_grouped <- tryCatch(
-      alakazam::groupGenes(data = db_l,
-                           v_call = v_call,
-                           j_call = j_call,
-                           junc_len = junc_len,
-                           cell_id = NULL,
-                           locus = locus,
-                           first = first),
-      error = function(e) e)
-    # warnings raised here are lost, so report the failure back to up the chain
-    if (inherits(db_l_grouped, "error")) {
-      return(structure(groups, error = conditionMessage(db_l_grouped)))
-    }
+    db_l_grouped <- alakazam::groupGenes(data = db_l,
+                                         v_call = v_call,
+                                         j_call = j_call,
+                                         junc_len = junc_len,
+                                         cell_id = NULL,
+                                         locus = locus,
+                                         first = first)
 
     # assign vj_group_light to light chain rows
     groups[db_l_grouped$row_idx] <- db_l_grouped$vj_group
@@ -1779,21 +1812,71 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
     }
 
     return(groups)
-  }, mc.cores = nproc)
+  }
+
+  # Run one clone, capturing its warnings and any error. Conditions raised in
+  # forked mclapply workers never reach the parent session, so they are
+  # returned as data and re-raised below. Capturing them for nproc = 1 too
+  # keeps the behavior the same whatever the number of cores.
+  run_clone <- function(x) {
+    warns <- character(0)
+    err <- NULL
+    groups <- tryCatch(
+      withCallingHandlers(process_clone(x),
+                          warning = function(w) {
+                            warns <<- c(warns, conditionMessage(w))
+                            invokeRestart("muffleWarning")
+                          }),
+      error = function(e) {
+        err <<- conditionMessage(e)
+        NULL
+      })
+    list(groups = groups, warnings = warns, error = err)
+  }
+
+  # process clones in parallel, nproc clones at a time
+  results <- parallel::mclapply(clone_rows, run_clone, mc.cores = nproc)
+
+  # a worker that died (e.g. killed by the OS) returns NULL or a try-error
+  # instead of the list built by run_clone
+  died <- vapply(results, function(r) !is.list(r) || inherits(r, "try-error"),
+                 logical(1))
+  if (any(died)) {
+    stop(paste0("groupLightGenes: the worker(s) for clone(s) ",
+                paste(names(clone_rows)[died], collapse = ", "),
+                " did not return a result."), call. = FALSE)
+  }
+
+  # re-raise worker warnings, once per distinct message, naming the clones
+  warn_msgs <- unlist(lapply(results, `[[`, "warnings"), use.names = FALSE)
+  warn_clones <- rep(names(clone_rows), lengths(lapply(results, `[[`, "warnings")))
+  for (msg in unique(warn_msgs)) {
+    clones_msg <- unique(warn_clones[warn_msgs == msg])
+    clones_txt <- paste(utils::head(clones_msg, 10), collapse = ", ")
+    if (length(clones_msg) > 10) {
+      clones_txt <- paste0(clones_txt, ", and ", length(clones_msg) - 10, " more")
+    }
+    warning(paste0(trimws(msg), " [clone(s): ", clones_txt, "]"), call. = FALSE)
+  }
+
+  # any error inside a clone stops the run, naming the clone(s)
+  errors <- lapply(results, `[[`, "error")
+  failed <- !vapply(errors, is.null, logical(1))
+  if (any(failed)) {
+    stop(paste0("groupLightGenes failed for clone(s):\n",
+                paste0("  ", names(clone_rows)[failed], ": ",
+                       unlist(errors[failed]), collapse = "\n")),
+         call. = FALSE)
+  }
 
   # write each clone's groups back to its rows
   for (k in seq_along(results)) {
-    # mclapply returns errors from forked workers instead of raising them
-    if (inherits(results[[k]], "try-error")) {
-      stop(paste0("groupLightGenes failed for clone ", names(results)[k], ": ",
-                  attr(results[[k]], "condition")$message))
-    }
-    if (!is.null(attr(results[[k]], "error"))) {
-      warning(paste("groupGenes failed for clone", names(results)[k], ":",
-                    attr(results[[k]], "error")))
-    }
-    data$vj_group_light[clone_rows[[k]]] <- results[[k]]
+    data$vj_group_light[clone_rows[[k]]] <- results[[k]]$groups
   }
 
-  return(data)
+  # return the input object, so its class (tibble, grouped_df, ...) and row
+  # order are kept.
+  data_in$vj_group_light <- data$vj_group_light[match(data_in[[sequence_id]],
+                                                      data[[sequence_id]])]
+  return(data_in)
 }
