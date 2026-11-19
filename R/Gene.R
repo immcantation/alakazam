@@ -1052,7 +1052,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     #  you never know if the user will supply this cell as input)
     n_separator_btw_seq_v_heavy <- stringi::stri_count_fixed(str = data[[v_call]], pattern = separator_between_seq)
     n_separator_btw_seq_j_heavy <- stringi::stri_count_fixed(str = data[[j_call]], pattern = separator_between_seq)
-    if (any(n_separator_btw_seq_v_heavy != n_separator_btw_seq_j_heavy)) {
+    if (any(n_separator_btw_seq_v_heavy != n_separator_btw_seq_j_heavy, na.rm = TRUE)) {
         stop("Requirement not met: one-to-one annotation-to-chain correspondence for both V and J (heavy)")
     }
 
