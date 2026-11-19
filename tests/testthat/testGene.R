@@ -898,3 +898,341 @@ test_that("groupGenes, AIRR-format migration", {
 
     expect_true(all(newDb_c[["vj_group"]] == newDb_a[["vj_group"]]))
 })
+
+test_that("groupGenes, bulk mode, NA heavy chain V call is removed with a warning", {
+    # Regression test: an NA in v_call made the one-to-one annotation check
+    # evaluate if (NA) and stop with "missing value where TRUE/FALSE needed"
+    # before the NA rows could be removed.
+    db_na <- data.frame(
+        sequence_id = c("s1", "s2", "s3"),
+        v_call = c("IGHV1-2*01", NA, "IGHV1-2*01"),
+        j_call = c("IGHJ4*02", "IGHJ4*02", "IGHJ4*02"),
+        junction_length = c(42, 42, 42),
+        locus = "IGH",
+        stringsAsFactors = FALSE
+    )
+    expect_warning(
+        res <- groupGenes(db_na, v_call = "v_call", j_call = "j_call"),
+        "NA\\(s\\) found in one or more of \\{ v_call, j_call \\} columns. 1 sequence\\(s\\) removed"
+    )
+    expect_equal(res$sequence_id, c("s1", "s3"))
+    expect_equal(length(unique(res$vj_group)), 1)
+    expect_false(any(is.na(res$vj_group)))
+})
+
+#### groupLightGenes ####
+
+# Build a single-cell data set from one row per chain:
+#   cell_id, locus, v_call, j_call, sequence_alignment, clone_id
+makeLightDb <- function(...) {
+    rows <- list(...)
+    db <- data.frame(
+        sequence_id = paste0("s", seq_along(rows)),
+        cell_id = vapply(rows, `[[`, character(1), 1),
+        locus = vapply(rows, `[[`, character(1), 2),
+        v_call = vapply(rows, `[[`, character(1), 3),
+        j_call = vapply(rows, `[[`, character(1), 4),
+        sequence_alignment = vapply(rows, `[[`, character(1), 5),
+        clone_id = vapply(rows, `[[`, character(1), 6),
+        stringsAsFactors = FALSE
+    )
+    db$v_call[db$v_call == "NA"] <- NA
+    db$sequence_alignment[db$sequence_alignment == "NA"] <- NA
+    db$junction_length <- ifelse(db$locus == "IGH", 42, 30)
+    db
+}
+KV1 <- "IGKV1-39*01"; KJ1 <- "IGKJ1*01"
+KV3 <- "IGKV3-20*01"; KJ2 <- "IGKJ2*01"
+LV2 <- "IGLV2-14*01"; LJ2 <- "IGLJ2*01"
+HV <- "IGHV1-2*01"; HJ <- "IGHJ4*02"
+
+# group of the chain(s) of `cell` with `locus` in result `res`
+grp <- function(res, cell, locus = "IGH") {
+    unique(res$vj_group_light[res$cell_id == cell & res$locus == locus])
+}
+
+test_that("groupLightGenes, paired and unpaired heavy chains", {
+    db <- makeLightDb(
+        # clone 1: two light chain groups (IGK and IGL)
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"),
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "AAAAAAAAAC", "1"),
+        c("c2", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCC", "1"),
+        c("c3", "IGL", IGLV2, IGLJ2, "TTT", "1"),
+        # unpaired heavy chains, closest to c1/c2 and to c3
+        c("c4", "IGH", HV, HJ, "AAAAAAAAAT", "1"),
+        c("c5", "IGH", HV, HJ, "CCCCCCCCCA", "1"),
+        # clone 2: no light chains at all
+        c("c6", "IGH", HV, HJ, "AAAAAAAAAA", "2"),
+        c("c7", "IGH", HV, HJ, "AAAAAAAAAA", "2")
+    )
+    res <- groupLightGenes(db)
+
+    expect_equal(nrow(res), nrow(db))
+    expect_equal(res$sequence_id, db$sequence_id)
+    # heavy chains inherit the group of their cell's light chain
+    for (cell in c("c1", "c2", "c3")) {
+        expect_equal(grp(res, cell, "IGH"), grp(res, cell, ifelse(cell == "c3", "IGL", "IGK")))
+    }
+    expect_equal(grp(res, "c1"), grp(res, "c2"))
+    expect_false(grp(res, "c1") == grp(res, "c3"))
+    # unpaired heavy chains go to the group of their nearest paired heavy chain
+    expect_equal(grp(res, "c4"), grp(res, "c1"))
+    expect_equal(grp(res, "c5"), grp(res, "c3"))
+    # clones without light chains stay NA
+    expect_true(all(is.na(res$vj_group_light[res$clone_id == "2"])))
+    # labels have the groupGenes format
+    expect_true(all(grepl("^G[0-9]+$", res$vj_group_light[res$clone_id == "1"])))
+})
+
+test_that("groupLightGenes, cells with multiple light chains link groups", {
+    db <- makeLightDb(
+        # c1 has an IGK and an IGL light chain, linking the IGK V1 and IGL groups
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"),
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"), 
+        c("c1", "IGL", LV2, LJ2, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c2", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c3", "IGL", LV2, LJ2, "TTT", "1"),
+        # different light chain gene, not linked
+        c("c4", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c4", "IGK", KV3, KJ2, "TTT", "1")
+    )
+    res <- groupLightGenes(db)
+
+    linked <- unique(res$vj_group_light[res$cell_id %in% c("c1", "c2", "c3")])
+    expect_length(linked, 1)
+    expect_false(grp(res, "c4") == linked)
+    expect_equal(grp(res, "c4", "IGK"), grp(res, "c4"))
+    # merged groups are renumbered without gaps
+    expect_setequal(unique(res$vj_group_light), c("G1", "G2"))
+})
+
+test_that("groupLightGenes, ties between unpaired heavy chain neighbours", {
+    # Tied neighbours in different groups: the larger group wins.
+    # u1 is at distance 5 from c1 (group of c1/c2, size 2) and from c3 (size 1)
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "GGGGGGGGGG", "1"), 
+        c("c2", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
+        c("c3", "IGL", LV2, LJ2, "TTT", "1"),
+        c("u1", "IGH", HV, HJ, "AAAAACCCCC", "1")
+    )
+    res <- groupLightGenes(db)
+    expect_equal(grp(res, "u1"), grp(res, "c1"))
+
+    # Tied neighbours in equally sized groups: the lowest numbered group wins.
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
+        c("c3", "IGL", LV2, LJ2, "TTT", "1"),
+        c("u1", "IGH", HV, HJ, "AAAAACCCCC", "1")
+    )
+    res <- groupLightGenes(db)
+    candidates <- c(grp(res, "c1"), grp(res, "c3"))
+    lowest <- candidates[which.min(as.integer(sub("^G", "", candidates)))]
+    expect_equal(grp(res, "u1"), lowest)
+})
+
+test_that("groupLightGenes, light chains with missing gene calls", {
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
+        c("c3", "IGL", LV2, LJ2, "TTT", "1"),
+        # c2's only light chain has no V call: c2 is treated as unpaired
+        c("c2", "IGH", HV, HJ, "AAAAAAAAAC", "1"), 
+        c("c2", "IGK", "NA", KJ1, "TTT", "1")
+    )
+    expect_warning(
+        res <- groupLightGenes(db),
+        "1 light chain sequence\\(s\\) with NA or empty values"
+    )
+    # the heavy chain is placed by distance, and the light chain inherits its group
+    expect_equal(grp(res, "c2"), grp(res, "c1"))
+    expect_equal(grp(res, "c2", "IGK"), grp(res, "c1"))
+})
+
+test_that("groupLightGenes, NA heavy chain sequence_alignment is an error", {
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "NA", "1")
+    )
+    expect_error(
+        groupLightGenes(db),
+        "1 heavy chain sequence\\(s\\) have NA or empty values in the sequence_alignment column"
+    )
+    db$sequence_alignment[3] <- ""
+    expect_error(groupLightGenes(db), "NA or empty values in the sequence_alignment column")
+
+    # missing light chain alignments are not used, so they are allowed
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "NA", "1")
+    )
+    expect_silent(res <- groupLightGenes(db))
+    expect_equal(grp(res, "c1"), "G1")
+})
+
+test_that("groupLightGenes, input validation", {
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1")
+    )
+    # no cell_id: warning and all NA
+    expect_warning(
+        res <- groupLightGenes(db, cell_id = NULL),
+        "cell_id not found or not specified"
+    )
+    expect_true(all(is.na(res$vj_group_light)))
+    expect_warning(res <- groupLightGenes(db[, names(db) != "cell_id"]),
+                   "cell_id not found or not specified")
+
+    # missing required column
+    expect_error(groupLightGenes(db[, names(db) != "sequence_alignment"]),
+                 "One or more required columns were not found")
+
+    # invalid locus
+    db_bad <- db
+    db_bad$locus[2] <- "XYZ"
+    expect_error(groupLightGenes(db_bad), "invalid loci annotations")
+
+    # nproc must be a positive integer
+    expect_error(groupLightGenes(db, nproc = 0), "nproc must be a positive integer")
+    expect_error(groupLightGenes(db, nproc = 1.5), "nproc must be a positive integer")
+    expect_error(groupLightGenes(db, nproc = "2"), "nproc must be a positive integer")
+    expect_error(groupLightGenes(db, nproc = c(1, 2)), "nproc must be a positive integer")
+
+    # factors are converted to character
+    db_f <- db
+    db_f$v_call <- factor(db_f$v_call)
+    db_f$locus <- factor(db_f$locus)
+    res <- groupLightGenes(db_f)
+    expect_type(res$v_call, "character")
+    expect_type(res$locus, "character")
+    expect_equal(res$vj_group_light, c("G1", "G1"))
+})
+
+test_that("groupLightGenes, keeps the class of the input", {
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "CCCCCCCCCC", "2"), 
+        c("c2", "IGL", LV2, LJ2, "TTT", "2")
+    )
+    res_df <- groupLightGenes(db)
+    expect_equal(class(res_df), "data.frame")
+
+    db_tbl <- tibble::as_tibble(db)
+    res_tbl <- groupLightGenes(db_tbl)
+    expect_equal(class(res_tbl), class(db_tbl))
+    expect_equal(res_tbl$vj_group_light, res_df$vj_group_light)
+
+    db_grp <- dplyr::group_by(db_tbl, clone_id)
+    res_grp <- groupLightGenes(db_grp)
+    expect_equal(class(res_grp), class(db_grp))
+    expect_equal(dplyr::group_vars(res_grp), "clone_id")
+    expect_equal(res_grp$vj_group_light, res_df$vj_group_light)
+})
+
+test_that("groupLightGenes, nproc > 1 gives the same result as nproc = 1", {
+    skip_on_os("windows")
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
+        c("c2", "IGL", LV2, LJ2, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCA", "1"),
+        c("c4", "IGH", HV, HJ, "AAAAAAAAAA", "2"), 
+        c("c4", "IGK", KV3, KJ2, "TTT", "2"),
+        c("c5", "IGH", HV, HJ, "AAAAAAAAAA", "3"), 
+        c("c5", "IGK", KV1, KJ1, "TTT", "3"),
+        c("c6", "IGH", HV, HJ, "AAAAAAAAAA", "4")
+    )
+    expect_equal(groupLightGenes(db, nproc = 2), groupLightGenes(db, nproc = 1))
+})
+
+test_that("groupLightGenes, reports warnings and errors from every clone", {
+    skip_on_os("windows")
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "AAAAAAAAAA", "2"), 
+        c("c2", "IGK", KV1, KJ1, "TTT", "2"),
+        # clone 3 has no light chains, so groupGenes is not called for it
+        c("c3", "IGH", HV, HJ, "AAAAAAAAAA", "3")
+    )
+    real_groupGenes <- groupGenes
+
+    # warnings raised inside a clone reach the caller, also from forked
+    # workers, once per message
+    local_mocked_bindings(groupGenes = function(...) {
+        warning("mock groupGenes warning")
+        real_groupGenes(...)
+    })
+    for (n in c(1, 2)) {
+        warns <- character(0)
+        res <- withCallingHandlers(
+            groupLightGenes(db, nproc = n),
+            warning = function(w) {
+                warns <<- c(warns, conditionMessage(w))
+                invokeRestart("muffleWarning")
+            })
+        expect_equal(warns, "mock groupGenes warning [clone(s): 1, 2]", info = paste("nproc =", n))
+        expect_equal(res$vj_group_light, c("G1", "G1", "G1", "G1", NA), info = paste("nproc =", n))
+    }
+
+    # an error in any clone stops the run and names the clone
+    local_mocked_bindings(groupGenes = function(data, ...) {
+        if (any(data$v_call == KV1)) stop("mock groupGenes error")
+        real_groupGenes(data, ...)
+    })
+    for (n in c(1, 2)) {
+        expect_error(
+            groupLightGenes(db, nproc = n),
+            "groupLightGenes failed for clone\\(s\\):\n  1: mock groupGenes error\n  2: mock groupGenes error",
+            info = paste("nproc =", n)
+        )
+    }
+})
+
+test_that("groupLightGenes, matches groups back to rows by sequence_id", {
+    db <- makeLightDb(
+        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
+        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
+        c("c2", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
+        c("c2", "IGL", LV2, LJ2, "TTT", "1"),
+        c("c3", "IGH", HV, HJ, "CCCCCCCCCA", "1"),
+        c("c4", "IGH", HV, HJ, "AAAAAAAAAA", "2")
+    )
+    res <- groupLightGenes(db)
+
+    # shuffled input: same group for each sequence, input order kept
+    set.seed(1)
+    db_shuf <- db[sample(nrow(db)), ]
+    res_shuf <- groupLightGenes(db_shuf)
+    expect_equal(res_shuf$sequence_id, db_shuf$sequence_id)
+    expect_equal(res_shuf$vj_group_light,
+                 res$vj_group_light[match(db_shuf$sequence_id, res$sequence_id)])
+
+    # custom sequence_id column name
+    db_custom <- db
+    names(db_custom)[names(db_custom) == "sequence_id"] <- "seq"
+    res_custom <- groupLightGenes(db_custom, sequence_id = "seq")
+    expect_equal(res_custom$vj_group_light, res$vj_group_light)
+
+    # sequence_id is required, unique and not NA
+    expect_error(groupLightGenes(db_custom), "One or more required columns were not found")
+    db_dup <- db
+    db_dup$sequence_id[2] <- db_dup$sequence_id[1]
+    expect_error(groupLightGenes(db_dup), "sequence_id column contains duplicated values")
+    db_na <- db
+    db_na$sequence_id[2] <- NA
+    expect_error(groupLightGenes(db_na), "sequence_id column contains NA values")
+})
