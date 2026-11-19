@@ -1514,11 +1514,13 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #' @param    nproc         Number of cores to use. 
 #' 
 #' @return   Returns a modified data.frame with light chain subgroup indices in 
-#'           a new \code{vj_group_light} column. Heavy chain sequences in clones 
-#'           with no light chain data will have \code{NA} in \code{vj_group_light}. 
-#'           Unpaired heavy chain sequences within clones that do have light chain 
-#'           data will be assigned to the nearest light chain subgroup based on 
-#'           Hamming distance to paired heavy chains.
+#'           a new \code{vj_group_light} column. These labels are only unique within
+#'           a clone. A combination of clone id and vj_group_light provides true 
+#'           clonal subgroups. Heavy chain sequences in clones with no light chain 
+#'           data  will have \code{NA} in \code{vj_group_light}. Unpaired heavy 
+#'           chain sequences within clones that do have light chain data will be 
+#'           assigned to the nearest light chain subgroup based on Hamming 
+#'           distance to paired heavy chains.
 #'
 #'           If \code{junc_len} is supplied, grouping will be based on V gene, 
 #'           J gene, and junction length simultaneously. The output column name 
@@ -1538,6 +1540,16 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #' Hamming distance to paired heavy chain sequences within the same clone. In the 
 #' case of ties, the largest vj_group_light is preferred; if vj_group_light sizes 
 #' are equal, the lowest-numbered vj_group_light is used.
+#' 
+#' If light chain sequences have NA or "" values for v_call, j_call, or junc_len 
+#' they will not go through the grouping process. Rather, their paired heavy chain
+#' will be treated as if it were a unpaired cell. The resulting grouping will be 
+#' applied to the light chain sequence. 
+#' 
+#' Cells with ambiguous V or J calls or cells with multiple light chains will be 
+#' transitively linked within a clone, analogous to single-linking clustering. If 
+#' first = FALSE then this transitive linking only happens when there are mutliple
+#' light chains to a cell that fall into different groups. 
 #'
 #' Specifying \code{junc_len} will force \code{groupLightGenes} to perform grouping
 #' based on V gene, J gene, and junction length simultaneously. If \code{junc_len=NULL},
@@ -1577,9 +1589,9 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
     return(data)
   }
   
-  # cast to character as needed
-  for (col in c(v_call, j_call, cell_id, locus, clone)) {
-    if (!is.null(col) && !is(data[[col]], "character")) {
+  # cast factors to character -- same as groupGenes
+  for (col in c(v_call, j_call, cell_id, locus)) {
+    if (!is.null(col) && is.factor(data[[col]])) {
       data[[col]] <- as.character(data[[col]])
     }
   }
@@ -1593,128 +1605,195 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
   heavy_loci <- c("IGH", "TRB", "TRD")
   light_loci <- c("IGK", "IGL", "TRA", "TRG")
   
+  if (!is.numeric(nproc) || length(nproc) != 1 || is.na(nproc) || nproc < 1) {
+    stop("nproc must be a positive integer.")
+  }
+  # mclapply forks, which Windows does not support
+  if (nproc > 1 && .Platform$OS.type == "windows") {
+    warning("nproc > 1 is not supported on Windows. Running with nproc = 1.")
+    nproc <- 1
+  }
+
   data$vj_group_light <- NA
-  
-  clone_ids <- unique(data[[clone]])
-  clone_ids <- clone_ids[!is.na(clone_ids)]
-  
+
   # work on a plain data.frame and integer row indices (tibbles drop rownames)
   data <- as.data.frame(dplyr::ungroup(data), stringsAsFactors = FALSE)
 
-  for (cloneid in clone_ids) {
-    idx_c <- which(data[[clone]] == cloneid)
+  # row indices of each clone (split drops NA clone ids)
+  clone_rows <- split(seq_len(nrow(data)), data[[clone]])
 
-    # split into heavy and light (integer row indices into data)
-    idx_h <- idx_c[data[[locus]][idx_c] %in% heavy_loci]
-    idx_l <- idx_c[data[[locus]][idx_c] %in% light_loci]
+  # light chains groupGenes cannot group (NA or empty V, J, or junction length).
+  # These are left out of grouping and pairing, so their cell is treated as
+  # unpaired, and they inherit their cell's heavy chain group at the end. 
+  # TODO decide if we want to have it included or just drop the light chain
+  light_cols <- c(v_call, j_call, junc_len)
+  light_bad <- data[[locus]] %in% light_loci & !is.na(data[[clone]]) &
+    rowSums(is.na(data[, light_cols, drop = FALSE]) |
+              data[, light_cols, drop = FALSE] == "") > 0
+  if (any(light_bad)) {
+    warning(paste0(sum(light_bad), " light chain sequence(s) with NA or empty values in { ",
+                   paste(light_cols, collapse = ", "), " } were excluded from light chain ",
+                   "grouping. They are assigned the vj_group_light of their cell's heavy chain."))
+  }
 
-    # no light chains in this clone -- leave vj_group_light as NA
-    if (length(idx_l) == 0) next
+  # process each clone on its own subset, nproc clones at a time. Returns the
+  # vj_group_light values for that clone's rows, in the order of x.
+  results <- parallel::mclapply(clone_rows, function(x) {
+    db_c <- data[x, , drop = FALSE]
+    groups <- rep(NA_character_, nrow(db_c))
+
+    # split into heavy and light (row indices into db_c)
+    idx_h <- which(db_c[[locus]] %in% heavy_loci)
+    idx_l <- which(db_c[[locus]] %in% light_loci)
+
+    # set aside light chains that cannot be grouped (see light_bad above)
+    idx_l_bad <- idx_l[light_bad[x][idx_l]]
+    idx_l <- setdiff(idx_l, idx_l_bad)
+
+    # no usable light chains in this clone -- leave vj_group_light as NA
+    if (length(idx_l) == 0) return(groups)
 
     # cells with paired light chain data
-    paired_cells <- intersect(data[[cell_id]][idx_h], data[[cell_id]][idx_l])
+    paired_cells <- intersect(db_c[[cell_id]][idx_h], db_c[[cell_id]][idx_l])
     paired_cells <- paired_cells[!is.na(paired_cells)]
 
-    # run groupGenes on light chain rows in bulk mode. Single-cell mode builds
-    # each cell's key from its heavy chain only, so passing cell_id here would
-    # drop every light-only cell. Drop the cell_id column (groupGenes refuses
-    # bulk mode when one is present) and track rows with a temporary index.
-    db_l <- data[idx_l, c(v_call, j_call, junc_len, locus), drop = FALSE]
-    db_l$.row_idx <- idx_l
+    # run groupGenes on light chain rows in bulk mode
+    db_l <- db_c[idx_l, c(v_call, j_call, junc_len, locus), drop = FALSE]
+    db_l$row_idx <- idx_l
     db_l_grouped <- tryCatch(
-      alakazam::groupGenes(
-        data = db_l,
-        v_call = v_call,
-        j_call = j_call,
-        junc_len = junc_len,
-        cell_id = NULL,
-        locus = locus,
-        first = first
-      ),
-      error = function(e) {
-        warning(paste("groupGenes failed for clone", cloneid, ":", e$message))
-        return(NULL)
-      }
-    )
+      alakazam::groupGenes(data = db_l,
+                           v_call = v_call,
+                           j_call = j_call,
+                           junc_len = junc_len,
+                           cell_id = NULL,
+                           locus = locus,
+                           first = first),
+      error = function(e) e)
+    # warnings raised here are lost, so report the failure back to up the chain
+    if (inherits(db_l_grouped, "error")) {
+      return(structure(groups, error = conditionMessage(db_l_grouped)))
+    }
 
-    if (is.null(db_l_grouped)) next
+    # assign vj_group_light to light chain rows
+    groups[db_l_grouped$row_idx] <- db_l_grouped$vj_group
 
-    # assign vj_group_light to light chain rows in data
-    data$vj_group_light[db_l_grouped$.row_idx] <- db_l_grouped$vj_group
+    # merge light chain groups linked by a cell with multiple light chains.
+    cell_groups <- lapply(split(groups[idx_l], db_c[[cell_id]][idx_l]),
+                          function(g) unique(g[!is.na(g)]))
+    links <- cell_groups[lengths(cell_groups) > 1]
+    if (length(links) > 0) {
+      # sort by group number so merged groups keep the lowest number
+      group_ids <- unique(groups[idx_l][!is.na(groups[idx_l])])
+      group_ids <- group_ids[order(as.integer(sub("^G", "", group_ids)))]
+      edges <- do.call(rbind, lapply(links, function(g) cbind(g[-length(g)], g[-1])))
+      graph <- igraph::graph_from_data_frame(as.data.frame(edges), directed = FALSE,
+                                             vertices = data.frame(name = group_ids))
+      membership <- igraph::components(graph)$membership
+      grouped <- idx_l[!is.na(groups[idx_l])]
+      groups[grouped] <- paste0("G", membership[groups[grouped]])
+    }
 
-    # assign vj_group_light to paired heavy chain rows
+    # assign vj_group_light to paired heavy chain rows. After merging, all of
+    # a cell's light chains share one group.
     for (cellname in paired_cells) {
       # get the vj_group assigned to this cell's light chain(s)
-      l_rows <- idx_l[data[[cell_id]][idx_l] == cellname]
-      light_group <- unique(stats::na.omit(data$vj_group_light[l_rows]))
+      l_rows <- idx_l[db_c[[cell_id]][idx_l] == cellname]
+      light_group <- unique(stats::na.omit(groups[l_rows]))
       if (length(light_group) == 0) next
+
       # assign to heavy chain row(s) for this cell
-      h_rows <- idx_h[which(data[[cell_id]][idx_h] == cellname)]
-      data$vj_group_light[h_rows] <- light_group[1]
+      h_rows <- idx_h[which(db_c[[cell_id]][idx_h] == cellname)]
+      groups[h_rows] <- light_group
     }
 
     # handle unpaired heavy chains using seqDist
-    idx_h_paired <- idx_h[data[[cell_id]][idx_h] %in% paired_cells &
-                            !is.na(data$vj_group_light[idx_h])]
-    idx_h_unpaired <- idx_h[!data[[cell_id]][idx_h] %in% paired_cells |
-                              is.na(data[[cell_id]][idx_h])]
+    idx_h_paired <- idx_h[db_c[[cell_id]][idx_h] %in% paired_cells &
+                            !is.na(groups[idx_h])]
+    idx_h_unpaired <- idx_h[!db_c[[cell_id]][idx_h] %in% paired_cells |
+                              is.na(db_c[[cell_id]][idx_h])]
 
-    if (length(idx_h_unpaired) == 0 || length(idx_h_paired) == 0) next
+    if (length(idx_h_unpaired) > 0 && length(idx_h_paired) > 0) {
+      # precompute subgroup sizes for tie-breaking
+      subgroup_tab <- table(groups[idx_h_paired])
 
-    # precompute subgroup sizes for tie-breaking
-    subgroup_tab <- table(data$vj_group_light[idx_h_paired])
-
-    for (i in seq_along(idx_h_unpaired)) {
-      distances <- sapply(seq_along(idx_h_paired), function(x) {
-        seqs <- c(data[[sequence_alignment]][idx_h_paired[x]],
-                  data[[sequence_alignment]][idx_h_unpaired[i]])
-        if (nchar(seqs[1]) != nchar(seqs[2])) {
-          if (pad_ends) {
-            seqs <- alakazam::padSeqEnds(seqs)
-          } else {
-            # pad to equal length with N on the right
-            max_len <- max(nchar(seqs))
-            seqs <- stringi::stri_pad_right(seqs, width = max_len, pad = "N")
+      for (i in seq_along(idx_h_unpaired)) {
+        distances <- sapply(seq_along(idx_h_paired), function(x) {
+          seqs <- c(db_c[[sequence_alignment]][idx_h_paired[x]],
+                    db_c[[sequence_alignment]][idx_h_unpaired[i]])
+          if (nchar(seqs[1]) != nchar(seqs[2])) {
+            if (pad_ends) {
+              seqs <- alakazam::padSeqEnds(seqs)
+            } else {
+              # pad to equal length with N on the right
+              max_len <- max(nchar(seqs))
+              seqs <- stringi::stri_pad_right(seqs, width = max_len, pad = "N")
+            }
           }
-        }
-        alakazam::seqDist(seqs[1], seqs[2])
-      })
-      
-      distances <- as.numeric(distances)
-      min_dist <- min(distances)
-      min_idx <- which(distances == min_dist)
-      
-      if (length(min_idx) == 1) {
-        # unambiguous nearest neighbor
-        assigned_group <- data$vj_group_light[idx_h_paired[min_idx]]
-      } else {
-        # tie -- get subgroups of all tied neighbors
-        tied_groups <- data$vj_group_light[idx_h_paired[min_idx]]
-        uniq_groups <- unique(tied_groups)
-        
-        if (length(uniq_groups) == 1) {
-          # all tied neighbors are in the same subgroup
-          assigned_group <- uniq_groups
+          alakazam::seqDist(seqs[1], seqs[2])
+        })
+
+        distances <- as.numeric(distances)
+        min_dist <- min(distances)
+        min_idx <- which(distances == min_dist)
+
+        if (length(min_idx) == 1) {
+          # unambiguous nearest neighbor
+          assigned_group <- groups[idx_h_paired[min_idx]]
         } else {
-          # multiple subgroups -- pick largest
-          group_sizes <- as.integer(subgroup_tab[uniq_groups])
-          max_size <- max(group_sizes)
-          largest_groups <- uniq_groups[group_sizes == max_size]
-          
-          if (length(largest_groups) == 1) {
-            assigned_group <- largest_groups
+          # tie -- get subgroups of all tied neighbors
+          tied_groups <- groups[idx_h_paired[min_idx]]
+          uniq_groups <- unique(tied_groups)
+
+          if (length(uniq_groups) == 1) {
+            # all tied neighbors are in the same subgroup
+            assigned_group <- uniq_groups
           } else {
-            # still tied -- pick lowest numbered group
-            # extract numeric part of group label e.g. "G1" -> 1
-            group_nums <- as.integer(gsub("^G", "", largest_groups))
-            assigned_group <- largest_groups[which.min(group_nums)]
+            # multiple subgroups -- pick largest
+            group_sizes <- as.integer(subgroup_tab[uniq_groups])
+            max_size <- max(group_sizes)
+            largest_groups <- uniq_groups[group_sizes == max_size]
+
+            if (length(largest_groups) == 1) {
+              assigned_group <- largest_groups
+            } else {
+              # still tied -- pick lowest numbered group
+              # extract numeric part of group label e.g. "G1" -> 1
+              group_nums <- as.integer(gsub("^G", "", largest_groups))
+              assigned_group <- largest_groups[which.min(group_nums)]
+            }
           }
         }
+
+        groups[idx_h_unpaired[i]] <- assigned_group
       }
-      
-      data$vj_group_light[idx_h_unpaired[i]] <- assigned_group
     }
+
+    # light chains set aside above inherit their cell's heavy chain group
+    # TODO decide if this is what we want -- could just remove the light chain
+    for (r in idx_l_bad) {
+      cellname <- db_c[[cell_id]][r]
+      if (is.na(cellname)) next
+      h_rows <- idx_h[which(db_c[[cell_id]][idx_h] == cellname)]
+      h_group <- unique(stats::na.omit(groups[h_rows]))
+      if (length(h_group) > 0) groups[r] <- h_group[1]
+    }
+
+    return(groups)
+  }, mc.cores = nproc)
+
+  # write each clone's groups back to its rows
+  for (k in seq_along(results)) {
+    # mclapply returns errors from forked workers instead of raising them
+    if (inherits(results[[k]], "try-error")) {
+      stop(paste0("groupLightGenes failed for clone ", names(results)[k], ": ",
+                  attr(results[[k]], "condition")$message))
+    }
+    if (!is.null(attr(results[[k]], "error"))) {
+      warning(paste("groupGenes failed for clone", names(results)[k], ":",
+                    attr(results[[k]], "error")))
+    }
+    data$vj_group_light[clone_rows[[k]]] <- results[[k]]
   }
-  
+
   return(data)
 }
