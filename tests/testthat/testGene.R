@@ -959,7 +959,7 @@ test_that("groupLightGenes, paired and unpaired heavy chains", {
         c("c2", "IGH", HV, HJ, "AAAAAAAAAC", "1"),
         c("c2", "IGK", KV1, KJ1, "TTT", "1"),
         c("c3", "IGH", HV, HJ, "CCCCCCCCCC", "1"),
-        c("c3", "IGL", IGLV2, IGLJ2, "TTT", "1"),
+        c("c3", "IGL", LV2, LJ2, "TTT", "1"),
         # unpaired heavy chains, closest to c1/c2 and to c3
         c("c4", "IGH", HV, HJ, "AAAAAAAAAT", "1"),
         c("c5", "IGH", HV, HJ, "CCCCCCCCCA", "1"),
@@ -1119,28 +1119,6 @@ test_that("groupLightGenes, input validation", {
     expect_equal(res$vj_group_light, c("G1", "G1"))
 })
 
-test_that("groupLightGenes, keeps the class of the input", {
-    db <- makeLightDb(
-        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
-        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
-        c("c2", "IGH", HV, HJ, "CCCCCCCCCC", "2"), 
-        c("c2", "IGL", LV2, LJ2, "TTT", "2")
-    )
-    res_df <- groupLightGenes(db)
-    expect_equal(class(res_df), "data.frame")
-
-    db_tbl <- tibble::as_tibble(db)
-    res_tbl <- groupLightGenes(db_tbl)
-    expect_equal(class(res_tbl), class(db_tbl))
-    expect_equal(res_tbl$vj_group_light, res_df$vj_group_light)
-
-    db_grp <- dplyr::group_by(db_tbl, clone_id)
-    res_grp <- groupLightGenes(db_grp)
-    expect_equal(class(res_grp), class(db_grp))
-    expect_equal(dplyr::group_vars(res_grp), "clone_id")
-    expect_equal(res_grp$vj_group_light, res_df$vj_group_light)
-})
-
 test_that("groupLightGenes, nproc > 1 gives the same result as nproc = 1", {
     skip_on_os("windows")
     db <- makeLightDb(
@@ -1200,39 +1178,4 @@ test_that("groupLightGenes, reports warnings and errors from every clone", {
             info = paste("nproc =", n)
         )
     }
-})
-
-test_that("groupLightGenes, matches groups back to rows by sequence_id", {
-    db <- makeLightDb(
-        c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
-        c("c1", "IGK", KV1, KJ1, "TTT", "1"),
-        c("c2", "IGH", HV, HJ, "CCCCCCCCCC", "1"), 
-        c("c2", "IGL", LV2, LJ2, "TTT", "1"),
-        c("c3", "IGH", HV, HJ, "CCCCCCCCCA", "1"),
-        c("c4", "IGH", HV, HJ, "AAAAAAAAAA", "2")
-    )
-    res <- groupLightGenes(db)
-
-    # shuffled input: same group for each sequence, input order kept
-    set.seed(1)
-    db_shuf <- db[sample(nrow(db)), ]
-    res_shuf <- groupLightGenes(db_shuf)
-    expect_equal(res_shuf$sequence_id, db_shuf$sequence_id)
-    expect_equal(res_shuf$vj_group_light,
-                 res$vj_group_light[match(db_shuf$sequence_id, res$sequence_id)])
-
-    # custom sequence_id column name
-    db_custom <- db
-    names(db_custom)[names(db_custom) == "sequence_id"] <- "seq"
-    res_custom <- groupLightGenes(db_custom, sequence_id = "seq")
-    expect_equal(res_custom$vj_group_light, res$vj_group_light)
-
-    # sequence_id is required, unique and not NA
-    expect_error(groupLightGenes(db_custom), "One or more required columns were not found")
-    db_dup <- db
-    db_dup$sequence_id[2] <- db_dup$sequence_id[1]
-    expect_error(groupLightGenes(db_dup), "sequence_id column contains duplicated values")
-    db_na <- db
-    db_na$sequence_id[2] <- NA
-    expect_error(groupLightGenes(db_na), "sequence_id column contains NA values")
 })

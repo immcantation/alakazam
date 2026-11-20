@@ -1507,9 +1507,6 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         \code{only_heavy} arguments. If set to \code{NULL} then the
 #'                         bulk sequencing data is assumed.
 #' @param    clone         The clone id of the dataset as defined by heavy chains.
-#' @param    sequence_id   name of the column containing sequence identifiers.
-#'                         Values must be unique and not \code{NA}; they are used
-#'                         to match the light chain groups back to the input rows.
 #' @param    locus         name of the column containing locus information.
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
@@ -1580,24 +1577,14 @@ sortGenes <- function(genes, method = c("name", "position")) {
 groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call", 
                             junc_len = NULL, sequence_alignment = "sequence_alignment",
                             cell_id = "cell_id", clone = "clone_id", locus = "locus",
-                            sequence_id = "sequence_id", first = FALSE, nproc = 1) {
+                            first = FALSE, nproc = 1) {
 
   # Check required columns
-  cols_to_check <- c(sequence_id, v_call, j_call, junc_len, sequence_alignment, locus, clone)
+  cols_to_check <- c(v_call, j_call, junc_len, sequence_alignment, locus, clone)
   check <- checkColumns(data, cols_to_check)
   if (check != TRUE) {
     stop(paste("One or more required columns were not found in the data:",
                paste(cols_to_check, collapse = ", ")))
-  }
-
-  # the results are matched back to the input rows by sequence_id
-  if (any(is.na(data[[sequence_id]]))) {
-    stop(paste0("The ", sequence_id, " column contains NA values. ",
-                "Each row must have a unique ", sequence_id, "."))
-  }
-  if (anyDuplicated(data[[sequence_id]])) {
-    stop(paste0("The ", sequence_id, " column contains duplicated values. ",
-                "Each row must have a unique ", sequence_id, "."))
   }
 
   # cell_id handling
@@ -1866,9 +1853,5 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
     data$vj_group_light[clone_rows[[k]]] <- results[[k]]$groups
   }
 
-  # return the input object, so its class (tibble, grouped_df, ...) and row
-  # order are kept.
-  data_in$vj_group_light <- data$vj_group_light[match(data_in[[sequence_id]],
-                                                      data[[sequence_id]])]
-  return(data_in)
+  return(data)
 }
