@@ -784,7 +784,7 @@ singleCellValidation <- function(data, locus = "locus", cell_id = "cell_id") {
 #' column must be correct. Otherwise, \code{groupGenes} will be run with bulk sequencing assumptions,
 #' using all input sequences regardless of the values in the \code{locus} column.
 #'
-#' Values in the \code{locus} column must be one of \code{c("IGH", "IGI", "IGK", "IGL")} for BCR
+#' Values in the \code{locus} column must be one of \code{c("IGH", "IGK", "IGL")} for BCR
 #' or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an
 #' error message and stops.
 #'
@@ -934,7 +934,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
             }
 
             # check locus column
-            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
             check <- !all(unique(data[[locus]]) %in% valid_loci)
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
@@ -952,7 +952,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
             }
 
             # check locus column
-            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
             check <- !all(unique(data[[locus]]) %in% valid_loci)
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
@@ -1517,7 +1517,6 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         is used. if \code{FALSE} the union of ambiguous gene
 #'                         assignments is used to group all sequences with any
 #'                         overlapping gene calls.
-#' @param    pad_ends      Pad the heavy chain sequences for hamming calculation?
 #' @param    nproc         Number of cores to use. Clones are processed in
 #'                         parallel with \code{parallel::mclapply}. Must be a
 #'                         positive integer. Values above 1 are not supported on
@@ -1544,7 +1543,7 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'            type \code{factor} in the input \code{data}.
 #'
 #' @details
-#' Values in the \code{locus} column must be one of \code{c("IGH", "IGI", "IGK", "IGL")} 
+#' Values in the \code{locus} column must be one of \code{c("IGH", "IGK", "IGL")} 
 #' for BCR or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, 
 #' the function returns an error message and stops.
 #'
@@ -1581,8 +1580,7 @@ sortGenes <- function(genes, method = c("name", "position")) {
 groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call", 
                             junc_len = NULL, sequence_alignment = "sequence_alignment",
                             cell_id = "cell_id", clone = "clone_id", locus = "locus",
-                            sequence_id = "sequence_id",
-                            first = FALSE, pad_ends = TRUE, nproc = 1) {
+                            sequence_id = "sequence_id", first = FALSE, nproc = 1) {
 
   # Check required columns
   cols_to_check <- c(sequence_id, v_call, j_call, junc_len, sequence_alignment, locus, clone)
@@ -1621,7 +1619,7 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
   }
   
   # validate locus values
-  valid_loci <- c("IGH", "IGK", "IGL", "IGI", "TRA", "TRB", "TRD", "TRG")
+  valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
   if (!all(unique(data[[locus]]) %in% valid_loci)) {
     stop("The locus column contains invalid loci annotations.")
   }
@@ -1754,13 +1752,7 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
           seqs <- c(db_c[[sequence_alignment]][idx_h_paired[x]],
                     db_c[[sequence_alignment]][idx_h_unpaired[i]])
           if (nchar(seqs[1]) != nchar(seqs[2])) {
-            if (pad_ends) {
-              seqs <- alakazam::padSeqEnds(seqs)
-            } else {
-              # pad to equal length with N on the right
-              max_len <- max(nchar(seqs))
-              seqs <- stringi::stri_pad_right(seqs, width = max_len, pad = "N")
-            }
+            seqs <- alakazam::padSeqEnds(seqs)
           }
           alakazam::seqDist(seqs[1], seqs[2])
         })
