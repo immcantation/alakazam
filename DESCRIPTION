@@ -66,6 +66,7 @@ Imports:
     igraph (>= 1.5.0),
     Matrix (>= 1.3-0),
     methods,
+    parallel,
     progress,
     Rcpp (>= 0.12.12),
     readr,

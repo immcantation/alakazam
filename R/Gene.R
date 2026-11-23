@@ -784,7 +784,7 @@ singleCellValidation <- function(data, locus = "locus", cell_id = "cell_id") {
 #' column must be correct. Otherwise, \code{groupGenes} will be run with bulk sequencing assumptions,
 #' using all input sequences regardless of the values in the \code{locus} column.
 #'
-#' Values in the \code{locus} column must be one of \code{c("IGH", "IGI", "IGK", "IGL")} for BCR
+#' Values in the \code{locus} column must be one of \code{c("IGH", "IGK", "IGL")} for BCR
 #' or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, the function returns an
 #' error message and stops.
 #'
@@ -846,11 +846,10 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     }
 
     if (split_light) {
-        warning(paste(
-            "split_light = TRUE is deprecated. Please use split_light = FALSE.",
-            "After clonal identification, light chain groups can be found with dowser::resolveLightChains"
-        ))
-        split_light <- FALSE
+      warning(paste(
+        "split_light = TRUE is deprecated.",
+        "Please use alakazam::groupLightGenes() for light chain based grouping."))
+      split_light <- FALSE
     }
 
     # CGJ 6/24/24 mixed data check -- with the lc options removed we want it to go
@@ -935,7 +934,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
             }
 
             # check locus column
-            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
             check <- !all(unique(data[[locus]]) %in% valid_loci)
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
@@ -953,7 +952,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
             }
 
             # check locus column
-            valid_loci <- c("IGH", "IGI", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+            valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
             check <- !all(unique(data[[locus]]) %in% valid_loci)
             if (check) {
                 stop("The locus column contains invalid loci annotations.")
@@ -1053,7 +1052,7 @@ groupGenes <- function(data, v_call = "v_call", j_call = "j_call", junc_len = NU
     #  you never know if the user will supply this cell as input)
     n_separator_btw_seq_v_heavy <- stringi::stri_count_fixed(str = data[[v_call]], pattern = separator_between_seq)
     n_separator_btw_seq_j_heavy <- stringi::stri_count_fixed(str = data[[j_call]], pattern = separator_between_seq)
-    if (any(n_separator_btw_seq_v_heavy != n_separator_btw_seq_j_heavy)) {
+    if (any(n_separator_btw_seq_v_heavy != n_separator_btw_seq_j_heavy, na.rm = TRUE)) {
         stop("Requirement not met: one-to-one annotation-to-chain correspondence for both V and J (heavy)")
     }
 
@@ -1476,4 +1475,380 @@ sortGenes <- function(genes, method = c("name", "position")) {
     }
 
     return(sorted_genes)
+}
+
+#' Group sequences by light chain gene assignment
+#'
+#' \code{groupLightGenes} groups sequences within existing clones by shared light 
+#' chain V and J gene assignments, and optionally also by junction lengths. This 
+#' function is intended to be used after clonal assignment to further subdivide 
+#' clones using light chain information. IGH:IGK/IGL and TRB:TRA and TRD:TRG paired 
+#' single-cell BCR/TCR sequencing is supported. Heavy chain sequences lacking a 
+#' paired light chain are assigned to a light chain vj_group based on sequence 
+#' similarity to paired heavy chains within the same clone.
+#'
+#' @param    data          data.frame containing sequence data.
+#' @param    v_call        name of the column containing the heavy/long chain
+#'                         V-segment allele calls.
+#' @param    j_call        name of the column containing the heavy/long chain
+#'                         J-segment allele calls.
+#' @param    junc_len      name of column containing the junction length.
+#'                         If \code{NULL} then 1-stage partitioning is perform
+#'                         considering only the V and J genes is performed.
+#'                         See Details for further clarification.
+#' @param    sequence_alignment name of the column containing the sequence alignment.
+#'                         Used to assign unpaired heavy chains to a light chain
+#'                         group. Heavy chain sequences with a clone id must not
+#'                         have \code{NA} or empty values in this column; the
+#'                         function stops with an error if they do.
+#' @param    cell_id       name of the column containing cell identifiers or barcodes.
+#'                         If specified, grouping will be performed in single-cell mode
+#'                         with the behavior governed by the \code{locus} and
+#'                         \code{only_heavy} arguments. If set to \code{NULL} then the
+#'                         bulk sequencing data is assumed.
+#' @param    clone         The clone id of the dataset as defined by heavy chains.
+#' @param    locus         name of the column containing locus information.
+#'                         Only applicable to single-cell data.
+#'                         Ignored if \code{cell_id=NULL}.
+#' @param    first         if \code{TRUE} only the first call of the gene assignments
+#'                         is used. if \code{FALSE} the union of ambiguous gene
+#'                         assignments is used to group all sequences with any
+#'                         overlapping gene calls.
+#' @param    nproc         Number of cores to use. Clones are processed in
+#'                         parallel with \code{parallel::mclapply}. Must be a
+#'                         positive integer. Values above 1 are not supported on
+#'                         Windows and fall back to 1 with a warning. Warnings
+#'                         raised while processing a clone are reported once
+#'                         per distinct message, naming the clones affected,
+#'                         and an error in any clone stops the function.
+#' 
+#' @return   Returns a modified data.frame with light chain subgroup indices in 
+#'           a new \code{vj_group_light} column. These labels are only unique within
+#'           a clone. A combination of clone id and vj_group_light provides true 
+#'           clonal subgroups. Heavy chain sequences in clones with no light chain 
+#'           data  will have \code{NA} in \code{vj_group_light}. Unpaired heavy 
+#'           chain sequences within clones that do have light chain data will be 
+#'           assigned to the nearest light chain subgroup based on Hamming 
+#'           distance to paired heavy chains.
+#'
+#'           If \code{junc_len} is supplied, grouping will be based on V gene, 
+#'           J gene, and junction length simultaneously. The output column name 
+#'           will remain \code{vj_group_light} regardless.
+#'
+#'           The output \code{v_call}, \code{j_call}, \code{cell_id}, and \code{locus}
+#'           columns will be converted to type \code{character} if they were of
+#'            type \code{factor} in the input \code{data}.
+#'
+#' @details
+#' Values in the \code{locus} column must be one of \code{c("IGH", "IGK", "IGL")} 
+#' for BCR or \code{c("TRA", "TRB", "TRD", "TRG")} for TCR sequences. Otherwise, 
+#' the function returns an error message and stops.
+#'
+#' Heavy chain sequences lacking a paired light chain (i.e., no light chain row shares
+#' the same \code{cell_id}) are assigned to a vj_group_light value based on 
+#' Hamming distance to paired heavy chain sequences within the same clone. In the 
+#' case of ties, the largest vj_group_light is preferred; if vj_group_light sizes 
+#' are equal, the lowest-numbered vj_group_light is used.
+#' 
+#' If light chain sequences have NA or "" values for v_call, j_call, or junc_len 
+#' they will not go through the grouping process. Rather, their paired heavy chain
+#' will be treated as if it were a unpaired cell. The resulting grouping will be 
+#' applied to the light chain sequence. 
+#' 
+#' Cells with ambiguous V or J calls or cells with multiple light chains will be 
+#' transitively linked within a clone, analogous to single-linking clustering. If 
+#' first = FALSE then this transitive linking only happens when there are mutliple
+#' light chains to a cell that fall into different groups. 
+#'
+#' Specifying \code{junc_len} will force \code{groupLightGenes} to perform grouping
+#' based on V gene, J gene, and junction length simultaneously. If \code{junc_len=NULL},
+#' grouping is based on V gene and J gene only.
+#'
+#' All rows containing \code{NA} values in any of the \code{v_call}, \code{j_call},
+#' and \code{junc_len} (if \code{junc_len != NULL}) columns will be removed by 
+#' the internal \code{groupGenes} call. A warning will be issued when this occurs.
+#'
+#' @examples
+#' # After clonal assignment, further subdivide clones by light chain gene usage
+#' db <- groupLightGenes(ExampleDb, clone = "clone_id", cell_id = "cell_id")
+#' head(db$vj_group_light)
+#'
+#' @export
+groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call", 
+                            junc_len = NULL, sequence_alignment = "sequence_alignment",
+                            cell_id = "cell_id", clone = "clone_id", locus = "locus",
+                            first = FALSE, nproc = 1) {
+
+  # Check required columns
+  cols_to_check <- c(v_call, j_call, junc_len, sequence_alignment, locus, clone)
+  check <- checkColumns(data, cols_to_check)
+  if (check != TRUE) {
+    stop(paste("One or more required columns were not found in the data:",
+               paste(cols_to_check, collapse = ", ")))
+  }
+
+  # cell_id handling
+  if (is.null(cell_id) || !cell_id %in% colnames(data)) {
+    warning(paste(
+      "cell_id not found or not specified.",
+      "Heavy chain sequences will have NA for vj_group_light.",
+      "For full paired analysis, please specify cell_id."
+    ))
+    data$vj_group_light <- NA
+    return(data)
+  }
+  
+  # cast factors to character -- same as groupGenes
+  for (col in c(v_call, j_call, cell_id, locus)) {
+    if (!is.null(col) && is.factor(data[[col]])) {
+      data[[col]] <- as.character(data[[col]])
+    }
+  }
+  
+  # validate locus values
+  valid_loci <- c("IGH", "IGK", "IGL", "TRA", "TRB", "TRD", "TRG")
+  if (!all(unique(data[[locus]]) %in% valid_loci)) {
+    stop("The locus column contains invalid loci annotations.")
+  }
+  
+  heavy_loci <- c("IGH", "TRB", "TRD")
+  light_loci <- c("IGK", "IGL", "TRA", "TRG")
+  
+  if (!is.numeric(nproc) || length(nproc) != 1 || is.na(nproc) || nproc < 1 ||
+      nproc != round(nproc)) {
+    stop("nproc must be a positive integer.")
+  }
+  nproc <- as.integer(nproc)
+  # mclapply forks, which Windows does not support
+  if (nproc > 1 && .Platform$OS.type == "windows") {
+    warning("nproc > 1 is not supported on Windows. Running with nproc = 1.")
+    nproc <- 1L
+  }
+
+  # heavy chain alignments are used to place unpaired heavy chains, so they
+  # must all be present
+  heavy_in_clone <- data[[locus]] %in% heavy_loci & !is.na(data[[clone]])
+  bad_alignment <- heavy_in_clone &
+    (is.na(data[[sequence_alignment]]) | data[[sequence_alignment]] == "")
+  if (any(bad_alignment)) {
+    stop(paste0(sum(bad_alignment), " heavy chain sequence(s) have NA or empty values in ",
+                "the ", sequence_alignment, " column. Remove or fix these sequences ",
+                "before running groupLightGenes."))
+  }
+
+  # work on a plain data.frame and integer row indices (tibbles drop rownames)
+  data <- as.data.frame(dplyr::ungroup(data), stringsAsFactors = FALSE)
+  data$vj_group_light <- NA
+
+  # row indices of each clone (split drops NA clone ids)
+  clone_rows <- split(seq_len(nrow(data)), data[[clone]])
+
+  # light chains groupGenes cannot group (NA or empty V, J, or junction length).
+  # These are left out of grouping and pairing, so their cell is treated as
+  # unpaired, and they inherit their cell's heavy chain group at the end. 
+  # TODO decide if we want to have it included or just drop the light chain
+  light_cols <- c(v_call, j_call, junc_len)
+  light_bad <- data[[locus]] %in% light_loci & !is.na(data[[clone]]) &
+    rowSums(is.na(data[, light_cols, drop = FALSE]) |
+              data[, light_cols, drop = FALSE] == "") > 0
+  if (any(light_bad)) {
+    warning(paste0(sum(light_bad), " light chain sequence(s) with NA or empty values in { ",
+                   paste(light_cols, collapse = ", "), " } were excluded from light chain ",
+                   "grouping. They are assigned the vj_group_light of their cell's heavy chain."))
+  }
+
+  # process one clone on its own subset. Returns the vj_group_light values for
+  # that clone's rows, in the order of x.
+  process_clone <- function(x) {
+    db_c <- data[x, , drop = FALSE]
+    groups <- rep(NA_character_, nrow(db_c))
+
+    # split into heavy and light (row indices into db_c)
+    idx_h <- which(db_c[[locus]] %in% heavy_loci)
+    idx_l <- which(db_c[[locus]] %in% light_loci)
+
+    # set aside light chains that cannot be grouped (see light_bad above)
+    idx_l_bad <- idx_l[light_bad[x][idx_l]]
+    idx_l <- setdiff(idx_l, idx_l_bad)
+
+    # no usable light chains in this clone -- leave vj_group_light as NA
+    if (length(idx_l) == 0) return(groups)
+
+    # cells with paired light chain data
+    paired_cells <- intersect(db_c[[cell_id]][idx_h], db_c[[cell_id]][idx_l])
+    paired_cells <- paired_cells[!is.na(paired_cells)]
+
+    # run groupGenes on light chain rows in bulk mode
+    db_l <- db_c[idx_l, c(v_call, j_call, junc_len, locus), drop = FALSE]
+    db_l$row_idx <- idx_l
+    db_l_grouped <- alakazam::groupGenes(data = db_l,
+                                         v_call = v_call,
+                                         j_call = j_call,
+                                         junc_len = junc_len,
+                                         cell_id = NULL,
+                                         locus = locus,
+                                         first = first)
+
+    # assign vj_group_light to light chain rows
+    groups[db_l_grouped$row_idx] <- db_l_grouped$vj_group
+
+    # merge light chain groups linked by a cell with multiple light chains.
+    cell_groups <- lapply(split(groups[idx_l], db_c[[cell_id]][idx_l]),
+                          function(g) unique(g[!is.na(g)]))
+    links <- cell_groups[lengths(cell_groups) > 1]
+    if (length(links) > 0) {
+      # sort by group number so merged groups keep the lowest number
+      group_ids <- unique(groups[idx_l][!is.na(groups[idx_l])])
+      group_ids <- group_ids[order(as.integer(sub("^G", "", group_ids)))]
+      edges <- do.call(rbind, lapply(links, function(g) cbind(g[-length(g)], g[-1])))
+      graph <- igraph::graph_from_data_frame(as.data.frame(edges), directed = FALSE,
+                                             vertices = data.frame(name = group_ids))
+      membership <- igraph::components(graph)$membership
+      grouped <- idx_l[!is.na(groups[idx_l])]
+      groups[grouped] <- paste0("G", membership[groups[grouped]])
+    }
+
+    # assign vj_group_light to paired heavy chain rows. After merging, all of
+    # a cell's light chains share one group.
+    for (cellname in paired_cells) {
+      # get the vj_group assigned to this cell's light chain(s)
+      l_rows <- idx_l[db_c[[cell_id]][idx_l] == cellname]
+      light_group <- unique(stats::na.omit(groups[l_rows]))
+      if (length(light_group) == 0) next
+
+      # assign to heavy chain row(s) for this cell
+      h_rows <- idx_h[which(db_c[[cell_id]][idx_h] == cellname)]
+      groups[h_rows] <- light_group
+    }
+
+    # handle unpaired heavy chains using seqDist
+    idx_h_paired <- idx_h[db_c[[cell_id]][idx_h] %in% paired_cells &
+                            !is.na(groups[idx_h])]
+    idx_h_unpaired <- idx_h[!db_c[[cell_id]][idx_h] %in% paired_cells |
+                              is.na(db_c[[cell_id]][idx_h])]
+
+    if (length(idx_h_unpaired) > 0 && length(idx_h_paired) > 0) {
+      # precompute subgroup sizes for tie-breaking
+      subgroup_tab <- table(groups[idx_h_paired])
+
+      for (i in seq_along(idx_h_unpaired)) {
+        distances <- sapply(seq_along(idx_h_paired), function(x) {
+          seqs <- c(db_c[[sequence_alignment]][idx_h_paired[x]],
+                    db_c[[sequence_alignment]][idx_h_unpaired[i]])
+          if (nchar(seqs[1]) != nchar(seqs[2])) {
+            seqs <- alakazam::padSeqEnds(seqs)
+          }
+          alakazam::seqDist(seqs[1], seqs[2])
+        })
+
+        distances <- as.numeric(distances)
+        min_dist <- min(distances)
+        min_idx <- which(distances == min_dist)
+
+        if (length(min_idx) == 1) {
+          # unambiguous nearest neighbor
+          assigned_group <- groups[idx_h_paired[min_idx]]
+        } else {
+          # tie -- get subgroups of all tied neighbors
+          tied_groups <- groups[idx_h_paired[min_idx]]
+          uniq_groups <- unique(tied_groups)
+
+          if (length(uniq_groups) == 1) {
+            # all tied neighbors are in the same subgroup
+            assigned_group <- uniq_groups
+          } else {
+            # multiple subgroups -- pick largest
+            group_sizes <- as.integer(subgroup_tab[uniq_groups])
+            max_size <- max(group_sizes)
+            largest_groups <- uniq_groups[group_sizes == max_size]
+
+            if (length(largest_groups) == 1) {
+              assigned_group <- largest_groups
+            } else {
+              # still tied -- pick lowest numbered group
+              # extract numeric part of group label e.g. "G1" -> 1
+              group_nums <- as.integer(gsub("^G", "", largest_groups))
+              assigned_group <- largest_groups[which.min(group_nums)]
+            }
+          }
+        }
+
+        groups[idx_h_unpaired[i]] <- assigned_group
+      }
+    }
+
+    # light chains set aside above inherit their cell's heavy chain group
+    # TODO decide if this is what we want -- could just remove the light chain
+    for (r in idx_l_bad) {
+      cellname <- db_c[[cell_id]][r]
+      if (is.na(cellname)) next
+      h_rows <- idx_h[which(db_c[[cell_id]][idx_h] == cellname)]
+      h_group <- unique(stats::na.omit(groups[h_rows]))
+      if (length(h_group) > 0) groups[r] <- h_group[1]
+    }
+
+    return(groups)
+  }
+
+  # Run one clone, capturing its warnings and any error. Conditions raised in
+  # forked mclapply workers never reach the parent session, so they are
+  # returned as data and re-raised below. Capturing them for nproc = 1 too
+  # keeps the behavior the same whatever the number of cores.
+  run_clone <- function(x) {
+    warns <- character(0)
+    err <- NULL
+    groups <- tryCatch(
+      withCallingHandlers(process_clone(x),
+                          warning = function(w) {
+                            warns <<- c(warns, conditionMessage(w))
+                            invokeRestart("muffleWarning")
+                          }),
+      error = function(e) {
+        err <<- conditionMessage(e)
+        NULL
+      })
+    list(groups = groups, warnings = warns, error = err)
+  }
+
+  # process clones in parallel, nproc clones at a time
+  results <- parallel::mclapply(clone_rows, run_clone, mc.cores = nproc)
+
+  # a worker that died (e.g. killed by the OS) returns NULL or a try-error
+  # instead of the list built by run_clone
+  died <- vapply(results, function(r) !is.list(r) || inherits(r, "try-error"),
+                 logical(1))
+  if (any(died)) {
+    stop(paste0("groupLightGenes: the worker(s) for clone(s) ",
+                paste(names(clone_rows)[died], collapse = ", "),
+                " did not return a result."), call. = FALSE)
+  }
+
+  # re-raise worker warnings, once per distinct message, naming the clones
+  warn_msgs <- unlist(lapply(results, `[[`, "warnings"), use.names = FALSE)
+  warn_clones <- rep(names(clone_rows), lengths(lapply(results, `[[`, "warnings")))
+  for (msg in unique(warn_msgs)) {
+    clones_msg <- unique(warn_clones[warn_msgs == msg])
+    clones_txt <- paste(utils::head(clones_msg, 10), collapse = ", ")
+    if (length(clones_msg) > 10) {
+      clones_txt <- paste0(clones_txt, ", and ", length(clones_msg) - 10, " more")
+    }
+    warning(paste0(trimws(msg), " [clone(s): ", clones_txt, "]"), call. = FALSE)
+  }
+
+  # any error inside a clone stops the run, naming the clone(s)
+  errors <- lapply(results, `[[`, "error")
+  failed <- !vapply(errors, is.null, logical(1))
+  if (any(failed)) {
+    stop(paste0("groupLightGenes failed for clone(s):\n",
+                paste0("  ", names(clone_rows)[failed], ": ",
+                       unlist(errors[failed]), collapse = "\n")),
+         call. = FALSE)
+  }
+
+  # write each clone's groups back to its rows
+  for (k in seq_along(results)) {
+    data$vj_group_light[clone_rows[[k]]] <- results[[k]]$groups
+  }
+
+  return(data)
 }
