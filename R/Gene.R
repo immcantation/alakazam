@@ -1721,11 +1721,12 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
       groups[h_rows] <- light_group
     }
 
-    # handle unpaired heavy chains using seqDist
-    idx_h_paired <- idx_h[db_c[[cell_id]][idx_h] %in% paired_cells &
-                            !is.na(groups[idx_h])]
-    idx_h_unpaired <- idx_h[!db_c[[cell_id]][idx_h] %in% paired_cells |
-                              is.na(db_c[[cell_id]][idx_h])]
+    # handle unpaired heavy chains using seqDist. A heavy chain is "paired"
+    # only if it actually received a group from its own light chain(s); any
+    # heavy chain still without a group (no light chain, or a light chain that
+    # could not be grouped) is placed by nearest neighbor.
+    idx_h_paired <- idx_h[!is.na(groups[idx_h])]
+    idx_h_unpaired <- idx_h[is.na(groups[idx_h])]
 
     if (length(idx_h_unpaired) > 0 && length(idx_h_paired) > 0) {
       # precompute subgroup sizes for tie-breaking
