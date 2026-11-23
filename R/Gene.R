@@ -1636,9 +1636,6 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
                 "before running groupLightGenes."))
   }
 
-  # keep the input (and its class, e.g. tibble or grouped_df) to return at the end
-  data_in <- data
-
   # work on a plain data.frame and integer row indices (tibbles drop rownames)
   data <- as.data.frame(dplyr::ungroup(data), stringsAsFactors = FALSE)
   data$vj_group_light <- NA
