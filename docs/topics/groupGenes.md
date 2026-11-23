@@ -105,7 +105,7 @@ To invoke single-cell mode the `cell_id` argument must be specified and the `loc
 column must be correct. Otherwise, `groupGenes` will be run with bulk sequencing assumptions,
 using all input sequences regardless of the values in the `locus` column.
 
-Values in the `locus` column must be one of `c("IGH", "IGI", "IGK", "IGL")` for BCR
+Values in the `locus` column must be one of `c("IGH", "IGK", "IGL")` for BCR
 or `c("TRA", "TRB", "TRD", "TRG")` for TCR sequences. Otherwise, the function returns an
 error message and stops.
 

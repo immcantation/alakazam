@@ -38,7 +38,7 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 ## Dependencies
 
 **Depends:** ggplot2  
-**Imports:** airr, ape, dplyr, graphics, grid, igraph, Matrix, methods, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils, Biostrings, GenomicAlignments, IRanges  
+**Imports:** airr, ape, dplyr, graphics, grid, igraph, Matrix, methods, parallel, progress, Rcpp, readr, rlang, scales, seqinr, stats, stringi, tibble, tidyr, utils, Biostrings, GenomicAlignments, IRanges  
 **Suggests:** cigarillo, knitr, rmarkdown, testthat
 
 
