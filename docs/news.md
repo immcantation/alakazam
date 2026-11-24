@@ -1,7 +1,12 @@
 # Release Notes
 
-Version 1.5.0.999: In development
+Version 1.6.0: November 24, 2026
 -------------------------------------------------------------------------------
+
+Gene:
+
++ Added `groupLightGenes`, which subdivides existing clones by shared light 
+  chain V and J gene assignments, and junction length. The `split_light = TRUE` deprecation warning in `groupGenes` now points to `groupLightGenes`.
 
 Sequence:
 
@@ -15,7 +20,8 @@ Sequence:
   unique sequences, peak memory fell from 151 GB to 1.7 GB and run time from 
   2.5 h to 5 min. Results are unchanged, including for `dry=TRUE`.
 + Fixed `collapseDuplicates` for missing (`NA`) sequences, which previously 
-  stopped with an error. Missing sequences are now not collapsed.
+  stopped with an error. Missing sequences are now kept as they are, not 
+  collapsed.
 
 Version 1.5.0: September 28, 2026
 -------------------------------------------------------------------------------
