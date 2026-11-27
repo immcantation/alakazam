@@ -1088,7 +1088,7 @@ test_that("groupLightGenes, input validation", {
     # cell_id = NULL: warning and all NA
     expect_warning(
         res <- groupLightGenes(db, cell_id = NULL),
-        "cell_id not specified, but 'cell_id' found in data"
+        "cell_id not specified, but 'cell_id' found in `data`"
     )
     expect_true(all(is.na(res$vj_group_light)))
     expect_warning(
@@ -1098,7 +1098,7 @@ test_that("groupLightGenes, input validation", {
     expect_true(all(is.na(res$vj_group_light)))
     # cell_id specified but column missing: error
     expect_error(groupLightGenes(db[, names(db) != "cell_id"]),
-                 "column is not found in the data")
+                 "column is not found in `data`")
 
     # missing required column
     expect_error(groupLightGenes(db[, names(db) != "sequence_alignment"]),
