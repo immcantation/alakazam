@@ -1085,14 +1085,20 @@ test_that("groupLightGenes, input validation", {
         c("c1", "IGH", HV, HJ, "AAAAAAAAAA", "1"), 
         c("c1", "IGK", KV1, KJ1, "TTT", "1")
     )
-    # no cell_id: warning and all NA
+    # cell_id = NULL: warning and all NA
     expect_warning(
         res <- groupLightGenes(db, cell_id = NULL),
-        "cell_id not found or not specified"
+        "cell_id not specified, but 'cell_id' found in data"
     )
     expect_true(all(is.na(res$vj_group_light)))
-    expect_warning(res <- groupLightGenes(db[, names(db) != "cell_id"]),
-                   "cell_id not found or not specified")
+    expect_warning(
+        res <- groupLightGenes(db[, names(db) != "cell_id"], cell_id = NULL),
+        "cell_id not specified\\. Heavy chain"
+    )
+    expect_true(all(is.na(res$vj_group_light)))
+    # cell_id specified but column missing: error
+    expect_error(groupLightGenes(db[, names(db) != "cell_id"]),
+                 "column is not found in the data")
 
     # missing required column
     expect_error(groupLightGenes(db[, names(db) != "sequence_alignment"]),
