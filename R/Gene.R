@@ -1505,7 +1505,7 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         If specified, grouping will be performed in single-cell mode
 #'                         with the behavior governed by the \code{locus}. If set to
 #'                         \code{NULL}, bulk sequencing data is assumed.
-#' #' @param    clone         The clone id of the dataset as defined by heavy chains.
+#' @param    clone         The clone id of the dataset as defined by heavy chains.
 #' @param    locus         name of the column containing locus information.
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
