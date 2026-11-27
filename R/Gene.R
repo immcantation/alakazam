@@ -1503,15 +1503,14 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'                         function stops with an error if they do.
 #' @param    cell_id       name of the column containing cell identifiers or barcodes.
 #'                         If specified, grouping will be performed in single-cell mode
-#'                         with the behavior governed by the \code{locus} and
-#'                         \code{only_heavy} arguments. If set to \code{NULL} then the
-#'                         bulk sequencing data is assumed.
-#' @param    clone         The clone id of the dataset as defined by heavy chains.
+#'                         with the behavior governed by the \code{locus}. If set to
+#'                         \code{NULL}, bulk sequencing data is assumed.
+#' #' @param    clone         The clone id of the dataset as defined by heavy chains.
 #' @param    locus         name of the column containing locus information.
 #'                         Only applicable to single-cell data.
 #'                         Ignored if \code{cell_id=NULL}.
 #' @param    first         if \code{TRUE} only the first call of the gene assignments
-#'                         is used. if \code{FALSE} the union of ambiguous gene
+#'                         is used. If \code{FALSE} the union of ambiguous gene
 #'                         assignments is used to group all sequences with any
 #'                         overlapping gene calls.
 #' @param    nproc         Number of cores to use. Clones are processed in
@@ -1570,7 +1569,7 @@ sortGenes <- function(genes, method = c("name", "position")) {
 #'
 #' @examples
 #' # After clonal assignment, further subdivide clones by light chain gene usage
-#' db <- groupLightGenes(ExampleDb, clone = "clone_id", cell_id = "cell_id")
+#' db <- groupLightGenes(ExampleDb, clone = "clone_id", cell_id = NULL)
 #' head(db$vj_group_light)
 #'
 #' @export
@@ -1588,14 +1587,21 @@ groupLightGenes <- function(data, v_call = "v_call", j_call = "j_call",
   }
 
   # cell_id handling
-  if (is.null(cell_id) || !cell_id %in% colnames(data)) {
-    warning(paste(
-      "cell_id not found or not specified.",
-      "Heavy chain sequences will have NA for vj_group_light.",
-      "For full paired analysis, please specify cell_id."
+  if (is.null(cell_id)) {
+    cell_id_exists_text <- ". "
+    if ("cell_id" %in% colnames(data)) {
+      cell_id_exists_text <- ", but 'cell_id' found in `data`. "
+    }
+    warning(paste0(
+      "cell_id not specified", cell_id_exists_text,
+      "Heavy chain sequences will have NA for vj_group_light. ",
+      "For full paired analysis, please specify `cell_id`."
     ))
     data$vj_group_light <- NA
     return(data)
+  } else if (!cell_id %in% colnames(data)) {
+    # cell_id column specified but does not exist in data
+    stop(paste0("The specified `cell_id` (", cell_id, ") column is not found in `data`."))
   }
   
   # cast factors to character -- same as groupGenes
