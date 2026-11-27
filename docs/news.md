@@ -6,7 +6,8 @@ Version 1.6.0: November 24, 2026
 Gene:
 
 + Added `groupLightGenes`, which subdivides existing clones by shared light 
-  chain V and J gene assignments, and junction length. The `split_light = TRUE` deprecation warning in `groupGenes` now points to `groupLightGenes`.
+  chain V and J gene assignments, and junction length. The `split_light = TRUE` 
+  deprecation warning in `groupGenes` now points to `groupLightGenes`.
 
 Sequence:
 
