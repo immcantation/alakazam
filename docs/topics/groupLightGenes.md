@@ -59,9 +59,8 @@ function stops with an error if they do.
 cell_id
 :   name of the column containing cell identifiers or barcodes.
 If specified, grouping will be performed in single-cell mode
-with the behavior governed by the `locus` and
-`only_heavy` arguments. If set to `NULL` then the
-bulk sequencing data is assumed.
+with the behavior governed by the `locus`. If set to
+`NULL`, bulk sequencing data is assumed.
 
 clone
 :   The clone id of the dataset as defined by heavy chains.
@@ -73,7 +72,7 @@ Ignored if `cell_id=NULL`.
 
 first
 :   if `TRUE` only the first call of the gene assignments
-is used. if `FALSE` the union of ambiguous gene
+is used. If `FALSE` the union of ambiguous gene
 assignments is used to group all sequences with any
 overlapping gene calls.
 
@@ -148,11 +147,11 @@ Examples
 
 ```R
 # After clonal assignment, further subdivide clones by light chain gene usage
-db <- groupLightGenes(ExampleDb, clone = "clone_id", cell_id = "cell_id")
+db <- groupLightGenes(ExampleDb, clone = "clone_id", cell_id = NULL)
 
 ```
 
-*Warning*:cell_id not found or not specified. Heavy chain sequences will have NA for vj_group_light. For full paired analysis, please specify cell_id.
+*Warning*:cell_id not specified. Heavy chain sequences will have NA for vj_group_light. For full paired analysis, please specify `cell_id`.
 ```R
 head(db$vj_group_light)
 
